@@ -1,0 +1,28 @@
+:root {
+  background: transparent;
+}
+
+html, body {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+.app-drag {
+  app-region: drag;
+}
+
+.app-no-drag {
+  app-region: no-drag;
+}
+
+.app-no-select {
+  user-select: none;
+}

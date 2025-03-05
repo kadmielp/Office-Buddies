@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { ANIMATIONS, Animation } from "./clippy-animations";
 import { EMPTY_ANIMATION, getRandomIdleAnimation } from "./clippy-animation-helpers";
+import { Bubble } from "./Bubble";
 
 type ClippyNamedStatus = 'welcome' | 'idle' | 'thinking' | 'waiting' | 'goodbye'
 
@@ -11,6 +12,7 @@ const ENABLE_DRAG_DEBUG = false;
 export function Clippy() {
   const [animation, setAnimation] = useState<Animation>(EMPTY_ANIMATION);
   const [status, setStatus] = useState<ClippyNamedStatus>('welcome');
+  const [showBubble, setShowBubble] = useState(false);
 
   useEffect(() => {
     let timeoutId: number | undefined;
@@ -25,12 +27,15 @@ export function Clippy() {
       timeoutId = window.setTimeout(() => {
         setAnimation(ANIMATIONS.Default);
         timeoutId = window.setTimeout(playRandomIdleAnimation, WAIT_TIME);
-      }, WAIT_TIME + randomIdleAnimation.length);
+      }, randomIdleAnimation.length);
     };
 
     if (status === 'welcome' && animation === EMPTY_ANIMATION) {
       setAnimation(ANIMATIONS.Show);
-      setTimeout(() => setStatus('idle'), ANIMATIONS.Show.length + 200);
+      setTimeout(() => {
+        setStatus('idle');
+        setShowBubble(true);
+      }, ANIMATIONS.Show.length + 200);
     } else if (status === 'idle') {
       if (!timeoutId) {
         playRandomIdleAnimation()
@@ -45,12 +50,27 @@ export function Clippy() {
     };
   }, [status]);
 
+  const handleLetterHelp = () => {
+    console.log('User wants help with writing a letter');
+    setShowBubble(false);
+  };
+
+  const handleNoHelp = () => {
+    console.log('User wants to type without help');
+    setShowBubble(false);
+  };
+
+  const handleDismiss = () => {
+    console.log('User doesn\'t want to see this tip again');
+    setShowBubble(false);
+  };
+
   return (
     <div>
       <div className="app-drag" style={{
         position: 'absolute',
-        height: '100%',
-        width: '100%',
+        height: '93px',
+        width: '124px',
         backgroundColor: ENABLE_DRAG_DEBUG ? 'blue' : 'transparent',
         opacity: 0.5,
         zIndex: 5,
@@ -60,13 +80,16 @@ export function Clippy() {
           height: '80px',
           width: '45px',
           backgroundColor: ENABLE_DRAG_DEBUG ? 'red' : 'transparent',
-          top: 'calc(50% - 95px)',
-          left: 'calc(50% - 60px)',
           zIndex: 10,
+          right: '40px',
+          top: '2px',
         }} onClick={() => {
-          console.log('clicked')
+            setShowBubble(!showBubble);
         }}></div>
       </div>
+      {showBubble && (
+        <Bubble onDismiss={handleDismiss} />
+      )}
       <img
         className="app-no-select"
         src={animation.src}

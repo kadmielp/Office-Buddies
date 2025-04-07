@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { ANIMATIONS, Animation } from "./clippy-animations";
-import { EMPTY_ANIMATION, getRandomIdleAnimation } from "./clippy-animation-helpers";
+import { ANIMATIONS, Animation } from "../clippy-animations";
+import { EMPTY_ANIMATION, getRandomIdleAnimation } from "../clippy-animation-helpers";
 import { Bubble } from "./Bubble";
 
 type ClippyNamedStatus = 'welcome' | 'idle' | 'thinking' | 'waiting' | 'goodbye'

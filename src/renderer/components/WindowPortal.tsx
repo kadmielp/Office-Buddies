@@ -19,8 +19,6 @@ export function WindowPortal({
   children,
   width = 400,
   height = 500,
-  left = 200,
-  top = 200,
   isOpen,
   onClose,
   title = 'Clippy Chat'
@@ -34,7 +32,7 @@ export function WindowPortal({
     // Create function for window management
     const showWindow = () => {
       if (!externalWindow || externalWindow.closed) {
-        const windowFeatures = `width=${width},height=${height},left=${left},top=${top}`;
+        const windowFeatures = `width=${width},height=${height},positionNextToParent`;
         externalWindow = window.open('', '', windowFeatures);
 
         if (!externalWindow) {
@@ -104,12 +102,6 @@ export function WindowPortal({
       hideWindow();
     }
 
-    // Update window dimensions if needed
-    if (isOpen && externalWindow && !externalWindow.closed) {
-      externalWindow.resizeTo(width, height);
-      externalWindow.moveTo(left, top);
-    }
-
     // Cleanup only on component unmount, not on every render
     return () => {
       console.log("WindowPortal unmounting");
@@ -118,7 +110,7 @@ export function WindowPortal({
         externalWindow = null;
       }
     };
-  }, [isOpen, width, height, left, top, onClose]);
+  }, [isOpen, width, height, onClose]);
 
   // Don't render if window isn't visible
   if (!isOpen || !containerDiv) {

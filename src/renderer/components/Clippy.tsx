@@ -2,18 +2,20 @@ import { useEffect, useState, useCallback } from "react";
 
 import { ANIMATIONS, Animation } from "../clippy-animations";
 import { EMPTY_ANIMATION, getRandomIdleAnimation } from "../clippy-animation-helpers";
-import { Bubble } from "./Bubble";
 import { useChat } from "../contexts/ChatContext";
 import { log } from "../logging";
 
 const WAIT_TIME = 6000;
 const ENABLE_DRAG_DEBUG = false;
 
-export function Clippy() {
+interface ClippyProps {
+  toggleChat?: () => void;
+}
+
+export function Clippy({ toggleChat }: ClippyProps) {
   const { animationKey, status, setStatus } = useChat();
   const [animation, setAnimation] = useState<Animation>(EMPTY_ANIMATION);
   const [animationTimeoutId, setAnimationTimeoutId] = useState<number | undefined>(undefined);
-  const [showBubble, setShowBubble] = useState(false);
 
   const playAnimation = useCallback((key: string) => {
     if (ANIMATIONS[key]) {
@@ -50,7 +52,6 @@ export function Clippy() {
       setAnimation(ANIMATIONS.Show);
       setTimeout(() => {
         setStatus('idle');
-        setShowBubble(true);
       }, ANIMATIONS.Show.length + 200);
     } else if (status === 'idle') {
       if (!animationTimeoutId) {
@@ -71,11 +72,6 @@ export function Clippy() {
     playAnimation(animationKey);
   }, [animationKey, playAnimation]);
 
-  const handleDismiss = () => {
-    console.log('User doesn\'t want to see this tip again');
-    setShowBubble(false);
-  };
-
   return (
     <div>
       <div className="app-drag" style={{
@@ -94,13 +90,8 @@ export function Clippy() {
           zIndex: 10,
           right: '40px',
           top: '2px',
-        }} onClick={() => {
-            setShowBubble(!showBubble);
-        }}></div>
+        }} onClick={toggleChat}></div>
       </div>
-      {showBubble && (
-        <Bubble onDismiss={handleDismiss} />
-      )}
       <img
         className="app-no-select"
         src={animation.src}

@@ -3,6 +3,7 @@ import { loadElectronLlm } from '@electron/llm';
 import path from 'node:path';
 
 import { shouldQuit } from './squirrel-startup';
+import { setupWindowOpenHandler } from './windows';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (shouldQuit) {
@@ -34,8 +35,8 @@ async function createWindow() {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
+  // Setup Window open handler
+  setupWindowOpenHandler(mainWindow.webContents);
 }
 
 app.on('ready', onReady);

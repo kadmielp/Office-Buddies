@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { Model } from '../../types/interfaces';
-import { ANIMATION_KEYS } from '../clippy-animation-helpers';
+import { ANIMATION_KEYS_BRACKETS } from '../clippy-animation-helpers';
 
 export interface SettingsState {
   model?: Model
@@ -12,6 +12,9 @@ interface SettingsContextType {
   updateSettings: (newSettings: Partial<SettingsState>) => void;
 }
 
+// Default animation prompt
+const animationPrompt = `Start your response with one of the following keywords matching the users request: ${ANIMATION_KEYS_BRACKETS.join(', ')}. Use only one of the keywords for each response. Use it only at the beginning of your response. Always start with one.`
+
 // Default settings
 const defaultSettings: SettingsState = {
   model: {
@@ -19,7 +22,7 @@ const defaultSettings: SettingsState = {
     path: "/Users/felix/Downloads/meta-llama-3-8b-instruct.Q4_K_M.gguf",
     version: "3.1",
   },
-  systemPrompt: `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\nWhen responding, you can finish your response with one of the following keywords matching your response: ${ANIMATION_KEYS.map(key => `"[${key}]"`).join(', ')}`
+  systemPrompt: `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\n${animationPrompt}`
 };
 
 // Create the context with a default undefined value

@@ -1,22 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import { ANIMATIONS, Animation } from "../clippy-animations";
 import { EMPTY_ANIMATION, getRandomIdleAnimation } from "../clippy-animation-helpers";
 import { Bubble } from "./Bubble";
-
-type ClippyNamedStatus = 'welcome' | 'idle' | 'thinking' | 'waiting' | 'goodbye'
+import { useChat } from "../contexts/ChatContext";
+import { log } from "../logging";
 
 const WAIT_TIME = 6000;
 const ENABLE_DRAG_DEBUG = false;
 
 export function Clippy() {
+  const { animationKey, status, setStatus } = useChat();
   const [animation, setAnimation] = useState<Animation>(EMPTY_ANIMATION);
-  const [status, setStatus] = useState<ClippyNamedStatus>('welcome');
+  const [animationTimeoutId, setAnimationTimeoutId] = useState<number | undefined>(undefined);
   const [showBubble, setShowBubble] = useState(false);
 
-  useEffect(() => {
-    let timeoutId: number | undefined;
+  const playAnimation = useCallback((key: string) => {
+    if (ANIMATIONS[key]) {
+      log(`Playing animation`, { key });
 
+      if (animationTimeoutId) {
+        window.clearTimeout(animationTimeoutId);
+      }
+
+      setAnimation(ANIMATIONS[key]);
+      setAnimationTimeoutId(window.setTimeout(() => {
+        setAnimation(ANIMATIONS.Default);
+      }, ANIMATIONS[key].length + 200));
+    } else {
+      log(`Animation not found`, { key });
+    }
+  }, []);
+
+  useEffect(() => {
     const playRandomIdleAnimation = () => {
       if (status !== 'idle') return;
 
@@ -24,10 +40,10 @@ export function Clippy() {
       setAnimation(randomIdleAnimation);
 
       // Reset back to default after 6 seconds and schedule next animation
-      timeoutId = window.setTimeout(() => {
+      setAnimationTimeoutId(window.setTimeout(() => {
         setAnimation(ANIMATIONS.Default);
-        timeoutId = window.setTimeout(playRandomIdleAnimation, WAIT_TIME);
-      }, randomIdleAnimation.length);
+        setAnimationTimeoutId(window.setTimeout(playRandomIdleAnimation, WAIT_TIME));
+      }, randomIdleAnimation.length));
     };
 
     if (status === 'welcome' && animation === EMPTY_ANIMATION) {
@@ -37,28 +53,23 @@ export function Clippy() {
         setShowBubble(true);
       }, ANIMATIONS.Show.length + 200);
     } else if (status === 'idle') {
-      if (!timeoutId) {
+      if (!animationTimeoutId) {
         playRandomIdleAnimation()
       }
     }
 
     // Clean up timeouts when component unmounts or status changes
     return () => {
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
+      if (animationTimeoutId) {
+        window.clearTimeout(animationTimeoutId);
       }
     };
   }, [status]);
 
-  const handleLetterHelp = () => {
-    console.log('User wants help with writing a letter');
-    setShowBubble(false);
-  };
-
-  const handleNoHelp = () => {
-    console.log('User wants to type without help');
-    setShowBubble(false);
-  };
+  useEffect(() => {
+    log(`New animation key`, { animationKey });
+    playAnimation(animationKey);
+  }, [animationKey, playAnimation]);
 
   const handleDismiss = () => {
     console.log('User doesn\'t want to see this tip again');

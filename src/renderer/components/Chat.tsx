@@ -3,6 +3,8 @@ import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
 import { useSettings } from "../contexts/SettingsContext";
 import type { ElectronLlmRenderer } from "@electron/llm";
+import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
+import { useChat } from "../contexts/ChatContext";
 
 export type ChatProps = {
   style?: React.CSSProperties;
@@ -14,10 +16,9 @@ declare global {
   }
 }
 
-
 export function Chat({ style }: ChatProps) {
+  const { setAnimationKey, setStatus, status } = useChat();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isStreaming, setIsStreaming] = useState(false);
   const [streamingMessageContent, setStreamingMessageContent] = useState<string>("");
   const { settings } = useSettings();
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -36,7 +37,7 @@ export function Chat({ style }: ChatProps) {
   }, [settings.model]);
 
   const handleSendMessage = async (message: string) => {
-    if (isStreaming) {
+    if (status !== 'idle') {
       return;
     }
 
@@ -44,15 +45,31 @@ export function Chat({ style }: ChatProps) {
     setMessages(prevMessages => [...prevMessages, userMessage]);
 
     setStreamingMessageContent("");
-    setIsStreaming(true);
+    setStatus('thinking');
 
     try {
       const response = await window.electronAi.promptStreaming(message);
 
-      // Update the streaming message as chunks arrive
       let fullContent = '';
+      let hasSetAnimationKey = false;
+
       for await (const chunk of response) {
-        fullContent += chunk;
+        if (fullContent === '') {
+          setStatus('responding');
+        }
+
+        if (!hasSetAnimationKey) {
+          const { text, animationKey } = filterMessageContent(fullContent + chunk);
+          fullContent = text;
+
+          if (animationKey) {
+            setAnimationKey(animationKey);
+            hasSetAnimationKey = true;
+          }
+        } else {
+          fullContent += chunk;
+        }
+
         setStreamingMessageContent(fullContent);
       }
 
@@ -61,12 +78,12 @@ export function Chat({ style }: ChatProps) {
       const assistantMessage: Message = { id: crypto.randomUUID(), content: fullContent, sender: 'clippy' };
       setMessages(prevMessages => [...prevMessages, assistantMessage]);
       setStreamingMessageContent("");
-      setIsStreaming(false);
+      setStatus('idle');
     } catch (error) {
       console.error(error);
 
       setStreamingMessageContent("");
-      setIsStreaming(false);
+      setStatus('idle');
     }
   }
 
@@ -75,9 +92,30 @@ export function Chat({ style }: ChatProps) {
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
-      {isStreaming && <Message message={{ id: "streaming", content: streamingMessageContent, sender: 'clippy' }} />}
-      {(messages.length > 0 || isStreaming) && <hr />}
+      {status === 'responding' && <Message message={{ id: "streaming", content: streamingMessageContent, sender: 'clippy' }} />}
+      {(messages.length > 0 || status === 'responding') && <hr />}
       <ChatInput onSend={handleSendMessage} />
     </div>
   );
+}
+
+/**
+ * Filter the message content to get the text and animation key
+ *
+ * @param content - The content of the message
+ * @returns The text and animation key
+ */
+function filterMessageContent(content: string): { text: string, animationKey: string } {
+  let text = content;
+  let animationKey = '';
+
+  for (const key of ANIMATION_KEYS_BRACKETS) {
+    if (content.startsWith(key)) {
+      animationKey = key.slice(1, -1);
+      text = content.slice(key.length).trim();
+      break;
+    }
+  }
+
+  return { text, animationKey };
 }

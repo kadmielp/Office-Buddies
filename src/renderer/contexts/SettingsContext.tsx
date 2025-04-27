@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Model } from '../../types/interfaces';
+import { ANIMATION_KEYS } from '../clippy-animation-helpers';
 
 export interface SettingsState {
   model?: Model
+  systemPrompt?: string
 }
 
 interface SettingsContextType {
@@ -16,7 +18,8 @@ const defaultSettings: SettingsState = {
     name: "Meta Llama 3.1",
     path: "/Users/felix/Downloads/meta-llama-3-8b-instruct.Q4_K_M.gguf",
     version: "3.1",
-  }
+  },
+  systemPrompt: `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\nWhen responding, you can finish your response with one of the following keywords matching your response: ${ANIMATION_KEYS.map(key => `"[${key}]"`).join(', ')}`
 };
 
 // Create the context with a default undefined value

@@ -16,10 +16,13 @@ export function Bubble() {
   }
 
   const chatStyle = {
-    maxHeight: 'calc(100% - 30px)',
-    overflow: 'auto' as const,
+    maxHeight: 'calc(100% - 50px)',
+    overflow: 'auto',
     padding: '15px',
-    height: 'calc(100% - 30px)'
+    height: 'calc(100% - 50px)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    justifyContent: 'flex-end'
   };
 
   let content = null;

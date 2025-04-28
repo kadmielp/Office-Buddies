@@ -46,6 +46,7 @@ export function Chat({ style }: ChatProps) {
       const response = await window.electronAi.promptStreaming(message);
 
       let fullContent = '';
+      let filteredContent = '';
       let hasSetAnimationKey = false;
 
       for await (const chunk of response) {
@@ -55,22 +56,24 @@ export function Chat({ style }: ChatProps) {
 
         if (!hasSetAnimationKey) {
           const { text, animationKey } = filterMessageContent(fullContent + chunk);
-          fullContent = text;
+
+          filteredContent = text;
+          fullContent = fullContent + chunk;
 
           if (animationKey) {
             setAnimationKey(animationKey);
             hasSetAnimationKey = true;
           }
         } else {
-          fullContent += chunk;
+          filteredContent += chunk;
         }
 
-        setStreamingMessageContent(fullContent);
+        setStreamingMessageContent(filteredContent);
       }
 
       // Once streaming is complete, add the full message to the messages array
       // and clear the streaming message
-      const assistantMessage: Message = { id: crypto.randomUUID(), content: fullContent, sender: 'clippy' };
+      const assistantMessage: Message = { id: crypto.randomUUID(), content: filteredContent, sender: 'clippy' };
       setMessages(prevMessages => [...prevMessages, assistantMessage]);
       setStreamingMessageContent("");
       setStatus('idle');
@@ -104,11 +107,20 @@ function filterMessageContent(content: string): { text: string, animationKey: st
   let text = content;
   let animationKey = '';
 
-  for (const key of ANIMATION_KEYS_BRACKETS) {
-    if (content.startsWith(key)) {
-      animationKey = key.slice(1, -1);
-      text = content.slice(key.length).trim();
-      break;
+  console.log(content);
+
+  if (content === '[') {
+    text = '';
+  } else if (/^\[[A-Za-z]*$/m.test(content)) {
+    text = content.replace(/^\[[A-Za-z]*$/m, '').trim();
+  } else {
+    // Check for animation keys in brackets
+    for (const key of ANIMATION_KEYS_BRACKETS) {
+      if (content.startsWith(key)) {
+        animationKey = key.slice(1, -1);
+        text = content.slice(key.length).trim();
+        break;
+      }
     }
   }
 

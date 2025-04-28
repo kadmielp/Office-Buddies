@@ -86,9 +86,10 @@ export function WindowPortal({
 
         externalDoc.body.innerHTML = '';
         externalDoc.body.appendChild(containerDiv);
+      } else {
+        await clippyApi.toggleChatWindow();
       }
 
-      await clippyApi.showWindowByName({ windowName: title, positionAsPopover: true });
       externalWindow.focus();
     };
 
@@ -96,7 +97,7 @@ export function WindowPortal({
     const hideWindow = async () => {
       // Don't destroy the window, just hide it
       if (externalWindow && !externalWindow.closed) {
-        await clippyApi.hideWindowByName({ windowName: title });
+        await clippyApi.toggleChatWindow();
       }
     };
 

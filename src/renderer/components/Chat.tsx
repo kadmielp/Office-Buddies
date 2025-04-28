@@ -83,7 +83,7 @@ export function Chat({ style }: ChatProps) {
   }
 
   return (
-    <div style={style} className="simple-scrollbar">
+    <div style={style}>
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}

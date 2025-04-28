@@ -61,9 +61,12 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
     return {
       action: 'allow',
       overrideBrowserWindowOptions: {
-        titleBarStyle: 'hidden',
+        frame: false,
         x: newWindowPosition?.x,
         y: newWindowPosition?.y,
+        roundedCorners: false,
+        minHeight: 400,
+        minWidth: 400,
       },
     }
   });
@@ -112,10 +115,50 @@ export function getPopoverWindowPosition(browserWindow: BrowserWindow, size: { w
 }
 
 /**
- * Get the main window URL
+ * Get the chat window
  *
- * @returns The main window URL
+ * @returns The chat window
  */
-function getMainWindowUrl(): string {
+export function getChatWindow(): BrowserWindow | undefined {
+  return BrowserWindow.getAllWindows().find((window) => window.webContents.getTitle() === 'Clippy Chat');
+}
 
+/**
+ * Toggle the chat window
+ */
+export function toggleChatWindow() {
+  const chatWindow = getChatWindow();
+
+  if (!chatWindow) {
+    return;
+  }
+
+  if (chatWindow.isVisible()) {
+    chatWindow.hide();
+  } else {
+    const mainWindow = getMainWindow();
+    const [width, height] = chatWindow.getSize();
+    const position = getPopoverWindowPosition(mainWindow, { width, height });
+
+    chatWindow.setPosition(position.x, position.y);
+    chatWindow.show();
+  }
+}
+
+/**
+ * Minimize the chat window
+ */
+export function minimizeChatWindow() {
+  return getChatWindow()?.minimize();
+}
+
+/**
+ * Maximize the chat window
+ */
+export function maximizeChatWindow() {
+  if (getChatWindow()?.isMaximized()) {
+    return getChatWindow()?.unmaximize();
+  }
+
+  return getChatWindow()?.maximize();
 }

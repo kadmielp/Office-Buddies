@@ -1,13 +1,5 @@
 export const IpcRendererMessages = {
-  HIDE_WINDOW_BY_NAME: 'clippy_hide_window_by_name',
-  SHOW_WINDOW_BY_NAME: 'clippy_show_window_by_name',
-};
-
-export type HideWindowByNameOptions = {
-  windowName: string;
-}
-
-export type ShowWindowByNameOptions = {
-  positionAsPopover?: boolean;
-  windowName: string;
+  TOGGLE_CHAT_WINDOW: 'clippy_toggle_chat_window',
+  MINIMIZE_CHAT_WINDOW: 'clippy_minimize_chat_window',
+  MAXIMIZE_CHAT_WINDOW: 'clippy_maximize_chat_window',
 };

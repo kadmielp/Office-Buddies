@@ -28,7 +28,6 @@ export function ChatInput({ onSend }: ChatInputProps) {
         placeholder="Type a message..."
         style={{
           width: '100%',
-          padding: '10px 0'
         }}
       />
     </div>

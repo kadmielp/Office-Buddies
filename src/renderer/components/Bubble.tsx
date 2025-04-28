@@ -1,23 +1,13 @@
+import { clippyApi } from '../clippyApi';
 import { Chat } from './Chat';
 
 export function Bubble() {
   const containerStyle = {
-    width: '100%',
-    height: '100%',
-  }
-
-  const bubbleStyle = {
-    backgroundColor: '#ffffc8',
-    boxShadow: '3px 3px 0 rgba(0, 0, 0, 0.2)',
-    fontFamily: 'Tahoma, Arial, sans-serif',
-    fontSize: '14px',
-    color: '#000',
-    position: 'relative' as const,
-    display: 'flex',
-    flexDirection: 'column' as const,
-    height: '100%',
+    width: 'calc(100% - 6px)',
+    height: 'calc(100% - 6px)',
+    margin: 0,
     overflow: 'hidden',
-  };
+  }
 
   const chatStyle = {
     maxHeight: 'calc(100% - 30px)',
@@ -27,20 +17,16 @@ export function Bubble() {
   };
 
   return (
-    <div className="bubble-container" style={containerStyle}>
-      <div className="bubble" style={bubbleStyle}>
-        <div className='app-drag' style={{
-          borderBottom: '1px solid #ccc',
-          padding: '5px 10px',
-          fontWeight: 'bold',
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-          background: '#0000000f'
-        }}>
-          <span>Chat with Clippy</span>
+    <div className="bubble-container window" style={containerStyle}>
+      <div className='app-drag title-bar'>
+        <div className='title-bar-text'>Chat with Clippy</div>
+        <div className="title-bar-controls app-no-drag">
+          <button aria-label="Minimize" onClick={() => clippyApi.minimizeChatWindow()}></button>
+          <button aria-label="Maximize" onClick={() => clippyApi.maximizeChatWindow()}></button>
+          <button aria-label="Close" onClick={() => clippyApi.toggleChatWindow()}></button>
         </div>
-
+      </div>
+      <div className='window-content'>
         <Chat style={chatStyle} />
       </div>
     </div>

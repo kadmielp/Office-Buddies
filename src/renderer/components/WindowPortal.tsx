@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import { clippyApi } from '../clippyApi';
+
 interface WindowPortalProps {
   children: React.ReactNode;
   width?: number;

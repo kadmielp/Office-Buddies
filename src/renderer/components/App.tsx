@@ -6,7 +6,7 @@ import { Clippy } from './Clippy'
 import { SettingsProvider } from '../contexts/SettingsContext'
 import { ChatProvider } from '../contexts/ChatContext'
 import { WindowPortal } from './WindowPortal'
-import { Bubble } from './Bubble'
+import { Bubble } from './BubbleWindow'
 
 export function App() {
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);

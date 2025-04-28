@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
+import { clippyApi } from '../clippyApi';
 interface WindowPortalProps {
   children: React.ReactNode;
   width?: number;
@@ -12,8 +13,10 @@ interface WindowPortalProps {
   title?: string;
 }
 
+// Singleton variables - moved outside component to persist across renders
 let externalWindow: Window | null = null;
 let containerDiv: HTMLDivElement | null = null;
+let isInitialized = false;
 
 export function WindowPortal({
   children,
@@ -23,14 +26,15 @@ export function WindowPortal({
   onClose,
   title = 'Clippy Chat'
 }: WindowPortalProps) {
-  // This will run once on component init
+  // Initialize the singleton container only once
   useEffect(() => {
-    if (!containerDiv) {
+    if (!isInitialized) {
       containerDiv = document.createElement('div');
+      isInitialized = true;
     }
 
     // Create function for window management
-    const showWindow = () => {
+    const showWindow = async () => {
       if (!externalWindow || externalWindow.closed) {
         const windowFeatures = `width=${width},height=${height},positionNextToParent`;
         externalWindow = window.open('', '', windowFeatures);
@@ -84,14 +88,15 @@ export function WindowPortal({
         externalDoc.body.appendChild(containerDiv);
       }
 
+      await clippyApi.showWindowByName({ windowName: title, positionAsPopover: true });
       externalWindow.focus();
     };
 
     // Close window function
-    const hideWindow = () => {
+    const hideWindow = async () => {
+      // Don't destroy the window, just hide it
       if (externalWindow && !externalWindow.closed) {
-        externalWindow.close();
-        externalWindow = null;
+        await clippyApi.hideWindowByName({ windowName: title });
       }
     };
 
@@ -102,21 +107,17 @@ export function WindowPortal({
       hideWindow();
     }
 
-    // Cleanup only on component unmount, not on every render
+    // Cleanup only on app unmount, not component unmount
     return () => {
-      console.log("WindowPortal unmounting");
-      if (externalWindow && !externalWindow.closed) {
-        externalWindow.close();
-        externalWindow = null;
-      }
+      // We don't close the window here anymore to maintain singleton
+      // The window will be closed when the app is closed
     };
-  }, [isOpen, width, height, onClose]);
+  }, [isOpen, width, height, onClose, title]);
 
-  // Don't render if window isn't visible
-  if (!isOpen || !containerDiv) {
+  // Always render to the portal if it exists, regardless of visibility
+  if (!containerDiv) {
     return null;
   }
 
-  // Render portal only when needed
-  return ReactDOM.createPortal(children, containerDiv);
+  return ReactDOM.createPortal(children, containerDiv)
 }

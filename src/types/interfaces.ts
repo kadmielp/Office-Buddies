@@ -1,5 +1,5 @@
 export interface Model {
   name: string;
-  path: string;
+  alias: string;
   version: string;
 }

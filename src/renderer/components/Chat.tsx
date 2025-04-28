@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
+
 import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
 import { useSettings } from "../contexts/SettingsContext";
-import type { ElectronLlmRenderer } from "@electron/llm";
 import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 import { useChat } from "../contexts/ChatContext";
+import { electronAi } from "../clippyApi";
 
 export type ChatProps = {
   style?: React.CSSProperties;
-}
-
-declare global {
-  interface Window {
-    electronAi: ElectronLlmRenderer;
-  }
 }
 
 export function Chat({ style }: ChatProps) {
@@ -25,8 +20,8 @@ export function Chat({ style }: ChatProps) {
 
   useEffect(() => {
     if (settings.model) {
-      window.electronAi.create({
-        modelPath: settings.model.path,
+      electronAi.create({
+        modelAlias: settings.model.alias,
         systemPrompt: settings.systemPrompt,
       }).then(() => {
         setIsModelLoaded(true);

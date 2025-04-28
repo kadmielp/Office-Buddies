@@ -1,5 +1,50 @@
 import { BrowserWindow, shell, screen } from "electron";
+import path from "path";
 
+let mainWindow: BrowserWindow | undefined;
+
+/**
+ * Get the main window
+ *
+ * @returns The main window
+ */
+export function getMainWindow(): BrowserWindow | undefined {
+  return mainWindow;
+}
+
+/**
+ * Create the main window
+ *
+ * @returns The main window
+ */
+export async function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 125,
+    height: 100,
+    transparent: true,
+    hasShadow: false,
+    frame: false,
+    acceptFirstMouse: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+  }
+
+  // Setup Window open handler
+  setupWindowOpenHandler(mainWindow);
+}
+
+/**
+ * Setup the window open handler
+ *
+ * @param browserWindow The browser window
+ */
 export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
   browserWindow.webContents.setWindowOpenHandler(({ url, features }) => {
     if (url.startsWith('http')) {
@@ -11,7 +56,7 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
     const width = parseInt(features.match(/width=(\d+)/)?.[1] || '400', 10);
     const height = parseInt(features.match(/height=(\d+)/)?.[1] || '600', 10);
     const shouldPositionNextToParent = features.includes('positionNextToParent');
-    const newWindowPosition = shouldPositionNextToParent ? getNewWindowPosition(browserWindow, { width, height }) : undefined;
+    const newWindowPosition = shouldPositionNextToParent ? getPopoverWindowPosition(browserWindow, { width, height }) : undefined;
 
     return {
       action: 'allow',
@@ -24,7 +69,14 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
   });
 }
 
-function getNewWindowPosition(browserWindow: BrowserWindow, size: { width: number, height: number }): { x: number, y: number } {
+/**
+ * Get the new window position for a popover-like window
+ *
+ * @param browserWindow The browser window
+ * @param size The size of the new window
+ * @returns The new window position
+ */
+export function getPopoverWindowPosition(browserWindow: BrowserWindow, size: { width: number, height: number }): { x: number, y: number } {
   const parentBounds = browserWindow.getBounds();
   const { width, height } = size;
   const SPACING = 50; // Distance between windows
@@ -57,4 +109,13 @@ function getNewWindowPosition(browserWindow: BrowserWindow, size: { width: numbe
   }
 
   return { x, y };
+}
+
+/**
+ * Get the main window URL
+ *
+ * @returns The main window URL
+ */
+function getMainWindowUrl(): string {
+
 }

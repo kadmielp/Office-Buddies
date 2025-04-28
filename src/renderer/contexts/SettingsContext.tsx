@@ -19,7 +19,7 @@ const animationPrompt = `Start your response with one of the following keywords 
 const defaultSettings: SettingsState = {
   model: {
     name: "Meta Llama 3.1",
-    path: "/Users/felix/Downloads/meta-llama-3-8b-instruct.Q4_K_M.gguf",
+    alias: "meta-llama-3-8b-instruct.Q4_K_M",
     version: "3.1",
   },
   systemPrompt: `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\n${animationPrompt}`

@@ -90,6 +90,7 @@ export function Clippy({ toggleChat }: ClippyProps) {
           zIndex: 10,
           right: '40px',
           top: '2px',
+          cursor: 'help',
         }} onClick={toggleChat}></div>
       </div>
       <img

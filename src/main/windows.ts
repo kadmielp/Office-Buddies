@@ -38,6 +38,9 @@ export async function createMainWindow() {
 
   // Setup Window open handler
   setupWindowOpenHandler(mainWindow);
+
+  // Open devtools
+  mainWindow.webContents.openDevTools();
 }
 
 /**

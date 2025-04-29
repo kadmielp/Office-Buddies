@@ -1,9 +1,9 @@
 import { app, BrowserWindow } from 'electron';
 import { loadElectronLlm } from '@electron/llm';
-import path from 'node:path';
 import { setupIpcListeners } from './ipc';
 import { shouldQuit } from './squirrel-startup';
 import { createMainWindow } from './windows';
+import { getModelManager } from './models';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (shouldQuit) {
@@ -13,15 +13,14 @@ if (shouldQuit) {
 async function onReady() {
   await loadElectronLlm({
     getModelPath: (modelAlias: string) => {
-      return path.join(app.getPath('downloads'), `${modelAlias}.gguf`);
+      console.log(`Loading model ${modelAlias} from ${getModelManager().getModelByName(modelAlias)?.path}`);
+      return getModelManager().getModelByName(modelAlias)?.path;
     }
   });
 
   setupIpcListeners();
   await createMainWindow();
 }
-
-
 
 app.on('ready', onReady);
 

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useWindow } from '../contexts/WindowContext';
 
 interface Column {
   key: string;
@@ -19,6 +20,8 @@ export const TableView: React.FC<TableViewProps> = ({
   style,
 }) => {
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const { currentWindow } = useWindow();
 
   const handleRowClick = (index: number) => {
     setSelectedRowIndex(selectedRowIndex === index ? null : index);
@@ -27,8 +30,72 @@ export const TableView: React.FC<TableViewProps> = ({
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!data.length) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        if (selectedRowIndex === null) {
+          // Select first row if nothing is selected
+          setSelectedRowIndex(0);
+          if (onRowSelect) onRowSelect(data[0], 0);
+        } else if (selectedRowIndex < data.length - 1) {
+          // Move to next row
+          const newIndex = selectedRowIndex + 1;
+          setSelectedRowIndex(newIndex);
+          if (onRowSelect) onRowSelect(data[newIndex], newIndex);
+        }
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (selectedRowIndex === null) {
+          // Select last row if nothing is selected
+          const lastIndex = data.length - 1;
+          setSelectedRowIndex(lastIndex);
+          if (onRowSelect) onRowSelect(data[lastIndex], lastIndex);
+        } else if (selectedRowIndex > 0) {
+          // Move to previous row
+          const newIndex = selectedRowIndex - 1;
+          setSelectedRowIndex(newIndex);
+          if (onRowSelect) onRowSelect(data[newIndex], newIndex);
+        }
+        break;
+      case 'Enter':
+        if (selectedRowIndex !== null) {
+          // Toggle selection on Enter
+          handleRowClick(selectedRowIndex);
+        }
+        break;
+      case 'Escape':
+        // Clear selection
+        setSelectedRowIndex(null);
+        break;
+    }
+  };
+
+  useEffect(() => {
+    // Focus the table container to enable keyboard navigation
+    if (tableRef.current) {
+      tableRef.current.focus();
+    }
+
+    // Add event listener for keyboard navigation
+    currentWindow.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup
+    return () => {
+      currentWindow.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedRowIndex, data, onRowSelect]);
+
   return (
-    <div className="sunken-panel" style={style}>
+    <div
+      className="sunken-panel"
+      style={{ ...style, outline: 'none' }}
+      ref={tableRef}
+      tabIndex={0}
+    >
       <table className="interactive" style={{ width: '100%', tableLayout: 'fixed' }}>
         <thead>
           <tr>

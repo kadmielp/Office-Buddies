@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
-import { useSettings } from "../contexts/SettingsContext";
 import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 import { useChat } from "../contexts/ChatContext";
-import { electronAi } from "../clippyApi";
 
 export type ChatProps = {
   style?: React.CSSProperties;
@@ -15,21 +13,6 @@ export function Chat({ style }: ChatProps) {
   const { setAnimationKey, setStatus, status } = useChat();
   const [messages, setMessages] = useState<Message[]>([]);
   const [streamingMessageContent, setStreamingMessageContent] = useState<string>("");
-  const { settings } = useSettings();
-  const [isModelLoaded, setIsModelLoaded] = useState(false);
-
-  useEffect(() => {
-    if (settings.model) {
-      electronAi.create({
-        modelAlias: settings.model.alias,
-        systemPrompt: settings.systemPrompt,
-      }).then(() => {
-        setIsModelLoaded(true);
-      }).catch((error) => {
-        console.error(error);
-      });
-    }
-  }, [settings.model]);
 
   const handleSendMessage = async (message: string) => {
     if (status !== 'idle') {
@@ -37,8 +20,8 @@ export function Chat({ style }: ChatProps) {
     }
 
     const userMessage: Message = { id: crypto.randomUUID(), content: message, sender: 'user' };
-    setMessages(prevMessages => [...prevMessages, userMessage]);
 
+    setMessages(prevMessages => [...prevMessages, userMessage]);
     setStreamingMessageContent("");
     setStatus('thinking');
 
@@ -106,8 +89,6 @@ export function Chat({ style }: ChatProps) {
 function filterMessageContent(content: string): { text: string, animationKey: string } {
   let text = content;
   let animationKey = '';
-
-  console.log(content);
 
   if (content === '[') {
     text = '';

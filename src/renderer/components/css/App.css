@@ -39,4 +39,14 @@ hr {
   user-select: none;
 }
 
+.clippy h1 {
+  font-size: 1.5rem;
+}
 
+.clippy h2 {
+  font-size: 1.25rem;
+}
+
+.clippy h3 {
+  font-size: 1rem;
+}

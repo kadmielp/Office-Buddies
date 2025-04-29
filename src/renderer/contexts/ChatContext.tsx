@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Message } from '../components/Message';
+import { electronAi } from '../clippyApi';
+import { SharedStateContext, useSharedState } from './SharedStateContext';
 
 type ClippyNamedStatus = 'welcome' | 'idle' | 'responding' | 'thinking' | 'goodbye'
 
@@ -10,6 +12,7 @@ export type ChatContextType = {
   setAnimationKey: (animationKey: string) => void;
   status: ClippyNamedStatus;
   setStatus: (status: ClippyNamedStatus) => void;
+  isModelLoaded: boolean;
 };
 
 export const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -18,6 +21,30 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [animationKey, setAnimationKey] = useState<string>('');
   const [status, setStatus] = useState<ClippyNamedStatus>('welcome');
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const { settings } = useContext(SharedStateContext);
+
+  useEffect(() => {
+    if (settings.selectedModel) {
+      electronAi.create({
+        modelAlias: settings.selectedModel,
+        systemPrompt: settings.systemPrompt,
+      }).then(() => {
+        setIsModelLoaded(true);
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
+
+    if (!settings.selectedModel && isModelLoaded) {
+      electronAi.destroy().then(() => {
+        setIsModelLoaded(false);
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
+  }, [settings.selectedModel, settings.systemPrompt]);
+
   const addMessage = (message: Message) => {
     setMessages(prevMessages => [...prevMessages, message]);
   };
@@ -29,6 +56,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setAnimationKey,
     status,
     setStatus,
+    isModelLoaded,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

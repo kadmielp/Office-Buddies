@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import { clippyApi } from '../clippyApi';
+import { WindowContext } from '../contexts/WindowContext';
 
 interface WindowPortalProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ interface WindowPortalProps {
 }
 
 // Singleton variables - moved outside component to persist across renders
-let externalWindow: Window | null = null;
+let _externalWindow: Window | null = null;
 let containerDiv: HTMLDivElement | null = null;
 let isInitialized = false;
 
@@ -27,26 +28,31 @@ export function WindowPortal({
   onClose,
   title = 'Clippy Chat'
 }: WindowPortalProps) {
+  const [ externalWindow, setExternalWindow ] = useState<Window | null>(null);
+
   // Initialize the singleton container only once
   useEffect(() => {
     if (!isInitialized) {
       containerDiv = document.createElement('div');
+      containerDiv.className = 'clippy';
       isInitialized = true;
     }
 
     // Create function for window management
     const showWindow = async () => {
-      if (!externalWindow || externalWindow.closed) {
+      if (!_externalWindow || _externalWindow.closed) {
         const windowFeatures = `width=${width},height=${height},positionNextToParent`;
-        externalWindow = window.open('', '', windowFeatures);
+        _externalWindow = window.open('', '', windowFeatures);
 
-        if (!externalWindow) {
+        if (!_externalWindow) {
           console.error("Failed to open window - popup may be blocked");
           return;
         }
 
+        setExternalWindow(_externalWindow);
+
         // Setup window
-        const externalDoc = externalWindow.document;
+        const externalDoc = _externalWindow.document;
         externalDoc.title = title;
 
         // Add styles
@@ -78,7 +84,7 @@ export function WindowPortal({
         externalDoc.head.appendChild(style);
 
         // Setup close event
-        externalWindow.addEventListener('beforeunload', () => {
+        _externalWindow.addEventListener('beforeunload', () => {
           console.log("Window closed by user");
           if (onClose) {
             onClose();
@@ -91,13 +97,13 @@ export function WindowPortal({
         await clippyApi.toggleChatWindow();
       }
 
-      externalWindow.focus();
+      _externalWindow.focus();
     };
 
     // Close window function
     const hideWindow = async () => {
       // Don't destroy the window, just hide it
-      if (externalWindow && !externalWindow.closed) {
+      if (_externalWindow && !_externalWindow.closed) {
         await clippyApi.toggleChatWindow();
       }
     };
@@ -121,5 +127,13 @@ export function WindowPortal({
     return null;
   }
 
-  return ReactDOM.createPortal(children, containerDiv)
+  // Wrap the children in the WindowContext provider
+  // This provides the external window to all children components
+  const wrappedChildren = (
+    <WindowContext.Provider value={{ currentWindow: externalWindow || window }}>
+      {children}
+    </WindowContext.Provider>
+  );
+
+  return ReactDOM.createPortal(wrappedChildren, containerDiv);
 }

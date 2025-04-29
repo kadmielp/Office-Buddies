@@ -4,6 +4,7 @@ import { useWindow } from '../contexts/WindowContext';
 interface Column {
   key: string;
   header: string;
+  width?: number;
 }
 
 interface TableViewProps {
@@ -89,6 +90,30 @@ export const TableView: React.FC<TableViewProps> = ({
     };
   }, [selectedRowIndex, data, onRowSelect]);
 
+  // Calculate column widths
+  const calculateColumnWidths = () => {
+    // Sum of fixed widths (columns with specified width)
+    const totalFixedWidth = columns
+      .filter(col => col.width !== undefined)
+      .reduce((sum, col) => sum + (col.width || 0), 0);
+
+    // Count columns without specified width
+    const flexibleColumnsCount = columns.filter(col => col.width === undefined).length;
+
+    return columns.map(column => {
+      if (column.width !== undefined) {
+        // Fixed width columns use their specified width
+        return { width: `${column.width}px` };
+      } else if (flexibleColumnsCount > 0) {
+        // Flexible columns share the remaining space equally
+        return { width: flexibleColumnsCount > 0 ? 'auto' : '100%' };
+      }
+      return {};
+    });
+  };
+
+  const columnWidths = calculateColumnWidths();
+
   return (
     <div
       className="sunken-panel"
@@ -99,8 +124,13 @@ export const TableView: React.FC<TableViewProps> = ({
       <table className="interactive" style={{ width: '100%', tableLayout: 'fixed' }}>
         <thead>
           <tr>
-            {columns.map((column) => (
-              <th key={column.key} style={{ width: `${100 / columns.length}%` }}>{column.header}</th>
+            {columns.map((column, index) => (
+              <th
+                key={column.key}
+                style={columnWidths[index]}
+              >
+                {column.header}
+              </th>
             ))}
           </tr>
         </thead>
@@ -111,8 +141,13 @@ export const TableView: React.FC<TableViewProps> = ({
               className={selectedRowIndex === rowIndex ? 'highlighted' : ''}
               onClick={() => handleRowClick(rowIndex)}
             >
-              {columns.map((column) => (
-                <td key={`${rowIndex}-${column.key}`}>{row[column.key]}</td>
+              {columns.map((column, colIndex) => (
+                <td
+                  key={`${rowIndex}-${column.key}`}
+                  style={columnWidths[colIndex]}
+                >
+                  {row[column.key]}
+                </td>
               ))}
             </tr>
           ))}

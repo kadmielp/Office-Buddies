@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import { loadElectronLlm } from '@electron/llm';
 import { setupIpcListeners } from './ipc';
 import { shouldQuit } from './squirrel-startup';
-import { createMainWindow } from './windows';
+import { createMainWindow, setupWindowListener } from './windows';
 import { getModelManager } from './models';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -19,6 +19,7 @@ async function onReady() {
   });
 
   setupIpcListeners();
+  setupWindowListener();
   await createMainWindow();
 }
 

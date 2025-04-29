@@ -13,6 +13,7 @@ export type ClippyApi = {
   getFullState: () => Promise<SharedState>;
   getState: (key: string) => Promise<any>;
   setState: (key: string, value: any) => Promise<void>;
+  openStateInEditor: () => Promise<void>;
 };
 
 declare global {

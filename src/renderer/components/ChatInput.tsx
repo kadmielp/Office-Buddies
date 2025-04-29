@@ -25,7 +25,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Type a message..."
+        placeholder="Type a message, press Enter to send..."
         style={{
           width: '100%',
         }}

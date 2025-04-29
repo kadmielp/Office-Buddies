@@ -9,4 +9,5 @@ export const IpcMessages = {
   STATE_GET_FULL: 'clippy_state_get_full',
   STATE_GET: 'clippy_state_get',
   STATE_SET: 'clippy_state_set',
+  STATE_OPEN_IN_EDITOR: 'clippy_state_open_in_editor',
 };

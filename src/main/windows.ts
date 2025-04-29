@@ -1,4 +1,4 @@
-import { BrowserWindow, shell, screen } from "electron";
+import { BrowserWindow, shell, screen, app } from "electron";
 import path from "path";
 
 let mainWindow: BrowserWindow | undefined;
@@ -36,11 +36,15 @@ export async function createMainWindow() {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  // Setup Window open handler
-  setupWindowOpenHandler(mainWindow);
-
   // Open devtools
   mainWindow.webContents.openDevTools();
+}
+
+export function setupWindowListener() {
+  app.on('browser-window-created', (event: Electron.Event, browserWindow: BrowserWindow) => {
+    setupWindowOpenHandler(browserWindow);
+    setupNavigationHandler(browserWindow);
+  });
 }
 
 /**
@@ -71,6 +75,14 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         minHeight: 400,
         minWidth: 400,
       },
+    }
+  });
+}
+
+function setupNavigationHandler(browserWindow: BrowserWindow) {
+  browserWindow.webContents.on('will-navigate', (event, url) => {
+    if (url.startsWith('http')) {
+      shell.openExternal(url);
     }
   });
 }

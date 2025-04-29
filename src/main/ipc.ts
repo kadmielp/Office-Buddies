@@ -16,4 +16,5 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.STATE_GET_FULL, () => getStateManager().store.store);
   ipcMain.handle(IpcMessages.STATE_SET, (_, key: string, value: any) => getStateManager().store.set(key, value));
   ipcMain.handle(IpcMessages.STATE_GET, (_, key: string) => getStateManager().store.get(key));
+  ipcMain.handle(IpcMessages.STATE_OPEN_IN_EDITOR, () => getStateManager().store.openInEditor());
 }

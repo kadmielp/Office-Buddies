@@ -39,6 +39,16 @@ hr {
   user-select: none;
 }
 
+.clippy {
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 12px;
+}
+
+.clippy > .title-bar, .window, button, input, label, legend, li[role="tab"], option, select, table, textarea, ul.tree-view {
+  font-family: Tahoma, Arial, sans-serif !important;
+  font-size: 12px !important;
+}
+
 .clippy h1 {
   font-size: 1.5rem;
 }
@@ -50,3 +60,24 @@ hr {
 .clippy h3 {
   font-size: 1rem;
 }
+
+.message {
+  flex-shrink: 0;
+  user-select: text;
+}
+
+.message:not(:last-child) {
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.scroll-anchor {
+  overflow-anchor: auto;
+  height: 1px;
+}
+
+pre {
+  text-wrap: pretty;
+}
+

@@ -13,7 +13,7 @@ export function SettingsModel() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const columns = [
-    { key: 'default', header: 'Loaded' },
+    { key: 'default', header: 'Loaded', width: 50 },
     { key: 'name', header: 'Name' },
     { key: 'size', header: 'Size' },
     { key: 'company', header: 'Company' },

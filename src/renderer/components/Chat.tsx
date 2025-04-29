@@ -69,7 +69,7 @@ export function Chat({ style }: ChatProps) {
   }
 
   return (
-    <div style={style}>
+    <div style={style} className="chat-container">
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}

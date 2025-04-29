@@ -16,13 +16,12 @@ export function Bubble() {
   }
 
   const chatStyle = {
-    maxHeight: 'calc(100% - 50px)',
-    overflow: 'auto',
     padding: '15px',
-    height: 'calc(100% - 50px)',
     display: 'flex',
     flexDirection: 'column' as const,
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    minHeight: 'calc(100% - 35px)',
+    overflowAnchor: 'none' as const,
   };
 
   let content = null;
@@ -46,6 +45,7 @@ export function Bubble() {
       </div>
       <div className='window-content'>
         {content}
+        <div className="scroll-anchor" />
       </div>
     </div>
   );

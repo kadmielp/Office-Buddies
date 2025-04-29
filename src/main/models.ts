@@ -148,6 +148,8 @@ class ModelManager {
         size: model.size,
         url: model.url,
         path: model.path,
+        description: model.description,
+        homepage: model.homepage,
         downloaded: this.getIsModelDownloaded(model),
         downloadState
       };

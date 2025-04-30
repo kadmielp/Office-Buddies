@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Message } from '../components/Message';
 import { electronAi } from '../clippyApi';
-import { SharedStateContext, useSharedState } from './SharedStateContext';
+import { SharedStateContext } from './SharedStateContext';
 
 type ClippyNamedStatus = 'welcome' | 'idle' | 'responding' | 'thinking' | 'goodbye'
 
@@ -28,9 +28,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
   useEffect(() => {
     if (settings.selectedModel) {
+      setIsModelLoaded(false);
       electronAi.create({
         modelAlias: settings.selectedModel,
         systemPrompt: settings.systemPrompt,
+        topK: settings.topK,
+        temperature: settings.temperature,
       }).then(() => {
         setIsModelLoaded(true);
       }).catch((error) => {
@@ -45,7 +48,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         console.error(error);
       });
     }
-  }, [settings.selectedModel, settings.systemPrompt]);
+  }, [settings.selectedModel, settings.systemPrompt, settings.topK, settings.temperature]);
 
   const addMessage = (message: Message) => {
     setMessages(prevMessages => [...prevMessages, message]);

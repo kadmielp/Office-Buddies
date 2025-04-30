@@ -3,23 +3,14 @@ import Store from 'electron-store';
 import { getMainWindow } from './windows';
 import { IpcMessages } from '../ipc-messages';
 import { getModelManager } from './models';
-import { SettingsState, SharedState } from '../types/interfaces';
-import { ANIMATION_KEYS_BRACKETS } from '../animations';
+import { EMPTY_SHARED_STATE, SettingsState, SharedState } from '../sharedState';
 import { BUILT_IN_MODELS } from '../models';
-
-const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the users request: ${ANIMATION_KEYS_BRACKETS.join(', ')}. Use only one of the keywords for each response. Use it only at the beginning of your response. Always start with one.`
-const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\n${ANIMATION_PROMPT}`
 
 export class StateManager {
   public store = new Store<SharedState>({
     defaults: {
+      ...EMPTY_SHARED_STATE,
       models: getModelManager().getInitialRendererModelState(),
-      settings: {
-        selectedModel: undefined,
-        systemPrompt: DEFAULT_SYSTEM_PROMPT,
-        alwaysOnTop: true,
-        alwaysOpenChat: true,
-      },
     },
   });
 
@@ -49,9 +40,18 @@ export class StateManager {
       if (!model || !getModelManager().getIsModelDownloaded(model)) {
         const settings = this.store.get('settings');
         settings.selectedModel = undefined;
-        this.store.set('settings', settings);
       }
     }
+
+    if (settings.topK === undefined) {
+      settings.topK = 10;
+    }
+
+    if (settings.temperature === undefined) {
+      settings.temperature = 0.7;
+    }
+
+    this.store.set('settings', settings);
   }
 
   private ensureCorrectModelState() {

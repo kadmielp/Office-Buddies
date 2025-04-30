@@ -1,5 +1,5 @@
 import { ElectronLlmRenderer } from "@electron/llm";
-import { SharedState } from "../types/interfaces";
+import { SharedState } from "../sharedState";
 
 export type ClippyApi = {
   toggleChatWindow: () => Promise<void>;

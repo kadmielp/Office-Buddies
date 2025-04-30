@@ -8,10 +8,6 @@ import { log } from "../logging";
 const WAIT_TIME = 6000;
 const ENABLE_DRAG_DEBUG = false;
 
-interface ClippyProps {
-  toggleChat?: () => void;
-}
-
 export function Clippy() {
   const { animationKey, status, setStatus, setIsChatWindowOpen, isChatWindowOpen } = useChat();
   const [animation, setAnimation] = useState<Animation>(EMPTY_ANIMATION);

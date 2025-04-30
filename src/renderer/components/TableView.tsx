@@ -92,12 +92,6 @@ export const TableView: React.FC<TableViewProps> = ({
 
   // Calculate column widths
   const calculateColumnWidths = () => {
-    // Sum of fixed widths (columns with specified width)
-    const totalFixedWidth = columns
-      .filter(col => col.width !== undefined)
-      .reduce((sum, col) => sum + (col.width || 0), 0);
-
-    // Count columns without specified width
     const flexibleColumnsCount = columns.filter(col => col.width === undefined).length;
 
     return columns.map(column => {

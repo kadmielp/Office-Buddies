@@ -14,8 +14,8 @@ export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
       <TabList tabs={[
         { label: 'General', content: <SettingsGeneral /> },
         { label: 'Model', content: <SettingsModel /> },
-        { label: 'About', content: <div>Credits</div> },
         { label: 'Advanced', content: <SettingsAdvanced /> },
+        { label: 'About', content: <div>Credits</div> },
       ]} />
       <BubbleWindowBottomBar>
         <button onClick={onClose}>Back to Chat</button>

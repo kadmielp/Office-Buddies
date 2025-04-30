@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 
 import { ManagedModel, ModelState, Model, BUILT_IN_MODELS } from "../models";
-import { DownloadState } from "../types/interfaces";
+import { DownloadState } from "../sharedState";
 import { getStateManager } from "./state";
 
 class ModelManager {

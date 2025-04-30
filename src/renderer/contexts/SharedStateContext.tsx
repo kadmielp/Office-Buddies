@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { SharedState } from "../../types/interfaces";
+import { SharedState } from "../../sharedState";
 import { clippyApi } from "../clippyApi";
 
 const EMPTY_SHARED_STATE: SharedState = {
@@ -7,6 +7,8 @@ const EMPTY_SHARED_STATE: SharedState = {
   settings: {
     selectedModel: undefined,
     systemPrompt: undefined,
+    alwaysOnTop: false,
+    alwaysOpenChat: true,
   },
 };
 

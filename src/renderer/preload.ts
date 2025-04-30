@@ -3,7 +3,7 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 import { IpcMessages } from '../ipc-messages';
-import type { SharedState } from '../types/interfaces';
+import type { SharedState } from '../sharedState';
 
 import type { ClippyApi } from './clippyApi';
 

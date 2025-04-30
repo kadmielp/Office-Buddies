@@ -107,7 +107,7 @@ export function SettingsModel() {
 
       {selectedModel && (
         <div className="model-details sunken-panel" style={{ marginTop: '20px', padding: '15px' }}>
-          <h3>{selectedModel.name}</h3>
+          <strong>{selectedModel.name}</strong>
 
           {selectedModel.description && (
             <p>{selectedModel.description}</p>
@@ -148,6 +148,7 @@ export function SettingsModel() {
           <SettingsModelDownload model={selectedModel} />
         </div>
       )}
+      <SettingsModelVariables />
     </div>
   );
 }
@@ -166,5 +167,23 @@ const SettingsModelDownload: React.FC<{
       <p>Downloading {model.name}... ({downloadSpeed}/s)</p>
       <Progress progress={model.downloadState?.percentComplete || 0} />
     </div>
+  )
+};
+
+const SettingsModelVariables: React.FC = () => {
+  const { settings } = useSharedState();
+
+  return (
+    <fieldset style={{ marginTop: '20px' }}>
+      <legend>Variables</legend>
+      <div className="field-row">
+        <label htmlFor="topK">Top K</label>
+        <input id="topK" type="number" value={settings.topK} onChange={(e) => clippyApi.setState('settings.topK', e.target.value)} />
+      </div>
+      <div className="field-row">
+        <label htmlFor="temperature">Temperature</label>
+        <input id="temperature" type="number" value={settings.temperature} onChange={(e) => clippyApi.setState('settings.temperature', e.target.value)} />
+      </div>
+    </fieldset>
   )
 };

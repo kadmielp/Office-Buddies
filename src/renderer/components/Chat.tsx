@@ -10,8 +10,7 @@ export type ChatProps = {
 }
 
 export function Chat({ style }: ChatProps) {
-  const { setAnimationKey, setStatus, status } = useChat();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { setAnimationKey, setStatus, status, messages, addMessage } = useChat();
   const [streamingMessageContent, setStreamingMessageContent] = useState<string>("");
 
   const handleSendMessage = async (message: string) => {
@@ -21,7 +20,7 @@ export function Chat({ style }: ChatProps) {
 
     const userMessage: Message = { id: crypto.randomUUID(), content: message, sender: 'user' };
 
-    setMessages(prevMessages => [...prevMessages, userMessage]);
+    addMessage(userMessage);
     setStreamingMessageContent("");
     setStatus('thinking');
 
@@ -57,7 +56,7 @@ export function Chat({ style }: ChatProps) {
       // Once streaming is complete, add the full message to the messages array
       // and clear the streaming message
       const assistantMessage: Message = { id: crypto.randomUUID(), content: filteredContent, sender: 'clippy' };
-      setMessages(prevMessages => [...prevMessages, assistantMessage]);
+      addMessage(assistantMessage);
       setStreamingMessageContent("");
       setStatus('idle');
     } catch (error) {

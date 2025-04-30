@@ -9,8 +9,7 @@ import { isModelDownloading } from "../../helpers/model-helpers";
 
 export function SettingsModel() {
   const { models, settings } = useSharedState();
-  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const columns = [
     { key: 'default', header: 'Loaded', width: 50 },
@@ -34,41 +33,9 @@ export function SettingsModel() {
   });
 
   // Variables
-  const selectedModel = selectedIndex > -1 ? models?.[modelKeys[selectedIndex] as keyof typeof models] : null;
+  const selectedModel = models?.[modelKeys[selectedIndex] as keyof typeof models] || null;
   const isDownloading = isModelDownloading(selectedModel);
   const isDefaultModel = selectedModel?.name === settings.selectedModel;
-
-  // Start or stop the interval based on download state
-  const startProgressInterval = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    intervalRef.current = setInterval(() => {
-      clippyApi.updateModelState();
-    }, 200);
-  };
-
-  const stopProgressInterval = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
-
-  // Check if any model is downloading
-  const isAnyModelDownloading = Object.values(models || {}).some(isModelDownloading);
-
-  // Initialize interval if any model is downloading when component mounts
-  useEffect(() => {
-    if (isAnyModelDownloading && !intervalRef.current) {
-      startProgressInterval();
-    } else if (!isAnyModelDownloading && intervalRef.current) {
-      stopProgressInterval();
-    }
-
-    return () => stopProgressInterval();
-  }, [isAnyModelDownloading]);
 
   // Handlers
   // ---------------------------------------------------------------------------
@@ -78,7 +45,6 @@ export function SettingsModel() {
 
   const handleDownload = async () => {
     if (selectedModel) {
-      startProgressInterval();
       await clippyApi.downloadModelByName(data[selectedIndex].name);
     }
   };
@@ -86,7 +52,6 @@ export function SettingsModel() {
   const handleDelete = async () => {
     if (selectedModel) {
       await clippyApi.deleteModelByName(selectedModel.name);
-      await clippyApi.updateModelState();
     }
   };
 
@@ -103,6 +68,7 @@ export function SettingsModel() {
         columns={columns}
         data={data}
         onRowSelect={handleRowSelect}
+        initialSelectedIndex={selectedIndex}
       />
 
       {selectedModel && (

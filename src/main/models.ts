@@ -41,6 +41,8 @@ class ModelManager {
    * @param name
    */
   public async downloadModelByName(name: string) {
+    console.log("Downloading model by name", name);
+
     const model = this.models[name];
 
     if (!model) {
@@ -48,6 +50,8 @@ class ModelManager {
     }
 
     session.defaultSession.downloadURL(model.url);
+
+    this.pollRendererModelState();
   }
 
   /**
@@ -57,6 +61,8 @@ class ModelManager {
    * @returns
    */
   public async deleteModelByName(name: string): Promise<boolean> {
+    console.log("Deleting model by name", name);
+
     const model = this.models[name];
 
     if (!model || !model.path) {
@@ -64,6 +70,8 @@ class ModelManager {
     }
 
     if (!fs.existsSync(model.path)) {
+      this.pollRendererModelState();
+
       return true;
     }
 
@@ -82,6 +90,8 @@ class ModelManager {
 
         delete this.downloadItems[name];
       }
+
+      this.pollRendererModelState();
 
       return true;
     } catch (error) {
@@ -109,13 +119,18 @@ class ModelManager {
     } catch (error) {
       console.error(`ModelManager: Error deleting all models`, error);
     }
+
+    this.pollRendererModelState();
   }
 
   /**
    * Polls the renderer model state
    */
   public pollRendererModelState() {
-    getStateManager().store.set('models', this.getRendererModelState());
+    process.nextTick(() => {
+      getStateManager().store.set('models', this.getRendererModelState());
+      getStateManager().onDidAnyChange();
+    });
   }
 
   /**
@@ -181,7 +196,7 @@ class ModelManager {
     const hasDownloadItem = this.downloadItems[model.name];
     const isDownloading = hasDownloadItem && this.downloadItems[model.name].getState() !== "completed";
 
-    return existsOnDisk || (hasDownloadItem && !isDownloading);
+    return existsOnDisk && !isDownloading;
   }
 
   /**
@@ -219,9 +234,17 @@ class ModelManager {
       console.log(`ModelManager: Handling will-download event for ${urlStr}, but did not find matching model. Disallowing download.`);
       event.preventDefault();
       return false;
-    } else {
-      console.log(`ModelManager: Handling will-download event for model ${model.name}. Allowing download.`);
     }
+
+    // Check if there's already a download in progress for this model
+    const existingDownload = this.downloadItems[model.name];
+    if (existingDownload && existingDownload.getState() === 'progressing') {
+      console.log(`ModelManager: Download already in progress for model ${model.name}. Disallowing duplicate download.`);
+      event.preventDefault();
+      return false;
+    }
+
+    console.log(`ModelManager: Handling will-download event for model ${model.name}. Allowing download.`);
 
     model.path = this.getModelPath(model);
     model.downloaded = false;

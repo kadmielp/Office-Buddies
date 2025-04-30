@@ -1,13 +1,16 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, use, useCallback } from 'react';
 import { Message } from '../components/Message';
-import { electronAi } from '../clippyApi';
+import { clippyApi, electronAi } from '../clippyApi';
 import { SharedStateContext } from './SharedStateContext';
+import { areAnyModelsReadyOrDownloading } from '../../helpers/model-helpers';
+import { WelcomeMessageContent } from '../components/WelcomeMessageContent';
 
 type ClippyNamedStatus = 'welcome' | 'idle' | 'responding' | 'thinking' | 'goodbye'
 
 export type ChatContextType = {
   messages: Message[];
   addMessage: (message: Message) => void;
+  setMessages: (messages: Message[]) => void;
   animationKey: string;
   setAnimationKey: (animationKey: string) => void;
   status: ClippyNamedStatus;
@@ -24,8 +27,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [animationKey, setAnimationKey] = useState<string>('');
   const [status, setStatus] = useState<ClippyNamedStatus>('welcome');
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const { settings } = useContext(SharedStateContext);
+  const { settings, models } = useContext(SharedStateContext);
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
+  const [hasPerformedStartupCheck, setHasPerformedStartupCheck] = useState(false);
+
+  const addMessage = useCallback((message: Message) => {
+    setMessages(prevMessages => [...prevMessages, message]);
+  }, []);
+
   useEffect(() => {
     if (settings.selectedModel) {
       setIsModelLoaded(false);
@@ -50,13 +59,51 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [settings.selectedModel, settings.systemPrompt, settings.topK, settings.temperature]);
 
-  const addMessage = (message: Message) => {
-    setMessages(prevMessages => [...prevMessages, message]);
-  };
+  // At app startup, check if any models are ready. If none are, kick off a download
+  // for our smallest model and tell the user about it.
+  useEffect(() => {
+    if (messages.length > 0 || Object.keys(models).length === 0 || areAnyModelsReadyOrDownloading(models)) {
+      return;
+    }
+
+    if (hasPerformedStartupCheck) {
+      return;
+    }
+
+    setHasPerformedStartupCheck(true);
+
+    addMessage({
+      id: crypto.randomUUID(),
+      children: <WelcomeMessageContent />,
+      sender: 'clippy',
+    });
+
+    const downloadModelIfNoneReady = async () => {
+      await clippyApi.downloadModelByName('Gemma 3 (1B)');
+
+      setTimeout(async () => {
+        await clippyApi.updateModelState();
+      }, 500);
+    };
+
+    void downloadModelIfNoneReady();
+  }, [models]);
+
+  // If selectedModel is undefined or not available, set it to the first downloaded model
+  useEffect(() => {
+    if (!settings.selectedModel || !models[settings.selectedModel] || !models[settings.selectedModel].downloaded) {
+      const downloadedModel = Object.values(models).find(model => model.downloaded);
+
+      if (downloadedModel) {
+        clippyApi.setState('settings.selectedModel', downloadedModel.name);
+      }
+    }
+  }, [models]);
 
   const value = {
     messages,
     addMessage,
+    setMessages,
     animationKey,
     setAnimationKey,
     status,

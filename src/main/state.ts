@@ -110,7 +110,7 @@ export class StateManager {
    *
    * @param newValue
    */
-  private onDidAnyChange(newValue: SharedState = this.store.store) {
+  public onDidAnyChange(newValue: SharedState = this.store.store) {
     getMainWindow()?.webContents.send(IpcMessages.STATE_CHANGED, newValue);
   }
 }

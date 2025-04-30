@@ -12,6 +12,7 @@ interface TableViewProps {
   data: Record<string, React.ReactNode>[];
   style?: React.CSSProperties;
   onRowSelect?: (row: Record<string, React.ReactNode>, index: number) => void;
+  initialSelectedIndex?: number;
 }
 
 export const TableView: React.FC<TableViewProps> = ({
@@ -19,8 +20,9 @@ export const TableView: React.FC<TableViewProps> = ({
   data,
   onRowSelect,
   style,
+  initialSelectedIndex,
 }) => {
-  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(initialSelectedIndex ?? null);
   const tableRef = useRef<HTMLDivElement>(null);
   const { currentWindow } = useWindow();
 

@@ -4,7 +4,8 @@ import defaultClippy from '../images/animations/Default.png'
 
 export interface Message {
   id: string;
-  content: string;
+  content?: string;
+  children?: React.ReactNode;
   sender: 'user' | 'clippy';
 }
 
@@ -17,7 +18,7 @@ export function Message({ message }: { message: Message }) {
         style={{ width: '24px', height: '24px', marginRight: '8px' }}
       />
       <div className="message-content">
-        <Markdown>{message.content}</Markdown>
+        {message.children ? message.children : <Markdown>{message.content}</Markdown>}
       </div>
     </div>
   );

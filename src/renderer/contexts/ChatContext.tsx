@@ -13,6 +13,8 @@ export type ChatContextType = {
   status: ClippyNamedStatus;
   setStatus: (status: ClippyNamedStatus) => void;
   isModelLoaded: boolean;
+  isChatWindowOpen: boolean;
+  setIsChatWindowOpen: (isChatWindowOpen: boolean) => void;
 };
 
 export const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -23,7 +25,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<ClippyNamedStatus>('welcome');
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const { settings } = useContext(SharedStateContext);
-
+  const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
   useEffect(() => {
     if (settings.selectedModel) {
       electronAi.create({
@@ -57,6 +59,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     status,
     setStatus,
     isModelLoaded,
+    isChatWindowOpen,
+    setIsChatWindowOpen,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

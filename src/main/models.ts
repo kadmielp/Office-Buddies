@@ -101,6 +101,17 @@ class ModelManager {
   }
 
   /**
+   * Deletes all models
+   */
+  public async deleteAllModels() {
+    try {
+      await fs.promises.rm(path.join(app.getPath("userData"), "models"), { recursive: true });
+    } catch (error) {
+      console.error(`ModelManager: Error deleting all models`, error);
+    }
+  }
+
+  /**
    * Polls the renderer model state
    */
   public pollRendererModelState() {
@@ -164,7 +175,7 @@ class ModelManager {
    * @param model
    * @returns
    */
-  private getIsModelDownloaded(model: ManagedModel | Model): boolean {
+  public getIsModelDownloaded(model: ManagedModel | Model): boolean {
     const filePath = 'path' in model ? model.path : this.getModelPath(model);
     const existsOnDisk = fs.existsSync(filePath);
     const hasDownloadItem = this.downloadItems[model.name];
@@ -179,7 +190,7 @@ class ModelManager {
    * @param model
    * @returns
    */
-  private getModelPath(model: Model): string {
+  public getModelPath(model: Model): string {
     return path.join(app.getPath("userData"), "models", this.getModelFileName(model));
   }
 

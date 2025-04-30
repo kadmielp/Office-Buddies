@@ -1,5 +1,6 @@
 import { BrowserWindow, shell, screen, app } from "electron";
 import path from "path";
+import { getStateManager } from "./state";
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -18,6 +19,8 @@ export function getMainWindow(): BrowserWindow | undefined {
  * @returns The main window
  */
 export async function createMainWindow() {
+  const settings = getStateManager().store.get('settings');
+
   mainWindow = new BrowserWindow({
     width: 125,
     height: 100,
@@ -25,6 +28,7 @@ export async function createMainWindow() {
     hasShadow: false,
     frame: false,
     acceptFirstMouse: true,
+    alwaysOnTop: settings.alwaysOnTop,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -35,9 +39,6 @@ export async function createMainWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
-
-  // Open devtools
-  mainWindow.webContents.openDevTools();
 }
 
 export function setupWindowListener() {
@@ -157,6 +158,7 @@ export function toggleChatWindow() {
 
     chatWindow.setPosition(position.x, position.y);
     chatWindow.show();
+    chatWindow.focus();
   }
 }
 

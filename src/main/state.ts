@@ -3,7 +3,7 @@ import Store from 'electron-store';
 import { getMainWindow } from './windows';
 import { IpcMessages } from '../ipc-messages';
 import { getModelManager } from './models';
-import { SharedState } from '../types/interfaces';
+import { SettingsState, SharedState } from '../types/interfaces';
 import { ANIMATION_KEYS_BRACKETS } from '../animations';
 import { BUILT_IN_MODELS } from '../models';
 
@@ -17,17 +17,41 @@ export class StateManager {
       settings: {
         selectedModel: undefined,
         systemPrompt: DEFAULT_SYSTEM_PROMPT,
+        alwaysOnTop: true,
+        alwaysOpenChat: true,
       },
     },
   });
 
   constructor() {
     this.ensureCorrectModelState();
+    this.ensureCorrectSettingsState();
+
     this.store.onDidAnyChange(this.onDidAnyChange);
+
+    // Handle settings changes
+    this.store.onDidChange('settings', (newValue, oldValue) => {
+      this.onSettingsChange(newValue, oldValue);
+    });
   }
 
   public updateModelState() {
     this.store.set('models', getModelManager().getRendererModelState());
+  }
+
+  private ensureCorrectSettingsState() {
+    const settings = this.store.get('settings');
+
+    // Default model exists?
+    if (settings.selectedModel) {
+      const model = this.store.get('models')[settings.selectedModel];
+
+      if (!model || !getModelManager().getIsModelDownloaded(model)) {
+        const settings = this.store.get('settings');
+        settings.selectedModel = undefined;
+        this.store.set('settings', settings);
+      }
+    }
   }
 
   private ensureCorrectModelState() {
@@ -36,6 +60,14 @@ export class StateManager {
     if (models === undefined || Object.keys(models).length === 0) {
       this.store.set('models', getModelManager().getInitialRendererModelState());
       return;
+    }
+
+    // Make sure we update the fs state for all models
+    for (const modelName of Object.keys(models)) {
+      const model = models[modelName];
+
+      model.downloaded = getModelManager().getIsModelDownloaded(model);
+      model.path = getModelManager().getModelPath(model);
     }
 
     // Make sure all models from the constant are in state
@@ -51,6 +83,22 @@ export class StateManager {
     }
 
     this.store.set('models', models)
+  }
+
+  /**
+   * Handles settings changes.
+   *
+   * @param newValue
+   * @param oldValue
+   */
+  private onSettingsChange(newValue: SettingsState, oldValue?: SettingsState) {
+    if (!oldValue) {
+      return;
+    }
+
+    if (oldValue.alwaysOnTop !== newValue.alwaysOnTop) {
+      getMainWindow()?.setAlwaysOnTop(newValue.alwaysOnTop);
+    }
   }
 
   /**

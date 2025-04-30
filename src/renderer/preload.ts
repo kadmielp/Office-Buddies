@@ -14,6 +14,7 @@ const clippyApi: ClippyApi = {
   updateModelState: () => ipcRenderer.invoke(IpcMessages.STATE_UPDATE_MODEL_STATE),
   downloadModelByName: (name: string) => ipcRenderer.invoke(IpcMessages.DOWNLOAD_MODEL_BY_NAME, name),
   deleteModelByName: (name: string) => ipcRenderer.invoke(IpcMessages.DELETE_MODEL_BY_NAME, name),
+  deleteAllModels: () => ipcRenderer.invoke(IpcMessages.DELETE_ALL_MODELS),
   getFullState: () => ipcRenderer.invoke(IpcMessages.STATE_GET_FULL),
   getState: (key: string) => ipcRenderer.invoke(IpcMessages.STATE_GET, key),
   setState: (key: string, value: any) => ipcRenderer.invoke(IpcMessages.STATE_SET, key, value),

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import { clippyApi } from '../clippyApi';
 import { WindowContext } from '../contexts/WindowContext';
+import { useChat } from '../contexts/ChatContext';
+import { useSharedState } from '../contexts/SharedStateContext';
 
 interface WindowPortalProps {
   children: React.ReactNode;
@@ -10,8 +12,6 @@ interface WindowPortalProps {
   height?: number;
   left?: number;
   top?: number;
-  isOpen: boolean;
-  onClose?: () => void;
   title?: string;
 }
 
@@ -24,11 +24,17 @@ export function WindowPortal({
   children,
   width = 400,
   height = 500,
-  isOpen,
-  onClose,
   title = 'Clippy Chat'
 }: WindowPortalProps) {
   const [ externalWindow, setExternalWindow ] = useState<Window | null>(null);
+  const { isChatWindowOpen, setIsChatWindowOpen } = useChat();
+  const { settings } = useSharedState();
+
+  useEffect(() => {
+    if (settings.alwaysOpenChat && !_externalWindow) {
+      setIsChatWindowOpen(true);
+    }
+  }, [settings.alwaysOpenChat]);
 
   // Initialize the singleton container only once
   useEffect(() => {
@@ -86,9 +92,7 @@ export function WindowPortal({
         // Setup close event
         _externalWindow.addEventListener('beforeunload', () => {
           console.log("Window closed by user");
-          if (onClose) {
-            onClose();
-          }
+          setIsChatWindowOpen(false);
         });
 
         externalDoc.body.innerHTML = '';
@@ -109,7 +113,7 @@ export function WindowPortal({
     };
 
     // Show/hide based on prop
-    if (isOpen) {
+    if (isChatWindowOpen) {
       showWindow();
     } else {
       hideWindow();
@@ -120,7 +124,7 @@ export function WindowPortal({
       // We don't close the window here anymore to maintain singleton
       // The window will be closed when the app is closed
     };
-  }, [isOpen, width, height, onClose, title]);
+  }, [isChatWindowOpen, width, height, title]);
 
   // Always render to the portal if it exists, regardless of visibility
   if (!containerDiv) {

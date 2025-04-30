@@ -12,8 +12,8 @@ interface ClippyProps {
   toggleChat?: () => void;
 }
 
-export function Clippy({ toggleChat }: ClippyProps) {
-  const { animationKey, status, setStatus } = useChat();
+export function Clippy() {
+  const { animationKey, status, setStatus, setIsChatWindowOpen, isChatWindowOpen } = useChat();
   const [animation, setAnimation] = useState<Animation>(EMPTY_ANIMATION);
   const [animationTimeoutId, setAnimationTimeoutId] = useState<number | undefined>(undefined);
 
@@ -33,6 +33,10 @@ export function Clippy({ toggleChat }: ClippyProps) {
       log(`Animation not found`, { key });
     }
   }, []);
+
+  const toggleChat = useCallback(() => {
+    setIsChatWindowOpen(!isChatWindowOpen);
+  }, [isChatWindowOpen, setIsChatWindowOpen]);
 
   useEffect(() => {
     const playRandomIdleAnimation = () => {

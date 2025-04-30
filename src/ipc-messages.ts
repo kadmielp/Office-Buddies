@@ -4,6 +4,7 @@ export const IpcMessages = {
   MAXIMIZE_CHAT_WINDOW: 'clippy_maximize_chat_window',
   DOWNLOAD_MODEL_BY_NAME: 'clippy_download_model_by_name',
   DELETE_MODEL_BY_NAME: 'clippy_delete_model_by_name',
+  DELETE_ALL_MODELS: 'clippy_delete_all_models',
   STATE_UPDATE_MODEL_STATE: 'clippy_state_update_model_state',
   STATE_CHANGED: 'clippy_state_changed',
   STATE_GET_FULL: 'clippy_state_get_full',

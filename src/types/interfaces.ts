@@ -3,6 +3,8 @@ import { ModelState } from "../models";
 export interface SettingsState {
   selectedModel?: string;
   systemPrompt?: string
+  alwaysOnTop?: boolean;
+  alwaysOpenChat?: boolean;
 }
 
 export interface SharedState {

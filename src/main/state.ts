@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 
-import { getMainWindow } from './windows';
+import { getChatWindow, getMainWindow } from './windows';
 import { IpcMessages } from '../ipc-messages';
 import { getModelManager } from './models';
 import { EMPTY_SHARED_STATE, SettingsState, SharedState } from '../sharedState';
@@ -96,8 +96,12 @@ export class StateManager {
       return;
     }
 
-    if (oldValue.alwaysOnTop !== newValue.alwaysOnTop) {
-      getMainWindow()?.setAlwaysOnTop(newValue.alwaysOnTop);
+    if (oldValue.clippyAlwaysOnTop !== newValue.clippyAlwaysOnTop) {
+      getMainWindow()?.setAlwaysOnTop(newValue.clippyAlwaysOnTop);
+    }
+
+    if (oldValue.chatAlwaysOnTop !== newValue.chatAlwaysOnTop) {
+      getChatWindow()?.setAlwaysOnTop(newValue.chatAlwaysOnTop);
     }
   }
 

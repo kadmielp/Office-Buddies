@@ -4,7 +4,8 @@ import { ModelState } from "./models";
 export interface SettingsState {
   selectedModel?: string;
   systemPrompt?: string
-  alwaysOnTop?: boolean;
+  clippyAlwaysOnTop?: boolean;
+  chatAlwaysOnTop?: boolean;
   alwaysOpenChat?: boolean;
   topK?: number;
   temperature?: number;
@@ -31,7 +32,8 @@ const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful assistant that was crea
 export const EMPTY_SHARED_STATE: SharedState = {
   models: {},
   settings: {
-    alwaysOnTop: undefined,
+    clippyAlwaysOnTop: undefined,
+    chatAlwaysOnTop: undefined,
     alwaysOpenChat: undefined,
     systemPrompt: DEFAULT_SYSTEM_PROMPT,
     topK: 10,

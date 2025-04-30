@@ -28,7 +28,7 @@ export async function createMainWindow() {
     hasShadow: false,
     frame: false,
     acceptFirstMouse: true,
-    alwaysOnTop: settings.alwaysOnTop,
+    alwaysOnTop: settings.clippyAlwaysOnTop,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -42,7 +42,7 @@ export async function createMainWindow() {
 }
 
 export function setupWindowListener() {
-  app.on('browser-window-created', (event: Electron.Event, browserWindow: BrowserWindow) => {
+  app.on('browser-window-created', (_event: Electron.Event, browserWindow: BrowserWindow) => {
     setupWindowOpenHandler(browserWindow);
     setupNavigationHandler(browserWindow);
   });
@@ -75,6 +75,7 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         roundedCorners: false,
         minHeight: 400,
         minWidth: 400,
+        alwaysOnTop: getStateManager().store.get('settings').chatAlwaysOnTop,
       },
     }
   });

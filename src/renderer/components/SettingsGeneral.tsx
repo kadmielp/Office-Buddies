@@ -10,11 +10,19 @@ export const SettingsGeneral: React.FC = () => {
       <fieldset>
         <legend>Window Options</legend>
         <Checkbox
-          id="alwaysOnTop"
+          id="clippyAlwaysOnTop"
           label="Keep Clippy always on top of all other windows"
-          checked={settings.alwaysOnTop}
+          checked={settings.clippyAlwaysOnTop}
           onChange={(checked) => {
-            clippyApi.setState('settings.alwaysOnTop', checked);
+            clippyApi.setState('settings.clippyAlwaysOnTop', checked);
+          }}
+        />
+        <Checkbox
+          id="chatAlwaysOnTop"
+          label="Keep chat always on top of all other windows"
+          checked={settings.chatAlwaysOnTop}
+          onChange={(checked) => {
+            clippyApi.setState('settings.chatAlwaysOnTop', checked);
           }}
         />
         <Checkbox

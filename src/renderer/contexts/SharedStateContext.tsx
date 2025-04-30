@@ -7,7 +7,7 @@ const EMPTY_SHARED_STATE: SharedState = {
   settings: {
     selectedModel: undefined,
     systemPrompt: undefined,
-    alwaysOnTop: false,
+    clippyAlwaysOnTop: false,
     alwaysOpenChat: true,
   },
 };

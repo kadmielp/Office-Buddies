@@ -32,9 +32,9 @@ const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful assistant that was crea
 export const EMPTY_SHARED_STATE: SharedState = {
   models: {},
   settings: {
-    clippyAlwaysOnTop: undefined,
-    chatAlwaysOnTop: undefined,
-    alwaysOpenChat: undefined,
+    clippyAlwaysOnTop: true,
+    chatAlwaysOnTop: true,
+    alwaysOpenChat: true,
     systemPrompt: DEFAULT_SYSTEM_PROMPT,
     topK: 10,
     temperature: 0.7,

@@ -1,12 +1,10 @@
-import { useState } from 'react';
 import { clippyApi } from '../clippyApi';
 import { Chat } from './Chat';
 import { Settings } from './Settings';
-
-export type BubbleView = 'chat' | 'settings';
+import { useBubbleView } from '../contexts/BubbleViewContext';
 
 export function Bubble() {
-  const [currentView, setCurrentView] = useState<BubbleView>('chat');
+  const { currentView, setCurrentView } = useBubbleView();
 
   const containerStyle = {
     width: 'calc(100% - 6px)',
@@ -28,7 +26,7 @@ export function Bubble() {
 
   if (currentView === 'chat') {
     content = <Chat style={chatStyle} />;
-  } else if (currentView === 'settings') {
+  } else if (currentView.startsWith('settings')) {
     content = <Settings onClose={() => setCurrentView('chat')} />;
   }
 

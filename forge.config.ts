@@ -1,6 +1,7 @@
 import { Walker, DepType, type Module } from 'flora-colossus';
-import { readdirSync, rmdirSync, statSync } from 'node:fs';
+import { readdirSync, rmdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'path';
+import dotenv from 'dotenv'
 
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
@@ -11,12 +12,41 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const packageJson = require('./package.json');
+dotenv.config()
+
+process.env.TEMP = process.env.TMP = `C:\\Users\\FelixRieseberg\\AppData\\Local\\Temp`
+
 let nativeModuleDependenciesToPackage: string[] = [];
 
-export const EXTERNAL_DEPENDENCIES = [
+const EXTERNAL_DEPENDENCIES = [
   '@electron/llm',
   'node-llama-cpp',
 ];
+
+const FLAGS = {
+  SIGNTOOL_PATH: process.env.SIGNTOOL_PATH,
+  AZURE_CODE_SIGNING_DLIB: process.env.AZURE_CODE_SIGNING_DLIB || path.join(__dirname, 'Microsoft.Trusted.Signing.Client.1.0.60/bin/x64/Azure.CodeSigning.Dlib.dll'),
+  AZURE_METADATA_JSON: process.env.AZURE_METADATA_JSON || path.resolve(__dirname, 'trusted-signing-metadata.json'),
+  AZURE_TENANT_ID: process.env.AZURE_TENANT_ID,
+  AZURE_CLIENT_ID: process.env.AZURE_CLIENT_ID,
+  AZURE_CLIENT_SECRET: process.env.AZURE_CLIENT_SECRET,
+  APPLE_ID: process.env.APPLE_ID,
+  APPLE_ID_PASSWORD: process.env.APPLE_ID_PASSWORD,
+}
+
+const windowsSign = {
+  signToolPath: FLAGS.SIGNTOOL_PATH,
+  signWithParams: `/v /dlib ${FLAGS.AZURE_CODE_SIGNING_DLIB} /dmdf ${FLAGS.AZURE_METADATA_JSON}`,
+  timestampServer: "http://timestamp.acs.microsoft.com",
+}
+
+writeFileSync(FLAGS.AZURE_METADATA_JSON, JSON.stringify({
+  Endpoint: process.env.AZURE_CODE_SIGNING_ENDPOINT || "https://wcus.codesigning.azure.net",
+  CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
+  CertificateProfileName: process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
+}, null, 2));
 
 const config: ForgeConfig = {
   hooks: {
@@ -210,7 +240,21 @@ const config: ForgeConfig = {
 
       return true;
     },
+    appBundleId: "com.felixrieseberg.clippy",
     appCategoryType: "public.app-category.productivity",
+    win32metadata: {
+      CompanyName: 'Felix Rieseberg',
+      OriginalFilename: 'Clippy'
+    },
+    osxSign: {
+      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
+    },
+    osxNotarize: {
+      appleId: FLAGS.APPLE_ID,
+      appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
+      teamId: 'LT94ZKYDCJ'
+    },
+    windowsSign,
     icon: path.resolve(__dirname, "assets/icon"),
     junk: true,
     overwrite: true,
@@ -221,7 +265,18 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel((arch) => ({
+      name: 'Clippy',
+      authors: 'Felix Rieseberg',
+      exe: 'Clippy.exe',
+      noMsi: true,
+      remoteReleases: '',
+      iconUrl: 'https://raw.githubusercontent.com/felixrieseberg/clippy/main/assets/icon.ico',
+      loadingGif: './assets/boot.gif',
+      setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
+      setupIcon: path.resolve(__dirname, 'assets', 'icon.ico'),
+      windowsSign
+    }), ['win32']),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     new MakerDeb({}),

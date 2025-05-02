@@ -11,6 +11,8 @@ if (shouldQuit) {
 }
 
 async function onReady() {
+  console.log("Welcome to Clippy!");
+
   await loadLlm();
   setupIpcListeners();
   setupWindowListener();

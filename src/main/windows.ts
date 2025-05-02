@@ -1,7 +1,9 @@
 import { BrowserWindow, shell, screen, app } from "electron";
+import contextMenu from "electron-context-menu";
+import { getLogger } from "./logger";
+
 import path from "path";
 import { getStateManager } from "./state";
-import contextMenu from "electron-context-menu";
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -20,6 +22,13 @@ export function getMainWindow(): BrowserWindow | undefined {
  * @returns The main window
  */
 export async function createMainWindow() {
+  getLogger().info("Creating main window");
+
+  if (mainWindow) {
+    getLogger().info("Main window already exists, skipping creation");
+    return;
+  }
+
   const settings = getStateManager().store.get("settings");
 
   mainWindow = new BrowserWindow({
@@ -28,7 +37,13 @@ export async function createMainWindow() {
     transparent: true,
     hasShadow: false,
     frame: false,
+    titleBarStyle: "hidden",
     acceptFirstMouse: true,
+    backgroundMaterial: "none",
+    resizable: false,
+    maximizable: false,
+    roundedCorners: false,
+    thickFrame: false,
     alwaysOnTop: settings.clippyAlwaysOnTop,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -48,6 +63,8 @@ export function setupWindowListener() {
   app.on(
     "browser-window-created",
     (_event: Electron.Event, browserWindow: BrowserWindow) => {
+      getLogger().info(`Creating window: ${browserWindow.webContents.getTitle()}`);
+
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);
 

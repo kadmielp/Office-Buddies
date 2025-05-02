@@ -24,7 +24,7 @@ dotenv.config();
 
 let nativeModuleDependenciesToPackage: string[] = [];
 
-const EXTERNAL_DEPENDENCIES = ["@electron/llm", "node-llama-cpp"];
+const EXTERNAL_DEPENDENCIES = ["@electron/llm", "node-llama-cpp", "electron-log"];
 
 const FLAGS = {
   SIGNTOOL_PATH:

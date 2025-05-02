@@ -1,7 +1,7 @@
 import { app, DownloadItem, session } from "electron";
 import path from "path";
 import fs from "fs";
-import log from "electron-log";
+import { getLogger } from "./logger";
 
 import { ManagedModel, ModelState, Model, BUILT_IN_MODELS } from "../models";
 import { DownloadState } from "../sharedState";
@@ -46,7 +46,7 @@ class ModelManager {
    * @param name
    */
   public async downloadModelByName(name: string) {
-    log.info("Downloading model by name", name);
+    getLogger().info("Downloading model by name", name);
 
     const model = this.models[name];
 
@@ -59,7 +59,7 @@ class ModelManager {
       try {
         this.downloadItems[name].cancel();
       } catch (error) {
-        log.error(`ModelManager: Error canceling download: ${name}`, error);
+        getLogger().error(`ModelManager: Error canceling download: ${name}`, error);
       }
 
       delete this.downloadItems[name];
@@ -90,7 +90,7 @@ class ModelManager {
    * @returns
    */
   public async deleteModelByName(name: string): Promise<boolean> {
-    log.info("Deleting model by name", name);
+    getLogger().info("Deleting model by name", name);
 
     const model = this.models[name];
 
@@ -112,7 +112,7 @@ class ModelManager {
       this.pollRendererModelState();
       return true;
     } catch (error) {
-      log.error(`ModelManager: Error deleting model: ${name}`, error);
+      getLogger().error(`ModelManager: Error deleting model: ${name}`, error);
       return false;
     }
   }
@@ -138,7 +138,7 @@ class ModelManager {
         recursive: true,
       });
     } catch (error) {
-      log.error(`ModelManager: Error deleting all models`, error);
+      getLogger().error(`ModelManager: Error deleting all models`, error);
     }
 
     this.pollRendererModelState();
@@ -244,7 +244,7 @@ class ModelManager {
     const model = this.models[modelKey];
 
     if (!model) {
-      log.info(
+      getLogger().info(
         `ModelManager: Handling will-download event for ${urlStr}, but did not find matching model. Disallowing download.`,
       );
       event.preventDefault();
@@ -254,14 +254,14 @@ class ModelManager {
     // Check if there's already a download in progress for this model
     const existingDownload = this.downloadItems[model.name];
     if (existingDownload && existingDownload.getState() === "progressing") {
-      log.info(
+      getLogger().info(
         `ModelManager: Download already in progress for model ${model.name}. Disallowing duplicate download.`,
       );
       event.preventDefault();
       return false;
     }
 
-    log.info(
+    getLogger().info(
       `ModelManager: Handling will-download event for model ${model.name}. Allowing download.`,
     );
 
@@ -284,7 +284,7 @@ class ModelManager {
       try {
         this.downloadItems[model.name].cancel();
       } catch (error) {
-        log.error(
+        getLogger().error(
           `ModelManager: Error canceling download: ${model.name}`,
           error,
         );

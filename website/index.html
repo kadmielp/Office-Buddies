@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clippy Desktop Assistant</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="main-content">
+      <div class="window video-container">
+        <div class="title-bar">
+          <div class="title-bar-text">Clippy in Action</div>
+          <div class="title-bar-controls">
+            <button aria-label="Minimize"></button>
+            <button aria-label="Maximize"></button>
+            <button aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <video autoplay loop muted width="640">
+            <source src="./video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
+      <div class="downloads">
+        <div class="window download-option">
+          <div class="title-bar">
+            <div class="title-bar-text">Download Clippy today!</div>
+            <div class="title-bar-controls">
+              <button aria-label="Minimize"></button>
+              <button aria-label="Maximize"></button>
+              <button aria-label="Close"></button>
+            </div>
+          </div>
+          <div class="window-body">
+            <p>
+              Clippy lets you run a variety of large language models (LLMs)
+              locally on your computer while sticking with a user interface of
+              the 1990s. It's a love letter and homage to the late, great
+              Clippy, the assistant from Microsoft Office 1997.
+            </p>
+            <p>
+              This app is not affiliated, approved, or supported by Microsoft.
+              Consider it software satire.
+            </p>
+            <p>Do you want to download Clippy for your computer?</p>
+            <button>
+              <a href="#macos-arm64-download">macOS (Apple Silicon)</a>
+            </button>
+            <button>
+              <a href="#macos-x64-download">macOS (Intel)</a>
+            </button>
+            <button>
+              <a href="#windows-x64-download">Windows</a>
+            </button>
+            <button>
+              <a href="#rpm-x64-download">Linux (RPM, x64)</a>
+            </button>
+            <button>
+              <a href="#deb-x64-download">Linux (Debian, x64)</a>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <p><a href="https://felixrieseberg.com">Made with ❤️ in San Francisco</a></p>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+body {
+  background-color: #008080;
+  font-family: "Pixelated MS Sans Serif", "MS Sans Serif", sans-serif;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+.main-content {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+}
+
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 150px;
+  height: auto;
+}
+
+.video-container {
+  width: 657px;
+  position: fixed;
+  z-index: 1;
+  left: calc(50% - 325px);
+  top: 100px;
+}
+
+.download-option {
+  width: 450px;
+  position: fixed;
+  top: 455px;
+  left: 50%;
+  z-index: 2;
+}
+
+.window-body {
+  color: black;
+  text-align: left;
+}
+
+.window-body button {
+  margin: 8px;
+  width: 180px;
+}
+
+.window-body p:first-of-type {
+  margin-top: 20px;
+}
+
+button a {
+  text-decoration: none;
+  color: inherit;
+}
+
+footer {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: white;
+}
+
+

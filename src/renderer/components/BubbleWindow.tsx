@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+
 import { clippyApi } from "../clippyApi";
 import { Chat } from "./Chat";
 import { Settings } from "./Settings";
@@ -22,6 +24,11 @@ export function Bubble() {
     overflowAnchor: "none" as const,
   };
 
+  const scrollAnchoredAtBottomStyle = {
+    display: "flex",
+    flexDirection: "column-reverse" as const,
+  };
+
   let content = null;
 
   if (currentView === "chat") {
@@ -29,6 +36,14 @@ export function Bubble() {
   } else if (currentView.startsWith("settings")) {
     content = <Settings onClose={() => setCurrentView("chat")} />;
   }
+
+  const handleSettingsClick = useCallback(() => {
+    if (currentView.startsWith("settings")) {
+      setCurrentView("chat");
+    } else {
+      setCurrentView("settings");
+    }
+  }, [setCurrentView, currentView]);
 
   return (
     <div className="bubble-container window" style={containerStyle}>
@@ -41,7 +56,7 @@ export function Bubble() {
               paddingLeft: "8px",
               paddingRight: "8px",
             }}
-            onClick={() => setCurrentView("settings")}
+            onClick={handleSettingsClick}
           >
             Settings
           </button>
@@ -61,7 +76,7 @@ export function Bubble() {
       </div>
       <div
         className="window-content"
-        style={{ display: "flex", flexDirection: "column-reverse" }}
+        style={currentView === "chat" ? scrollAnchoredAtBottomStyle : {}}
       >
         {content}
       </div>

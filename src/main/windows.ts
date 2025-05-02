@@ -92,6 +92,8 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
 
 function setupNavigationHandler(browserWindow: BrowserWindow) {
   browserWindow.webContents.on("will-navigate", (event, url) => {
+    event.preventDefault();
+
     if (url.startsWith("http")) {
       shell.openExternal(url);
     }

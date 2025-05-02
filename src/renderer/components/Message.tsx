@@ -26,7 +26,15 @@ export function Message({ message }: { message: Message }) {
         {message.children ? (
           message.children
         ) : (
-          <Markdown>{message.content}</Markdown>
+          <Markdown
+            components={{
+              a: ({ node, ...props }) => (
+                <a target="_blank" rel="noopener noreferrer" {...props} />
+              ),
+            }}
+          >
+            {message.content}
+          </Markdown>
         )}
       </div>
     </div>

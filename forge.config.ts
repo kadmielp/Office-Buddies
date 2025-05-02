@@ -1,7 +1,7 @@
-import { Walker, DepType, type Module } from 'flora-colossus';
-import { readdirSync, rmdirSync, statSync, writeFileSync } from 'node:fs';
-import path from 'path';
-import dotenv from 'dotenv'
+import { Walker, DepType, type Module } from "flora-colossus";
+import { readdirSync, rmdirSync, statSync, writeFileSync } from "node:fs";
+import path from "path";
+import dotenv from "dotenv";
 
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
@@ -13,40 +13,55 @@ import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const packageJson = require('./package.json');
-dotenv.config()
+const packageJson = require("./package.json");
+dotenv.config();
 
-process.env.TEMP = process.env.TMP = `C:\\Users\\FelixRieseberg\\AppData\\Local\\Temp`
+process.env.TEMP =
+  process.env.TMP = `C:\\Users\\FelixRieseberg\\AppData\\Local\\Temp`;
 
 let nativeModuleDependenciesToPackage: string[] = [];
 
-const EXTERNAL_DEPENDENCIES = [
-  '@electron/llm',
-  'node-llama-cpp',
-];
+const EXTERNAL_DEPENDENCIES = ["@electron/llm", "node-llama-cpp"];
 
 const FLAGS = {
   SIGNTOOL_PATH: process.env.SIGNTOOL_PATH,
-  AZURE_CODE_SIGNING_DLIB: process.env.AZURE_CODE_SIGNING_DLIB || path.join(__dirname, 'Microsoft.Trusted.Signing.Client.1.0.60/bin/x64/Azure.CodeSigning.Dlib.dll'),
-  AZURE_METADATA_JSON: process.env.AZURE_METADATA_JSON || path.resolve(__dirname, 'trusted-signing-metadata.json'),
+  AZURE_CODE_SIGNING_DLIB:
+    process.env.AZURE_CODE_SIGNING_DLIB ||
+    path.join(
+      __dirname,
+      "Microsoft.Trusted.Signing.Client.1.0.60/bin/x64/Azure.CodeSigning.Dlib.dll",
+    ),
+  AZURE_METADATA_JSON:
+    process.env.AZURE_METADATA_JSON ||
+    path.resolve(__dirname, "trusted-signing-metadata.json"),
   AZURE_TENANT_ID: process.env.AZURE_TENANT_ID,
   AZURE_CLIENT_ID: process.env.AZURE_CLIENT_ID,
   AZURE_CLIENT_SECRET: process.env.AZURE_CLIENT_SECRET,
   APPLE_ID: process.env.APPLE_ID,
   APPLE_ID_PASSWORD: process.env.APPLE_ID_PASSWORD,
-}
+};
 
 const windowsSign = {
   signToolPath: FLAGS.SIGNTOOL_PATH,
   signWithParams: `/v /dlib ${FLAGS.AZURE_CODE_SIGNING_DLIB} /dmdf ${FLAGS.AZURE_METADATA_JSON}`,
   timestampServer: "http://timestamp.acs.microsoft.com",
-}
+};
 
-writeFileSync(FLAGS.AZURE_METADATA_JSON, JSON.stringify({
-  Endpoint: process.env.AZURE_CODE_SIGNING_ENDPOINT || "https://wcus.codesigning.azure.net",
-  CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
-  CertificateProfileName: process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
-}, null, 2));
+writeFileSync(
+  FLAGS.AZURE_METADATA_JSON,
+  JSON.stringify(
+    {
+      Endpoint:
+        process.env.AZURE_CODE_SIGNING_ENDPOINT ||
+        "https://wcus.codesigning.azure.net",
+      CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
+      CertificateProfileName:
+        process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
+    },
+    null,
+    2,
+  ),
+);
 
 const config: ForgeConfig = {
   hooks: {
@@ -54,7 +69,7 @@ const config: ForgeConfig = {
       const projectRoot = path.normalize(__dirname);
       const getExternalNestedDependencies = async (
         nodeModuleNames: string[],
-        includeNestedDeps = true
+        includeNestedDeps = true,
       ) => {
         const foundModules = new Set(nodeModuleNames);
         if (includeNestedDeps) {
@@ -66,23 +81,24 @@ const config: ForgeConfig = {
               modules: Module[];
               walkDependenciesForModule: (
                 moduleRoot: string,
-                depType: DepType
+                depType: DepType,
               ) => Promise<void>;
             };
-            const moduleRoot = path.join(projectRoot, 'node_modules', external);
+            const moduleRoot = path.join(projectRoot, "node_modules", external);
             const walker = new Walker(moduleRoot) as unknown as MyPublicWalker;
             walker.modules = [];
             await walker.walkDependenciesForModule(moduleRoot, DepType.PROD);
             walker.modules
               .filter((dep) => (dep.depType as number) === DepType.PROD)
-              .map((dep) => dep.name.split('/')[0])
+              .map((dep) => dep.name.split("/")[0])
               .forEach((name) => foundModules.add(name));
           }
         }
         return foundModules;
       };
-      const nativeModuleDependencies =
-        await getExternalNestedDependencies(EXTERNAL_DEPENDENCIES);
+      const nativeModuleDependencies = await getExternalNestedDependencies(
+        EXTERNAL_DEPENDENCIES,
+      );
       nativeModuleDependenciesToPackage = Array.from(nativeModuleDependencies);
     },
     packageAfterPrune: async (_forgeConfig, buildPath) => {
@@ -90,9 +106,9 @@ const config: ForgeConfig = {
         filePath: string,
         totalCollection: {
           path: string;
-          type: 'directory' | 'file';
+          type: "directory" | "file";
           empty: boolean;
-        }[] = []
+        }[] = [],
       ) {
         try {
           const normalizedPath = path.normalize(filePath);
@@ -101,19 +117,22 @@ const config: ForgeConfig = {
           if (getItemStats.isDirectory()) {
             totalCollection.push({
               path: normalizedPath,
-              type: 'directory',
+              type: "directory",
               empty: childItems.length === 0,
             });
           }
           childItems.forEach((childItem) => {
-            const childItemNormalizedPath = path.join(normalizedPath, childItem);
+            const childItemNormalizedPath = path.join(
+              normalizedPath,
+              childItem,
+            );
             const childItemStats = statSync(childItemNormalizedPath);
             if (childItemStats.isDirectory()) {
               getItemsFromFolder(childItemNormalizedPath, totalCollection);
             } else {
               totalCollection.push({
                 path: childItemNormalizedPath,
-                type: 'file',
+                type: "file",
                 empty: false,
               });
             }
@@ -158,54 +177,50 @@ const config: ForgeConfig = {
         log: true,
       };
 
-      const foldersToIgnore = [
-        '/test/',
-        '/.github/',
-        '/.git/'
-      ]
+      const foldersToIgnore = ["/test/", "/.github/", "/.git/"];
 
       const extensionsToIgnore = [
-        '.DS_Store',
-        '.gitignore',
-        '.gitmodules',
-        '.target.mk',
-        '.config.gypi',
-        '.o',
-        '.obj',
-        '.ts',
-        '.tsbuildinfo',
-        '.map',
-        '.d',
-        '.ts',
-        '.ts.snap',
-        '.cmake',
-        '.cpp',
-        '.h',
-        '.md',
-        '.nycrc',
-        'tsconfig.json',
-        '.travis.yml',
-        '.eslintrc',
-        '.markdown',
-        'CHANGELOG.md',
-        'README.md',
-        'HISTORY.md',
-        'GOVERNANCE.md',
-        'CONTRIBUTING.md',
-        'CODE_OF_CONDUCT.md',
-        'SECURITY.md'
-      ]
+        ".DS_Store",
+        ".gitignore",
+        ".gitmodules",
+        ".target.mk",
+        ".config.gypi",
+        ".o",
+        ".obj",
+        ".ts",
+        ".tsbuildinfo",
+        ".map",
+        ".d",
+        ".ts",
+        ".ts.snap",
+        ".cmake",
+        ".cpp",
+        ".h",
+        ".md",
+        ".nycrc",
+        "tsconfig.json",
+        ".travis.yml",
+        ".eslintrc",
+        ".markdown",
+        "CHANGELOG.md",
+        "README.md",
+        "HISTORY.md",
+        "GOVERNANCE.md",
+        "CONTRIBUTING.md",
+        "CODE_OF_CONDUCT.md",
+        "SECURITY.md",
+      ];
 
       // NOTE: must return false for empty string or nothing will be packaged
-      if (filePath === '') result.keep = true;
-      if (!result.keep && filePath === '/package.json') result.keep = true;
-      if (!result.keep && filePath === '/node_modules') result.keep = true;
-      if (!result.keep && filePath === '/.vite') result.keep = true;
-      if (!result.keep && filePath.startsWith('/.vite/')) result.keep = true;
-      if (!result.keep && filePath.startsWith('/node_modules/')) {
+      if (filePath === "") result.keep = true;
+      if (!result.keep && filePath === "/package.json") result.keep = true;
+      if (!result.keep && filePath === "/node_modules") result.keep = true;
+      if (!result.keep && filePath === "/.vite") result.keep = true;
+      if (!result.keep && filePath.startsWith("/.vite/")) result.keep = true;
+      if (!result.keep && filePath.startsWith("/node_modules/")) {
         // check if matches any of the external dependencies
         for (const dep of nativeModuleDependenciesToPackage) {
-          if (foldersToIgnore.some(folder => filePath.includes(folder))) {
+          if (foldersToIgnore.some((folder) => filePath.includes(folder))) {
             result.keep = false;
             break;
           }
@@ -229,12 +244,12 @@ const config: ForgeConfig = {
         }
       }
 
-      if (extensionsToIgnore.some(ext => filePath.endsWith(ext))) {
+      if (extensionsToIgnore.some((ext) => filePath.endsWith(ext))) {
         result.keep = false;
       }
 
       if (result.keep) {
-        if (result.log) console.log('Keeping:', file);
+        if (result.log) console.log("Keeping:", file);
         return false;
       }
 
@@ -243,16 +258,16 @@ const config: ForgeConfig = {
     appBundleId: "com.felixrieseberg.clippy",
     appCategoryType: "public.app-category.productivity",
     win32metadata: {
-      CompanyName: 'Felix Rieseberg',
-      OriginalFilename: 'Clippy'
+      CompanyName: "Felix Rieseberg",
+      OriginalFilename: "Clippy",
     },
     osxSign: {
-      identity: 'Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)',
+      identity: "Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)",
     },
     osxNotarize: {
       appleId: FLAGS.APPLE_ID,
       appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
-      teamId: 'LT94ZKYDCJ'
+      teamId: "LT94ZKYDCJ",
     },
     windowsSign,
     icon: path.resolve(__dirname, "assets/icon"),
@@ -265,18 +280,22 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel((arch) => ({
-      name: 'Clippy',
-      authors: 'Felix Rieseberg',
-      exe: 'Clippy.exe',
-      noMsi: true,
-      remoteReleases: '',
-      iconUrl: 'https://raw.githubusercontent.com/felixrieseberg/clippy/main/assets/icon.ico',
-      loadingGif: './assets/boot.gif',
-      setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
-      setupIcon: path.resolve(__dirname, 'assets', 'icon.ico'),
-      windowsSign
-    }), ['win32']),
+    new MakerSquirrel(
+      (arch) => ({
+        name: "Clippy",
+        authors: "Felix Rieseberg",
+        exe: "Clippy.exe",
+        noMsi: true,
+        remoteReleases: "",
+        iconUrl:
+          "https://raw.githubusercontent.com/felixrieseberg/clippy/main/assets/icon.ico",
+        loadingGif: "./assets/boot.gif",
+        setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
+        setupIcon: path.resolve(__dirname, "assets", "icon.ico"),
+        windowsSign,
+      }),
+      ["win32"],
+    ),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     new MakerDeb({}),

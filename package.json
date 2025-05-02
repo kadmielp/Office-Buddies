@@ -52,5 +52,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0"
+  },
+  "overrides": {
+    "@electron/windows-sign": "1.2.2"
   }
 }

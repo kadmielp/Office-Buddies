@@ -59,9 +59,11 @@ export function Bubble() {
           ></button>
         </div>
       </div>
-      <div className="window-content">
+      <div
+        className="window-content"
+        style={{ display: "flex", flexDirection: "column-reverse" }}
+      >
         {content}
-        <div className="scroll-anchor" />
       </div>
     </div>
   );

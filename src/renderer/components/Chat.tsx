@@ -93,7 +93,6 @@ export function Chat({ style }: ChatProps) {
           }}
         />
       )}
-      {(messages.length > 0 || status === "responding") && <hr />}
       <ChatInput onSend={handleSendMessage} />
     </div>
   );

@@ -1,5 +1,11 @@
 import { Walker, DepType, type Module } from "flora-colossus";
-import { existsSync, readdirSync, rmdirSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  readdirSync,
+  rmdirSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import path from "path";
 import dotenv from "dotenv";
 
@@ -24,7 +30,12 @@ let nativeModuleDependenciesToPackage: string[] = [];
 const EXTERNAL_DEPENDENCIES = ["@electron/llm", "node-llama-cpp"];
 
 const FLAGS = {
-  SIGNTOOL_PATH: process.env.SIGNTOOL_PATH || path.join(__dirname, "Microsoft.Windows.SDK.BuildTools/bin/10.0.26100.0/x64/signtool.exe"),
+  SIGNTOOL_PATH:
+    process.env.SIGNTOOL_PATH ||
+    path.join(
+      __dirname,
+      "Microsoft.Windows.SDK.BuildTools/bin/10.0.26100.0/x64/signtool.exe",
+    ),
   AZURE_CODE_SIGNING_DLIB:
     process.env.AZURE_CODE_SIGNING_DLIB ||
     path.join(
@@ -61,16 +72,16 @@ function setup() {
     writeFileSync(
       FLAGS.AZURE_METADATA_JSON_PATH,
       JSON.stringify(
-      {
-        Endpoint:
-          process.env.AZURE_CODE_SIGNING_ENDPOINT ||
-          "https://wcus.codesigning.azure.net",
-        CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
-        CertificateProfileName:
-          process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
-      },
-      null,
-      2,
+        {
+          Endpoint:
+            process.env.AZURE_CODE_SIGNING_ENDPOINT ||
+            "https://wcus.codesigning.azure.net",
+          CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
+          CertificateProfileName:
+            process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
+        },
+        null,
+        2,
       ),
     );
   }
@@ -186,13 +197,19 @@ const config: ForgeConfig = {
       unpack: "**/node_modules/*node-llama-cpp*",
     },
     ignore: (file) => {
-      const filePath = file.toLowerCase().replace(/\\/g, '/');
+      const filePath = file.toLowerCase().replace(/\\/g, "/");
       const result = {
         keep: false,
         log: true,
       };
 
-      const foldersToIgnore = ["/test/", "/.github/", "/.git/", "/Microsoft.Trusted.Signing.Client/", "/Microsoft.Windows.SDK.BuildTools/"];
+      const foldersToIgnore = [
+        "/test/",
+        "/.github/",
+        "/.git/",
+        "/Microsoft.Trusted.Signing.Client/",
+        "/Microsoft.Windows.SDK.BuildTools/",
+      ];
 
       const extensionsToIgnore = [
         ".DS_Store",

@@ -87,7 +87,7 @@ jobs:
           fileName: "win-certificate.pfx"
           encodedString: ${{ secrets.WINDOWS_CODESIGN_P12 }}
       - name: Install
-        run: yarn
+        run: npm ci
       - name: Make
         if: startsWith(github.ref, 'refs/tags/')
         run: npm run make --arch=${{ matrix.arch }}

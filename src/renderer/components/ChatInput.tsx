@@ -1,11 +1,12 @@
 import { useState } from "react";
-
+import { useChat } from "../contexts/ChatContext";
 export type ChatInputProps = {
   onSend: (message: string) => void;
 };
 
 export function ChatInput({ onSend }: ChatInputProps) {
   const [message, setMessage] = useState("");
+  const { isModelLoaded } = useChat();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -18,14 +19,19 @@ export function ChatInput({ onSend }: ChatInputProps) {
     }
   };
 
+  const placeholder = isModelLoaded
+    ? "Type a message, press Enter to send..."
+    : "This is your chat input, we're just waiting for a model to load...";
+
   return (
     <div>
       <input
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        disabled={!isModelLoaded}
         onKeyDown={handleKeyDown}
-        placeholder="Type a message, press Enter to send..."
+        placeholder={placeholder}
         style={{
           width: "100%",
         }}

@@ -8,7 +8,7 @@ import {
 } from "node:fs";
 import path from "path";
 import dotenv from "dotenv";
-
+import os from "os";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
@@ -21,9 +21,6 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageJson = require("./package.json");
 dotenv.config();
-
-process.env.TEMP =
-  process.env.TMP = `C:\\Users\\FelixRieseberg\\AppData\\Local\\Temp`;
 
 let nativeModuleDependenciesToPackage: string[] = [];
 
@@ -67,6 +64,11 @@ function setup() {
     if (!existsSync(FLAGS.AZURE_CODE_SIGNING_DLIB)) {
       console.warn("Azure codesigning DLib path does not exist");
     }
+
+    // Setup TEMP
+    // Use the system's TEMP directory or fallback to a default path
+    process.env.TEMP = process.env.TMP = process.env.TEMP || process.env.TMP ||
+      path.join(os.homedir(), 'AppData', 'Local', 'Temp');
 
     // Write Azure codesigning metadata
     writeFileSync(

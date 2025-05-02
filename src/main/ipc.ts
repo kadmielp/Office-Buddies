@@ -7,6 +7,8 @@ import {
 import { IpcMessages } from "../ipc-messages";
 import { getModelManager } from "./models";
 import { getStateManager } from "./state";
+import { getChatManager } from "./chats";
+import { ChatWithMessages } from "../types/interfaces";
 
 export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.TOGGLE_CHAT_WINDOW, () => toggleChatWindow());
@@ -37,5 +39,17 @@ export function setupIpcListeners() {
   );
   ipcMain.handle(IpcMessages.STATE_OPEN_IN_EDITOR, () =>
     getStateManager().store.openInEditor(),
+  );
+
+  ipcMain.handle(IpcMessages.CHAT_GET_CHAT_RECORDS, () =>
+    getChatManager().getChats(),
+  );
+  ipcMain.handle(IpcMessages.CHAT_GET_CHAT_WITH_MESSAGES, (_, chatId: string) =>
+    getChatManager().getChatWithMessages(chatId),
+  );
+  ipcMain.handle(
+    IpcMessages.CHAT_WRITE_CHAT_WITH_MESSAGES,
+    (_, chatWithMessages: ChatWithMessages) =>
+      getChatManager().writeChatWithMessages(chatWithMessages),
   );
 }

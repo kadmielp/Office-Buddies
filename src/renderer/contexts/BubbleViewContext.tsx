@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 
 export type BubbleView =
   | "chat"
+  | "chats"
   | "settings"
   | "settings-general"
   | "settings-model"

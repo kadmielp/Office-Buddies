@@ -1,11 +1,13 @@
 import Markdown from "react-markdown";
 import questionIcon from "../images/icons/question.png";
 import defaultClippy from "../images/animations/Default.png";
+import { MessageRecord } from "../../types/interfaces";
 
-export interface Message {
+export interface Message extends MessageRecord {
   id: string;
   content?: string;
   children?: React.ReactNode;
+  createdAt: number;
   sender: "user" | "clippy";
 }
 

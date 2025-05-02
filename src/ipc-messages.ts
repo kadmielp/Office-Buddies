@@ -11,4 +11,7 @@ export const IpcMessages = {
   STATE_GET: "clippy_state_get",
   STATE_SET: "clippy_state_set",
   STATE_OPEN_IN_EDITOR: "clippy_state_open_in_editor",
+  CHAT_GET_CHAT_RECORDS: "clippy_chat_get_chat_records",
+  CHAT_GET_CHAT_WITH_MESSAGES: "clippy_chat_get_chat_with_messages",
+  CHAT_WRITE_CHAT_WITH_MESSAGES: "clippy_chat_write_chat_with_messages",
 };

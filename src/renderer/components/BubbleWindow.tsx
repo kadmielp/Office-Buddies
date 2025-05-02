@@ -1,12 +1,14 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { clippyApi } from "../clippyApi";
 import { Chat } from "./Chat";
 import { Settings } from "./Settings";
 import { useBubbleView } from "../contexts/BubbleViewContext";
+import { Chats } from "./Chats";
 
 export function Bubble() {
   const { currentView, setCurrentView } = useBubbleView();
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const containerStyle = {
     width: "calc(100% - 6px)",
@@ -35,6 +37,8 @@ export function Bubble() {
     content = <Chat style={chatStyle} />;
   } else if (currentView.startsWith("settings")) {
     content = <Settings onClose={() => setCurrentView("chat")} />;
+  } else if (currentView === "chats") {
+    content = <Chats onClose={() => setCurrentView("chat")} />;
   }
 
   const handleSettingsClick = useCallback(() => {
@@ -45,11 +49,29 @@ export function Bubble() {
     }
   }, [setCurrentView, currentView]);
 
+  const handleChatsClick = useCallback(() => {
+    if (currentView === "chats") {
+      setCurrentView("chat");
+    } else {
+      setCurrentView("chats");
+    }
+  }, [setCurrentView, currentView]);
+
   return (
     <div className="bubble-container window" style={containerStyle}>
       <div className="app-drag title-bar">
         <div className="title-bar-text">Chat with Clippy</div>
         <div className="title-bar-controls app-no-drag">
+          <button
+            style={{
+              marginRight: "8px",
+              paddingLeft: "8px",
+              paddingRight: "8px",
+            }}
+            onClick={handleChatsClick}
+          >
+            Chats
+          </button>
           <button
             style={{
               marginRight: "8px",
@@ -65,8 +87,11 @@ export function Bubble() {
             onClick={() => clippyApi.minimizeChatWindow()}
           ></button>
           <button
-            aria-label="Maximize"
-            onClick={() => clippyApi.maximizeChatWindow()}
+            aria-label={isMaximized ? "Restore" : "Maximize"}
+            onClick={() => {
+              clippyApi.maximizeChatWindow();
+              setIsMaximized(!isMaximized);
+            }}
           ></button>
           <button
             aria-label="Close"

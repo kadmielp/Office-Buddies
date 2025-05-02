@@ -24,9 +24,10 @@ export function Chat({ style }: ChatProps) {
       id: crypto.randomUUID(),
       content: message,
       sender: "user",
+      createdAt: Date.now(),
     };
 
-    addMessage(userMessage);
+    await addMessage(userMessage);
     setStreamingMessageContent("");
     setStatus("thinking");
 
@@ -67,6 +68,7 @@ export function Chat({ style }: ChatProps) {
         id: crypto.randomUUID(),
         content: filteredContent,
         sender: "clippy",
+        createdAt: Date.now(),
       };
       addMessage(assistantMessage);
       setStreamingMessageContent("");
@@ -90,6 +92,7 @@ export function Chat({ style }: ChatProps) {
             id: "streaming",
             content: streamingMessageContent,
             sender: "clippy",
+            createdAt: Date.now(),
           }}
         />
       )}

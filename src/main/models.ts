@@ -77,7 +77,9 @@ class ModelManager {
       session.defaultSession.downloadURL(model.url);
     }
 
-    this.pollRendererModelState();
+    setTimeout(() => {
+      this.pollRendererModelState();
+    }, 500);
   }
 
   /**

@@ -63,7 +63,9 @@ export function setupWindowListener() {
   app.on(
     "browser-window-created",
     (_event: Electron.Event, browserWindow: BrowserWindow) => {
-      getLogger().info(`Creating window: ${browserWindow.webContents.getURL()}`);
+      getLogger().info(
+        `Creating window: ${browserWindow.webContents.getURL()}`,
+      );
 
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);

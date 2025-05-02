@@ -79,7 +79,9 @@ export class MockDownloadItem implements Partial<DownloadItem> {
   public cancel(): void {
     clearInterval(this._intervalId);
     this._state = "cancelled";
-    getLogger().info(`MockDownloadItem: Cancelled download for model: ${this._name}`);
+    getLogger().info(
+      `MockDownloadItem: Cancelled download for model: ${this._name}`,
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

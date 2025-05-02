@@ -7,7 +7,7 @@ function getElectronLog() {
     return _log;
   }
 
-  return _log = require("electron-log");
+  return (_log = require("electron-log"));
 }
 
 export function getLogger() {

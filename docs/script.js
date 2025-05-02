@@ -1,6 +1,8 @@
 // Show alert when download links are clicked
 document.addEventListener("DOMContentLoaded", () => {
-  const downloadButtons = document.querySelectorAll(".downloads .window-body button");
+  const downloadButtons = document.querySelectorAll(
+    ".downloads .window-body button",
+  );
 
   downloadButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
@@ -36,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Remove any transforms which could interfere with dragging
       if (window.style.transform) {
-        window.style.transform = 'none';
+        window.style.transform = "none";
         window.style.left = `${rect.left}px`;
         window.style.top = `${rect.top}px`;
       }
@@ -64,8 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
       lastMouseY = e.clientY;
 
       // Get current window position
-      const currentLeft = parseInt(window.style.left) || window.getBoundingClientRect().left;
-      const currentTop = parseInt(window.style.top) || window.getBoundingClientRect().top;
+      const currentLeft =
+        parseInt(window.style.left) || window.getBoundingClientRect().left;
+      const currentTop =
+        parseInt(window.style.top) || window.getBoundingClientRect().top;
 
       // Move window by the delta amount
       window.style.left = `${currentLeft + deltaX}px`;
@@ -78,8 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Add event listeners for window control buttons
-    const minimizeButton = titleBar.querySelector('button[aria-label="Minimize"]');
-    const maximizeButton = titleBar.querySelector('button[aria-label="Maximize"]');
+    const minimizeButton = titleBar.querySelector(
+      'button[aria-label="Minimize"]',
+    );
+    const maximizeButton = titleBar.querySelector(
+      'button[aria-label="Maximize"]',
+    );
     const closeButton = titleBar.querySelector('button[aria-label="Close"]');
 
     // Store original dimensions for restore after minimize/maximize
@@ -92,20 +100,20 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isMinimized) {
         // If already minimized, restore
         isMinimized = false;
-        window.style.height = '';
-        const windowBody = window.querySelector('.window-body');
+        window.style.height = "";
+        const windowBody = window.querySelector(".window-body");
         if (windowBody) {
-          windowBody.style.display = '';
+          windowBody.style.display = "";
         }
       } else {
         // Minimize the window
         isMinimized = true;
         isMaximized = false;
-        const windowBody = window.querySelector('.window-body');
+        const windowBody = window.querySelector(".window-body");
         if (windowBody) {
-          windowBody.style.display = 'none';
+          windowBody.style.display = "none";
         }
-        window.style.height = 'auto';
+        window.style.height = "auto";
       }
     });
 
@@ -126,23 +134,23 @@ document.addEventListener("DOMContentLoaded", () => {
           width: window.style.width,
           height: window.style.height,
           top: window.style.top,
-          left: window.style.left
+          left: window.style.left,
         };
 
         // Maximize the window
         isMaximized = true;
         isMinimized = false;
 
-        window.style.width = '100%';
-        window.style.height = '90vh';
-        window.style.top = '5vh';
-        window.style.left = '0';
+        window.style.width = "100%";
+        window.style.height = "90vh";
+        window.style.top = "5vh";
+        window.style.left = "0";
       }
     });
 
     // Close button functionality
     closeButton.addEventListener("click", () => {
-      window.style.display = 'none';
+      window.style.display = "none";
     });
   });
 });

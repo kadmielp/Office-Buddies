@@ -59,7 +59,10 @@ class ModelManager {
       try {
         this.downloadItems[name].cancel();
       } catch (error) {
-        getLogger().error(`ModelManager: Error canceling download: ${name}`, error);
+        getLogger().error(
+          `ModelManager: Error canceling download: ${name}`,
+          error,
+        );
       }
 
       delete this.downloadItems[name];

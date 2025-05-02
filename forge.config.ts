@@ -67,9 +67,7 @@ function setup() {
     }
 
     // Setup TEMP
-    // Use the system's TEMP directory or fallback to a default path
-    process.env.TEMP = process.env.TMP = process.env.TEMP || process.env.TMP ||
-      path.join(os.homedir(), 'AppData', 'Local', 'Temp');
+    process.env.TEMP = process.env.TMP = path.join(os.homedir(), 'AppData', 'Local', 'Temp');
 
     // Write Azure codesigning metadata
     writeFileSync(
@@ -322,8 +320,7 @@ const config: ForgeConfig = {
         exe: "Clippy.exe",
         noMsi: true,
         remoteReleases: "",
-        iconUrl:
-          "https://raw.githubusercontent.com/felixrieseberg/clippy/main/assets/icon.ico",
+        iconUrl: 'https://raw.githubusercontent.com/felixrieseberg/windows95/master/assets/icon.ico',
         loadingGif: "./assets/boot.gif",
         setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
         setupIcon: path.resolve(__dirname, "assets", "icon.ico"),

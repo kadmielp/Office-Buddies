@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChat } from "../contexts/ChatContext";
 export type ChatInputProps = {
   onSend: (message: string) => void;
@@ -7,6 +7,13 @@ export type ChatInputProps = {
 export function ChatInput({ onSend }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const { isModelLoaded } = useChat();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isModelLoaded && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isModelLoaded]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -26,6 +33,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
   return (
     <div>
       <input
+        ref={inputRef}
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}

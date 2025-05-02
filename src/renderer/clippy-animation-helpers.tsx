@@ -2,7 +2,9 @@ import { ANIMATIONS, Animation } from "./clippy-animations";
 
 export const ANIMATION_KEYS = Object.keys(ANIMATIONS);
 export const ANIMATION_KEYS_BRACKETS = ANIMATION_KEYS.map((k) => `[${k}]`);
-export const IDLE_ANIMATION_KEYS = ANIMATION_KEYS.filter((k) => k.startsWith('Idle'));
+export const IDLE_ANIMATION_KEYS = ANIMATION_KEYS.filter((k) =>
+  k.startsWith("Idle"),
+);
 
 export const EMPTY_ANIMATION: Animation = {
   src: `data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==`,
@@ -38,4 +40,3 @@ export function getRandomAnimation(keys: string[], current?: Animation) {
 export function getRandomIdleAnimation(current?: Animation) {
   return getRandomAnimation(IDLE_ANIMATION_KEYS, current);
 }
-

@@ -12,34 +12,38 @@ export function SettingsModel() {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const columns = [
-    { key: 'default', header: 'Loaded', width: 50 },
-    { key: 'name', header: 'Name' },
-    { key: 'size', header: 'Size' },
-    { key: 'company', header: 'Company' },
-    { key: 'downloaded', header: 'Downloaded' },
+    { key: "default", header: "Loaded", width: 50 },
+    { key: "name", header: "Name" },
+    { key: "size", header: "Size" },
+    { key: "company", header: "Company" },
+    { key: "downloaded", header: "Downloaded" },
   ];
 
   const modelKeys = Object.keys(models || {});
-  const data = modelKeys.map(modelKey => {
+  const data = modelKeys.map((modelKey) => {
     const model = models?.[modelKey as keyof typeof models];
 
     return {
-      default: model?.name === settings.selectedModel ? 'ｘ' : '',
+      default: model?.name === settings.selectedModel ? "ｘ" : "",
       name: model?.name,
       company: model?.company,
       size: `${model.size.toLocaleString()} MB`,
-      downloaded: model.downloaded ? 'Yes' : 'No',
-    }
+      downloaded: model.downloaded ? "Yes" : "No",
+    };
   });
 
   // Variables
-  const selectedModel = models?.[modelKeys[selectedIndex] as keyof typeof models] || null;
+  const selectedModel =
+    models?.[modelKeys[selectedIndex] as keyof typeof models] || null;
   const isDownloading = isModelDownloading(selectedModel);
   const isDefaultModel = selectedModel?.name === settings.selectedModel;
 
   // Handlers
   // ---------------------------------------------------------------------------
-  const handleRowSelect = (row: Record<string, React.ReactNode>, index: number) => {
+  const handleRowSelect = (
+    row: Record<string, React.ReactNode>,
+    index: number,
+  ) => {
     setSelectedIndex(index);
   };
 
@@ -57,13 +61,17 @@ export function SettingsModel() {
 
   const handleMakeDefault = async () => {
     if (selectedModel) {
-      clippyApi.setState('settings.selectedModel', selectedModel.name);
+      clippyApi.setState("settings.selectedModel", selectedModel.name);
     }
   };
 
   return (
     <div>
-      <p>Select the model you want to use for your chat. The larger the model, the more powerful the chat, but the slower it will be - and the more memory it will use.</p>
+      <p>
+        Select the model you want to use for your chat. The larger the model,
+        the more powerful the chat, but the slower it will be - and the more
+        memory it will use.
+      </p>
       <TableView
         columns={columns}
         data={data}
@@ -72,27 +80,29 @@ export function SettingsModel() {
       />
 
       {selectedModel && (
-        <div className="model-details sunken-panel" style={{ marginTop: '20px', padding: '15px' }}>
+        <div
+          className="model-details sunken-panel"
+          style={{ marginTop: "20px", padding: "15px" }}
+        >
           <strong>{selectedModel.name}</strong>
 
-          {selectedModel.description && (
-            <p>{selectedModel.description}</p>
-          )}
+          {selectedModel.description && <p>{selectedModel.description}</p>}
 
           {selectedModel.homepage && (
             <p>
-              <a href={selectedModel.homepage} target="_blank" rel="noopener noreferrer">
+              <a
+                href={selectedModel.homepage}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Visit Homepage
               </a>
             </p>
           )}
 
-          <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+          <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
             {!selectedModel.downloaded ? (
-              <button
-                disabled={isDownloading}
-                onClick={handleDownload}
-              >
+              <button disabled={isDownloading} onClick={handleDownload}>
                 Download Model
               </button>
             ) : (
@@ -101,13 +111,11 @@ export function SettingsModel() {
                   disabled={isDownloading || isDefaultModel}
                   onClick={handleMakeDefault}
                 >
-                  {isDefaultModel ? 'Clippy uses this model' : 'Make Clippy use this model'}
+                  {isDefaultModel
+                    ? "Clippy uses this model"
+                    : "Make Clippy use this model"}
                 </button>
-                <button
-                  onClick={handleDelete}
-                >
-                  Delete Model
-                </button>
+                <button onClick={handleDelete}>Delete Model</button>
               </>
             )}
           </div>
@@ -126,30 +134,46 @@ const SettingsModelDownload: React.FC<{
     return null;
   }
 
-  const downloadSpeed = prettyDownloadSpeed(model?.downloadState?.currentBytesPerSecond || 0);
+  const downloadSpeed = prettyDownloadSpeed(
+    model?.downloadState?.currentBytesPerSecond || 0,
+  );
 
   return (
-    <div style={{ marginTop: '15px' }}>
-      <p>Downloading {model.name}... ({downloadSpeed}/s)</p>
+    <div style={{ marginTop: "15px" }}>
+      <p>
+        Downloading {model.name}... ({downloadSpeed}/s)
+      </p>
       <Progress progress={model.downloadState?.percentComplete || 0} />
     </div>
-  )
+  );
 };
 
 const SettingsModelVariables: React.FC = () => {
   const { settings } = useSharedState();
 
   return (
-    <fieldset style={{ marginTop: '20px' }}>
+    <fieldset style={{ marginTop: "20px" }}>
       <legend>Variables</legend>
       <div className="field-row">
         <label htmlFor="topK">Top K</label>
-        <input id="topK" type="number" value={settings.topK} onChange={(e) => clippyApi.setState('settings.topK', e.target.value)} />
+        <input
+          id="topK"
+          type="number"
+          value={settings.topK}
+          onChange={(e) => clippyApi.setState("settings.topK", e.target.value)}
+        />
       </div>
       <div className="field-row">
         <label htmlFor="temperature">Temperature</label>
-        <input id="temperature" type="number" value={settings.temperature} onChange={(e) => clippyApi.setState('settings.temperature', e.target.value)} />
+        <input
+          id="temperature"
+          type="number"
+          value={settings.temperature}
+          onChange={(e) =>
+            clippyApi.setState("settings.temperature", e.target.value)
+          }
+        />
       </div>
     </fieldset>
-  )
+  );
 };

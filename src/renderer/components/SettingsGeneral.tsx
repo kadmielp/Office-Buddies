@@ -14,7 +14,7 @@ export const SettingsGeneral: React.FC = () => {
           label="Keep Clippy always on top of all other windows"
           checked={settings.clippyAlwaysOnTop}
           onChange={(checked) => {
-            clippyApi.setState('settings.clippyAlwaysOnTop', checked);
+            clippyApi.setState("settings.clippyAlwaysOnTop", checked);
           }}
         />
         <Checkbox
@@ -22,7 +22,7 @@ export const SettingsGeneral: React.FC = () => {
           label="Keep chat always on top of all other windows"
           checked={settings.chatAlwaysOnTop}
           onChange={(checked) => {
-            clippyApi.setState('settings.chatAlwaysOnTop', checked);
+            clippyApi.setState("settings.chatAlwaysOnTop", checked);
           }}
         />
         <Checkbox
@@ -30,7 +30,7 @@ export const SettingsGeneral: React.FC = () => {
           label="Always open chat when Clippy starts"
           checked={settings.alwaysOpenChat}
           onChange={(checked) => {
-            clippyApi.setState('settings.alwaysOpenChat', checked);
+            clippyApi.setState("settings.alwaysOpenChat", checked);
           }}
         />
       </fieldset>

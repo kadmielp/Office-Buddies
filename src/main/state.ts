@@ -1,10 +1,11 @@
-import Store from 'electron-store';
+import Store from "electron-store";
 
-import { getChatWindow, getMainWindow } from './windows';
-import { IpcMessages } from '../ipc-messages';
-import { getModelManager } from './models';
-import { EMPTY_SHARED_STATE, SettingsState, SharedState } from '../sharedState';
-import { BUILT_IN_MODELS } from '../models';
+import { getChatWindow, getMainWindow } from "./windows";
+import { IpcMessages } from "../ipc-messages";
+import { getModelManager, getModelPath, isModelOnDisk } from "./models";
+import { EMPTY_SHARED_STATE, SettingsState, SharedState } from "../sharedState";
+import { BUILT_IN_MODELS } from "../models";
+import { DEBUG } from "../debug";
 
 export class StateManager {
   public store = new Store<SharedState>({
@@ -12,33 +13,45 @@ export class StateManager {
       ...EMPTY_SHARED_STATE,
       models: getModelManager().getInitialRendererModelState(),
     },
+    serialize: (value) => {
+      return JSON.stringify({ ...value, debug: undefined }, null, 2);
+    },
+    deserialize: (value) => {
+      return JSON.parse(value);
+    },
   });
 
   constructor() {
+    this.ensureCorrectDebugState();
     this.ensureCorrectModelState();
     this.ensureCorrectSettingsState();
 
     this.store.onDidAnyChange(this.onDidAnyChange);
 
     // Handle settings changes
-    this.store.onDidChange('settings', (newValue, oldValue) => {
+    this.store.onDidChange("settings", (newValue, oldValue) => {
       this.onSettingsChange(newValue, oldValue);
     });
   }
 
   public updateModelState() {
-    this.store.set('models', getModelManager().getRendererModelState());
+    this.store.set("models", getModelManager().getRendererModelState());
+  }
+
+  private ensureCorrectDebugState() {
+    for (const key of Object.keys(DEBUG)) {
+      this.store.set(`debug.${key}`, DEBUG[key as keyof typeof DEBUG]);
+    }
   }
 
   private ensureCorrectSettingsState() {
-    const settings = this.store.get('settings');
+    const settings = this.store.get("settings");
 
     // Default model exists?
     if (settings.selectedModel) {
-      const model = this.store.get('models')[settings.selectedModel];
+      const model = this.store.get("models")[settings.selectedModel];
 
-      if (!model || !getModelManager().getIsModelDownloaded(model)) {
-        const settings = this.store.get('settings');
+      if (!model || !isModelOnDisk(model)) {
         settings.selectedModel = undefined;
       }
     }
@@ -51,14 +64,17 @@ export class StateManager {
       settings.temperature = 0.7;
     }
 
-    this.store.set('settings', settings);
+    this.store.set("settings", settings);
   }
 
   private ensureCorrectModelState() {
-    const models = this.store.get('models');
+    const models = this.store.get("models");
 
     if (models === undefined || Object.keys(models).length === 0) {
-      this.store.set('models', getModelManager().getInitialRendererModelState());
+      this.store.set(
+        "models",
+        getModelManager().getInitialRendererModelState(),
+      );
       return;
     }
 
@@ -67,7 +83,7 @@ export class StateManager {
       const model = models[modelName];
 
       model.downloaded = getModelManager().getIsModelDownloaded(model);
-      model.path = getModelManager().getModelPath(model);
+      model.path = getModelPath(model);
     }
 
     // Make sure all models from the constant are in state
@@ -82,7 +98,7 @@ export class StateManager {
       }
     }
 
-    this.store.set('models', models)
+    this.store.set("models", models);
   }
 
   /**

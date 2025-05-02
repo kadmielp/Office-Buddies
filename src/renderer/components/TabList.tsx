@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 export type TabListTab = {
   label: string;
   key: string;
   content: React.ReactNode;
-}
+};
 
 export interface TabListProps {
   tabs: TabListTab[];
@@ -17,7 +17,7 @@ export function TabList({ tabs, activeTab, onTabChange }: TabListProps) {
 
   // Find the active tab index based on value
   const activeTabIndex = activeTab
-    ? tabs.findIndex(tab => tab.key === activeTab)
+    ? tabs.findIndex((tab) => tab.key === activeTab)
     : internalActiveTab;
 
   const handleTabClick = (index: number) => {
@@ -38,7 +38,7 @@ export function TabList({ tabs, activeTab, onTabChange }: TabListProps) {
             aria-selected={activeTabIndex === index}
             onClick={() => handleTabClick(index)}
             style={{
-              cursor: 'pointer',
+              cursor: "pointer",
             }}
           >
             <a>{tab.label}</a>
@@ -46,9 +46,7 @@ export function TabList({ tabs, activeTab, onTabChange }: TabListProps) {
         ))}
       </menu>
       <div className="window" role="tabpanel">
-        <div className="window-body">
-          {tabs[activeTabIndex]?.content}
-        </div>
+        <div className="window-body">{tabs[activeTabIndex]?.content}</div>
       </div>
     </div>
   );

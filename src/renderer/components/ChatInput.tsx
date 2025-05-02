@@ -5,15 +5,15 @@ export type ChatInputProps = {
 };
 
 export function ChatInput({ onSend }: ChatInputProps) {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       const trimmedMessage = message.trim();
 
       if (trimmedMessage) {
         onSend(trimmedMessage);
-        setMessage('');
+        setMessage("");
       }
     }
   };
@@ -27,7 +27,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
         onKeyDown={handleKeyDown}
         placeholder="Type a message, press Enter to send..."
         style={{
-          width: '100%',
+          width: "100%",
         }}
       />
     </div>

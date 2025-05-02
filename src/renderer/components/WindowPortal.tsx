@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 
-import { clippyApi } from '../clippyApi';
-import { WindowContext } from '../contexts/WindowContext';
-import { useChat } from '../contexts/ChatContext';
-import { useSharedState } from '../contexts/SharedStateContext';
+import { clippyApi } from "../clippyApi";
+import { WindowContext } from "../contexts/WindowContext";
+import { useChat } from "../contexts/ChatContext";
+import { useSharedState } from "../contexts/SharedStateContext";
 
 interface WindowPortalProps {
   children: React.ReactNode;
@@ -24,9 +24,9 @@ export function WindowPortal({
   children,
   width = 400,
   height = 500,
-  title = 'Clippy Chat'
+  title = "Clippy Chat",
 }: WindowPortalProps) {
-  const [ externalWindow, setExternalWindow ] = useState<Window | null>(null);
+  const [externalWindow, setExternalWindow] = useState<Window | null>(null);
   const { isChatWindowOpen, setIsChatWindowOpen } = useChat();
   const { settings } = useSharedState();
 
@@ -39,8 +39,8 @@ export function WindowPortal({
   // Initialize the singleton container only once
   useEffect(() => {
     if (!isInitialized) {
-      containerDiv = document.createElement('div');
-      containerDiv.className = 'clippy';
+      containerDiv = document.createElement("div");
+      containerDiv.className = "clippy";
       isInitialized = true;
     }
 
@@ -48,7 +48,7 @@ export function WindowPortal({
     const showWindow = async () => {
       if (!_externalWindow || _externalWindow.closed) {
         const windowFeatures = `width=${width},height=${height},positionNextToParent`;
-        _externalWindow = window.open('', '', windowFeatures);
+        _externalWindow = window.open("", "", windowFeatures);
 
         if (!_externalWindow) {
           console.error("Failed to open window - popup may be blocked");
@@ -62,7 +62,7 @@ export function WindowPortal({
         externalDoc.title = title;
 
         // Add styles
-        const style = externalDoc.createElement('style');
+        const style = externalDoc.createElement("style");
         style.textContent = ``;
 
         // Copy styles from parent window
@@ -71,31 +71,31 @@ export function WindowPortal({
           try {
             if (sheet.href) {
               // For external stylesheets
-              const linkElem = externalDoc.createElement('link');
-              linkElem.rel = 'stylesheet';
+              const linkElem = externalDoc.createElement("link");
+              linkElem.rel = "stylesheet";
               linkElem.href = sheet.href;
               externalDoc.head.appendChild(linkElem);
             } else {
               // For internal stylesheets
               const rules = Array.from(sheet.cssRules || []);
               for (const rule of rules) {
-                style.textContent += rule.cssText + '\n';
+                style.textContent += rule.cssText + "\n";
               }
             }
           } catch (e) {
-            console.warn('Could not copy stylesheet', e);
+            console.warn("Could not copy stylesheet", e);
           }
         }
 
         externalDoc.head.appendChild(style);
 
         // Setup close event
-        _externalWindow.addEventListener('beforeunload', () => {
+        _externalWindow.addEventListener("beforeunload", () => {
           console.log("Window closed by user");
           setIsChatWindowOpen(false);
         });
 
-        externalDoc.body.innerHTML = '';
+        externalDoc.body.innerHTML = "";
         externalDoc.body.appendChild(containerDiv);
       } else {
         await clippyApi.toggleChatWindow();

@@ -3,7 +3,7 @@ import { ModelState } from "./models";
 
 export interface SettingsState {
   selectedModel?: string;
-  systemPrompt?: string
+  systemPrompt?: string;
   clippyAlwaysOnTop?: boolean;
   chatAlwaysOnTop?: boolean;
   alwaysOpenChat?: boolean;
@@ -11,9 +11,16 @@ export interface SettingsState {
   temperature?: number;
 }
 
+export interface DebugState {
+  simulateDownload?: boolean;
+  simulateLoadModel?: boolean;
+  simulateNoModelsDownloaded?: boolean;
+}
+
 export interface SharedState {
   models: ModelState;
   settings: SettingsState;
+  debug: DebugState;
 }
 
 export type DownloadState = {
@@ -23,11 +30,11 @@ export type DownloadState = {
   startTime: number;
   savePath: string;
   currentBytesPerSecond: number;
-  state: 'progressing' | 'completed' | 'cancelled' | 'interrupted';
+  state: "progressing" | "completed" | "cancelled" | "interrupted";
 };
 
-const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the users request: ${ANIMATION_KEYS_BRACKETS.join(', ')}. Use only one of the keywords for each response. Use it only at the beginning of your response. Always start with one.`
-const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\n${ANIMATION_PROMPT}`
+const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the users request: ${ANIMATION_KEYS_BRACKETS.join(", ")}. Use only one of the keywords for each response. Use it only at the beginning of your response. Always start with one.`;
+const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\n${ANIMATION_PROMPT}`;
 
 export const EMPTY_SHARED_STATE: SharedState = {
   models: {},
@@ -38,5 +45,10 @@ export const EMPTY_SHARED_STATE: SharedState = {
     systemPrompt: DEFAULT_SYSTEM_PROMPT,
     topK: 10,
     temperature: 0.7,
+  },
+  debug: {
+    simulateDownload: undefined,
+    simulateLoadModel: undefined,
+    simulateNoModelsDownloaded: undefined,
   },
 };

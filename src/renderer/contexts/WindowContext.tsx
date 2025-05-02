@@ -1,8 +1,8 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from "react";
 
 export type WindowContextType = {
   currentWindow: Window;
-}
+};
 
 /**
  * Context for providing access to the correct window object
@@ -20,7 +20,7 @@ export function useWindow(): WindowContextType {
   const { currentWindow } = useContext(WindowContext);
 
   if (!currentWindow) {
-    throw new Error('useWindow must be used within a WindowProvider');
+    throw new Error("useWindow must be used within a WindowProvider");
   }
 
   return { currentWindow };

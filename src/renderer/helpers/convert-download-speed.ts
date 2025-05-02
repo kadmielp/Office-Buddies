@@ -5,7 +5,7 @@
  * @returns
  */
 export function prettyDownloadSpeed(bytesPerSecond: number): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const units = ["B", "KB", "MB", "GB", "TB"];
   let index = 0;
   let speed = bytesPerSecond;
 

@@ -1,11 +1,24 @@
-import { createContext, useContext, useState, ReactNode, useEffect, use, useCallback } from 'react';
-import { Message } from '../components/Message';
-import { clippyApi, electronAi } from '../clippyApi';
-import { SharedStateContext } from './SharedStateContext';
-import { areAnyModelsReadyOrDownloading } from '../../helpers/model-helpers';
-import { WelcomeMessageContent } from '../components/WelcomeMessageContent';
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  use,
+  useCallback,
+} from "react";
+import { Message } from "../components/Message";
+import { clippyApi, electronAi } from "../clippyApi";
+import { SharedStateContext } from "./SharedStateContext";
+import { areAnyModelsReadyOrDownloading } from "../../helpers/model-helpers";
+import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
 
-type ClippyNamedStatus = 'welcome' | 'idle' | 'responding' | 'thinking' | 'goodbye'
+type ClippyNamedStatus =
+  | "welcome"
+  | "idle"
+  | "responding"
+  | "thinking"
+  | "goodbye";
 
 export type ChatContextType = {
   messages: Message[];
@@ -20,49 +33,87 @@ export type ChatContextType = {
   setIsChatWindowOpen: (isChatWindowOpen: boolean) => void;
 };
 
-export const ChatContext = createContext<ChatContextType | undefined>(undefined);
+export const ChatContext = createContext<ChatContextType | undefined>(
+  undefined,
+);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [animationKey, setAnimationKey] = useState<string>('');
-  const [status, setStatus] = useState<ClippyNamedStatus>('welcome');
+  const [animationKey, setAnimationKey] = useState<string>("");
+  const [status, setStatus] = useState<ClippyNamedStatus>("welcome");
+  const [triedToLoadModel, setTriedToLoadModel] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const { settings, models } = useContext(SharedStateContext);
+  const { settings, models, debug } = useContext(SharedStateContext);
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
-  const [hasPerformedStartupCheck, setHasPerformedStartupCheck] = useState(false);
+  const [hasPerformedStartupCheck, setHasPerformedStartupCheck] =
+    useState(false);
 
   const addMessage = useCallback((message: Message) => {
-    setMessages(prevMessages => [...prevMessages, message]);
+    setMessages((prevMessages) => [...prevMessages, message]);
   }, []);
 
-  useEffect(() => {
-    if (settings.selectedModel) {
-      setIsModelLoaded(false);
-      electronAi.create({
+  const loadModel = useCallback(() => {
+    setIsModelLoaded(false);
+    electronAi
+      .create({
         modelAlias: settings.selectedModel,
         systemPrompt: settings.systemPrompt,
         topK: settings.topK,
         temperature: settings.temperature,
-      }).then(() => {
+      })
+      .then(() => {
         setIsModelLoaded(true);
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.error(error);
+
+        if (triedToLoadModel < 3) {
+          setTriedToLoadModel(triedToLoadModel + 1);
+          setTimeout(() => {
+            loadModel();
+          }, 500);
+        }
       });
+  }, [
+    settings.selectedModel,
+    settings.systemPrompt,
+    settings.topK,
+    settings.temperature,
+  ]);
+
+  useEffect(() => {
+    if (debug?.simulateDownload) {
+      setIsModelLoaded(true);
+      return;
     }
 
-    if (!settings.selectedModel && isModelLoaded) {
-      electronAi.destroy().then(() => {
-        setIsModelLoaded(false);
-      }).catch((error) => {
-        console.error(error);
-      });
+    if (settings.selectedModel) {
+      loadModel();
+    } else if (!settings.selectedModel && isModelLoaded) {
+      electronAi
+        .destroy()
+        .then(() => {
+          setIsModelLoaded(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
-  }, [settings.selectedModel, settings.systemPrompt, settings.topK, settings.temperature]);
+  }, [
+    settings.selectedModel,
+    settings.systemPrompt,
+    settings.topK,
+    settings.temperature,
+  ]);
 
   // At app startup, check if any models are ready. If none are, kick off a download
   // for our smallest model and tell the user about it.
   useEffect(() => {
-    if (messages.length > 0 || Object.keys(models).length === 0 || areAnyModelsReadyOrDownloading(models)) {
+    if (
+      messages.length > 0 ||
+      Object.keys(models).length === 0 ||
+      areAnyModelsReadyOrDownloading(models)
+    ) {
       return;
     }
 
@@ -75,11 +126,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     addMessage({
       id: crypto.randomUUID(),
       children: <WelcomeMessageContent />,
-      sender: 'clippy',
+      sender: "clippy",
     });
 
     const downloadModelIfNoneReady = async () => {
-      await clippyApi.downloadModelByName('Gemma 3 (1B)');
+      await clippyApi.downloadModelByName("Gemma 3 (1B)");
 
       setTimeout(async () => {
         await clippyApi.updateModelState();
@@ -91,11 +142,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   // If selectedModel is undefined or not available, set it to the first downloaded model
   useEffect(() => {
-    if (!settings.selectedModel || !models[settings.selectedModel] || !models[settings.selectedModel].downloaded) {
-      const downloadedModel = Object.values(models).find(model => model.downloaded);
+    if (
+      !settings.selectedModel ||
+      !models[settings.selectedModel] ||
+      !models[settings.selectedModel].downloaded
+    ) {
+      const downloadedModel = Object.values(models).find(
+        (model) => model.downloaded,
+      );
 
       if (downloadedModel) {
-        clippyApi.setState('settings.selectedModel', downloadedModel.name);
+        clippyApi.setState("settings.selectedModel", downloadedModel.name);
       }
     }
   }, [models]);
@@ -120,9 +177,8 @@ export function useChat() {
   const context = useContext(ChatContext);
 
   if (!context) {
-    throw new Error('useChat must be used within a ChatProvider');
+    throw new Error("useChat must be used within a ChatProvider");
   }
 
   return context;
 }
-

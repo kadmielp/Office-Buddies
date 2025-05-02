@@ -24,5 +24,5 @@ declare global {
   }
 }
 
-export const clippyApi = window['clippy'];
-export const electronAi = window['electronAi'];
+export const clippyApi = window["clippy"];
+export const electronAi = window["electronAi"];

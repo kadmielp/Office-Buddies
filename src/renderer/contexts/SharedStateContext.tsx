@@ -11,12 +11,19 @@ const EMPTY_SHARED_STATE: SharedState = {
     clippyAlwaysOnTop: false,
     alwaysOpenChat: true,
   },
+  debug: {},
 };
 
-export const SharedStateContext = createContext<SharedState>(EMPTY_SHARED_STATE);
+export const SharedStateContext =
+  createContext<SharedState>(EMPTY_SHARED_STATE);
 
-export const SharedStateProvider = ({ children }: { children: React.ReactNode }) => {
-  const [sharedState, setSharedState] = useState<SharedState>(EMPTY_SHARED_STATE);
+export const SharedStateProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [sharedState, setSharedState] =
+    useState<SharedState>(EMPTY_SHARED_STATE);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -39,7 +46,9 @@ export const SharedStateProvider = ({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     // Check if any model is downloading
-    const isAnyModelDownloading = Object.values(sharedState.models || {}).some(isModelDownloading);
+    const isAnyModelDownloading = Object.values(sharedState.models || {}).some(
+      isModelDownloading,
+    );
 
     // Start interval if any model is downloading
     if (isAnyModelDownloading && !intervalRef.current) {
@@ -66,14 +75,14 @@ export const SharedStateProvider = ({ children }: { children: React.ReactNode })
     <SharedStateContext.Provider value={sharedState}>
       {children}
     </SharedStateContext.Provider>
-  )
+  );
 };
 
 export const useSharedState = () => {
   const sharedState = useContext(SharedStateContext);
 
   if (!sharedState) {
-    throw new Error('useSharedState must be used within a SharedStateProvider');
+    throw new Error("useSharedState must be used within a SharedStateProvider");
   }
 
   return sharedState;

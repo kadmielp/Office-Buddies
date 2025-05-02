@@ -5,227 +5,226 @@ export interface Animation {
   length: number;
 }
 
-import Alert from './images/animations/Alert.png';
-import CheckingSomething from './images/animations/CheckingSomething.png';
-import Congratulate from './images/animations/Congratulate.png';
-import Default from './images/animations/Default.png';
-import EmptyTrash from './images/animations/EmptyTrash.png';
-import Explain from './images/animations/Explain.png';
-import GestureDown from './images/animations/GestureDown.png';
-import GestureLeft from './images/animations/GestureLeft.png';
-import GestureRight from './images/animations/GestureRight.png';
-import GestureUp from './images/animations/GestureUp.png';
-import GetArtsy from './images/animations/GetArtsy.png';
-import GetAttention from './images/animations/GetAttention.png';
-import GetTechy from './images/animations/GetTechy.png';
-import GetWizardy from './images/animations/GetWizardy.png';
-import GoodBye from './images/animations/GoodBye.png';
-import Greeting from './images/animations/Greeting.png';
-import Hearing_1 from './images/animations/Hearing_1.png';
-import Hide from './images/animations/Hide.png';
-import Idle1_1 from './images/animations/Idle1_1.png';
-import IdleAtom from './images/animations/IdleAtom.png';
-import IdleEyeBrowRaise from './images/animations/IdleEyeBrowRaise.png';
-import IdleFingerTap from './images/animations/IdleFingerTap.png';
-import IdleHeadScratch from './images/animations/IdleHeadScratch.png';
-import IdleRopePile from './images/animations/IdleRopePile.png';
-import IdleSideToSide from './images/animations/IdleSideToSide.png';
-import IdleSnooze from './images/animations/IdleSnooze.png';
-import LookDown from './images/animations/LookDown.png';
-import LookDownLeft from './images/animations/LookDownLeft.png';
-import LookDownRight from './images/animations/LookDownRight.png';
-import LookLeft from './images/animations/LookLeft.png';
-import LookRight from './images/animations/LookRight.png';
-import LookUp from './images/animations/LookUp.png';
-import LookUpLeft from './images/animations/LookUpLeft.png';
-import LookUpRight from './images/animations/LookUpRight.png';
-import Print from './images/animations/Print.png';
-import Processing from './images/animations/Processing.png';
-import RestPose from './images/animations/RestPose.png';
-import Save from './images/animations/Save.png';
-import Searching from './images/animations/Searching.png';
-import SendMail from './images/animations/SendMail.png';
-import Show from './images/animations/Show.png';
-import Thinking from './images/animations/Thinking.png';
-import Wave from './images/animations/Wave.png';
-import Writing from './images/animations/Writing.png';
+import Alert from "./images/animations/Alert.png";
+import CheckingSomething from "./images/animations/CheckingSomething.png";
+import Congratulate from "./images/animations/Congratulate.png";
+import Default from "./images/animations/Default.png";
+import EmptyTrash from "./images/animations/EmptyTrash.png";
+import Explain from "./images/animations/Explain.png";
+import GestureDown from "./images/animations/GestureDown.png";
+import GestureLeft from "./images/animations/GestureLeft.png";
+import GestureRight from "./images/animations/GestureRight.png";
+import GestureUp from "./images/animations/GestureUp.png";
+import GetArtsy from "./images/animations/GetArtsy.png";
+import GetAttention from "./images/animations/GetAttention.png";
+import GetTechy from "./images/animations/GetTechy.png";
+import GetWizardy from "./images/animations/GetWizardy.png";
+import GoodBye from "./images/animations/GoodBye.png";
+import Greeting from "./images/animations/Greeting.png";
+import Hearing_1 from "./images/animations/Hearing_1.png";
+import Hide from "./images/animations/Hide.png";
+import Idle1_1 from "./images/animations/Idle1_1.png";
+import IdleAtom from "./images/animations/IdleAtom.png";
+import IdleEyeBrowRaise from "./images/animations/IdleEyeBrowRaise.png";
+import IdleFingerTap from "./images/animations/IdleFingerTap.png";
+import IdleHeadScratch from "./images/animations/IdleHeadScratch.png";
+import IdleRopePile from "./images/animations/IdleRopePile.png";
+import IdleSideToSide from "./images/animations/IdleSideToSide.png";
+import IdleSnooze from "./images/animations/IdleSnooze.png";
+import LookDown from "./images/animations/LookDown.png";
+import LookDownLeft from "./images/animations/LookDownLeft.png";
+import LookDownRight from "./images/animations/LookDownRight.png";
+import LookLeft from "./images/animations/LookLeft.png";
+import LookRight from "./images/animations/LookRight.png";
+import LookUp from "./images/animations/LookUp.png";
+import LookUpLeft from "./images/animations/LookUpLeft.png";
+import LookUpRight from "./images/animations/LookUpRight.png";
+import Print from "./images/animations/Print.png";
+import Processing from "./images/animations/Processing.png";
+import RestPose from "./images/animations/RestPose.png";
+import Save from "./images/animations/Save.png";
+import Searching from "./images/animations/Searching.png";
+import SendMail from "./images/animations/SendMail.png";
+import Show from "./images/animations/Show.png";
+import Thinking from "./images/animations/Thinking.png";
+import Wave from "./images/animations/Wave.png";
+import Writing from "./images/animations/Writing.png";
 
 export const ANIMATIONS: Record<string, Animation> = {
-  'Alert': {
+  Alert: {
     src: Alert,
-    length: 2400
+    length: 2400,
   },
-  'CheckingSomething': {
+  CheckingSomething: {
     src: CheckingSomething,
-    length: 6640
+    length: 6640,
   },
-  'Congratulate': {
+  Congratulate: {
     src: Congratulate,
-    length: 3680
+    length: 3680,
   },
-  'Default': {
+  Default: {
     src: Default,
-    length: 0
+    length: 0,
   },
-  'EmptyTrash': {
+  EmptyTrash: {
     src: EmptyTrash,
-    length: 5000
+    length: 5000,
   },
-  'Explain': {
+  Explain: {
     src: Explain,
-    length: 1500
+    length: 1500,
   },
-  'GestureDown': {
+  GestureDown: {
     src: GestureDown,
-    length: 2250
+    length: 2250,
   },
-  'GestureLeft': {
+  GestureLeft: {
     src: GestureLeft,
-    length: 3050
+    length: 3050,
   },
-  'GestureRight': {
+  GestureRight: {
     src: GestureRight,
-    length: 3250
+    length: 3250,
   },
-  'GestureUp': {
+  GestureUp: {
     src: GestureUp,
-    length: 2800
+    length: 2800,
   },
-  'GetArtsy': {
+  GetArtsy: {
     src: GetArtsy,
-    length: 4900
+    length: 4900,
   },
-  'GetAttention': {
+  GetAttention: {
     src: GetAttention,
-    length: 2650
+    length: 2650,
   },
-  'GetTechy': {
+  GetTechy: {
     src: GetTechy,
-    length: 4500
+    length: 4500,
   },
-  'GetWizardy': {
+  GetWizardy: {
     src: GetWizardy,
-    length: 3680
+    length: 3680,
   },
-  'GoodBye': {
+  GoodBye: {
     src: GoodBye,
-    length: 4450
+    length: 4450,
   },
-  'Greeting': {
+  Greeting: {
     src: Greeting,
-    length: 4450
+    length: 4450,
   },
-  'Hearing 1': {
+  "Hearing 1": {
     src: Hearing_1,
-    length: 5400
+    length: 5400,
   },
-  'Hide': {
+  Hide: {
     src: Hide,
-    length: 50
+    length: 50,
   },
-  'Idle1 1': {
+  "Idle1 1": {
     src: Idle1_1,
-    length: 7300
+    length: 7300,
   },
-  'IdleAtom': {
+  IdleAtom: {
     src: IdleAtom,
-    length: 4500
+    length: 4500,
   },
-  'IdleEyeBrowRaise': {
+  IdleEyeBrowRaise: {
     src: IdleEyeBrowRaise,
-    length: 1500
+    length: 1500,
   },
-  'IdleFingerTap': {
+  IdleFingerTap: {
     src: IdleFingerTap,
-    length: 1150
+    length: 1150,
   },
-  'IdleHeadScratch': {
+  IdleHeadScratch: {
     src: IdleHeadScratch,
-    length: 1900
+    length: 1900,
   },
-  'IdleRopePile': {
+  IdleRopePile: {
     src: IdleRopePile,
-    length: 7500
+    length: 7500,
   },
-  'IdleSideToSide': {
+  IdleSideToSide: {
     src: IdleSideToSide,
-    length: 5700
+    length: 5700,
   },
-  'IdleSnooze': {
+  IdleSnooze: {
     src: IdleSnooze,
-    length: 13600
+    length: 13600,
   },
-  'LookDown': {
+  LookDown: {
     src: LookDown,
-    length: 1800
+    length: 1800,
   },
-  'LookDownLeft': {
+  LookDownLeft: {
     src: LookDownLeft,
-    length: 1800
+    length: 1800,
   },
-  'LookDownRight': {
+  LookDownRight: {
     src: LookDownRight,
-    length: 1800
+    length: 1800,
   },
-  'LookLeft': {
+  LookLeft: {
     src: LookLeft,
-    length: 1800
+    length: 1800,
   },
-  'LookRight': {
+  LookRight: {
     src: LookRight,
-    length: 1800
+    length: 1800,
   },
-  'LookUp': {
+  LookUp: {
     src: LookUp,
-    length: 1800
+    length: 1800,
   },
-  'LookUpLeft': {
+  LookUpLeft: {
     src: LookUpLeft,
-    length: 1800
+    length: 1800,
   },
-  'LookUpRight': {
+  LookUpRight: {
     src: LookUpRight,
-    length: 1800
+    length: 1800,
   },
-  'Print': {
+  Print: {
     src: Print,
-    length: 8400
+    length: 8400,
   },
-  'Processing': {
+  Processing: {
     src: Processing,
-    length: 3800
+    length: 3800,
   },
-  'RestPose': {
+  RestPose: {
     src: RestPose,
-    length: 100
+    length: 100,
   },
-  'Save': {
+  Save: {
     src: Save,
-    length: 5530
+    length: 5530,
   },
-  'Searching': {
+  Searching: {
     src: Searching,
-    length: 8100
+    length: 8100,
   },
-  'SendMail': {
+  SendMail: {
     src: SendMail,
-    length: 6800
+    length: 6800,
   },
-  'Show': {
+  Show: {
     src: Show,
-    length: 50
+    length: 50,
   },
-  'Thinking': {
+  Thinking: {
     src: Thinking,
-    length: 4500
+    length: 4500,
   },
-  'Wave': {
+  Wave: {
     src: Wave,
-    length: 4900
+    length: 4900,
   },
-  'Writing': {
+  Writing: {
     src: Writing,
-    length: 8400
+    length: 8400,
   },
 };
-

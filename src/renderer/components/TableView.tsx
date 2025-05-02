@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useWindow } from '../contexts/WindowContext';
+import React, { useState, useEffect, useRef } from "react";
+import { useWindow } from "../contexts/WindowContext";
 
 interface Column {
   key: string;
@@ -22,7 +22,9 @@ export const TableView: React.FC<TableViewProps> = ({
   style,
   initialSelectedIndex,
 }) => {
-  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(initialSelectedIndex ?? null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(
+    initialSelectedIndex ?? null,
+  );
   const tableRef = useRef<HTMLDivElement>(null);
   const { currentWindow } = useWindow();
 
@@ -37,7 +39,7 @@ export const TableView: React.FC<TableViewProps> = ({
     if (!data.length) return;
 
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
         if (selectedRowIndex === null) {
           // Select first row if nothing is selected
@@ -50,7 +52,7 @@ export const TableView: React.FC<TableViewProps> = ({
           if (onRowSelect) onRowSelect(data[newIndex], newIndex);
         }
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         if (selectedRowIndex === null) {
           // Select last row if nothing is selected
@@ -64,13 +66,13 @@ export const TableView: React.FC<TableViewProps> = ({
           if (onRowSelect) onRowSelect(data[newIndex], newIndex);
         }
         break;
-      case 'Enter':
+      case "Enter":
         if (selectedRowIndex !== null) {
           // Toggle selection on Enter
           handleRowClick(selectedRowIndex);
         }
         break;
-      case 'Escape':
+      case "Escape":
         // Clear selection
         setSelectedRowIndex(null);
         break;
@@ -84,25 +86,27 @@ export const TableView: React.FC<TableViewProps> = ({
     }
 
     // Add event listener for keyboard navigation
-    currentWindow.addEventListener('keydown', handleKeyDown);
+    currentWindow.addEventListener("keydown", handleKeyDown);
 
     // Cleanup
     return () => {
-      currentWindow.removeEventListener('keydown', handleKeyDown);
+      currentWindow.removeEventListener("keydown", handleKeyDown);
     };
   }, [selectedRowIndex, data, onRowSelect]);
 
   // Calculate column widths
   const calculateColumnWidths = () => {
-    const flexibleColumnsCount = columns.filter(col => col.width === undefined).length;
+    const flexibleColumnsCount = columns.filter(
+      (col) => col.width === undefined,
+    ).length;
 
-    return columns.map(column => {
+    return columns.map((column) => {
       if (column.width !== undefined) {
         // Fixed width columns use their specified width
         return { width: `${column.width}px` };
       } else if (flexibleColumnsCount > 0) {
         // Flexible columns share the remaining space equally
-        return { width: flexibleColumnsCount > 0 ? 'auto' : '100%' };
+        return { width: flexibleColumnsCount > 0 ? "auto" : "100%" };
       }
       return {};
     });
@@ -113,18 +117,18 @@ export const TableView: React.FC<TableViewProps> = ({
   return (
     <div
       className="sunken-panel"
-      style={{ ...style, outline: 'none' }}
+      style={{ ...style, outline: "none" }}
       ref={tableRef}
       tabIndex={0}
     >
-      <table className="interactive" style={{ width: '100%', tableLayout: 'fixed' }}>
+      <table
+        className="interactive"
+        style={{ width: "100%", tableLayout: "fixed" }}
+      >
         <thead>
           <tr>
             {columns.map((column, index) => (
-              <th
-                key={column.key}
-                style={columnWidths[index]}
-              >
+              <th key={column.key} style={columnWidths[index]}>
                 {column.header}
               </th>
             ))}
@@ -134,7 +138,7 @@ export const TableView: React.FC<TableViewProps> = ({
           {data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className={selectedRowIndex === rowIndex ? 'highlighted' : ''}
+              className={selectedRowIndex === rowIndex ? "highlighted" : ""}
               onClick={() => handleRowClick(rowIndex)}
             >
               {columns.map((column, colIndex) => (

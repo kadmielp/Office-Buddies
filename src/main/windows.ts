@@ -19,7 +19,7 @@ export function getMainWindow(): BrowserWindow | undefined {
  * @returns The main window
  */
 export async function createMainWindow() {
-  const settings = getStateManager().store.get('settings');
+  const settings = getStateManager().store.get("settings");
 
   mainWindow = new BrowserWindow({
     width: 125,
@@ -30,22 +30,27 @@ export async function createMainWindow() {
     acceptFirstMouse: true,
     alwaysOnTop: settings.clippyAlwaysOnTop,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
   }
 }
 
 export function setupWindowListener() {
-  app.on('browser-window-created', (_event: Electron.Event, browserWindow: BrowserWindow) => {
-    setupWindowOpenHandler(browserWindow);
-    setupNavigationHandler(browserWindow);
-  });
+  app.on(
+    "browser-window-created",
+    (_event: Electron.Event, browserWindow: BrowserWindow) => {
+      setupWindowOpenHandler(browserWindow);
+      setupNavigationHandler(browserWindow);
+    },
+  );
 }
 
 /**
@@ -55,19 +60,23 @@ export function setupWindowListener() {
  */
 export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
   browserWindow.webContents.setWindowOpenHandler(({ url, features }) => {
-    if (url.startsWith('http')) {
+    if (url.startsWith("http")) {
       shell.openExternal(url);
 
-      return { action: 'deny' };
+      return { action: "deny" };
     }
 
-    const width = parseInt(features.match(/width=(\d+)/)?.[1] || '400', 10);
-    const height = parseInt(features.match(/height=(\d+)/)?.[1] || '600', 10);
-    const shouldPositionNextToParent = features.includes('positionNextToParent');
-    const newWindowPosition = shouldPositionNextToParent ? getPopoverWindowPosition(browserWindow, { width, height }) : undefined;
+    const width = parseInt(features.match(/width=(\d+)/)?.[1] || "400", 10);
+    const height = parseInt(features.match(/height=(\d+)/)?.[1] || "600", 10);
+    const shouldPositionNextToParent = features.includes(
+      "positionNextToParent",
+    );
+    const newWindowPosition = shouldPositionNextToParent
+      ? getPopoverWindowPosition(browserWindow, { width, height })
+      : undefined;
 
     return {
-      action: 'allow',
+      action: "allow",
       overrideBrowserWindowOptions: {
         frame: false,
         x: newWindowPosition?.x,
@@ -75,15 +84,15 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         roundedCorners: false,
         minHeight: 400,
         minWidth: 400,
-        alwaysOnTop: getStateManager().store.get('settings').chatAlwaysOnTop,
+        alwaysOnTop: getStateManager().store.get("settings").chatAlwaysOnTop,
       },
-    }
+    };
   });
 }
 
 function setupNavigationHandler(browserWindow: BrowserWindow) {
-  browserWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.startsWith('http')) {
+  browserWindow.webContents.on("will-navigate", (event, url) => {
+    if (url.startsWith("http")) {
       shell.openExternal(url);
     }
   });
@@ -96,17 +105,22 @@ function setupNavigationHandler(browserWindow: BrowserWindow) {
  * @param size The size of the new window
  * @returns The new window position
  */
-export function getPopoverWindowPosition(browserWindow: BrowserWindow, size: { width: number, height: number }): { x: number, y: number } {
+export function getPopoverWindowPosition(
+  browserWindow: BrowserWindow,
+  size: { width: number; height: number },
+): { x: number; y: number } {
   const parentBounds = browserWindow.getBounds();
   const { width, height } = size;
   const SPACING = 50; // Distance between windows
 
   // Get the current display
   const displays = screen.getAllDisplays();
-  const display = displays.find((display) =>
-    parentBounds.x >= display.bounds.x &&
-    parentBounds.x <= display.bounds.x + display.bounds.width
-  ) || displays[0];
+  const display =
+    displays.find(
+      (display) =>
+        parentBounds.x >= display.bounds.x &&
+        parentBounds.x <= display.bounds.x + display.bounds.width,
+    ) || displays[0];
 
   // Calculate horizontal position (left or right of parent)
   let x: number;
@@ -137,7 +151,9 @@ export function getPopoverWindowPosition(browserWindow: BrowserWindow, size: { w
  * @returns The chat window
  */
 export function getChatWindow(): BrowserWindow | undefined {
-  return BrowserWindow.getAllWindows().find((window) => window.webContents.getTitle() === 'Clippy Chat');
+  return BrowserWindow.getAllWindows().find(
+    (window) => window.webContents.getTitle() === "Clippy Chat",
+  );
 }
 
 /**

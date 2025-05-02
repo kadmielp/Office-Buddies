@@ -4,6 +4,7 @@ import { SettingsModel } from "./SettingsModel";
 import { BubbleWindowBottomBar } from "./BubbleWindowBottomBar";
 import { SettingsAdvanced } from "./SettingsAdvanced";
 import { SettingsGeneral } from "./SettingsGeneral";
+import { SettingsAbout } from "./SettingsAbout";
 import { BubbleView, useBubbleView } from "../contexts/BubbleViewContext";
 
 export type SettingsTab = "general" | "model" | "advanced" | "about";
@@ -22,7 +23,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     { label: "General", key: "general", content: <SettingsGeneral /> },
     { label: "Model", key: "model", content: <SettingsModel /> },
     { label: "Advanced", key: "advanced", content: <SettingsAdvanced /> },
-    { label: "About", key: "about", content: <div>Credits</div> },
+    { label: "About", key: "about", content: <SettingsAbout /> },
   ];
 
   return (

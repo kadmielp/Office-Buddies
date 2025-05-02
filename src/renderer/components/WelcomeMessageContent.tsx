@@ -23,7 +23,7 @@ export const WelcomeMessageContent: React.FC = () => {
         illustrator Kevan Atteberry, who created more than 15 potential
         characters for Microsoft's Office Assistants. It is <i>not</i>{" "}
         affiliated, approved, or supported by Microsoft. Consider it software
-        satire.
+        art or satire.
       </p>
       <p>
         This version of Clippy can run a Large Language Model (LLM) locally, so

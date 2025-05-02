@@ -9,6 +9,6 @@ It is also meant to be a reference implementation of [@electron/llm](https://git
 Thanks to:
 
 - I am so grateful to Microsoft - not only for everything they've done for Electron, but also for giving us one of the most iconic characters of computing history.
+- [@jdan's 98.css](https://github.com/jdan) for the Windows 98 design
 - [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for squeezing llama.cpp into Node.js
 - @pi0 for being the (as far as I know) person to extract the length of each frame from the Clippy spritesheet.
-

@@ -23,6 +23,8 @@ export type ClippyApi = {
   getChatRecords: () => Promise<Record<string, ChatRecord>>;
   getChatWithMessages: (chatId: string) => Promise<ChatWithMessages | null>;
   writeChatWithMessages: (chatWithMessages: ChatWithMessages) => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
+  deleteAllChats: () => Promise<void>;
 };
 
 declare global {

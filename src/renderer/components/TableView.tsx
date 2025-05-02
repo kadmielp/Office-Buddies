@@ -5,6 +5,10 @@ interface Column {
   key: string;
   header: string;
   width?: number;
+  render?: (
+    row: Record<string, React.ReactNode>,
+    index?: number,
+  ) => React.ReactNode;
 }
 
 interface TableViewProps {
@@ -146,7 +150,9 @@ export const TableView: React.FC<TableViewProps> = ({
                   key={`${rowIndex}-${column.key}`}
                   style={columnWidths[colIndex]}
                 >
-                  {row[column.key]}
+                  {column.render
+                    ? column.render(row, rowIndex)
+                    : row[column.key]}
                 </td>
               ))}
             </tr>

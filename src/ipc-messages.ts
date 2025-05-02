@@ -14,4 +14,6 @@ export const IpcMessages = {
   CHAT_GET_CHAT_RECORDS: "clippy_chat_get_chat_records",
   CHAT_GET_CHAT_WITH_MESSAGES: "clippy_chat_get_chat_with_messages",
   CHAT_WRITE_CHAT_WITH_MESSAGES: "clippy_chat_write_chat_with_messages",
+  CHAT_DELETE_CHAT: "clippy_chat_delete_chat",
+  CHAT_DELETE_ALL_CHATS: "clippy_chat_delete_all_chats",
 };

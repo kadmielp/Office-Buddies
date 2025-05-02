@@ -52,4 +52,10 @@ export function setupIpcListeners() {
     (_, chatWithMessages: ChatWithMessages) =>
       getChatManager().writeChatWithMessages(chatWithMessages),
   );
+  ipcMain.handle(IpcMessages.CHAT_DELETE_CHAT, (_, chatId: string) =>
+    getChatManager().deleteChat(chatId),
+  );
+  ipcMain.handle(IpcMessages.CHAT_DELETE_ALL_CHATS, () =>
+    getChatManager().deleteAllChats(),
+  );
 }

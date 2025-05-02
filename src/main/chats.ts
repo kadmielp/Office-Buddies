@@ -56,6 +56,21 @@ export class ChatManager {
     return this.chatRecords;
   }
 
+  public async deleteChat(chatId: string): Promise<void> {
+    delete this.chatRecords[chatId];
+    delete this.messageRecords[chatId];
+    await this.writeChatsIndexToDisk();
+    await this.deleteChatFromDisk(chatId);
+  }
+
+  public async deleteAllChats(): Promise<void> {
+    this.chatRecords = {};
+    this.messageRecords = {};
+
+    await this.deleteAllChatsFromDisk();
+    await this.writeChatsIndexToDisk();
+  }
+
   private async writeChatsIndexToDisk(): Promise<void> {
     try {
       await fs.promises.mkdir(this.getChatsPath(), { recursive: true });
@@ -65,6 +80,30 @@ export class ChatManager {
       );
     } catch (error) {
       console.error("Error writing chats index file:", error);
+    }
+  }
+
+  private async deleteAllChatsFromDisk(): Promise<void> {
+    const chatsPath = this.getChatsPath();
+
+    try {
+      if (fs.existsSync(chatsPath)) {
+        await fs.promises.rm(chatsPath, { recursive: true, force: true });
+      }
+    } catch (error) {
+      console.error("Error deleting all chats from disk:", error);
+    }
+  }
+
+  private async deleteChatFromDisk(chatId: string): Promise<void> {
+    const chatPath = this.getChatPath(chatId);
+
+    try {
+      if (fs.existsSync(chatPath)) {
+        await fs.promises.unlink(chatPath);
+      }
+    } catch (error) {
+      console.error(`Error deleting chat file ${chatPath}:`, error);
     }
   }
 

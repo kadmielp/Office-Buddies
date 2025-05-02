@@ -49,6 +49,9 @@ const clippyApi: ClippyApi = {
       IpcMessages.CHAT_WRITE_CHAT_WITH_MESSAGES,
       chatWithMessages,
     ),
+  deleteChat: (chatId: string) =>
+    ipcRenderer.invoke(IpcMessages.CHAT_DELETE_CHAT, chatId),
+  deleteAllChats: () => ipcRenderer.invoke(IpcMessages.CHAT_DELETE_ALL_CHATS),
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);

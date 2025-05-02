@@ -40,6 +40,8 @@ export type ChatContextType = {
   currentChatRecord: ChatRecord;
   selectChat: (chatId: string) => void;
   startNewChat: () => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
+  deleteAllChats: () => Promise<void>;
 };
 
 export const ChatContext = createContext<ChatContextType | undefined>(
@@ -154,6 +156,31 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     ],
   );
 
+  const deleteChat = useCallback(
+    async (chatId: string) => {
+      await clippyApi.deleteChat(chatId);
+
+      setChatRecords((prevChatRecords) => {
+        const newChatRecords = { ...prevChatRecords };
+        delete newChatRecords[chatId];
+        return newChatRecords;
+      });
+
+      if (currentChatRecord.id === chatId) {
+        await startNewChat();
+      }
+    },
+    [currentChatRecord.id],
+  );
+
+  const deleteAllChats = useCallback(async () => {
+    await clippyApi.deleteAllChats();
+
+    setChatRecords({});
+    setMessages([]);
+    startNewChat();
+  }, []);
+
   useEffect(() => {
     const updatedChatRecord = {
       ...currentChatRecord,
@@ -260,6 +287,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     chatRecords,
     currentChatRecord,
     selectChat,
+    deleteChat,
+    deleteAllChats,
     startNewChat,
     messages,
     addMessage,

@@ -1,6 +1,8 @@
 import { useChat } from "../contexts/ChatContext";
 import { TableView } from "./TableView";
 import { formatDistance } from "date-fns";
+import { clippyApi } from "../clippyApi";
+import { useState } from "react";
 
 export type SettingsTab = "general" | "model" | "advanced" | "about";
 
@@ -9,28 +11,96 @@ export type SettingsProps = {
 };
 
 export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
-  const { chatRecords, currentChatRecord, selectChat } = useChat();
+  const {
+    chatRecords,
+    currentChatRecord,
+    selectChat,
+    deleteChat,
+    deleteAllChats,
+  } = useChat();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedChatIndex, setSelectedChatIndex] = useState<number | null>(
+    null,
+  );
+
   const chatsWithPreview = Object.values(chatRecords).map((chat) => ({
     id: chat.id,
     lastUpdated: formatDistance(chat.updatedAt, new Date(), {
       addSuffix: true,
     }),
-    createdAt: formatDistance(chat.createdAt, new Date(), { addSuffix: true }),
     preview: chat.preview,
   }));
 
   const handleSelectChat = async (
-    row: Record<string, React.ReactNode>,
+    _row: Record<string, React.ReactNode>,
     index: number,
   ) => {
-    selectChat(chatsWithPreview[index].id);
+    setSelectedChatIndex(index);
+  };
+
+  const handleRestoreChat = async () => {
+    if (
+      selectedChatIndex === null ||
+      selectedChatIndex >= chatsWithPreview.length
+    ) {
+      return;
+    }
+
+    selectChat(chatsWithPreview[selectedChatIndex].id);
     onClose();
+  };
+
+  const handleDeleteChat = async (chatId: string) => {
+    if (!confirm("Are you sure you want to delete this chat?")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteChat(chatId);
+      setSelectedChatIndex(null);
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (
+      selectedChatIndex === null ||
+      selectedChatIndex >= chatsWithPreview.length
+    ) {
+      return;
+    }
+
+    const chatId = chatsWithPreview[selectedChatIndex].id;
+    await handleDeleteChat(chatId);
+  };
+
+  const handleDeleteAllChats = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete ALL chats? This cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteAllChats();
+      setSelectedChatIndex(null);
+    } catch (error) {
+      console.error("Failed to delete all chats:", error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const columns = [
     { key: "preview", header: "Preview" },
-    { key: "lastUpdated", header: "Last Updated", width: 150 },
-    { key: "createdAt", header: "Created", width: 150 },
+    { key: "lastUpdated", header: "Last Updated" },
   ];
 
   return (
@@ -52,23 +122,34 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
         }}
       >
         <h1>Chats</h1>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            onClick={handleRestoreChat}
+            disabled={selectedChatIndex === null}
+          >
+            Restore Chat
+          </button>
+          <button
+            onClick={handleDeleteSelected}
+            disabled={isDeleting || selectedChatIndex === null}
+          >
+            Delete Selected
+          </button>
+          <button onClick={handleDeleteAllChats} disabled={isDeleting}>
+            Delete All Chats
+          </button>
+        </div>
       </div>
 
-      {chatsWithPreview.length > 0 ? (
-        <TableView
-          columns={columns}
-          data={chatsWithPreview}
-          onRowSelect={handleSelectChat}
-          style={{ height: "calc(80vh - 100px)", overflow: "auto" }}
-          initialSelectedIndex={Object.values(chatRecords).findIndex(
-            (chat) => chat.id === currentChatRecord.id,
-          )}
-        />
-      ) : (
-        <div style={{ textAlign: "center", marginTop: "40px" }}>
-          <p>No chats yet. Start a new conversation!</p>
-        </div>
-      )}
+      <TableView
+        columns={columns}
+        data={chatsWithPreview}
+        onRowSelect={handleSelectChat}
+        style={{ height: "calc(80vh - 100px)", overflow: "auto" }}
+        initialSelectedIndex={Object.values(chatRecords).findIndex(
+          (chat) => chat.id === currentChatRecord.id,
+        )}
+      />
     </div>
   );
 };

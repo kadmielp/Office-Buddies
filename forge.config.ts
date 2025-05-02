@@ -118,37 +118,9 @@ const config: ForgeConfig = {
     },
   },
   packagerConfig: {
-    // asar: {
-    //   unpack: "**/node_modules/*node-llama-cpp*",
-    // },
-    // ignore: [
-    //   // Files we never want
-    //   /out/,
-    //   /src/,
-    //   /.eslintrc/,
-    //   /package-lock.json/,
-    //   /tools/,
-		// 	/\.DS_Store$/,
-		// 	/\.js\.map$/,
-		// 	/\.o\.d$/,
-		// 	/\.ts$/,
-		// 	/\.tsx$/,
-		// 	/\.target\.mk$/,
-		// 	/\.ts\.snap$/,
-		// 	/\.ts\.map$/,
-		// 	/\.js\.map$/,
-		// 	/\.jsx\.map$/,
-		// 	/\.a$/,
-		// 	/node\.d$/,
-		// 	/config\.gypi$/,
-		// 	/\.Makefile$/,
-		// 	/\.target\.mk$/,
-		// 	/readme\.md$/i,
-		// 	/changelog\.md$/i,
-		// 	/forge\.config/,
-		// 	/tsconfig/,
-		// 	/asar-ordering.txt/
-    // ],
+    asar: {
+      unpack: "**/node_modules/*node-llama-cpp*",
+    },
     ignore: (file) => {
       const filePath = file.toLowerCase();
       const result = {
@@ -163,16 +135,19 @@ const config: ForgeConfig = {
       ]
 
       const extensionsToIgnore = [
+        '.DS_Store',
+        '.gitignore',
+        '.gitmodules',
+        '.target.mk',
+        '.config.gypi',
         '.o',
         '.obj',
         '.ts',
         '.tsbuildinfo',
         '.map',
         '.d',
-        '.d.ts',
-        '.d.ts.map',
-        '.d.ts.snap',
-        '.d.ts.snap',
+        '.ts',
+        '.ts.snap',
         '.cmake',
         '.cpp',
         '.h',
@@ -235,7 +210,6 @@ const config: ForgeConfig = {
 
       return true;
     },
-    asar: false,
     appCategoryType: "public.app-category.productivity",
     icon: path.resolve(__dirname, "assets/icon"),
     junk: true,

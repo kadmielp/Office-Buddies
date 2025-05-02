@@ -78,14 +78,10 @@ jobs:
         env:
           MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
           MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
-      - name: Set Windows signing certificate
+      - name: Install Windows dependencies
         if: matrix.os == 'windows-latest'
-        continue-on-error: true
-        id: write_file
-        uses: timheuer/base64-to-file@v1
-        with:
-          fileName: "win-certificate.pfx"
-          encodedString: ${{ secrets.WINDOWS_CODESIGN_P12 }}
+        run: "nuget install Microsoft.Windows.SDK.BuildTools -Version 10.0.26100.1742 -x ; nuget install Microsoft.Trusted.Signing.Client -Version 1.0.60 -x"
+        shell: pwsh
       - name: Install
         run: npm ci
       - name: Make
@@ -95,8 +91,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WINDOWS_CODESIGN_FILE: ${{ steps.write_file.outputs.filePath }}
-          WINDOWS_CODESIGN_PASSWORD: ${{ secrets.WINDOWS_CODESIGN_PASSWORD }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

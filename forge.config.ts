@@ -1,5 +1,5 @@
 import { Walker, DepType, type Module } from "flora-colossus";
-import { readdirSync, rmdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, rmdirSync, statSync, writeFileSync } from "node:fs";
 import path from "path";
 import dotenv from "dotenv";
 
@@ -24,14 +24,14 @@ let nativeModuleDependenciesToPackage: string[] = [];
 const EXTERNAL_DEPENDENCIES = ["@electron/llm", "node-llama-cpp"];
 
 const FLAGS = {
-  SIGNTOOL_PATH: process.env.SIGNTOOL_PATH,
+  SIGNTOOL_PATH: process.env.SIGNTOOL_PATH || path.join(__dirname, "Microsoft.Windows.SDK.BuildTools/bin/10.0.26100.0/x64/signtool.exe"),
   AZURE_CODE_SIGNING_DLIB:
     process.env.AZURE_CODE_SIGNING_DLIB ||
     path.join(
       __dirname,
-      "Microsoft.Trusted.Signing.Client.1.0.60/bin/x64/Azure.CodeSigning.Dlib.dll",
+      "Microsoft.Trusted.Signing.Client/bin/x64/Azure.CodeSigning.Dlib.dll",
     ),
-  AZURE_METADATA_JSON:
+  AZURE_METADATA_JSON_PATH:
     process.env.AZURE_METADATA_JSON ||
     path.resolve(__dirname, "trusted-signing-metadata.json"),
   AZURE_TENANT_ID: process.env.AZURE_TENANT_ID,
@@ -43,25 +43,40 @@ const FLAGS = {
 
 const windowsSign = {
   signToolPath: FLAGS.SIGNTOOL_PATH,
-  signWithParams: `/v /dlib ${FLAGS.AZURE_CODE_SIGNING_DLIB} /dmdf ${FLAGS.AZURE_METADATA_JSON}`,
+  signWithParams: `/v /dlib ${FLAGS.AZURE_CODE_SIGNING_DLIB} /dmdf ${FLAGS.AZURE_METADATA_JSON_PATH}`,
   timestampServer: "http://timestamp.acs.microsoft.com",
 };
 
-writeFileSync(
-  FLAGS.AZURE_METADATA_JSON,
-  JSON.stringify(
-    {
-      Endpoint:
-        process.env.AZURE_CODE_SIGNING_ENDPOINT ||
-        "https://wcus.codesigning.azure.net",
-      CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
-      CertificateProfileName:
-        process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
-    },
-    null,
-    2,
-  ),
-);
+function setup() {
+  if (process.platform === "win32") {
+    // Ensure windows codesigning files exist
+    if (!existsSync(FLAGS.SIGNTOOL_PATH)) {
+      console.warn("SignTool path does not exist");
+    }
+    if (!existsSync(FLAGS.AZURE_CODE_SIGNING_DLIB)) {
+      console.warn("Azure codesigning DLib path does not exist");
+    }
+
+    // Write Azure codesigning metadata
+    writeFileSync(
+      FLAGS.AZURE_METADATA_JSON_PATH,
+      JSON.stringify(
+      {
+        Endpoint:
+          process.env.AZURE_CODE_SIGNING_ENDPOINT ||
+          "https://wcus.codesigning.azure.net",
+        CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
+        CertificateProfileName:
+          process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
+      },
+      null,
+      2,
+      ),
+    );
+  }
+}
+
+setup();
 
 const config: ForgeConfig = {
   hooks: {
@@ -171,13 +186,13 @@ const config: ForgeConfig = {
       unpack: "**/node_modules/*node-llama-cpp*",
     },
     ignore: (file) => {
-      const filePath = file.toLowerCase();
+      const filePath = file.toLowerCase().replace(/\\/g, '/');
       const result = {
         keep: false,
         log: true,
       };
 
-      const foldersToIgnore = ["/test/", "/.github/", "/.git/"];
+      const foldersToIgnore = ["/test/", "/.github/", "/.git/", "/Microsoft.Trusted.Signing.Client/", "/Microsoft.Windows.SDK.BuildTools/"];
 
       const extensionsToIgnore = [
         ".DS_Store",

@@ -339,7 +339,7 @@ const config: ForgeConfig = {
       }),
       ["win32"],
     ),
-    new MakerZIP({}, ["darwin"]),
+    new MakerZIP({}, ["darwin", "win32"]),
     new MakerRpm({}),
     new MakerDeb({}),
   ],

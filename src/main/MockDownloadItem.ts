@@ -1,5 +1,6 @@
 import { DownloadItem } from "electron";
 import { ManagedModel } from "../models";
+import log from "electron-log";
 
 /**
  * Mock implementation of Electron's DownloadItem for download simulation
@@ -24,7 +25,7 @@ export class MockDownloadItem implements Partial<DownloadItem> {
     const downloadDuration = 10 * 1000; // 10 seconds
     const updateInterval = 100; // Update every 100ms
 
-    console.log(
+    log.info(
       `MockDownloadItem: Simulating download for model: ${model.name} (will take 10 seconds)`,
     );
 
@@ -39,7 +40,7 @@ export class MockDownloadItem implements Partial<DownloadItem> {
       if (progress >= 1) {
         clearInterval(this._intervalId);
         this._state = "completed";
-        console.log(
+        log.info(
           `MockDownloadItem: Simulated download completed for model: ${model.name}`,
         );
         onComplete();
@@ -78,9 +79,7 @@ export class MockDownloadItem implements Partial<DownloadItem> {
   public cancel(): void {
     clearInterval(this._intervalId);
     this._state = "cancelled";
-    console.log(
-      `MockDownloadItem: Cancelled download for model: ${this._name}`,
-    );
+    log.info(`MockDownloadItem: Cancelled download for model: ${this._name}`);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

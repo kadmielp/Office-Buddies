@@ -17,6 +17,10 @@
     "name": "Felix Rieseberg",
     "email": "fr@makenotion.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/felixrieseberg/clippy"
+  },
   "license": "MIT",
   "devDependencies": {
     "@electron-forge/cli": "^7.8.0",
@@ -48,10 +52,13 @@
     "@electron/llm": "^1.0.2",
     "98.css": "^0.1.21",
     "date-fns": "^4.1.0",
+    "electron-context-menu": "^4.0.5",
+    "electron-log": "^5.4.0",
     "electron-store": "^8.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.1.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "update-electron-app": "^3.1.1"
   },
   "overrides": {
     "@electron/windows-sign": "1.2.2"

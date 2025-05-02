@@ -67,7 +67,12 @@ function setup() {
     }
 
     // Setup TEMP
-    process.env.TEMP = process.env.TMP = path.join(os.homedir(), 'AppData', 'Local', 'Temp');
+    process.env.TEMP = process.env.TMP = path.join(
+      os.homedir(),
+      "AppData",
+      "Local",
+      "Temp",
+    );
 
     // Write Azure codesigning metadata
     writeFileSync(
@@ -210,6 +215,7 @@ const config: ForgeConfig = {
         "/.git/",
         "/Microsoft.Trusted.Signing.Client/",
         "/Microsoft.Windows.SDK.BuildTools/",
+        "/website/",
       ];
 
       const extensionsToIgnore = [
@@ -320,7 +326,8 @@ const config: ForgeConfig = {
         exe: "Clippy.exe",
         noMsi: true,
         remoteReleases: "",
-        iconUrl: 'https://raw.githubusercontent.com/felixrieseberg/windows95/master/assets/icon.ico',
+        iconUrl:
+          "https://raw.githubusercontent.com/felixrieseberg/windows95/master/assets/icon.ico",
         loadingGif: "./assets/boot.gif",
         setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
         setupIcon: path.resolve(__dirname, "assets", "icon.ico"),

@@ -1,6 +1,7 @@
 import { BrowserWindow, shell, screen, app } from "electron";
 import path from "path";
 import { getStateManager } from "./state";
+import contextMenu from "electron-context-menu";
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -49,6 +50,10 @@ export function setupWindowListener() {
     (_event: Electron.Event, browserWindow: BrowserWindow) => {
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);
+
+      contextMenu({
+        window: browserWindow,
+      });
     },
   );
 }
@@ -153,9 +158,17 @@ export function getPopoverWindowPosition(
  * @returns The chat window
  */
 export function getChatWindow(): BrowserWindow | undefined {
-  return BrowserWindow.getAllWindows().find(
-    (window) => window.webContents.getTitle() === "Clippy Chat",
-  );
+  return BrowserWindow.getAllWindows().find(isChatWindow);
+}
+
+/**
+ * Check if a window is a chat window
+ *
+ * @param window The window to check
+ * @returns True if the window is a chat window
+ */
+function isChatWindow(window: BrowserWindow): boolean {
+  return window.webContents.getTitle() === "Clippy Chat";
 }
 
 /**

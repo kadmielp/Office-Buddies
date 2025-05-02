@@ -1,6 +1,7 @@
 import { app, DownloadItem, session } from "electron";
 import path from "path";
 import fs from "fs";
+import log from "electron-log";
 
 import { ManagedModel, ModelState, Model, BUILT_IN_MODELS } from "../models";
 import { DownloadState } from "../sharedState";
@@ -45,7 +46,7 @@ class ModelManager {
    * @param name
    */
   public async downloadModelByName(name: string) {
-    console.log("Downloading model by name", name);
+    log.info("Downloading model by name", name);
 
     const model = this.models[name];
 
@@ -58,7 +59,7 @@ class ModelManager {
       try {
         this.downloadItems[name].cancel();
       } catch (error) {
-        console.error(`ModelManager: Error canceling download: ${name}`, error);
+        log.error(`ModelManager: Error canceling download: ${name}`, error);
       }
 
       delete this.downloadItems[name];
@@ -89,7 +90,7 @@ class ModelManager {
    * @returns
    */
   public async deleteModelByName(name: string): Promise<boolean> {
-    console.log("Deleting model by name", name);
+    log.info("Deleting model by name", name);
 
     const model = this.models[name];
 
@@ -111,7 +112,7 @@ class ModelManager {
       this.pollRendererModelState();
       return true;
     } catch (error) {
-      console.error(`ModelManager: Error deleting model: ${name}`, error);
+      log.error(`ModelManager: Error deleting model: ${name}`, error);
       return false;
     }
   }
@@ -137,7 +138,7 @@ class ModelManager {
         recursive: true,
       });
     } catch (error) {
-      console.error(`ModelManager: Error deleting all models`, error);
+      log.error(`ModelManager: Error deleting all models`, error);
     }
 
     this.pollRendererModelState();
@@ -243,7 +244,7 @@ class ModelManager {
     const model = this.models[modelKey];
 
     if (!model) {
-      console.log(
+      log.info(
         `ModelManager: Handling will-download event for ${urlStr}, but did not find matching model. Disallowing download.`,
       );
       event.preventDefault();
@@ -253,14 +254,14 @@ class ModelManager {
     // Check if there's already a download in progress for this model
     const existingDownload = this.downloadItems[model.name];
     if (existingDownload && existingDownload.getState() === "progressing") {
-      console.log(
+      log.info(
         `ModelManager: Download already in progress for model ${model.name}. Disallowing duplicate download.`,
       );
       event.preventDefault();
       return false;
     }
 
-    console.log(
+    log.info(
       `ModelManager: Handling will-download event for model ${model.name}. Allowing download.`,
     );
 
@@ -283,7 +284,7 @@ class ModelManager {
       try {
         this.downloadItems[model.name].cancel();
       } catch (error) {
-        console.error(
+        log.error(
           `ModelManager: Error canceling download: ${model.name}`,
           error,
         );

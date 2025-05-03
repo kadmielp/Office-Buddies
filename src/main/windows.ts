@@ -4,6 +4,7 @@ import { getLogger } from "./logger";
 
 import path from "path";
 import { getStateManager } from "./state";
+import { getDebugManager } from "./debug";
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -73,6 +74,10 @@ export function setupWindowListener() {
       contextMenu({
         window: browserWindow,
       });
+
+      if (getDebugManager().store.get("openDevToolsOnStart")) {
+        browserWindow.webContents.openDevTools({ mode: "detach" });
+      }
     },
   );
 }

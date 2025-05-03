@@ -5,7 +5,6 @@ import { IpcMessages } from "../ipc-messages";
 import { getModelManager, getModelPath, isModelOnDisk } from "./models";
 import { EMPTY_SHARED_STATE, SettingsState, SharedState } from "../sharedState";
 import { BUILT_IN_MODELS } from "../models";
-import { DEBUG } from "../debug";
 
 export class StateManager {
   public store = new Store<SharedState>({
@@ -22,7 +21,6 @@ export class StateManager {
   });
 
   constructor() {
-    this.ensureCorrectDebugState();
     this.ensureCorrectModelState();
     this.ensureCorrectSettingsState();
 
@@ -36,12 +34,6 @@ export class StateManager {
 
   public updateModelState() {
     this.store.set("models", getModelManager().getRendererModelState());
-  }
-
-  private ensureCorrectDebugState() {
-    for (const key of Object.keys(DEBUG)) {
-      this.store.set(`debug.${key}`, DEBUG[key as keyof typeof DEBUG]);
-    }
   }
 
   private ensureCorrectSettingsState() {

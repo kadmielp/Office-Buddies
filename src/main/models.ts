@@ -7,7 +7,7 @@ import { ManagedModel, ModelState, Model, BUILT_IN_MODELS } from "../models";
 import { DownloadState } from "../sharedState";
 import { getStateManager } from "./state";
 import { MockDownloadItem } from "./MockDownloadItem";
-import { DEBUG } from "../debug";
+import { getDebugManager } from "./debug";
 
 class ModelManager {
   private downloadItems: Record<string, DownloadItem | MockDownloadItem> = {};
@@ -72,7 +72,7 @@ class ModelManager {
     model.downloaded = false;
     model.path = getModelPath(model);
 
-    if (DEBUG.simulateDownload) {
+    if (getDebugManager().store.get("simulateDownload")) {
       this.downloadItems[name] = new MockDownloadItem(model, () => {
         model.downloaded = true;
         this.pollRendererModelState();
@@ -217,7 +217,7 @@ class ModelManager {
    * @returns
    */
   public getIsModelDownloaded(model: ManagedModel | Model): boolean {
-    if (DEBUG.simulateNoModelsDownloaded) {
+    if (getDebugManager().store.get("simulateNoModelsDownloaded")) {
       return false;
     }
 

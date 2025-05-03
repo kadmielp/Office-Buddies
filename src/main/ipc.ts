@@ -11,10 +11,12 @@ import { getChatManager } from "./chats";
 import { ChatWithMessages } from "../types/interfaces";
 
 export function setupIpcListeners() {
+  // Window
   ipcMain.handle(IpcMessages.TOGGLE_CHAT_WINDOW, () => toggleChatWindow());
   ipcMain.handle(IpcMessages.MINIMIZE_CHAT_WINDOW, () => minimizeChatWindow());
   ipcMain.handle(IpcMessages.MAXIMIZE_CHAT_WINDOW, () => maximizeChatWindow());
 
+  // Model
   ipcMain.handle(IpcMessages.DOWNLOAD_MODEL_BY_NAME, (_, name: string) =>
     getModelManager().downloadModelByName(name),
   );
@@ -24,6 +26,8 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.DELETE_ALL_MODELS, () =>
     getModelManager().deleteAllModels(),
   );
+
+  // State
   ipcMain.handle(IpcMessages.STATE_UPDATE_MODEL_STATE, () =>
     getStateManager().updateModelState(),
   );
@@ -41,6 +45,22 @@ export function setupIpcListeners() {
     getStateManager().store.openInEditor(),
   );
 
+  // Debug
+  ipcMain.handle(
+    IpcMessages.DEBUG_STATE_GET_FULL,
+    () => getStateManager().store.store,
+  );
+  ipcMain.handle(IpcMessages.DEBUG_STATE_SET, (_, key: string, value: any) =>
+    getStateManager().store.set(key, value),
+  );
+  ipcMain.handle(IpcMessages.DEBUG_STATE_GET, (_, key: string) =>
+    getStateManager().store.get(key),
+  );
+  ipcMain.handle(IpcMessages.DEBUG_STATE_OPEN_IN_EDITOR, () =>
+    getStateManager().store.openInEditor(),
+  );
+
+  // Chat
   ipcMain.handle(IpcMessages.CHAT_GET_CHAT_RECORDS, () =>
     getChatManager().getChats(),
   );

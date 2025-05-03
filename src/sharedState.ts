@@ -11,16 +11,9 @@ export interface SettingsState {
   temperature?: number;
 }
 
-export interface DebugState {
-  simulateDownload?: boolean;
-  simulateLoadModel?: boolean;
-  simulateNoModelsDownloaded?: boolean;
-}
-
 export interface SharedState {
   models: ModelState;
   settings: SettingsState;
-  debug: DebugState;
 }
 
 export type DownloadState = {
@@ -45,10 +38,5 @@ export const EMPTY_SHARED_STATE: SharedState = {
     systemPrompt: DEFAULT_SYSTEM_PROMPT,
     topK: 10,
     temperature: 0.7,
-  },
-  debug: {
-    simulateDownload: undefined,
-    simulateLoadModel: undefined,
-    simulateNoModelsDownloaded: undefined,
   },
 };

@@ -7,6 +7,7 @@ import type { SharedState } from "../sharedState";
 
 import type { ClippyApi } from "./clippyApi";
 import { ChatWithMessages } from "../types/interfaces";
+import { DebugState } from "../debugState";
 
 const clippyApi: ClippyApi = {
   // Window
@@ -38,6 +39,24 @@ const clippyApi: ClippyApi = {
   },
   offStateChanged: () => {
     ipcRenderer.removeAllListeners(IpcMessages.STATE_CHANGED);
+  },
+
+  // Debug
+  getFullDebugState: () => ipcRenderer.invoke(IpcMessages.DEBUG_STATE_GET_FULL),
+  getDebugState: (key: string) =>
+    ipcRenderer.invoke(IpcMessages.DEBUG_STATE_GET, key),
+  setDebugState: (key: string, value: any) =>
+    ipcRenderer.invoke(IpcMessages.DEBUG_STATE_SET, key, value),
+  openDebugStateInEditor: () =>
+    ipcRenderer.invoke(IpcMessages.DEBUG_STATE_OPEN_IN_EDITOR),
+  onDebugStateChanged: (callback: (state: DebugState) => void) => {
+    ipcRenderer.on(
+      IpcMessages.DEBUG_STATE_CHANGED,
+      (_event, state: DebugState) => callback(state),
+    );
+  },
+  offDebugStateChanged: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.DEBUG_STATE_CHANGED);
   },
 
   // Chats

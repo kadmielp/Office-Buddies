@@ -7,9 +7,9 @@ import {
 } from "../clippy-animation-helpers";
 import { useChat } from "../contexts/ChatContext";
 import { log } from "../logging";
+import { useDebugState } from "../contexts/DebugContext";
 
 const WAIT_TIME = 6000;
-const ENABLE_DRAG_DEBUG = false;
 
 export function Clippy() {
   const {
@@ -19,6 +19,7 @@ export function Clippy() {
     setIsChatWindowOpen,
     isChatWindowOpen,
   } = useChat();
+  const { enableDragDebug } = useDebugState();
   const [animation, setAnimation] = useState<Animation>(EMPTY_ANIMATION);
   const [animationTimeoutId, setAnimationTimeoutId] = useState<
     number | undefined
@@ -97,7 +98,7 @@ export function Clippy() {
           position: "absolute",
           height: "93px",
           width: "124px",
-          backgroundColor: ENABLE_DRAG_DEBUG ? "blue" : "transparent",
+          backgroundColor: enableDragDebug ? "blue" : "transparent",
           opacity: 0.5,
           zIndex: 5,
         }}
@@ -108,7 +109,7 @@ export function Clippy() {
             position: "absolute",
             height: "80px",
             width: "45px",
-            backgroundColor: ENABLE_DRAG_DEBUG ? "red" : "transparent",
+            backgroundColor: enableDragDebug ? "red" : "transparent",
             zIndex: 10,
             right: "40px",
             top: "2px",

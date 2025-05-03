@@ -4,12 +4,18 @@ export const SettingsAdvanced: React.FC = () => {
   return (
     <div>
       <fieldset>
-        <legend>State</legend>
+        <legend>Configuration</legend>
         <p>
-          Clippy keeps its configuration in a JSON file. Click this button to
-          open it in your default JSON editor.
+          Clippy keeps its configuration in JSON files. Click these buttons to
+          open them in your default JSON editor. After editing, restart Clippy
+          to apply the changes.
         </p>
-        <button onClick={clippyApi.openStateInEditor}>Open State File</button>
+        <button onClick={clippyApi.openStateInEditor}>
+          Open Configuration File
+        </button>
+        <button onClick={clippyApi.openDebugStateInEditor}>
+          Open Debug File
+        </button>
       </fieldset>
       <fieldset>
         <legend>Delete All Models</legend>

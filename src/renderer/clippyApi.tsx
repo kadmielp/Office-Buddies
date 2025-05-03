@@ -1,6 +1,7 @@
 import { ElectronLlmRenderer } from "@electron/llm";
 import { SharedState } from "../sharedState";
 import { ChatRecord, ChatWithMessages } from "../types/interfaces";
+import { DebugState } from "../debugState";
 
 export type ClippyApi = {
   // Window
@@ -19,6 +20,13 @@ export type ClippyApi = {
   getState: (key: string) => Promise<any>;
   setState: (key: string, value: any) => Promise<void>;
   openStateInEditor: () => Promise<void>;
+  // Debug
+  offDebugStateChanged: () => void;
+  onDebugStateChanged: (callback: (state: DebugState) => void) => void;
+  getFullDebugState: () => Promise<DebugState>;
+  getDebugState: (key: string) => Promise<any>;
+  setDebugState: (key: string, value: any) => Promise<void>;
+  openDebugStateInEditor: () => Promise<void>;
   // Chats
   getChatRecords: () => Promise<Record<string, ChatRecord>>;
   getChatWithMessages: (chatId: string) => Promise<ChatWithMessages | null>;

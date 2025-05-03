@@ -11,7 +11,6 @@ const EMPTY_SHARED_STATE: SharedState = {
     clippyAlwaysOnTop: false,
     alwaysOpenChat: true,
   },
-  debug: {},
 };
 
 export const SharedStateContext =

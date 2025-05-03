@@ -24,15 +24,8 @@ dotenv.config();
 
 let nativeModuleDependenciesToPackage: string[] = [];
 
-const EXTERNAL_DEPENDENCIES = [
-  "@electron/llm",
-  "node-llama-cpp",
-  "@node-llama-cpp/",
-  "electron-log",
-  ...getNodeLlamaBinaryDependencies(),
-];
-
 const FLAGS = {
+  ARCH: process.argv.some((s) => s.includes("arm64")) ? "arm64" : "x64",
   IS_CODESIGNING_ENABLED: process.env.IS_CODESIGNING_ENABLED !== "false",
   SIGNTOOL_PATH:
     process.env.SIGNTOOL_PATH ||
@@ -55,6 +48,13 @@ const FLAGS = {
   APPLE_ID: process.env.APPLE_ID || "felix@felixrieseberg.com",
   APPLE_ID_PASSWORD: process.env.APPLE_ID_PASSWORD,
 };
+const EXTERNAL_DEPENDENCIES = [
+  "@electron/llm",
+  "node-llama-cpp",
+  "@node-llama-cpp/",
+  "electron-log",
+  ...getNodeLlamaBinaryDependenciesToKeep(),
+];
 
 const windowsSign: any = {
   signToolPath: FLAGS.SIGNTOOL_PATH,
@@ -116,6 +116,7 @@ const config: ForgeConfig = {
         "/Microsoft.Trusted.Signing.Client/",
         "/Microsoft.Windows.SDK.BuildTools/",
         "/website/",
+        ...getNodeLlamaBinaryDependenciesToIgnore().map((dep) => `/${dep}/`),
       ];
 
       const extensionsToIgnore = [
@@ -157,28 +158,27 @@ const config: ForgeConfig = {
       if (!result.keep && filePath === "/.vite") result.keep = true;
       if (!result.keep && filePath.startsWith("/.vite/")) result.keep = true;
       if (!result.keep && filePath.startsWith("/node_modules/")) {
-        // check if matches any of the external dependencies
-        for (const dep of nativeModuleDependenciesToPackage) {
-          if (foldersToIgnore.some((folder) => filePath.includes(folder))) {
-            result.keep = false;
-            break;
-          }
-
-          if (
-            filePath === `/node_modules/${dep}/` ||
-            filePath === `/node_modules/${dep}`
-          ) {
-            result.keep = true;
-            break;
-          }
-          if (filePath === `/node_modules/${dep}/package.json`) {
-            result.keep = true;
-            break;
-          }
-          if (filePath.startsWith(`/node_modules/${dep}/`)) {
-            result.keep = true;
-            result.log = false;
-            break;
+        if (foldersToIgnore.some((folder) => filePath.includes(folder))) {
+          result.keep = false;
+        } else {
+          // check if matches any of the external dependencies
+          for (const dep of nativeModuleDependenciesToPackage) {
+            if (
+              filePath === `/node_modules/${dep}/` ||
+              filePath === `/node_modules/${dep}`
+            ) {
+              result.keep = true;
+              break;
+            }
+            if (filePath === `/node_modules/${dep}/package.json`) {
+              result.keep = true;
+              break;
+            }
+            if (filePath.startsWith(`/node_modules/${dep}/`)) {
+              result.keep = true;
+              result.log = false;
+              break;
+            }
           }
         }
       }
@@ -293,14 +293,64 @@ export default config;
  *
  * @returns {Array<string>} The optional dependencies of the node-llama-cpp package
  */
-function getNodeLlamaBinaryDependencies(): Array<string> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const llamaPackageJson = require("./node_modules/node-llama-cpp/package.json");
-  const { optionalDependencies } = llamaPackageJson;
+function getNodeLlamaBinaryDependenciesToKeep(): Array<string> {
+  // "@node-llama-cpp/linux-arm64"
+  // "@node-llama-cpp/linux-armv7l"
+  // "@node-llama-cpp/linux-x64"
+  // "@node-llama-cpp/linux-x64-cuda"
+  // "@node-llama-cpp/linux-x64-vulkan"
+  // "@node-llama-cpp/mac-arm64-metal"
+  // "@node-llama-cpp/mac-x64"
+  // "@node-llama-cpp/win-arm64"
+  // "@node-llama-cpp/win-x64"
+  // "@node-llama-cpp/win-x64-cuda"
+  // "@node-llama-cpp/win-x64-vulkan"
+  if (process.platform === "darwin") {
+    return FLAGS.ARCH === "arm64"
+      ? ["@node-llama-cpp/mac-arm64-metal"]
+      : ["@node-llama-cpp/mac-x64"];
+  }
 
-  return Object.keys(optionalDependencies).filter((dep) =>
-    dep.startsWith("@node-llama-cpp/"),
-  );
+  if (process.platform === "win32") {
+    return FLAGS.ARCH === "arm64"
+      ? ["@node-llama-cpp/win-arm64"]
+      : [
+          "@node-llama-cpp/win-x64",
+          "@node-llama-cpp/win-x64-cuda",
+          "@node-llama-cpp/win-x64-vulkan",
+        ];
+  }
+
+  if (process.platform === "linux") {
+    return FLAGS.ARCH === "arm64"
+      ? ["@node-llama-cpp/linux-arm64"]
+      : [
+          "@node-llama-cpp/linux-x64",
+          "@node-llama-cpp/linux-x64-cuda",
+          "@node-llama-cpp/linux-x64-vulkan",
+        ];
+  }
+}
+
+/**
+ * Get node-llama-cpp binaries we don't want to keep
+ */
+function getNodeLlamaBinaryDependenciesToIgnore(): Array<string> {
+  const all = [
+    "@node-llama-cpp/linux-arm64",
+    "@node-llama-cpp/linux-armv7l",
+    "@node-llama-cpp/linux-x64",
+    "@node-llama-cpp/linux-x64-cuda",
+    "@node-llama-cpp/linux-x64-vulkan",
+    "@node-llama-cpp/mac-arm64-metal",
+    "@node-llama-cpp/mac-x64",
+    "@node-llama-cpp/win-arm64",
+    "@node-llama-cpp/win-x64",
+    "@node-llama-cpp/win-x64-cuda",
+    "@node-llama-cpp/win-x64-vulkan",
+  ];
+  const keep = getNodeLlamaBinaryDependenciesToKeep();
+  return all.filter((item) => !keep.includes(item));
 }
 
 function getItemsFromFolder(

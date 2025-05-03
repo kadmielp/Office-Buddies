@@ -110,6 +110,7 @@ const config: ForgeConfig = {
       };
 
       const foldersToIgnore = [
+        "/@types/",
         "/test/",
         "/.github/",
         "/.git/",

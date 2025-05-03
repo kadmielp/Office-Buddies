@@ -27,10 +27,13 @@ let nativeModuleDependenciesToPackage: string[] = [];
 const EXTERNAL_DEPENDENCIES = [
   "@electron/llm",
   "node-llama-cpp",
+  "@node-llama-cpp/",
   "electron-log",
+  ...getNodeLlamaBinaryDependencies(),
 ];
 
 const FLAGS = {
+  IS_CODESIGNING_ENABLED: process.env.IS_CODESIGNING_ENABLED !== "false",
   SIGNTOOL_PATH:
     process.env.SIGNTOOL_PATH ||
     path.join(
@@ -49,7 +52,7 @@ const FLAGS = {
   AZURE_TENANT_ID: process.env.AZURE_TENANT_ID,
   AZURE_CLIENT_ID: process.env.AZURE_CLIENT_ID,
   AZURE_CLIENT_SECRET: process.env.AZURE_CLIENT_SECRET,
-  APPLE_ID: process.env.APPLE_ID,
+  APPLE_ID: process.env.APPLE_ID || "felix@felixrieseberg.com",
   APPLE_ID_PASSWORD: process.env.APPLE_ID_PASSWORD,
 };
 
@@ -60,128 +63,21 @@ const windowsSign: any = {
   hashes: ["sha256"],
 };
 
-function setup() {
-  if (process.platform === "win32") {
-    // Ensure windows codesigning files exist
-    if (!existsSync(FLAGS.SIGNTOOL_PATH)) {
-      console.warn("SignTool path does not exist");
-    }
-    if (!existsSync(FLAGS.AZURE_CODE_SIGNING_DLIB)) {
-      console.warn("Azure codesigning DLib path does not exist");
-    }
-
-    // Setup TEMP
-    process.env.TEMP = process.env.TMP = path.join(
-      os.homedir(),
-      "AppData",
-      "Local",
-      "Temp",
-    );
-
-    // Write Azure codesigning metadata
-    writeFileSync(
-      FLAGS.AZURE_METADATA_JSON_PATH,
-      JSON.stringify(
-        {
-          Endpoint:
-            process.env.AZURE_CODE_SIGNING_ENDPOINT ||
-            "https://wcus.codesigning.azure.net",
-          CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
-          CertificateProfileName:
-            process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
-        },
-        null,
-        2,
-      ),
-    );
-  }
-}
-
 setup();
 
 const config: ForgeConfig = {
   hooks: {
     prePackage: async () => {
-      const projectRoot = path.normalize(__dirname);
-      const getExternalNestedDependencies = async (
-        nodeModuleNames: string[],
-        includeNestedDeps = true,
-      ) => {
-        const foundModules = new Set(nodeModuleNames);
-        if (includeNestedDeps) {
-          for (const external of nodeModuleNames) {
-            type MyPublicClass<T> = {
-              [P in keyof T]: T[P];
-            };
-            type MyPublicWalker = MyPublicClass<Walker> & {
-              modules: Module[];
-              walkDependenciesForModule: (
-                moduleRoot: string,
-                depType: DepType,
-              ) => Promise<void>;
-            };
-            const moduleRoot = path.join(projectRoot, "node_modules", external);
-            const walker = new Walker(moduleRoot) as unknown as MyPublicWalker;
-            walker.modules = [];
-            await walker.walkDependenciesForModule(moduleRoot, DepType.PROD);
-            walker.modules
-              .filter((dep) => (dep.depType as number) === DepType.PROD)
-              .map((dep) => dep.name.split("/")[0])
-              .forEach((name) => foundModules.add(name));
-          }
-        }
-        return foundModules;
-      };
-      const nativeModuleDependencies = await getExternalNestedDependencies(
-        EXTERNAL_DEPENDENCIES,
+      nativeModuleDependenciesToPackage = Array.from(
+        await getExternalNestedDependencies(EXTERNAL_DEPENDENCIES),
       );
-      nativeModuleDependenciesToPackage = Array.from(nativeModuleDependencies);
     },
     packageAfterPrune: async (_forgeConfig, buildPath) => {
-      function getItemsFromFolder(
-        filePath: string,
-        totalCollection: {
-          path: string;
-          type: "directory" | "file";
-          empty: boolean;
-        }[] = [],
-      ) {
-        try {
-          const normalizedPath = path.normalize(filePath);
-          const childItems = readdirSync(normalizedPath);
-          const getItemStats = statSync(normalizedPath);
-          if (getItemStats.isDirectory()) {
-            totalCollection.push({
-              path: normalizedPath,
-              type: "directory",
-              empty: childItems.length === 0,
-            });
-          }
-          childItems.forEach((childItem) => {
-            const childItemNormalizedPath = path.join(
-              normalizedPath,
-              childItem,
-            );
-            const childItemStats = statSync(childItemNormalizedPath);
-            if (childItemStats.isDirectory()) {
-              getItemsFromFolder(childItemNormalizedPath, totalCollection);
-            } else {
-              totalCollection.push({
-                path: childItemNormalizedPath,
-                type: "file",
-                empty: false,
-              });
-            }
-          });
-        } catch {
-          return;
-        }
-        return totalCollection;
-      }
-
       const getItems = getItemsFromFolder(buildPath) ?? [];
+
       for (const item of getItems) {
         const DELETE_EMPTY_DIRECTORIES = true;
+
         if (item.empty === true) {
           if (DELETE_EMPTY_DIRECTORIES) {
             const pathToDelete = path.normalize(item.path);
@@ -204,7 +100,7 @@ const config: ForgeConfig = {
   },
   packagerConfig: {
     asar: {
-      unpack: "**/node_modules/*node-llama-cpp*",
+      unpack: "**/node_modules/*node-llama-cpp*/**",
     },
     ignore: (file) => {
       const filePath = file.toLowerCase().replace(/\\/g, "/");
@@ -304,15 +200,19 @@ const config: ForgeConfig = {
       CompanyName: "Felix Rieseberg",
       OriginalFilename: "Clippy",
     },
-    osxSign: {
-      identity: "Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)",
-    },
-    osxNotarize: {
-      appleId: FLAGS.APPLE_ID,
-      appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
-      teamId: "LT94ZKYDCJ",
-    },
-    windowsSign,
+    osxSign: FLAGS.IS_CODESIGNING_ENABLED
+      ? {
+          identity: "Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)",
+        }
+      : undefined,
+    osxNotarize: FLAGS.IS_CODESIGNING_ENABLED
+      ? {
+          appleId: FLAGS.APPLE_ID,
+          appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
+          teamId: "LT94ZKYDCJ",
+        }
+      : undefined,
+    windowsSign: FLAGS.IS_CODESIGNING_ENABLED ? windowsSign : undefined,
     icon: path.resolve(__dirname, "assets/icon"),
     junk: true,
     overwrite: true,
@@ -335,7 +235,7 @@ const config: ForgeConfig = {
         loadingGif: "./assets/boot.gif",
         setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
         setupIcon: path.resolve(__dirname, "assets", "icon.ico"),
-        windowsSign,
+        windowsSign: FLAGS.IS_CODESIGNING_ENABLED ? windowsSign : undefined,
       }),
       ["win32"],
     ),
@@ -382,3 +282,146 @@ const config: ForgeConfig = {
 };
 
 export default config;
+
+/**
+ * Helper functions
+ */
+
+/**
+ * Get the optional dependencies of the node-llama-cpp package, which will
+ * be all the binaries that need to be packaged.
+ *
+ * @returns {Array<string>} The optional dependencies of the node-llama-cpp package
+ */
+function getNodeLlamaBinaryDependencies(): Array<string> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const llamaPackageJson = require("./node_modules/node-llama-cpp/package.json");
+  const { optionalDependencies } = llamaPackageJson;
+
+  return Object.keys(optionalDependencies).filter((dep) =>
+    dep.startsWith("@node-llama-cpp/"),
+  );
+}
+
+function getItemsFromFolder(
+  filePath: string,
+  totalCollection: {
+    path: string;
+    type: "directory" | "file";
+    empty: boolean;
+  }[] = [],
+) {
+  try {
+    const normalizedPath = path.normalize(filePath);
+    const childItems = readdirSync(normalizedPath);
+    const getItemStats = statSync(normalizedPath);
+
+    if (getItemStats.isDirectory()) {
+      totalCollection.push({
+        path: normalizedPath,
+        type: "directory",
+        empty: childItems.length === 0,
+      });
+    }
+
+    childItems.forEach((childItem) => {
+      const childItemNormalizedPath = path.join(normalizedPath, childItem);
+      const childItemStats = statSync(childItemNormalizedPath);
+
+      if (childItemStats.isDirectory()) {
+        getItemsFromFolder(childItemNormalizedPath, totalCollection);
+      } else {
+        totalCollection.push({
+          path: childItemNormalizedPath,
+          type: "file",
+          empty: false,
+        });
+      }
+    });
+  } catch {
+    return;
+  }
+
+  return totalCollection;
+}
+
+/**
+ * Gets all the production dependencies of the given node module names.
+ *
+ * @param nodeModuleNames
+ * @param includeNestedDeps
+ * @returns
+ */
+async function getExternalNestedDependencies(
+  nodeModuleNames: string[],
+): Promise<Set<string>> {
+  const projectRoot = path.normalize(__dirname);
+  const foundModules = new Set(nodeModuleNames);
+
+  for (const external of nodeModuleNames) {
+    type MyPublicClass<T> = {
+      [P in keyof T]: T[P];
+    };
+
+    type MyPublicWalker = MyPublicClass<Walker> & {
+      modules: Module[];
+      walkDependenciesForModule: (
+        moduleRoot: string,
+        depType: DepType,
+      ) => Promise<void>;
+    };
+
+    const moduleRoot = path.join(projectRoot, "node_modules", external);
+    const walker = new Walker(moduleRoot) as unknown as MyPublicWalker;
+
+    walker.modules = [];
+    await walker.walkDependenciesForModule(moduleRoot, DepType.PROD);
+
+    walker.modules
+      .filter((dep) => (dep.depType as number) === DepType.PROD)
+      .map((dep) => dep.name.split("/")[0])
+      .forEach((name) => foundModules.add(name));
+  }
+
+  return foundModules;
+}
+
+/**
+ * Setup function to run before packaging
+ */
+function setup() {
+  if (process.platform === "win32") {
+    // Ensure windows codesigning files exist
+    if (!existsSync(FLAGS.SIGNTOOL_PATH)) {
+      console.warn("SignTool path does not exist");
+    }
+    if (!existsSync(FLAGS.AZURE_CODE_SIGNING_DLIB)) {
+      console.warn("Azure codesigning DLib path does not exist");
+    }
+
+    // Setup TEMP
+    process.env.TEMP = process.env.TMP = path.join(
+      os.homedir(),
+      "AppData",
+      "Local",
+      "Temp",
+    );
+
+    // Write Azure codesigning metadata
+    writeFileSync(
+      FLAGS.AZURE_METADATA_JSON_PATH,
+      JSON.stringify(
+        {
+          Endpoint:
+            process.env.AZURE_CODE_SIGNING_ENDPOINT ||
+            "https://wcus.codesigning.azure.net",
+          CodeSigningAccountName: process.env.AZURE_CODE_SIGNING_ACCOUNT_NAME,
+          CertificateProfileName:
+            process.env.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME,
+        },
+        null,
+        2,
+      ),
+    );
+  }
+}

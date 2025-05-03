@@ -331,6 +331,10 @@ function getPreviewFromMessages(messages: Message[]): string {
     return "";
   }
 
+  if (messages[0].sender === "clippy") {
+    return "Welcome to Clippy!";
+  }
+
   // Remove newlines and limit to 100 characters
   return messages[0].content.replace(/\n/g, " ").substring(0, 100);
 }

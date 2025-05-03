@@ -1,7 +1,7 @@
 {
   "name": "Clippy",
   "productName": "Clippy",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Clippy",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -49,8 +49,8 @@
     "vite": "^5.4.14"
   },
   "dependencies": {
-    "@electron/llm": "^1.0.2",
     "98.css": "^0.1.21",
+    "@electron/llm": "^1.0.2",
     "date-fns": "^4.1.0",
     "electron-context-menu": "^4.0.5",
     "electron-log": "^5.4.0",

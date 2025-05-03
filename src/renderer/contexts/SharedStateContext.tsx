@@ -1,15 +1,14 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
-import { SharedState } from "../../sharedState";
+import { DEFAULT_SETTINGS, SharedState } from "../../sharedState";
 import { clippyApi } from "../clippyApi";
 import { isModelDownloading } from "../../helpers/model-helpers";
 
 const EMPTY_SHARED_STATE: SharedState = {
   models: {},
   settings: {
+    ...DEFAULT_SETTINGS,
     selectedModel: undefined,
     systemPrompt: undefined,
-    clippyAlwaysOnTop: false,
-    alwaysOpenChat: true,
   },
 };
 

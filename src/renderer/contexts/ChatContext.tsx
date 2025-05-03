@@ -17,6 +17,7 @@ import type {
   LanguageModelPromptRole,
   LanguageModelPromptType,
 } from "@electron/llm/dist/language-model";
+import { useDebugState } from "./DebugContext";
 
 type ClippyNamedStatus =
   | "welcome"
@@ -63,7 +64,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<ClippyNamedStatus>("welcome");
   const [triedToLoadModel, setTriedToLoadModel] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const { settings, models, debug } = useContext(SharedStateContext);
+  const { settings, models } = useContext(SharedStateContext);
+  const debug = useDebugState();
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
   const [hasPerformedStartupCheck, setHasPerformedStartupCheck] =
     useState(false);

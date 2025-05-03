@@ -78,6 +78,15 @@ export function setupWindowListener() {
       if (getDebugManager().store.get("openDevToolsOnStart")) {
         browserWindow.webContents.openDevTools({ mode: "detach" });
       }
+
+      browserWindow.webContents.on("did-finish-load", () => {
+        setFontSize(getStateManager().store.get("settings").defaultFontSize, [
+          browserWindow,
+        ]);
+        setFont(getStateManager().store.get("settings").defaultFont, [
+          browserWindow,
+        ]);
+      });
     },
   );
 }
@@ -234,4 +243,36 @@ export function maximizeChatWindow() {
   }
 
   return getChatWindow()?.maximize();
+}
+
+/**
+ * Set the font size for all windows
+ *
+ * @param fontSize The font size to set
+ */
+export function setFontSize(
+  fontSize: number,
+  windows: BrowserWindow[] = BrowserWindow.getAllWindows(),
+) {
+  windows.forEach((window) => {
+    window.webContents.executeJavaScript(
+      `document.documentElement.style.setProperty('--font-size', '${fontSize}px');`,
+    );
+  });
+}
+
+/**
+ * Set the font for all windows
+ *
+ * @param font The font to set
+ */
+export function setFont(
+  font: string,
+  windows: BrowserWindow[] = BrowserWindow.getAllWindows(),
+) {
+  windows.forEach((window) => {
+    window.webContents.executeJavaScript(
+      `document.querySelector('.clippy').setAttribute('data-font', '${font}');`,
+    );
+  });
 }

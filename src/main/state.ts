@@ -1,10 +1,11 @@
 import Store from "electron-store";
 
-import { getChatWindow, getMainWindow } from "./windows";
+import { getChatWindow, getMainWindow, setFont, setFontSize } from "./windows";
 import { IpcMessages } from "../ipc-messages";
 import { getModelManager, getModelPath, isModelOnDisk } from "./models";
 import { EMPTY_SHARED_STATE, SettingsState, SharedState } from "../sharedState";
 import { BUILT_IN_MODELS } from "../models";
+import { getLogger } from "./logger";
 
 export class StateManager {
   public store = new Store<SharedState>({
@@ -111,6 +112,28 @@ export class StateManager {
     if (oldValue.chatAlwaysOnTop !== newValue.chatAlwaysOnTop) {
       getChatWindow()?.setAlwaysOnTop(newValue.chatAlwaysOnTop);
     }
+
+    if (oldValue.defaultFontSize !== newValue.defaultFontSize) {
+      setFontSize(newValue.defaultFontSize);
+    }
+
+    if (oldValue.defaultFont !== newValue.defaultFont) {
+      setFont(newValue.defaultFont);
+    }
+
+    // Log the settings change by getting a deep diff
+    const diff = Object.keys(newValue).reduce(
+      (acc, key) => {
+        const typedKey = key as keyof SettingsState;
+        if (newValue[typedKey] !== oldValue[typedKey]) {
+          acc[typedKey] = newValue[typedKey];
+        }
+
+        return acc;
+      },
+      {} as Record<string, unknown>,
+    );
+    getLogger().info("Settings changed", diff);
   }
 
   /**

@@ -3,11 +3,11 @@ import { TabList } from "./TabList";
 import { SettingsModel } from "./SettingsModel";
 import { BubbleWindowBottomBar } from "./BubbleWindowBottomBar";
 import { SettingsAdvanced } from "./SettingsAdvanced";
-import { SettingsGeneral } from "./SettingsGeneral";
+import { SettingsAppearance } from "./SettingsAppearance";
 import { SettingsAbout } from "./SettingsAbout";
 import { BubbleView, useBubbleView } from "../contexts/BubbleViewContext";
 
-export type SettingsTab = "general" | "model" | "advanced" | "about";
+export type SettingsTab = "appearance" | "model" | "advanced" | "about";
 
 export type SettingsProps = {
   onClose: () => void;
@@ -20,7 +20,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   );
 
   const tabs = [
-    { label: "General", key: "general", content: <SettingsGeneral /> },
+    { label: "Appearance", key: "appearance", content: <SettingsAppearance /> },
     { label: "Model", key: "model", content: <SettingsModel /> },
     { label: "Advanced", key: "advanced", content: <SettingsAdvanced /> },
     { label: "About", key: "about", content: <SettingsAbout /> },
@@ -48,15 +48,15 @@ export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
  */
 function bubbleViewToSettingsTab(view: BubbleView): SettingsTab {
   if (!view || !view.includes("settings")) {
-    return "general";
+    return "appearance";
   }
 
   const settingsTab = view.replace(/settings-?/, "");
-  const settingsTabs = ["general", "model", "advanced", "about"] as const;
+  const settingsTabs = ["appearance", "model", "advanced", "about"] as const;
 
   if (settingsTabs.includes(settingsTab as SettingsTab)) {
     return settingsTab as SettingsTab;
   }
 
-  return "general";
+  return "appearance";
 }

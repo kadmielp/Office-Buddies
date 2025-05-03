@@ -1,6 +1,7 @@
 import "./css/App.css";
 import "../../../node_modules/98.css/dist/98.css";
 import "./css/98.extended.css";
+import "./css/Theme.css";
 
 import { Clippy } from "./Clippy";
 import { ChatProvider } from "../contexts/ChatContext";

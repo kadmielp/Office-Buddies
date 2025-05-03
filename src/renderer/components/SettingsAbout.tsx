@@ -3,12 +3,10 @@ export const SettingsAbout: React.FC = () => {
     <div>
       <h1>About</h1>
       <p>
-        Clippy is a love letter and homage to the late, great Clippy, the
-        assistant from Microsoft Office 1997. The character was designed by
-        illustrator Kevan Atteberry, who created more than 15 potential
-        characters for Microsoft's Office Assistants. It is <i>not</i>{" "}
-        affiliated, approved, or supported by Microsoft. Consider it software
-        art.
+        This app is a love letter and homage to the late, great Clippy, the
+        assistant from Microsoft Office 1997. It is <i>not</i> affiliated,
+        approved, or supported by Microsoft. Consider it software art. If you
+        don't like it, consider it software satire.
       </p>
       <h3>Acknowledgments</h3>
       <p>
@@ -33,6 +31,16 @@ export const SettingsAbout: React.FC = () => {
           Jordan Scales
         </a>
         .
+      </p>
+      <p>
+        The character was designed by illustrator{" "}
+        <a href="https://www.kevanatteberry.com/" target="_blank">
+          Kevan Atteberry
+        </a>
+        , who created more than 15 potential characters for Microsoft's Office
+        Assistants. "He's a guy that just wants to help, and he's a little bit
+        too helpful sometimes — and there's something fun and vulnerable about
+        that.", he once said about Clippy.
       </p>
       <p>
         Clippy and all visual assets related to Clippy are owned by Microsoft.

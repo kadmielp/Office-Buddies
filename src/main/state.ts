@@ -6,6 +6,7 @@ import { getModelManager, getModelPath, isModelOnDisk } from "./models";
 import { EMPTY_SHARED_STATE, SettingsState, SharedState } from "../sharedState";
 import { BUILT_IN_MODELS } from "../models";
 import { getLogger } from "./logger";
+import { setupAppMenu } from "./menu";
 
 export class StateManager {
   public store = new Store<SharedState>({
@@ -120,6 +121,9 @@ export class StateManager {
     if (oldValue.defaultFont !== newValue.defaultFont) {
       setFont(newValue.defaultFont);
     }
+
+    // Update the menu, which contains state
+    setupAppMenu();
 
     // Log the settings change by getting a deep diff
     const diff = Object.keys(newValue).reduce(

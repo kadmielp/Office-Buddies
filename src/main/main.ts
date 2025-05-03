@@ -11,12 +11,14 @@ import { setupIpcListeners } from "./ipc";
 import { createMainWindow, setupWindowListener } from "./windows";
 import { getModelManager } from "./models";
 import { setupAutoUpdater } from "./update";
+import { setupAppMenu } from "./menu";
 
 async function onReady() {
   console.info("Welcome to Clippy!");
 
   await setupAutoUpdater();
   await loadLlm();
+  setupAppMenu();
   setupIpcListeners();
   setupWindowListener();
   await createMainWindow();

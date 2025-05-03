@@ -10,6 +10,6 @@ function getElectronLog() {
   return (_log = require("electron-log"));
 }
 
-export function getLogger() {
+export function getLogger(): Logger {
   return getElectronLog();
 }

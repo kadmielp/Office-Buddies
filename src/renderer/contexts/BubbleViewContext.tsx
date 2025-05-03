@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { clippyApi } from "../clippyApi";
 
 export type BubbleView =
   | "chat"
@@ -22,6 +23,17 @@ export const BubbleViewProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [currentView, setCurrentView] = useState<BubbleView>("chat");
+
+  useEffect(() => {
+    clippyApi.offSetBubbleView();
+    clippyApi.onSetBubbleView((view: BubbleView) => {
+      setCurrentView(view);
+    });
+
+    return () => {
+      clippyApi.offSetBubbleView();
+    };
+  }, []);
 
   return (
     <BubbleViewContext.Provider value={{ currentView, setCurrentView }}>

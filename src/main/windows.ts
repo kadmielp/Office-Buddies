@@ -5,6 +5,7 @@ import { getLogger } from "./logger";
 import path from "path";
 import { getStateManager } from "./state";
 import { getDebugManager } from "./debug";
+import { popupAppMenu } from "./menu";
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -25,7 +26,7 @@ export function getMainWindow(): BrowserWindow | undefined {
 export async function createMainWindow() {
   getLogger().info("Creating main window");
 
-  if (mainWindow) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
     getLogger().info("Main window already exists, skipping creation");
     return;
   }
@@ -45,6 +46,7 @@ export async function createMainWindow() {
     maximizable: false,
     roundedCorners: false,
     thickFrame: false,
+    title: "Clippy",
     alwaysOnTop: settings.clippyAlwaysOnTop,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -58,22 +60,34 @@ export async function createMainWindow() {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
+
+  mainWindow.on("system-context-menu", (event) => {
+    event.preventDefault();
+    popupAppMenu();
+  });
+
+  mainWindow.webContents.on("context-menu", (event) => {
+    event.preventDefault();
+    popupAppMenu();
+  });
 }
 
 export function setupWindowListener() {
   app.on(
     "browser-window-created",
     (_event: Electron.Event, browserWindow: BrowserWindow) => {
-      getLogger().info(
-        `Creating window: ${browserWindow.webContents.getURL()}`,
-      );
+      const isMainWindow = !browserWindow.getParentWindow();
+
+      getLogger().info(`Creating window (${isMainWindow ? "main" : "child"})`);
 
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);
 
-      contextMenu({
-        window: browserWindow,
-      });
+      if (!isMainWindow) {
+        contextMenu({
+          window: browserWindow,
+        });
+      }
 
       if (getDebugManager().store.get("openDevToolsOnStart")) {
         browserWindow.webContents.openDevTools({ mode: "detach" });
@@ -104,6 +118,8 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
       return { action: "deny" };
     }
 
+    getLogger().info(`window.open() called with features: ${features}`);
+
     const width = parseInt(features.match(/width=(\d+)/)?.[1] || "400", 10);
     const height = parseInt(features.match(/height=(\d+)/)?.[1] || "600", 10);
     const shouldPositionNextToParent = features.includes(
@@ -123,6 +139,7 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         minHeight: 400,
         minWidth: 400,
         alwaysOnTop: getStateManager().store.get("settings").chatAlwaysOnTop,
+        parent: browserWindow,
       },
     };
   });

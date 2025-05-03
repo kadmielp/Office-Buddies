@@ -253,6 +253,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     addMessage({
       id: crypto.randomUUID(),
       children: <WelcomeMessageContent />,
+      content: "Welcome to Clippy!",
       sender: "clippy",
       createdAt: Date.now(),
     });
@@ -284,6 +285,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [models]);
+
+  // If the main process wants a new chat, start a new one
+  useEffect(() => {
+    clippyApi.offNewChat();
+    clippyApi.onNewChat(async () => {
+      await startNewChat();
+    });
+
+    return () => {
+      clippyApi.offNewChat();
+    };
+  }, [startNewChat]);
 
   const value = {
     chatRecords,
@@ -346,6 +359,6 @@ function messagesToInitialPrompts(messages: Message[]): LanguageModelPrompt[] {
         ? ("assistant" as LanguageModelPromptRole)
         : ("user" as LanguageModelPromptRole),
     type: "text" as LanguageModelPromptType,
-    content: message.content,
+    content: message.content || "",
   }));
 }

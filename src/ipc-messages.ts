@@ -3,6 +3,8 @@ export const IpcMessages = {
   TOGGLE_CHAT_WINDOW: "clippy_toggle_chat_window",
   MINIMIZE_CHAT_WINDOW: "clippy_minimize_chat_window",
   MAXIMIZE_CHAT_WINDOW: "clippy_maximize_chat_window",
+  SET_BUBBLE_VIEW: "clippy_set_bubble_view",
+  POPUP_APP_MENU: "clippy_popup_app_menu",
 
   // Model messages
   DOWNLOAD_MODEL_BY_NAME: "clippy_download_model_by_name",
@@ -30,4 +32,5 @@ export const IpcMessages = {
   CHAT_WRITE_CHAT_WITH_MESSAGES: "clippy_chat_write_chat_with_messages",
   CHAT_DELETE_CHAT: "clippy_chat_delete_chat",
   CHAT_DELETE_ALL_CHATS: "clippy_chat_delete_all_chats",
+  CHAT_NEW_CHAT: "clippy_chat_new_chat",
 };

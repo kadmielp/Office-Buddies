@@ -9,12 +9,14 @@ import { getModelManager } from "./models";
 import { getStateManager } from "./state";
 import { getChatManager } from "./chats";
 import { ChatWithMessages } from "../types/interfaces";
+import { getMainAppMenu } from "./menu";
 
 export function setupIpcListeners() {
   // Window
   ipcMain.handle(IpcMessages.TOGGLE_CHAT_WINDOW, () => toggleChatWindow());
   ipcMain.handle(IpcMessages.MINIMIZE_CHAT_WINDOW, () => minimizeChatWindow());
   ipcMain.handle(IpcMessages.MAXIMIZE_CHAT_WINDOW, () => maximizeChatWindow());
+  ipcMain.handle(IpcMessages.POPUP_APP_MENU, () => getMainAppMenu().popup());
 
   // Model
   ipcMain.handle(IpcMessages.DOWNLOAD_MODEL_BY_NAME, (_, name: string) =>

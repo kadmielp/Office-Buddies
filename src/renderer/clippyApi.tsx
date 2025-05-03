@@ -3,11 +3,16 @@ import { SharedState } from "../sharedState";
 import { ChatRecord, ChatWithMessages } from "../types/interfaces";
 import { DebugState } from "../debugState";
 
+import type { BubbleView } from "./contexts/BubbleViewContext";
+
 export type ClippyApi = {
   // Window
   toggleChatWindow: () => Promise<void>;
   minimizeChatWindow: () => Promise<void>;
   maximizeChatWindow: () => Promise<void>;
+  onSetBubbleView: (callback: (bubbleView: BubbleView) => void) => void;
+  offSetBubbleView: () => void;
+  popupAppMenu: () => void;
   // Models
   updateModelState: () => Promise<void>;
   downloadModelByName: (name: string) => Promise<void>;
@@ -33,6 +38,8 @@ export type ClippyApi = {
   writeChatWithMessages: (chatWithMessages: ChatWithMessages) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
   deleteAllChats: () => Promise<void>;
+  onNewChat: (callback: () => void) => void;
+  offNewChat: () => void;
 };
 
 declare global {

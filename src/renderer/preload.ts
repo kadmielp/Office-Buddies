@@ -8,6 +8,7 @@ import type { SharedState } from "../sharedState";
 import type { ClippyApi } from "./clippyApi";
 import { ChatWithMessages } from "../types/interfaces";
 import { DebugState } from "../debugState";
+import { BubbleView } from "./contexts/BubbleViewContext";
 
 const clippyApi: ClippyApi = {
   // Window
@@ -16,6 +17,15 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.MINIMIZE_CHAT_WINDOW),
   maximizeChatWindow: () =>
     ipcRenderer.invoke(IpcMessages.MAXIMIZE_CHAT_WINDOW),
+  onSetBubbleView(callback: (bubbleView: BubbleView) => void) {
+    ipcRenderer.on(IpcMessages.SET_BUBBLE_VIEW, (_event, bubbleView) =>
+      callback(bubbleView),
+    );
+  },
+  offSetBubbleView() {
+    ipcRenderer.removeAllListeners(IpcMessages.SET_BUBBLE_VIEW);
+  },
+  popupAppMenu: () => ipcRenderer.invoke(IpcMessages.POPUP_APP_MENU),
 
   // Models
   updateModelState: () =>
@@ -71,6 +81,12 @@ const clippyApi: ClippyApi = {
   deleteChat: (chatId: string) =>
     ipcRenderer.invoke(IpcMessages.CHAT_DELETE_CHAT, chatId),
   deleteAllChats: () => ipcRenderer.invoke(IpcMessages.CHAT_DELETE_ALL_CHATS),
+  onNewChat: (callback: () => void) => {
+    ipcRenderer.on(IpcMessages.CHAT_NEW_CHAT, callback);
+  },
+  offNewChat: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.CHAT_NEW_CHAT);
+  },
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);

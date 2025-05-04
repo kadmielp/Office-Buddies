@@ -1,20 +1,24 @@
-import { TableView } from "./TableView";
+import { Column, TableView } from "./TableView";
 import { Progress } from "./Progress";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { clippyApi } from "../clippyApi";
 import { prettyDownloadSpeed } from "../helpers/convert-download-speed";
 import { ManagedModel } from "../../models";
 import { isModelDownloading } from "../../helpers/model-helpers";
 
-export function SettingsModel() {
+export const SettingsModel: React.FC = () => {
   const { models, settings } = useSharedState();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
-  const columns = [
+  const columns: Array<Column> = [
     { key: "default", header: "Loaded", width: 50 },
     { key: "name", header: "Name" },
-    { key: "size", header: "Size" },
+    {
+      key: "size",
+      header: "Size",
+      render: (row) => `${row.size.toLocaleString()} MB`,
+    },
     { key: "company", header: "Company" },
     { key: "downloaded", header: "Downloaded" },
   ];
@@ -27,7 +31,7 @@ export function SettingsModel() {
       default: model?.name === settings.selectedModel ? "ｘ" : "",
       name: model?.name,
       company: model?.company,
-      size: `${model.size.toLocaleString()} MB`,
+      size: model?.size,
       downloaded: model.downloaded ? "Yes" : "No",
     };
   });
@@ -41,7 +45,6 @@ export function SettingsModel() {
   // Handlers
   // ---------------------------------------------------------------------------
   const handleRowSelect = (
-    row: Record<string, React.ReactNode>,
     index: number,
   ) => {
     setSelectedIndex(index);

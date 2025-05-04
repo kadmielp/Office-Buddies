@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useWindow } from "../contexts/WindowContext";
 
-interface Column {
+export interface Column {
   key: string;
   header: string;
   width?: number;
@@ -11,11 +17,13 @@ interface Column {
   ) => React.ReactNode;
 }
 
+export type Row = Record<string, React.ReactNode>;
+
 interface TableViewProps {
   columns: Column[];
-  data: Record<string, React.ReactNode>[];
+  data: Row[];
   style?: React.CSSProperties;
-  onRowSelect?: (row: Record<string, React.ReactNode>, index: number) => void;
+  onRowSelect?: (index: number) => void;
   initialSelectedIndex?: number;
 }
 
@@ -29,53 +37,85 @@ export const TableView: React.FC<TableViewProps> = ({
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(
     initialSelectedIndex ?? null,
   );
-  const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
-  const [resizing, setResizing] = useState<{ key: string; startX: number; initialWidth: number; cursorOffset: number } | null>(null);
+  const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>(
+    {},
+  );
+  const [resizing, setResizing] = useState<{
+    key: string;
+    startX: number;
+    initialWidth: number;
+    cursorOffset: number;
+  } | null>(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "asc" | "desc";
+  } | null>(null);
   const tableRef = useRef<HTMLDivElement>(null);
   const { currentWindow } = useWindow();
 
-  const handleRowClick = (index: number) => {
-    setSelectedRowIndex(selectedRowIndex === index ? null : index);
-    if (onRowSelect) {
-      onRowSelect(data[index], index);
+  const sortedData = useMemo(() => {
+    const dataCopy = [...data];
+
+    if (sortConfig !== null) {
+      dataCopy.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
     }
+
+    return dataCopy;
+  }, [data, sortConfig]);
+
+  const indexMap = useMemo(() => {
+    return new Map<Row, number>(data.map((row, index) => [row, index]));
+  }, [data]);
+
+  const handleRowSelect = useCallback(
+    (sortedDataIndex: number) => {
+      if (onRowSelect) {
+        onRowSelect(indexMap.get(sortedData[sortedDataIndex]));
+      }
+
+      setSelectedRowIndex(sortedDataIndex);
+    },
+    [onRowSelect, indexMap],
+  );
+
+  const handleSort = (columnKey: string) => {
+    setSortConfig((currentSort) => ({
+      key: columnKey,
+      direction:
+        currentSort?.key === columnKey && currentSort?.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (!data.length) return;
+    if (!sortedData.length) return;
 
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
         if (selectedRowIndex === null) {
           // Select first row if nothing is selected
-          setSelectedRowIndex(0);
-          if (onRowSelect) onRowSelect(data[0], 0);
-        } else if (selectedRowIndex < data.length - 1) {
+          handleRowSelect(0);
+        } else if (selectedRowIndex < sortedData.length - 1) {
           // Move to next row
-          const newIndex = selectedRowIndex + 1;
-          setSelectedRowIndex(newIndex);
-          if (onRowSelect) onRowSelect(data[newIndex], newIndex);
+          handleRowSelect(selectedRowIndex + 1);
         }
         break;
       case "ArrowUp":
         e.preventDefault();
         if (selectedRowIndex === null) {
           // Select last row if nothing is selected
-          const lastIndex = data.length - 1;
-          setSelectedRowIndex(lastIndex);
-          if (onRowSelect) onRowSelect(data[lastIndex], lastIndex);
+          handleRowSelect(sortedData.length - 1);
         } else if (selectedRowIndex > 0) {
           // Move to previous row
-          const newIndex = selectedRowIndex - 1;
-          setSelectedRowIndex(newIndex);
-          if (onRowSelect) onRowSelect(data[newIndex], newIndex);
-        }
-        break;
-      case "Enter":
-        if (selectedRowIndex !== null) {
-          // Toggle selection on Enter
-          handleRowClick(selectedRowIndex);
+          handleRowSelect(selectedRowIndex - 1);
         }
         break;
       case "Escape":
@@ -98,31 +138,34 @@ export const TableView: React.FC<TableViewProps> = ({
     return () => {
       currentWindow.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedRowIndex, data, onRowSelect]);
+  }, [selectedRowIndex, sortedData]);
 
   const handleResizeStart = (e: React.MouseEvent, columnKey: string) => {
     e.preventDefault();
     const resizeHandle = e.currentTarget as HTMLElement;
     const handleRect = resizeHandle.getBoundingClientRect();
     const cursorOffset = e.clientX - handleRect.left;
-    
-    setResizing({ 
-      key: columnKey, 
+
+    setResizing({
+      key: columnKey,
       startX: e.clientX,
       initialWidth: columnWidths[columnKey] || 50,
-      cursorOffset
+      cursorOffset,
     });
   };
 
   const handleResizeMove = (e: MouseEvent) => {
     if (!resizing) return;
 
-    const deltaX = (e.clientX - resizing.cursorOffset) - (resizing.startX - resizing.cursorOffset);
+    const deltaX =
+      e.clientX -
+      resizing.cursorOffset -
+      (resizing.startX - resizing.cursorOffset);
     const newWidth = Math.max(50, resizing.initialWidth + deltaX);
 
-    setColumnWidths(prev => ({
+    setColumnWidths((prev) => ({
       ...prev,
-      [resizing.key]: newWidth
+      [resizing.key]: newWidth,
     }));
   };
 
@@ -132,23 +175,26 @@ export const TableView: React.FC<TableViewProps> = ({
 
   useEffect(() => {
     if (resizing) {
-      currentWindow.document.addEventListener('mousemove', handleResizeMove);
-      currentWindow.document.addEventListener('mouseup', handleResizeEnd);
+      currentWindow.document.addEventListener("mousemove", handleResizeMove);
+      currentWindow.document.addEventListener("mouseup", handleResizeEnd);
       return () => {
-        currentWindow.document.removeEventListener('mousemove', handleResizeMove);
-        currentWindow.document.removeEventListener('mouseup', handleResizeEnd);
+        currentWindow.document.removeEventListener(
+          "mousemove",
+          handleResizeMove,
+        );
+        currentWindow.document.removeEventListener("mouseup", handleResizeEnd);
       };
     }
   }, [resizing]);
 
-  const getColumnWidth = (column: Column, index: number) => {
+  const getColumnWidth = (column: Column) => {
     if (columnWidths[column.key]) {
       return { width: `${columnWidths[column.key]}px` };
     }
     if (column.width !== undefined) {
       return { width: `${column.width}px` };
     }
-    return { width: 'auto' };
+    return { width: "auto" };
   };
 
   return (
@@ -164,25 +210,33 @@ export const TableView: React.FC<TableViewProps> = ({
       >
         <thead>
           <tr>
-            {columns.map((column, index) => (
-              <th 
-                key={column.key} 
+            {columns.map((column) => (
+              <th
+                key={column.key}
                 style={{
-                  ...getColumnWidth(column, index),
-                  position: 'relative',
-                  userSelect: 'none'
+                  ...getColumnWidth(column),
+                  position: "relative",
+                  userSelect: "none",
+                  cursor: "pointer",
                 }}
+                onClick={() => handleSort(column.key)}
               >
                 {column.header}
+                {sortConfig?.key === column.key && (
+                  <span style={{ marginLeft: "4px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
                 <div
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     right: 0,
                     top: 0,
                     bottom: 0,
-                    width: '4px',
-                    cursor: 'col-resize',
-                    backgroundColor: resizing?.key === column.key ? '#666' : 'transparent'
+                    width: "4px",
+                    cursor: "col-resize",
+                    backgroundColor:
+                      resizing?.key === column.key ? "#666" : "transparent",
                   }}
                   onMouseDown={(e) => handleResizeStart(e, column.key)}
                 />
@@ -191,16 +245,16 @@ export const TableView: React.FC<TableViewProps> = ({
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIndex) => (
+          {sortedData.map((row, rowIndex) => (
             <tr
               key={rowIndex}
               className={selectedRowIndex === rowIndex ? "highlighted" : ""}
-              onClick={() => handleRowClick(rowIndex)}
+              onClick={() => handleRowSelect(rowIndex)}
             >
-              {columns.map((column, colIndex) => (
+              {columns.map((column) => (
                 <td
                   key={`${rowIndex}-${column.key}`}
-                  style={getColumnWidth(column, colIndex)}
+                  style={getColumnWidth(column)}
                 >
                   {column.render
                     ? column.render(row, rowIndex)

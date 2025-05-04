@@ -2,9 +2,9 @@ import type { DownloadState } from "./sharedState";
 
 export interface Model {
   name: string;
-  company: string;
   size: number;
-  url: string;
+  company?: string;
+  url?: string;
   description?: string;
   homepage?: string;
 }
@@ -13,6 +13,7 @@ export interface ManagedModel extends Model {
   path: string;
   downloaded?: boolean;
   downloadState?: DownloadState;
+  imported?: boolean;
 }
 
 export type ModelState = Record<string, ManagedModel>;

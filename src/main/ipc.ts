@@ -22,11 +22,17 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.DOWNLOAD_MODEL_BY_NAME, (_, name: string) =>
     getModelManager().downloadModelByName(name),
   );
+  ipcMain.handle(IpcMessages.REMOVE_MODEL_BY_NAME, (_, name: string) =>
+    getModelManager().removeModelByName(name),
+  );
   ipcMain.handle(IpcMessages.DELETE_MODEL_BY_NAME, (_, name: string) =>
     getModelManager().deleteModelByName(name),
   );
   ipcMain.handle(IpcMessages.DELETE_ALL_MODELS, () =>
     getModelManager().deleteAllModels(),
+  );
+  ipcMain.handle(IpcMessages.ADD_MODEL_FROM_FILE, () =>
+    getModelManager().addModelFromFile(),
   );
 
   // State

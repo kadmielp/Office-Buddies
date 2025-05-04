@@ -30,6 +30,10 @@ export const SettingsAbout: React.FC = () => {
         <a href="https://github.com/jdan" target="_blank">
           Jordan Scales
         </a>
+        . Quantized GGUF models provided by{" "}
+        <a href="https://www.unsloth.ai" target="_blank">
+          Unsloth
+        </a>
         .
       </p>
       <p>

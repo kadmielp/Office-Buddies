@@ -23,7 +23,7 @@ let isInitialized = false;
 export function WindowPortal({
   children,
   width = 400,
-  height = 500,
+  height = 700,
   title = "Clippy Chat",
 }: WindowPortalProps) {
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);

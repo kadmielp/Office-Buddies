@@ -53,8 +53,10 @@ export function SettingsModel() {
     }
   };
 
-  const handleDelete = async () => {
-    if (selectedModel) {
+  const handleDeleteOrRemove = async () => {
+    if (selectedModel?.imported) {
+      await clippyApi.removeModelByName(selectedModel.name);
+    } else if (selectedModel) {
       await clippyApi.deleteModelByName(selectedModel.name);
     }
   };
@@ -70,8 +72,15 @@ export function SettingsModel() {
       <p>
         Select the model you want to use for your chat. The larger the model,
         the more powerful the chat, but the slower it will be - and the more
-        memory it will use.
+        memory it will use. Clippy uses models in the GGUF format.
       </p>
+
+      <button
+        style={{ marginBottom: 10 }}
+        onClick={() => clippyApi.addModelFromFile()}
+      >
+        Add model from file
+      </button>
       <TableView
         columns={columns}
         data={data}
@@ -115,7 +124,9 @@ export function SettingsModel() {
                     ? "Clippy uses this model"
                     : "Make Clippy use this model"}
                 </button>
-                <button onClick={handleDelete}>Delete Model</button>
+                <button onClick={handleDeleteOrRemove}>
+                  {selectedModel?.imported ? "Remove" : "Delete"} Model
+                </button>
               </>
             )}
           </div>

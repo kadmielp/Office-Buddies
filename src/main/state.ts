@@ -14,12 +14,6 @@ export class StateManager {
       ...EMPTY_SHARED_STATE,
       models: getModelManager().getInitialRendererModelState(),
     },
-    serialize: (value) => {
-      return JSON.stringify({ ...value, debug: undefined }, null, 2);
-    },
-    deserialize: (value) => {
-      return JSON.parse(value);
-    },
   });
 
   constructor() {
@@ -76,8 +70,14 @@ export class StateManager {
     for (const modelName of Object.keys(models)) {
       const model = models[modelName];
 
-      model.downloaded = getModelManager().getIsModelDownloaded(model);
-      model.path = getModelPath(model);
+      if (model.imported) {
+        if (!isModelOnDisk(model)) {
+          delete models[modelName];
+        }
+      } else {
+        model.downloaded = isModelOnDisk(model);
+        model.path = getModelPath(model);
+      }
     }
 
     // Make sure all models from the constant are in state

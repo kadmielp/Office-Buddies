@@ -1,4 +1,4 @@
-import { app, DownloadItem, session } from "electron";
+import { app, DownloadItem, session, dialog } from "electron";
 import path from "path";
 import fs from "fs";
 import { getLogger } from "./logger";
@@ -87,6 +87,27 @@ class ModelManager {
   }
 
   /**
+   * Removes models from state without deleting them from disk
+   *
+   * @param name {string}
+   * @returns {Promise<void>}
+   */
+  public async removeModelByName(name: string) {
+    getLogger().info("Removing model by name", name);
+
+    const models = { ...this.models };
+
+    if (models[name]) {
+      this.cancelDownload(this.models[name]);
+
+      delete models[name];
+      this.models = models;
+    }
+
+    this.pollRendererModelState();
+  }
+
+  /**
    * Deletes a model by name
    *
    * @param name
@@ -98,26 +119,34 @@ class ModelManager {
     const model = this.models[name];
 
     if (!model || !model.path) {
+      getLogger().warn(
+        `ModelManager deleteModelByName: Model not found: ${name}`,
+      );
       throw new Error(`Model not found: ${name}`);
+    }
+
+    if (model.imported) {
+      getLogger().warn(
+        `ModelManager deleteModelByName: Tried to delete imported model: ${name}`,
+      );
+      throw new Error(`Refusing to delete imported model: ${name}`);
     }
 
     this.cancelDownload(model);
 
-    if (!fs.existsSync(model.path)) {
-      this.pollRendererModelState();
-      return true;
+    if (fs.existsSync(model.path)) {
+      try {
+        await fs.promises.unlink(model.path);
+        model.downloaded = false;
+        model.path = undefined;
+      } catch (error) {
+        getLogger().error(`ModelManager: Error deleting model: ${name}`, error);
+        return false;
+      }
     }
 
-    try {
-      await fs.promises.unlink(model.path);
-      model.downloaded = false;
-      model.path = undefined;
-      this.pollRendererModelState();
-      return true;
-    } catch (error) {
-      getLogger().error(`ModelManager: Error deleting model: ${name}`, error);
-      return false;
-    }
+    this.pollRendererModelState();
+    return true;
   }
 
   /**
@@ -202,6 +231,7 @@ class ModelManager {
         path: model.path,
         description: model.description,
         homepage: model.homepage,
+        imported: model.imported,
         downloaded: this.getIsModelDownloaded(model),
         downloadState,
       };
@@ -228,6 +258,59 @@ class ModelManager {
       this.downloadItems[model.name].getState() !== "completed";
 
     return existsOnDisk && !isDownloading;
+  }
+
+  /**
+   * Opens a file dialog to select a GGUF file and adds it as a model
+   */
+  public async addModelFromFile() {
+    try {
+      const result = await dialog.showOpenDialog({
+        title: "Select a GGUF Model File",
+        defaultPath: app.getPath("downloads"),
+        filters: [{ name: "GGUF Model Files", extensions: ["gguf"] }],
+        properties: ["openFile"],
+      });
+
+      if (result.canceled || result.filePaths.length === 0) {
+        getLogger().info("No file selected for adding model.");
+        return;
+      }
+
+      const filePath = result.filePaths[0];
+      const fileName = path.basename(filePath);
+
+      if (this.models[fileName]) {
+        const overwrite = await dialog.showMessageBox({
+          type: "warning",
+          buttons: ["Overwrite", "Cancel"],
+          defaultId: 1,
+          title: "Model Already Exists",
+          message: `A model with the name "${fileName}" already exists. Do you want to overwrite the entry in Clippy? This will not delete the file on disk.`,
+        });
+
+        if (overwrite.response !== 0) {
+          getLogger().info("User canceled overwriting the existing model.");
+          return;
+        }
+      }
+
+      const model: ManagedModel = {
+        name: fileName,
+        size: Math.round(fs.statSync(filePath).size / (1024 * 1024)),
+        path: filePath,
+        description: `Imported GGUF model from ${filePath}.`,
+        imported: true,
+      };
+
+      const models = { ...this.models, [fileName]: model };
+      getStateManager().store.set("models", models);
+      this.pollRendererModelState();
+
+      getLogger().info(`Model added from file: ${filePath}`);
+    } catch (error) {
+      getLogger().error("Error adding model from file", error);
+    }
   }
 
   /**

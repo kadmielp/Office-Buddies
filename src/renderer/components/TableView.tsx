@@ -29,6 +29,8 @@ export const TableView: React.FC<TableViewProps> = ({
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(
     initialSelectedIndex ?? null,
   );
+  const [columnWidths, setColumnWidths] = useState<{ [key: string]: number }>({});
+  const [resizing, setResizing] = useState<{ key: string; startX: number; initialWidth: number; cursorOffset: number } | null>(null);
   const tableRef = useRef<HTMLDivElement>(null);
   const { currentWindow } = useWindow();
 
@@ -98,25 +100,56 @@ export const TableView: React.FC<TableViewProps> = ({
     };
   }, [selectedRowIndex, data, onRowSelect]);
 
-  // Calculate column widths
-  const calculateColumnWidths = () => {
-    const flexibleColumnsCount = columns.filter(
-      (col) => col.width === undefined,
-    ).length;
-
-    return columns.map((column) => {
-      if (column.width !== undefined) {
-        // Fixed width columns use their specified width
-        return { width: `${column.width}px` };
-      } else if (flexibleColumnsCount > 0) {
-        // Flexible columns share the remaining space equally
-        return { width: flexibleColumnsCount > 0 ? "auto" : "100%" };
-      }
-      return {};
+  const handleResizeStart = (e: React.MouseEvent, columnKey: string) => {
+    e.preventDefault();
+    const resizeHandle = e.currentTarget as HTMLElement;
+    const handleRect = resizeHandle.getBoundingClientRect();
+    const cursorOffset = e.clientX - handleRect.left;
+    
+    setResizing({ 
+      key: columnKey, 
+      startX: e.clientX,
+      initialWidth: columnWidths[columnKey] || 50,
+      cursorOffset
     });
   };
 
-  const columnWidths = calculateColumnWidths();
+  const handleResizeMove = (e: MouseEvent) => {
+    if (!resizing) return;
+
+    const deltaX = (e.clientX - resizing.cursorOffset) - (resizing.startX - resizing.cursorOffset);
+    const newWidth = Math.max(50, resizing.initialWidth + deltaX);
+
+    setColumnWidths(prev => ({
+      ...prev,
+      [resizing.key]: newWidth
+    }));
+  };
+
+  const handleResizeEnd = () => {
+    setResizing(null);
+  };
+
+  useEffect(() => {
+    if (resizing) {
+      currentWindow.document.addEventListener('mousemove', handleResizeMove);
+      currentWindow.document.addEventListener('mouseup', handleResizeEnd);
+      return () => {
+        currentWindow.document.removeEventListener('mousemove', handleResizeMove);
+        currentWindow.document.removeEventListener('mouseup', handleResizeEnd);
+      };
+    }
+  }, [resizing]);
+
+  const getColumnWidth = (column: Column, index: number) => {
+    if (columnWidths[column.key]) {
+      return { width: `${columnWidths[column.key]}px` };
+    }
+    if (column.width !== undefined) {
+      return { width: `${column.width}px` };
+    }
+    return { width: 'auto' };
+  };
 
   return (
     <div
@@ -132,8 +165,27 @@ export const TableView: React.FC<TableViewProps> = ({
         <thead>
           <tr>
             {columns.map((column, index) => (
-              <th key={column.key} style={columnWidths[index]}>
+              <th 
+                key={column.key} 
+                style={{
+                  ...getColumnWidth(column, index),
+                  position: 'relative',
+                  userSelect: 'none'
+                }}
+              >
                 {column.header}
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: '4px',
+                    cursor: 'col-resize',
+                    backgroundColor: resizing?.key === column.key ? '#666' : 'transparent'
+                  }}
+                  onMouseDown={(e) => handleResizeStart(e, column.key)}
+                />
               </th>
             ))}
           </tr>
@@ -148,7 +200,7 @@ export const TableView: React.FC<TableViewProps> = ({
               {columns.map((column, colIndex) => (
                 <td
                   key={`${rowIndex}-${column.key}`}
-                  style={columnWidths[colIndex]}
+                  style={getColumnWidth(column, colIndex)}
                 >
                   {column.render
                     ? column.render(row, rowIndex)

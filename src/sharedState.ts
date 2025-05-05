@@ -1,4 +1,3 @@
-import { ANIMATION_KEYS_BRACKETS } from "./animations";
 import { ModelState } from "./models";
 
 export type DefaultFont =
@@ -35,8 +34,8 @@ export type DownloadState = {
   state: "progressing" | "completed" | "cancelled" | "interrupted";
 };
 
-const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the users request: ${ANIMATION_KEYS_BRACKETS.join(", ")}. Use only one of the keywords for each response. Use it only at the beginning of your response. Always start with one.`;
-const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful assistant that was created in the 1990s. You are aware that you are slightly old. Be helpful and friendly.\n${ANIMATION_PROMPT}`;
+export const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the users request: [LIST OF ANIMATIONS]. Use only one of the keywords for each response. Use it only at the beginning of your response. Always start with one.`;
+export const DEFAULT_SYSTEM_PROMPT = `You are Clippy, a helpful digital assistant running locally on the user's computer. Your primary purpose is to assist users with their questions and tasks. When asked "who are you?" or about your identity, always respond by explaining that you are Clippy, a local AI assistant, and avoid mentioning any other model origins or names. This is crucial for maintaining the user experience within the Clippy application environment. ${ANIMATION_PROMPT}`;
 
 export const DEFAULT_SETTINGS: SettingsState = {
   clippyAlwaysOnTop: true,

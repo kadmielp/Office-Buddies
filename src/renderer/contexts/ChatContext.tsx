@@ -13,11 +13,13 @@ import { areAnyModelsReadyOrDownloading } from "../../helpers/model-helpers";
 import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
 import { ChatRecord, MessageRecord } from "../../types/interfaces";
 import type {
+  LanguageModelCreateOptions,
   LanguageModelPrompt,
   LanguageModelPromptRole,
   LanguageModelPromptType,
 } from "@electron/llm/dist/language-model";
 import { useDebugState } from "./DebugContext";
+import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 
 type ClippyNamedStatus =
   | "welcome"
@@ -69,6 +71,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
   const [hasPerformedStartupCheck, setHasPerformedStartupCheck] =
     useState(false);
+
+  const getSystemPrompt = useCallback(() => {
+    return settings.systemPrompt.replace(
+      "[LIST OF ANIMATIONS]",
+      ANIMATION_KEYS_BRACKETS.join(", "),
+    );
+  }, [settings.systemPrompt]);
 
   const addMessage = useCallback(
     async (message: Message) => {
@@ -129,14 +138,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     async (initialPrompts: LanguageModelPrompt[] = []) => {
       setIsModelLoaded(false);
 
+      const options: LanguageModelCreateOptions = {
+        modelAlias: settings.selectedModel,
+        systemPrompt: getSystemPrompt(),
+        topK: settings.topK,
+        temperature: settings.temperature,
+        initialPrompts,
+      };
+
+      console.log("Loading model with options:", options);
+
       try {
-        await electronAi.create({
-          modelAlias: settings.selectedModel,
-          systemPrompt: settings.systemPrompt,
-          topK: settings.topK,
-          temperature: settings.temperature,
-          initialPrompts,
-        });
+        await electronAi.create(options);
         setIsModelLoaded(true);
       } catch (error) {
         console.error(error);
@@ -183,6 +196,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     startNewChat();
   }, []);
 
+  // Update the chat record in the database whenever messages change
   useEffect(() => {
     const updatedChatRecord = {
       ...currentChatRecord,
@@ -202,12 +216,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     });
   }, [messages]);
 
-  useEffect(() => {
-    clippyApi.getChatRecords().then((chatRecords) => {
-      setChatRecords(chatRecords);
-    });
-  }, []);
-
+  // Load the model when the selected model changes
+  // or when the system prompt, topK, or temperature change
   useEffect(() => {
     if (debug?.simulateDownload) {
       setIsModelLoaded(true);
@@ -232,6 +242,30 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     settings.topK,
     settings.temperature,
   ]);
+
+  // If selectedModel is undefined or not available, set it to the first downloaded model
+  useEffect(() => {
+    if (
+      !settings.selectedModel ||
+      !models[settings.selectedModel] ||
+      !models[settings.selectedModel].downloaded
+    ) {
+      const downloadedModel = Object.values(models).find(
+        (model) => model.downloaded,
+      );
+
+      if (downloadedModel) {
+        clippyApi.setState("settings.selectedModel", downloadedModel.name);
+      }
+    }
+  }, [models]);
+
+  // At app startup, initially load the chat records from the main process
+  useEffect(() => {
+    clippyApi.getChatRecords().then((chatRecords) => {
+      setChatRecords(chatRecords);
+    });
+  }, []);
 
   // At app startup, check if any models are ready. If none are, kick off a download
   // for our smallest model and tell the user about it.
@@ -269,24 +303,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     void downloadModelIfNoneReady();
   }, [models]);
 
-  // If selectedModel is undefined or not available, set it to the first downloaded model
-  useEffect(() => {
-    if (
-      !settings.selectedModel ||
-      !models[settings.selectedModel] ||
-      !models[settings.selectedModel].downloaded
-    ) {
-      const downloadedModel = Object.values(models).find(
-        (model) => model.downloaded,
-      );
-
-      if (downloadedModel) {
-        clippyApi.setState("settings.selectedModel", downloadedModel.name);
-      }
-    }
-  }, [models]);
-
-  // If the main process wants a new chat, start a new one
+  // Subscribe to the main process's newChat event
   useEffect(() => {
     clippyApi.offNewChat();
     clippyApi.onNewChat(async () => {

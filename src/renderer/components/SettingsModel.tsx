@@ -44,9 +44,7 @@ export const SettingsModel: React.FC = () => {
 
   // Handlers
   // ---------------------------------------------------------------------------
-  const handleRowSelect = (
-    index: number,
-  ) => {
+  const handleRowSelect = (index: number) => {
     setSelectedIndex(index);
   };
 
@@ -136,10 +134,9 @@ export const SettingsModel: React.FC = () => {
           <SettingsModelDownload model={selectedModel} />
         </div>
       )}
-      <SettingsModelVariables />
     </div>
   );
-}
+};
 
 const SettingsModelDownload: React.FC<{
   model?: ManagedModel;
@@ -159,35 +156,5 @@ const SettingsModelDownload: React.FC<{
       </p>
       <Progress progress={model.downloadState?.percentComplete || 0} />
     </div>
-  );
-};
-
-const SettingsModelVariables: React.FC = () => {
-  const { settings } = useSharedState();
-
-  return (
-    <fieldset style={{ marginTop: "20px" }}>
-      <legend>Variables</legend>
-      <div className="field-row">
-        <label htmlFor="topK">Top K</label>
-        <input
-          id="topK"
-          type="number"
-          value={settings.topK}
-          onChange={(e) => clippyApi.setState("settings.topK", e.target.value)}
-        />
-      </div>
-      <div className="field-row">
-        <label htmlFor="temperature">Temperature</label>
-        <input
-          id="temperature"
-          type="number"
-          value={settings.temperature}
-          onChange={(e) =>
-            clippyApi.setState("settings.temperature", e.target.value)
-          }
-        />
-      </div>
-    </fieldset>
   );
 };

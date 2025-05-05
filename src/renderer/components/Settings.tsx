@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+
 import { TabList } from "./TabList";
+import { BubbleView, useBubbleView } from "../contexts/BubbleViewContext";
 import { SettingsModel } from "./SettingsModel";
 import { BubbleWindowBottomBar } from "./BubbleWindowBottomBar";
 import { SettingsAdvanced } from "./SettingsAdvanced";
 import { SettingsAppearance } from "./SettingsAppearance";
 import { SettingsAbout } from "./SettingsAbout";
-import { BubbleView, useBubbleView } from "../contexts/BubbleViewContext";
+import { SettingsParameters } from "./SettingsParameters";
 
 export type SettingsTab = "appearance" | "model" | "advanced" | "about";
 
@@ -30,6 +32,7 @@ export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const tabs = [
     { label: "Appearance", key: "appearance", content: <SettingsAppearance /> },
     { label: "Model", key: "model", content: <SettingsModel /> },
+    { label: "Parameters", key: "parameters", content: <SettingsParameters /> },
     { label: "Advanced", key: "advanced", content: <SettingsAdvanced /> },
     { label: "About", key: "about", content: <SettingsAbout /> },
   ];
@@ -60,7 +63,13 @@ function bubbleViewToSettingsTab(view: BubbleView): SettingsTab {
   }
 
   const settingsTab = view.replace(/settings-?/, "");
-  const settingsTabs = ["appearance", "model", "advanced", "about"] as const;
+  const settingsTabs = [
+    "appearance",
+    "model",
+    "parameters",
+    "advanced",
+    "about",
+  ] as const;
 
   if (settingsTabs.includes(settingsTab as SettingsTab)) {
     return settingsTab as SettingsTab;

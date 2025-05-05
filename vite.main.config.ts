@@ -6,5 +6,6 @@ export default defineConfig({
     rollupOptions: {
       external: ["@electron/llm", "node-llama-cpp", "electron-log"],
     },
+    sourcemap: true,
   },
 });

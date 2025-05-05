@@ -12,14 +12,10 @@ import { SharedStateContext } from "./SharedStateContext";
 import { areAnyModelsReadyOrDownloading } from "../../helpers/model-helpers";
 import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
 import { ChatRecord, MessageRecord } from "../../types/interfaces";
-import type {
-  LanguageModelCreateOptions,
-  LanguageModelPrompt,
-  LanguageModelPromptRole,
-  LanguageModelPromptType,
-} from "@electron/llm/dist/language-model";
 import { useDebugState } from "./DebugContext";
 import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
+
+import type { LanguageModelPrompt, LanguageModelCreateOptions, LanguageModelPromptRole, LanguageModelPromptType } from "@electron/llm";
 
 type ClippyNamedStatus =
   | "welcome"

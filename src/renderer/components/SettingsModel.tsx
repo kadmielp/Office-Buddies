@@ -73,7 +73,7 @@ export const SettingsModel: React.FC = () => {
       <p>
         Select the model you want to use for your chat. The larger the model,
         the more powerful the chat, but the slower it will be - and the more
-        memory it will use. Clippy uses models in the GGUF format.
+        memory it will use. Clippy uses models in the GGUF format. <a href="https://github.com/felixrieseberg/clippy?tab=readme-ov-file#downloading-more-models" target="_blank">More information.</a>
       </p>
 
       <button

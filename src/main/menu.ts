@@ -14,6 +14,11 @@ import type { BubbleView } from "../renderer/contexts/BubbleViewContext";
 import { getMainWindow } from "./windows";
 import { IpcMessages } from "../ipc-messages";
 import { checkForUpdates } from "./update";
+import {
+  closeInspector,
+  getIsInspectorEnabled,
+  openInspector,
+} from "./debugger";
 
 /**
  * Setup the application menu
@@ -200,6 +205,26 @@ function getHelpMenu(): MenuItemConstructorOptions[] {
       type: "separator",
     },
     {
+      label: "Open All Developer Tools",
+      click: () => {
+        const windows = BrowserWindow.getAllWindows();
+        for (const window of windows) {
+          window.webContents.openDevTools({ mode: "detach" });
+        }
+      },
+    },
+    {
+      label: "Enable Main Process Debugger",
+      type: "checkbox",
+      checked: getIsInspectorEnabled(),
+      click: () => {
+        getIsInspectorEnabled() ? closeInspector() : openInspector();
+      },
+    },
+    {
+      type: "separator",
+    },
+    {
       label: "Open Logs",
       click: () => {
         try {
@@ -217,15 +242,6 @@ function getHelpMenu(): MenuItemConstructorOptions[] {
             title: "Error",
             message: `Failed to open logs. The error was: ${error}. I'd normally tell you to check the logs for more details, but... well, you can't.`,
           });
-        }
-      },
-    },
-    {
-      label: "Open All Developer Tools",
-      click: () => {
-        const windows = BrowserWindow.getAllWindows();
-        for (const window of windows) {
-          window.webContents.openDevTools({ mode: "detach" });
         }
       },
     },

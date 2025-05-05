@@ -4,6 +4,7 @@ import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
 import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 import { useChat } from "../contexts/ChatContext";
+import { electronAi } from "../clippyApi";
 
 export type ChatProps = {
   style?: React.CSSProperties;
@@ -14,6 +15,13 @@ export function Chat({ style }: ChatProps) {
     useChat();
   const [streamingMessageContent, setStreamingMessageContent] =
     useState<string>("");
+  const [lastRequestUUID, setLastRequestUUID] = useState<string>(
+    crypto.randomUUID(),
+  );
+
+  const handleAbortMessage = () => {
+    electronAi.abortRequest(lastRequestUUID);
+  };
 
   const handleSendMessage = async (message: string) => {
     if (status !== "idle") {
@@ -32,7 +40,12 @@ export function Chat({ style }: ChatProps) {
     setStatus("thinking");
 
     try {
-      const response = await window.electronAi.promptStreaming(message);
+      const requestUUID = crypto.randomUUID();
+      setLastRequestUUID(requestUUID);
+
+      const response = await window.electronAi.promptStreaming(message, {
+        requestUUID,
+      });
 
       let fullContent = "";
       let filteredContent = "";
@@ -96,7 +109,7 @@ export function Chat({ style }: ChatProps) {
           }}
         />
       )}
-      <ChatInput onSend={handleSendMessage} />
+      <ChatInput onSend={handleSendMessage} onAbort={handleAbortMessage} />
     </div>
   );
 }

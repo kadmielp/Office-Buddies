@@ -35,6 +35,10 @@ export const WelcomeMessageContent: React.FC = () => {
         smallest model for you in the background. You can choose a bigger, more
         powerful model in the settings.
       </p>
+      <p>
+        By the way, you can open or close this chat window by clicking right on
+        Clippy's head.
+      </p>
 
       {downloadingModel && (
         <div style={{ marginTop: "15px", marginBottom: "15px" }}>

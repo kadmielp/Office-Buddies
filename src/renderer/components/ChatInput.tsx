@@ -45,13 +45,16 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
   }, [isModelLoaded]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       const trimmedMessage = message.trim();
 
       if (trimmedMessage) {
         onSend(trimmedMessage);
         setMessage("");
       }
+
+      e.preventDefault();
+      e.stopPropagation();
     }
   };
 

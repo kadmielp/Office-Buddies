@@ -83,12 +83,11 @@ export function Chat({ style }: ChatProps) {
         sender: "clippy",
         createdAt: Date.now(),
       };
+
       addMessage(assistantMessage);
-      setStreamingMessageContent("");
-      setStatus("idle");
     } catch (error) {
       console.error(error);
-
+    } finally {
       setStreamingMessageContent("");
       setStatus("idle");
     }

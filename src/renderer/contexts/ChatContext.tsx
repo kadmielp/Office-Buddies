@@ -15,7 +15,12 @@ import { ChatRecord, MessageRecord } from "../../types/interfaces";
 import { useDebugState } from "./DebugContext";
 import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 
-import type { LanguageModelPrompt, LanguageModelCreateOptions, LanguageModelPromptRole, LanguageModelPromptType } from "@electron/llm";
+import type {
+  LanguageModelPrompt,
+  LanguageModelCreateOptions,
+  LanguageModelPromptRole,
+  LanguageModelPromptType,
+} from "@electron/llm";
 
 type ClippyNamedStatus =
   | "welcome"

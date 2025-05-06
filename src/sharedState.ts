@@ -17,6 +17,7 @@ export interface SettingsState {
   temperature?: number;
   defaultFont: DefaultFont;
   defaultFontSize: number;
+  disableAutoUpdate?: boolean;
 }
 
 export interface SharedState {
@@ -46,6 +47,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   temperature: 0.7,
   defaultFont: "Tahoma",
   defaultFontSize: 12,
+  disableAutoUpdate: false,
 };
 
 export const EMPTY_SHARED_STATE: SharedState = {

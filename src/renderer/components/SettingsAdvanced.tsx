@@ -1,8 +1,23 @@
 import { clippyApi } from "../clippyApi";
+import { useSharedState } from "../contexts/SharedStateContext";
+import { Checkbox } from "./Checkbox";
 
 export const SettingsAdvanced: React.FC = () => {
+  const { settings } = useSharedState();
+
   return (
     <div>
+      <fieldset>
+        <legend>Automatic Updates</legend>
+        <Checkbox
+          id="autoUpdates"
+          label="Automatically keep Clippy up to date"
+          checked={!settings.disableAutoUpdate}
+          onChange={(checked) => {
+            clippyApi.setState("settings.disableAutoUpdate", !checked);
+          }}
+        />
+      </fieldset>
       <fieldset>
         <legend>Configuration</legend>
         <p>

@@ -1,19 +1,31 @@
 import { app, autoUpdater, dialog, shell } from "electron";
 import { updateElectronApp, UpdateSourceType } from "update-electron-app";
 import { getLogger } from "./logger";
+import { getStateManager } from "./state";
 
 /**
  * Setup the auto updater
  */
 export function setupAutoUpdater() {
-  updateElectronApp({
-    updateSource: {
-      type: UpdateSourceType.ElectronPublicUpdateService,
-      repo: "felixrieseberg/clippy",
-    },
-    updateInterval: "1 hour",
-    logger: require("electron-log"),
-  });
+  let disableAutoUpdate = false;
+
+  try {
+    disableAutoUpdate =
+      getStateManager().store.get("settings")?.disableAutoUpdate;
+  } catch (error) {
+    getLogger().warn("Failed to get settings from state manager", error);
+  }
+
+  if (!disableAutoUpdate) {
+    updateElectronApp({
+      updateSource: {
+        type: UpdateSourceType.ElectronPublicUpdateService,
+        repo: "felixrieseberg/clippy",
+      },
+      updateInterval: "1 hour",
+      logger: require("electron-log"),
+    });
+  }
 }
 
 /**

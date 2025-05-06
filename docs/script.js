@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
   icons.forEach((icon) => {
     icon.addEventListener("click", (e) => {
       const matchingWindow = document.getElementById(
-        icon.getAttribute("href").substring(1)
+        icon.getAttribute("href").substring(1),
       );
 
       if (window.innerWidth <= 768) {

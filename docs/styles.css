@@ -177,3 +177,63 @@ footer {
   font-size: 12px;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
+
+@media (max-width: 768px) {
+  .desktop-icons {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+
+  .window {
+    position: static !important;
+    width: 99% !important;
+    margin-bottom: 20px;
+    margin-left: 0.7%;
+    display: block !important;
+    box-sizing: border-box;
+  }
+
+  .window .title-bar {
+    pointer-events: none;
+  }
+
+  .window .title-bar-controls {
+    display: none;
+  }
+
+  .video-container video {
+    width: 100%;
+    height: auto;
+  }
+
+  .download-container {
+    max-width: 100%;
+  }
+
+  .download-buttons {
+    flex-direction: column;
+  }
+
+  .download-buttons > div {
+    width: 100%;
+  }
+
+  .download-buttons a.button {
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  footer {
+    position: relative;
+    text-align: center;
+    color: white;
+  }
+}

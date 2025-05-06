@@ -1,24 +1,60 @@
+let zIndex = 3;
+
+function focusWindow(windowToFocus) {
+  // Get current position from fixed positioning before making any changes
+  const rect = windowToFocus.getBoundingClientRect();
+
+  windowToFocus.style.display = "block";
+
+  // Remove any transforms which could interfere with dragging
+  if (windowToFocus.style.transform) {
+    windowToFocus.style.transform = "none";
+    windowToFocus.style.left = `${rect.left}px`;
+    windowToFocus.style.top = `${rect.top}px`;
+  }
+
+  // Ensure windowToFocus is fixed positioned
+  windowToFocus.style.position = "fixed";
+
+  // Bring windowToFocus to front
+  windowToFocus.style.zIndex = zIndex++;
+}
+
 // Show alert when download links are clicked
 document.addEventListener("DOMContentLoaded", () => {
-  const downloadButtons = document.querySelectorAll(
-    ".downloads .window-body button",
-  );
+  const windows = document.querySelectorAll(".window");
+  const icons = document.querySelectorAll(".desktop-icon");
 
-  downloadButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      // Prevent default action
-      e.preventDefault();
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      windows.forEach((window) => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const viewportHeight = document.documentElement.clientHeight;
+        const windowWidth = window.offsetWidth;
+        const windowHeight = window.offsetHeight;
 
-      // Alert user that downloads are coming soon
-      alert("Downloads coming soon!");
+        window.style.left = `${(viewportWidth - windowWidth) / 2}px`;
+        window.style.top = `${(viewportHeight - windowHeight) / 2}px`;
+      });
+    }, 250);
+  });
+
+  icons.forEach((icon) => {
+    icon.addEventListener("click", () => {
+      const matchingWindow = document.getElementById(
+        icon.id.replace("icon", "window"),
+      );
+
+      if (matchingWindow) {
+        focusWindow(matchingWindow);
+      }
     });
   });
 
-  // Make windows draggable using delta movement with fixed positioning
-  const windows = document.querySelectorAll(".window");
-
-  windows.forEach((window) => {
-    const titleBar = window.querySelector(".title-bar");
+  windows.forEach((fakeWindow) => {
+    const titleBar = fakeWindow.querySelector(".title-bar");
     let isDragging = false;
 
     // Variables to track mouse movement
@@ -33,21 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       lastMouseX = e.clientX;
       lastMouseY = e.clientY;
 
-      // Get current position from fixed positioning before making any changes
-      const rect = window.getBoundingClientRect();
-
-      // Remove any transforms which could interfere with dragging
-      if (window.style.transform) {
-        window.style.transform = "none";
-        window.style.left = `${rect.left}px`;
-        window.style.top = `${rect.top}px`;
-      }
-
-      // Ensure window is fixed positioned
-      window.style.position = "fixed";
-
-      // Bring window to front
-      window.style.zIndex = 1000;
+      focusWindow(fakeWindow);
 
       // Prevent text selection and default behaviors
       e.preventDefault();
@@ -67,13 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Get current window position
       const currentLeft =
-        parseInt(window.style.left) || window.getBoundingClientRect().left;
+        parseInt(fakeWindow.style.left) ||
+        fakeWindow.getBoundingClientRect().left;
       const currentTop =
-        parseInt(window.style.top) || window.getBoundingClientRect().top;
+        parseInt(fakeWindow.style.top) ||
+        fakeWindow.getBoundingClientRect().top;
 
       // Move window by the delta amount
-      window.style.left = `${currentLeft + deltaX}px`;
-      window.style.top = `${currentTop + deltaY}px`;
+      fakeWindow.style.left = `${currentLeft + deltaX}px`;
+      fakeWindow.style.top = `${currentTop + deltaY}px`;
     });
 
     // Handle mouseup to stop dragging
@@ -100,8 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isMinimized) {
         // If already minimized, restore
         isMinimized = false;
-        window.style.height = "";
-        const windowBody = window.querySelector(".window-body");
+        fakeWindow.style.height = "";
+        const windowBody = fakeWindow.querySelector(".window-body");
         if (windowBody) {
           windowBody.style.display = "";
         }
@@ -109,11 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Minimize the window
         isMinimized = true;
         isMaximized = false;
-        const windowBody = window.querySelector(".window-body");
+        const windowBody = fakeWindow.querySelector(".window-body");
         if (windowBody) {
           windowBody.style.display = "none";
         }
-        window.style.height = "auto";
+        fakeWindow.style.height = "auto";
       }
     });
 
@@ -123,34 +147,36 @@ document.addEventListener("DOMContentLoaded", () => {
         // Restore to original size
         isMaximized = false;
         if (originalDimensions) {
-          window.style.width = originalDimensions.width;
-          window.style.height = originalDimensions.height;
-          window.style.top = originalDimensions.top;
-          window.style.left = originalDimensions.left;
+          fakeWindow.style.width = originalDimensions.width;
+          fakeWindow.style.height = originalDimensions.height;
+          fakeWindow.style.top = originalDimensions.top;
+          fakeWindow.style.left = originalDimensions.left;
         }
+        maximizeButton.ariaLabel = "Maximize";
       } else {
         // Save original dimensions
         originalDimensions = {
-          width: window.style.width,
-          height: window.style.height,
-          top: window.style.top,
-          left: window.style.left,
+          width: fakeWindow.style.width,
+          height: fakeWindow.style.height,
+          top: fakeWindow.style.top,
+          left: fakeWindow.style.left,
         };
 
         // Maximize the window
         isMaximized = true;
         isMinimized = false;
+        maximizeButton.ariaLabel = "Restore";
 
-        window.style.width = "100%";
-        window.style.height = "90vh";
-        window.style.top = "5vh";
-        window.style.left = "0";
+        fakeWindow.style.width = "calc(100% - 7px)";
+        fakeWindow.style.height = "100vph";
+        fakeWindow.style.top = "0";
+        fakeWindow.style.left = "0";
       }
     });
 
     // Close button functionality
     closeButton.addEventListener("click", () => {
-      window.style.display = "none";
+      fakeWindow.style.display = "none";
     });
   });
 });

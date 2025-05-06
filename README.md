@@ -6,7 +6,22 @@ It's a love letter and homage to the late, great Clippy, the assistant from Micr
 
 It is also meant to be a reference implementation of [@electron/llm](https://github.com/electron/llm), hoping to help other developers of Electron apps make use of local language models.
 
-# Acknowledgements
+## Features
+
+- Simple, familiar, and classic chat interface. Send messages to your models, get a response.
+- Batteries included: No complicated setup. Just open the app and chat away. Thanks to llama.cpp and `node-llama-cpp`, the app will automatically discover the most efficient way to run your models (Metal, CUDA, Vulkan, etc).
+- Custom models, prompts, and parameters: Load your own downloaded models and play with the settings.
+- Offline, local, free: Everything runs on your computers. The only network request Clippy makes is to check for updates (which you can disable).
+
+## Non-Features
+
+Countless little chat apps for local LLMs exist out there. Many of them are likely better - and that's okay. This project isn't trying to be your best chat bot. I'd like you to enjoy a weird mix of nostalgia for 1990s technology paired with one the most magical technologies we can run on our computers in 2025.
+
+## Downloading More Models
+
+Clippy supports (thanks to Llama.cpp) most GGUF models. You can find GGUF models in plenty of online sources - I tend to go with models quantized by [TheBloke](https://huggingface.co/thebloke) or [Unsloth](https://huggingface.co/unsloth).
+
+## Acknowledgements
 
 Thanks to:
 

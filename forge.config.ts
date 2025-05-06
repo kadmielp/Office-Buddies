@@ -1,11 +1,5 @@
 import { Walker, DepType, type Module } from "flora-colossus";
-import {
-  existsSync,
-  readdirSync,
-  rmdirSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import * as fs from "node:fs";
 import path from "path";
 import dotenv from "dotenv";
 import os from "os";
@@ -17,6 +11,7 @@ import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
+import { execSync } from "node:child_process";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageJson = require("./package.json");
@@ -82,20 +77,22 @@ const config: ForgeConfig = {
           if (DELETE_EMPTY_DIRECTORIES) {
             const pathToDelete = path.normalize(item.path);
             // one last check to make sure it is a directory and is empty
-            const stats = statSync(pathToDelete);
+            const stats = fs.statSync(pathToDelete);
             if (!stats.isDirectory()) {
               // SKIPPING DELETION: pathToDelete is not a directory
               return;
             }
-            const childItems = readdirSync(pathToDelete);
+            const childItems = fs.readdirSync(pathToDelete);
             if (childItems.length !== 0) {
               // SKIPPING DELETION: pathToDelete is not empty
               return;
             }
-            rmdirSync(pathToDelete);
+            fs.rmdirSync(pathToDelete);
           }
         }
       }
+
+      await forceInstallNodeLlamaBinaries(buildPath);
     },
   },
   packagerConfig: {
@@ -364,8 +361,8 @@ function getItemsFromFolder(
 ) {
   try {
     const normalizedPath = path.normalize(filePath);
-    const childItems = readdirSync(normalizedPath);
-    const getItemStats = statSync(normalizedPath);
+    const childItems = fs.readdirSync(normalizedPath);
+    const getItemStats = fs.statSync(normalizedPath);
 
     if (getItemStats.isDirectory()) {
       totalCollection.push({
@@ -377,7 +374,7 @@ function getItemsFromFolder(
 
     childItems.forEach((childItem) => {
       const childItemNormalizedPath = path.join(normalizedPath, childItem);
-      const childItemStats = statSync(childItemNormalizedPath);
+      const childItemStats = fs.statSync(childItemNormalizedPath);
 
       if (childItemStats.isDirectory()) {
         getItemsFromFolder(childItemNormalizedPath, totalCollection);
@@ -443,10 +440,10 @@ async function getExternalNestedDependencies(
 function setup() {
   if (process.platform === "win32") {
     // Ensure windows codesigning files exist
-    if (!existsSync(FLAGS.SIGNTOOL_PATH)) {
+    if (!fs.existsSync(FLAGS.SIGNTOOL_PATH)) {
       console.warn("SignTool path does not exist");
     }
-    if (!existsSync(FLAGS.AZURE_CODE_SIGNING_DLIB)) {
+    if (!fs.existsSync(FLAGS.AZURE_CODE_SIGNING_DLIB)) {
       console.warn("Azure codesigning DLib path does not exist");
     }
 
@@ -459,7 +456,7 @@ function setup() {
     );
 
     // Write Azure codesigning metadata
-    writeFileSync(
+    fs.writeFileSync(
       FLAGS.AZURE_METADATA_JSON_PATH,
       JSON.stringify(
         {
@@ -478,14 +475,73 @@ function setup() {
 }
 
 function getArch() {
-  if (process.env.CI) {
-    // In CI, we always want to see a passed in flag
-    if (!process.argv.some((s) => s.includes("arch"))) {
-      throw new Error("No arch flag passed");
-    }
-
+  // If we're running in CI, we want to use the arch passed in
+  // If someone is passing in a flag, we want to use that, too
+  if (process.env.CI || process.argv.some((s) => s.includes("arch"))) {
     return process.argv.some((s) => s.includes("arm64")) ? "arm64" : "x64";
   }
 
   return process.arch;
+}
+
+/**
+ * node-llama-cpp binaries have a cpu flag in their package.json, meaning
+ * they don't install without a little force.
+ *
+ * @param buildPath
+ */
+async function forceInstallNodeLlamaBinaries(buildPath: string) {
+  const nodeLlamaBinaries = getNodeLlamaBinaryDependenciesToKeep();
+  const nodeLlamaBinariesToInstall = nodeLlamaBinaries.filter(
+    (binary) => !fs.existsSync(path.join(buildPath, "node_modules", binary)),
+  );
+
+  console.log(`node-llama-cpp binaries required: ${nodeLlamaBinaries}`);
+  console.log(
+    `node-llama-cpp binaries to install: ${nodeLlamaBinariesToInstall}`,
+  );
+
+  if (nodeLlamaBinariesToInstall.length === 0) {
+    console.log("All node-llama-cpp binaries are already installed");
+    return;
+  }
+
+  // Make a temporary directory to install the binaries
+  const tempDir = path.join(
+    os.tmpdir(),
+    `node-llama-binaries-${crypto.randomUUID().slice(0, 8)}`,
+  );
+  const tempDirNodeLlamaBinaries = path.join(
+    tempDir,
+    "node_modules",
+    "@node-llama-cpp",
+  );
+  const buildPathNodeLlamaBinaries = path.join(
+    buildPath,
+    "node_modules",
+    "@node-llama-cpp",
+  );
+  await fs.promises.mkdir(tempDir, { recursive: true });
+
+  nodeLlamaBinariesToInstall.forEach((binary) => {
+    console.log(`Installing ${binary}...`);
+    execSync(
+      `npm install ${binary} --force --package-lock=false --save=false --ignore-scripts --omit=optional --no-engine-strict`,
+      { cwd: tempDir },
+    );
+  });
+
+  // We'd now expect tempDir/node_modules to contain the binaries
+  // Copy the binaries to the build path
+  fs.readdirSync(tempDirNodeLlamaBinaries).forEach((file) => {
+    const sourcePath = path.join(tempDirNodeLlamaBinaries, file);
+    const destPath = path.join(buildPathNodeLlamaBinaries, file);
+
+    // Copy recursively
+    if (fs.statSync(sourcePath).isDirectory()) {
+      fs.cpSync(sourcePath, destPath, { recursive: true });
+    } else {
+      fs.copyFileSync(sourcePath, destPath);
+    }
+  });
 }

@@ -25,7 +25,7 @@ dotenv.config();
 let nativeModuleDependenciesToPackage: string[] = [];
 
 const FLAGS = {
-  ARCH: process.argv.some((s) => s.includes("arm64")) ? "arm64" : "x64",
+  ARCH: getArch(),
   IS_CODESIGNING_ENABLED: process.env.IS_CODESIGNING_ENABLED !== "false",
   SIGNTOOL_PATH:
     process.env.SIGNTOOL_PATH ||
@@ -475,4 +475,17 @@ function setup() {
       ),
     );
   }
+}
+
+function getArch() {
+  if (process.env.CI) {
+    // In CI, we always want to see a passed in flag
+    if (!process.argv.some((s) => s.includes("arch"))) {
+      throw new Error("No arch flag passed");
+    }
+
+    return process.argv.some((s) => s.includes("arm64")) ? "arm64" : "x64";
+  }
+
+  return process.arch;
 }

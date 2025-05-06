@@ -65,7 +65,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
   const [animationKey, setAnimationKey] = useState<string>("");
   const [status, setStatus] = useState<ClippyNamedStatus>("welcome");
-  const [triedToLoadModel, setTriedToLoadModel] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const { settings, models } = useContext(SharedStateContext);
   const debug = useDebugState();
@@ -155,12 +154,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error(error);
 
-        if (triedToLoadModel < 3) {
-          setTriedToLoadModel(triedToLoadModel + 1);
-          setTimeout(() => {
-            loadModel(initialPrompts);
-          }, 500);
-        }
+        addMessage({
+          id: crypto.randomUUID(),
+          content: `Sadly, Clippy failed to successfully load the model. This could be an issue with Clippy itself, the selected model, or your system. You can report this error at [github.com/felixrieseberg/clippy/issues](https://github.com/felixrieseberg/clippy/issues).\nThe error was:\n\n\`\`\`\n${error}\n\`\`\``,
+          sender: "clippy",
+          createdAt: Date.now(),
+        });
       }
     },
     [

@@ -31,9 +31,7 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     preview: chat.preview,
   }));
 
-  const handleSelectChat = async (
-    index: number,
-  ) => {
+  const handleSelectChat = async (index: number) => {
     setSelectedChatIndex(index);
   };
 
@@ -44,7 +42,7 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     ) {
       return;
     }
-    
+
     selectChat(chatsWithPreview[selectedChatIndex].id);
     onClose();
   };

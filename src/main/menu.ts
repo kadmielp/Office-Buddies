@@ -11,7 +11,7 @@ import { FileTransport } from "electron-log";
 import { getStateManager } from "./state";
 
 import type { BubbleView } from "../renderer/contexts/BubbleViewContext";
-import { getMainWindow } from "./windows";
+import { getMainWindow, toggleChatWindow } from "./windows";
 import { IpcMessages } from "../ipc-messages";
 import { checkForUpdates } from "./update";
 import {
@@ -102,6 +102,18 @@ export function getMainAppMenu(): Menu {
           menuItem.checked,
         );
       },
+    }),
+  );
+  windowMenu?.submenu?.append(
+    new MenuItem({
+      type: "separator",
+    }),
+  );
+  windowMenu?.submenu?.append(
+    new MenuItem({
+      label: "Toggle Chat Window",
+      click: () => toggleChatWindow(),
+      accelerator: "Cmd+`",
     }),
   );
 

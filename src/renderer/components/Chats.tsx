@@ -32,7 +32,6 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
   }));
 
   const handleSelectChat = async (
-    _row: Record<string, React.ReactNode>,
     index: number,
   ) => {
     setSelectedChatIndex(index);
@@ -45,7 +44,7 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     ) {
       return;
     }
-
+    
     selectChat(chatsWithPreview[selectedChatIndex].id);
     onClose();
   };

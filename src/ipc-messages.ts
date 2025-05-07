@@ -28,6 +28,10 @@ export const IpcMessages = {
   DEBUG_STATE_CHANGED: "clippy_debug_state_changed",
   DEBUG_STATE_OPEN_IN_EDITOR: "clippy_debug_state_open_in_editor",
 
+  // App messages
+  APP_CHECK_FOR_UPDATES: "clippy_app_check_for_updates",
+  APP_GET_VERSIONS: "clippy_app__get_versions",
+
   // Chat messages
   CHAT_GET_CHAT_RECORDS: "clippy_chat_get_chat_records",
   CHAT_GET_CHAT_WITH_MESSAGES: "clippy_chat_get_chat_with_messages",

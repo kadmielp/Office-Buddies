@@ -57,6 +57,15 @@ export function getIsNewUpdateAvailable() {
  * @returns {Promise<void>}
  */
 export async function checkForUpdates() {
+  if (!app.isPackaged) {
+    return dialog.showMessageBox({
+      type: "info",
+      title: "Update Check",
+      message:
+        "You are running a development version of Clippy, so the auto updater is disabled.",
+    });
+  }
+
   try {
     const [comparisonString, isUpdateAvailable] = await Promise.all([
       getVersionComparisonString(),

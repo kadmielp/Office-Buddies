@@ -90,6 +90,10 @@ const clippyApi: ClippyApi = {
   offNewChat: () => {
     ipcRenderer.removeAllListeners(IpcMessages.CHAT_NEW_CHAT);
   },
+
+  // App
+  getVersions: () => ipcRenderer.invoke(IpcMessages.APP_GET_VERSIONS),
+  checkForUpdates: () => ipcRenderer.invoke(IpcMessages.APP_CHECK_FOR_UPDATES),
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);

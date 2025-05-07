@@ -10,6 +10,8 @@ import { getStateManager } from "./state";
 import { getChatManager } from "./chats";
 import { ChatWithMessages } from "../types/interfaces";
 import { getMainAppMenu } from "./menu";
+import { checkForUpdates } from "./update";
+import { getVersions } from "./helpers/getVersions";
 
 export function setupIpcListeners() {
   // Window
@@ -17,6 +19,10 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.MINIMIZE_CHAT_WINDOW, () => minimizeChatWindow());
   ipcMain.handle(IpcMessages.MAXIMIZE_CHAT_WINDOW, () => maximizeChatWindow());
   ipcMain.handle(IpcMessages.POPUP_APP_MENU, () => getMainAppMenu().popup());
+
+  // App
+  ipcMain.handle(IpcMessages.APP_CHECK_FOR_UPDATES, () => checkForUpdates());
+  ipcMain.handle(IpcMessages.APP_GET_VERSIONS, () => getVersions());
 
   // Model
   ipcMain.handle(IpcMessages.DOWNLOAD_MODEL_BY_NAME, (_, name: string) =>

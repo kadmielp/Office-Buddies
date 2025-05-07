@@ -14,7 +14,7 @@ import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
 
 async function onReady() {
-  console.info("Welcome to Clippy!");
+  console.info(`Welcome to Clippy v${app.getVersion()}`);
 
   await setupAutoUpdater();
   await loadLlm();

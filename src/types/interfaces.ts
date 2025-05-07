@@ -18,3 +18,10 @@ export interface ChatWithMessages {
 }
 
 export type ChatRecordsState = Record<string, ChatRecord>;
+
+export interface Versions extends NodeJS.ProcessVersions {
+  clippy: string;
+  electron: string;
+  nodeLlamaCpp: string;
+  chromium: string;
+}

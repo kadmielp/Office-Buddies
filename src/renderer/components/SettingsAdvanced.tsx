@@ -17,6 +17,13 @@ export const SettingsAdvanced: React.FC = () => {
             clippyApi.setState("settings.disableAutoUpdate", !checked);
           }}
         />
+
+        <button
+          style={{ marginTop: "10px" }}
+          onClick={() => clippyApi.checkForUpdates()}
+        >
+          Check for Updates
+        </button>
       </fieldset>
       <fieldset>
         <legend>Configuration</legend>

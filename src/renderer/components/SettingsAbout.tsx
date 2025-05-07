@@ -1,7 +1,27 @@
+import { useEffect, useState } from "react";
+import { Versions } from "../../types/interfaces";
+import { clippyApi } from "../clippyApi";
+
 export const SettingsAbout: React.FC = () => {
+  const [versions, setVersions] = useState<Partial<Versions>>({});
+
+  useEffect(() => {
+    clippyApi.getVersions().then((versions) => {
+      setVersions(versions);
+    });
+  }, []);
+
   return (
     <div>
       <h1>About</h1>
+      <fieldset>
+        <legend>Version</legend>
+        <p>
+          Clippy <code>{versions.clippy || "Unknown"}</code> (with Electron{" "}
+          <code>{versions.electron || "Unknown"}</code> and Node-llama-cpp:{" "}
+          <code>{versions.nodeLlamaCpp || "Unknown"})</code>
+        </p>
+      </fieldset>
       <p>
         This app is a love letter and homage to the late, great Clippy, the
         assistant from Microsoft Office 1997. It is <i>not</i> affiliated,

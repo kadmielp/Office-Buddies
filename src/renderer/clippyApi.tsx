@@ -1,6 +1,6 @@
 import { ElectronLlmRenderer } from "@electron/llm";
 import { SharedState } from "../sharedState";
-import { ChatRecord, ChatWithMessages } from "../types/interfaces";
+import { ChatRecord, ChatWithMessages, Versions } from "../types/interfaces";
 import { DebugState } from "../debugState";
 
 import type { BubbleView } from "./contexts/BubbleViewContext";
@@ -34,6 +34,9 @@ export type ClippyApi = {
   getDebugState: (key: string) => Promise<any>;
   setDebugState: (key: string, value: any) => Promise<void>;
   openDebugStateInEditor: () => Promise<void>;
+  // App
+  getVersions: () => Promise<Versions>;
+  checkForUpdates: () => Promise<void>;
   // Chats
   getChatRecords: () => Promise<Record<string, ChatRecord>>;
   getChatWithMessages: (chatId: string) => Promise<ChatWithMessages | null>;

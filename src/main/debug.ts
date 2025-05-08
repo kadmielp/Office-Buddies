@@ -14,6 +14,7 @@ class DebugManager {
         simulateLoadModel: false,
         simulateNoModelsDownloaded: false,
         openDevToolsOnStart: false,
+        enableDragDebug: false,
       },
     });
   }

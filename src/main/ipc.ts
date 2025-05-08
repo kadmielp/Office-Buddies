@@ -64,13 +64,13 @@ export function setupIpcListeners() {
   // Debug
   ipcMain.handle(
     IpcMessages.DEBUG_STATE_GET_FULL,
-    () => getStateManager().store.store,
+    () => getDebugManager().store.store,
   );
   ipcMain.handle(IpcMessages.DEBUG_STATE_SET, (_, key: string, value: any) =>
-    getStateManager().store.set(key, value),
+    getDebugManager().store.set(key, value),
   );
   ipcMain.handle(IpcMessages.DEBUG_STATE_GET, (_, key: string) =>
-    getStateManager().store.get(key),
+    getDebugManager().store.get(key),
   );
   ipcMain.handle(IpcMessages.DEBUG_STATE_OPEN_IN_EDITOR, () =>
     getDebugManager().store.openInEditor(),

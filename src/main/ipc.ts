@@ -13,6 +13,7 @@ import { getMainAppMenu } from "./menu";
 import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
 import { getClippyDebugInfo } from "./debug-clippy";
+import { getDebugManager } from "./debug";
 
 export function setupIpcListeners() {
   // Window
@@ -72,7 +73,7 @@ export function setupIpcListeners() {
     getStateManager().store.get(key),
   );
   ipcMain.handle(IpcMessages.DEBUG_STATE_OPEN_IN_EDITOR, () =>
-    getStateManager().store.openInEditor(),
+    getDebugManager().store.openInEditor(),
   );
   ipcMain.handle(IpcMessages.DEBUG_GET_DEBUG_INFO, () => getClippyDebugInfo());
 

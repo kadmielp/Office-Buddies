@@ -1,9 +1,15 @@
 import { ElectronLlmRenderer } from "@electron/llm";
 import { SharedState } from "../sharedState";
-import { ChatRecord, ChatWithMessages, Versions } from "../types/interfaces";
+import {
+  ChatRecord,
+  ChatWithMessages,
+  ClippyDebugInfo,
+  Versions,
+} from "../types/interfaces";
 import { DebugState } from "../debugState";
 
 import type { BubbleView } from "./contexts/BubbleViewContext";
+import { Data } from "electron";
 
 export type ClippyApi = {
   // Window
@@ -34,6 +40,7 @@ export type ClippyApi = {
   getDebugState: (key: string) => Promise<any>;
   setDebugState: (key: string, value: any) => Promise<void>;
   openDebugStateInEditor: () => Promise<void>;
+  getDebugInfo(): Promise<ClippyDebugInfo>;
   // App
   getVersions: () => Promise<Versions>;
   checkForUpdates: () => Promise<void>;
@@ -45,6 +52,8 @@ export type ClippyApi = {
   deleteAllChats: () => Promise<void>;
   onNewChat: (callback: () => void) => void;
   offNewChat: () => void;
+  // Clipboard
+  clipboardWrite: (data: Data) => Promise<void>;
 };
 
 declare global {

@@ -27,6 +27,7 @@ export const IpcMessages = {
   DEBUG_STATE_SET: "clippy_debug_state_set",
   DEBUG_STATE_CHANGED: "clippy_debug_state_changed",
   DEBUG_STATE_OPEN_IN_EDITOR: "clippy_debug_state_open_in_editor",
+  DEBUG_GET_DEBUG_INFO: "clippy_debug_get_debug_info",
 
   // App messages
   APP_CHECK_FOR_UPDATES: "clippy_app_check_for_updates",
@@ -39,4 +40,7 @@ export const IpcMessages = {
   CHAT_DELETE_CHAT: "clippy_chat_delete_chat",
   CHAT_DELETE_ALL_CHATS: "clippy_chat_delete_all_chats",
   CHAT_NEW_CHAT: "clippy_chat_new_chat",
+
+  // Clipboard
+  CLIPBOARD_WRITE: "clippy_clipboard_write",
 };

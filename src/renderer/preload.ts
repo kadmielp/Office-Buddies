@@ -1,7 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, Data, ipcRenderer } from "electron";
 import { IpcMessages } from "../ipc-messages";
 import type { SharedState } from "../sharedState";
 
@@ -71,6 +71,7 @@ const clippyApi: ClippyApi = {
   offDebugStateChanged: () => {
     ipcRenderer.removeAllListeners(IpcMessages.DEBUG_STATE_CHANGED);
   },
+  getDebugInfo: () => ipcRenderer.invoke(IpcMessages.DEBUG_GET_DEBUG_INFO),
 
   // Chats
   getChatRecords: () => ipcRenderer.invoke(IpcMessages.CHAT_GET_CHAT_RECORDS),
@@ -94,6 +95,10 @@ const clippyApi: ClippyApi = {
   // App
   getVersions: () => ipcRenderer.invoke(IpcMessages.APP_GET_VERSIONS),
   checkForUpdates: () => ipcRenderer.invoke(IpcMessages.APP_CHECK_FOR_UPDATES),
+
+  // Clipboard
+  clipboardWrite: (data: Data) =>
+    ipcRenderer.invoke(IpcMessages.CLIPBOARD_WRITE, data),
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);

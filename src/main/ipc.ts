@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { clipboard, Data, ipcMain } from "electron";
 import {
   toggleChatWindow,
   maximizeChatWindow,
@@ -12,6 +12,7 @@ import { ChatWithMessages } from "../types/interfaces";
 import { getMainAppMenu } from "./menu";
 import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
+import { getClippyDebugInfo } from "./debug-clippy";
 
 export function setupIpcListeners() {
   // Window
@@ -73,6 +74,7 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.DEBUG_STATE_OPEN_IN_EDITOR, () =>
     getStateManager().store.openInEditor(),
   );
+  ipcMain.handle(IpcMessages.DEBUG_GET_DEBUG_INFO, () => getClippyDebugInfo());
 
   // Chat
   ipcMain.handle(IpcMessages.CHAT_GET_CHAT_RECORDS, () =>
@@ -91,5 +93,10 @@ export function setupIpcListeners() {
   );
   ipcMain.handle(IpcMessages.CHAT_DELETE_ALL_CHATS, () =>
     getChatManager().deleteAllChats(),
+  );
+
+  // Clipboard
+  ipcMain.handle(IpcMessages.CLIPBOARD_WRITE, (_, data: Data) =>
+    clipboard.write(data, "clipboard"),
   );
 }

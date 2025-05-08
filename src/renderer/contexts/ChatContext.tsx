@@ -14,6 +14,7 @@ import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
 import { ChatRecord, MessageRecord } from "../../types/interfaces";
 import { useDebugState } from "./DebugContext";
 import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
+import { ErrorLoadModelMessageContent } from "../components/ErrorLoadModelMessageContent";
 
 import type {
   LanguageModelPrompt,
@@ -156,7 +157,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         addMessage({
           id: crypto.randomUUID(),
-          content: `Sadly, Clippy failed to successfully load the model. This could be an issue with Clippy itself, the selected model, or your system. You can report this error at [github.com/felixrieseberg/clippy/issues](https://github.com/felixrieseberg/clippy/issues).\nThe error was:\n\n\`\`\`\n${error}\n\`\`\``,
+          children: <ErrorLoadModelMessageContent error={error} />,
           sender: "clippy",
           createdAt: Date.now(),
         });

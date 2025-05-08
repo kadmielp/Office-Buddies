@@ -25,3 +25,17 @@ export interface Versions extends NodeJS.ProcessVersions {
   nodeLlamaCpp: string;
   chromium: string;
 }
+
+export type NestedRecord<T> = {
+  [key: string]: T | NestedRecord<T>;
+};
+
+export interface ClippyDebugInfo {
+  platform: string;
+  arch: string;
+  versions: Record<string, string>;
+  llamaBinaries: Array<string>;
+  llamaBinaryFiles: NestedRecord<number>;
+  checks: Record<string, boolean | string>;
+  gpu: unknown;
+}

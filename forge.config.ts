@@ -20,7 +20,6 @@ dotenv.config();
 let nativeModuleDependenciesToPackage: string[] = [];
 
 const FLAGS = {
-  ARCH: getArch(),
   IS_CODESIGNING_ENABLED: process.env.IS_CODESIGNING_ENABLED !== "false",
   SIGNTOOL_PATH:
     process.env.SIGNTOOL_PATH ||
@@ -43,6 +42,7 @@ const FLAGS = {
   APPLE_ID: process.env.APPLE_ID || "felix@felixrieseberg.com",
   APPLE_ID_PASSWORD: process.env.APPLE_ID_PASSWORD,
 };
+
 const EXTERNAL_DEPENDENCIES = [
   "@electron/llm",
   "node-llama-cpp",
@@ -67,7 +67,13 @@ const config: ForgeConfig = {
         await getExternalNestedDependencies(EXTERNAL_DEPENDENCIES),
       );
     },
-    packageAfterPrune: async (_forgeConfig, buildPath) => {
+    packageAfterPrune: async (
+      _forgeConfig,
+      buildPath,
+      _electronVersion,
+      _platform,
+      arch,
+    ) => {
       const getItems = getItemsFromFolder(buildPath) ?? [];
 
       for (const item of getItems) {
@@ -92,7 +98,7 @@ const config: ForgeConfig = {
         }
       }
 
-      await forceInstallNodeLlamaBinaries(buildPath);
+      await forceInstallNodeLlamaBinaries(buildPath, arch);
     },
   },
   packagerConfig: {
@@ -291,7 +297,9 @@ export default config;
  *
  * @returns {Array<string>} The optional dependencies of the node-llama-cpp package
  */
-function getNodeLlamaBinaryDependenciesToKeep(): Array<string> {
+function getNodeLlamaBinaryDependenciesToKeep(
+  arch: string = getArch(),
+): Array<string> {
   // "@node-llama-cpp/linux-arm64"
   // "@node-llama-cpp/linux-armv7l"
   // "@node-llama-cpp/linux-x64"
@@ -304,13 +312,13 @@ function getNodeLlamaBinaryDependenciesToKeep(): Array<string> {
   // "@node-llama-cpp/win-x64-cuda"
   // "@node-llama-cpp/win-x64-vulkan"
   if (process.platform === "darwin") {
-    return FLAGS.ARCH === "arm64"
+    return arch === "arm64"
       ? ["@node-llama-cpp/mac-arm64-metal"]
       : ["@node-llama-cpp/mac-x64"];
   }
 
   if (process.platform === "win32") {
-    return FLAGS.ARCH === "arm64"
+    return arch === "arm64"
       ? ["@node-llama-cpp/win-arm64"]
       : [
           "@node-llama-cpp/win-x64",
@@ -320,7 +328,7 @@ function getNodeLlamaBinaryDependenciesToKeep(): Array<string> {
   }
 
   if (process.platform === "linux") {
-    return FLAGS.ARCH === "arm64"
+    return arch === "arm64"
       ? ["@node-llama-cpp/linux-arm64"]
       : [
           "@node-llama-cpp/linux-x64",
@@ -478,7 +486,7 @@ function getArch() {
   // If we're running in CI, we want to use the arch passed in
   // If someone is passing in a flag, we want to use that, too
   if (process.env.CI || process.argv.some((s) => s.includes("arch"))) {
-    return process.argv.some((s) => s.includes("arm64")) ? "arm64" : "x64";
+    return process.argv.some((s) => s.includes("--arch=arm64")) ? "arm64" : "x64";
   }
 
   return process.arch;
@@ -490,8 +498,8 @@ function getArch() {
  *
  * @param buildPath
  */
-async function forceInstallNodeLlamaBinaries(buildPath: string) {
-  const nodeLlamaBinaries = getNodeLlamaBinaryDependenciesToKeep();
+async function forceInstallNodeLlamaBinaries(buildPath: string, arch: string) {
+  const nodeLlamaBinaries = getNodeLlamaBinaryDependenciesToKeep(arch);
   const nodeLlamaBinariesToInstall = nodeLlamaBinaries.filter(
     (binary) => !fs.existsSync(path.join(buildPath, "node_modules", binary)),
   );

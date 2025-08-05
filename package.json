@@ -61,6 +61,6 @@
     "update-electron-app": "^3.1.1"
   },
   "overrides": {
-    "@electron/windows-sign": "1.2.2"
+    "@electron/windows-sign": "2.0.2"
   }
 }

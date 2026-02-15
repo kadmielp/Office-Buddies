@@ -39,7 +39,9 @@ export function popupAppMenu(options: Electron.PopupOptions = {}) {
 }
 
 export function setContextMenuAnimations(animationKeys: string[]) {
-  contextMenuAnimationKeys = [...animationKeys];
+  contextMenuAnimationKeys = [...animationKeys].sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" }),
+  );
 }
 
 /**

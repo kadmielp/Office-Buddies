@@ -59,6 +59,13 @@ function getNextFrameIndex(
   return currentIndex + 1;
 }
 
+function findFirstAnimationKey(
+  animations: Record<string, AgentAnimation>,
+  candidates: string[],
+): string | undefined {
+  return candidates.find((key) => Boolean(animations[key]));
+}
+
 export function Clippy() {
   const {
     animationKey,
@@ -69,28 +76,33 @@ export function Clippy() {
   } = useChat();
   const { settings } = useSharedState();
   const { enableDragDebug } = useDebugState();
+  const selectedAgent = settings.selectedAgent || "Clippy";
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const spriteImageRef = useRef<HTMLImageElement | null>(null);
   const frameTimeoutRef = useRef<number | undefined>(undefined);
   const defaultTimeoutRef = useRef<number | undefined>(undefined);
   const idleTimeoutRef = useRef<number | undefined>(undefined);
-  const manualOnceTimeoutRef = useRef<number | undefined>(undefined);
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
 
   const [isSpriteReady, setIsSpriteReady] = useState(false);
+  const [displayedAgent, setDisplayedAgent] = useState<string>(selectedAgent);
   const [manualAnimationKey, setManualAnimationKey] = useState<string | null>(
     null,
   );
-
-  const agentPack = useMemo(
-    () => getAgentPack(settings.selectedAgent),
-    [settings.selectedAgent],
+  const [switchTargetAgent, setSwitchTargetAgent] = useState<string | null>(
+    null,
   );
+  const [switchPhase, setSwitchPhase] = useState<"none" | "goodbye" | "welcome">(
+    "none",
+  );
+  const isAgentSwitchAnimating = switchPhase !== "none";
+
+  const agentPack = useMemo(() => getAgentPack(displayedAgent), [displayedAgent]);
   const contextMenuAnimations = useMemo(
-    () => getChatAnimationKeys(settings.selectedAgent),
-    [settings.selectedAgent],
+    () => getChatAnimationKeys(displayedAgent),
+    [displayedAgent],
   );
 
   const clearFrameTimeout = useCallback(() => {
@@ -111,13 +123,6 @@ export function Clippy() {
     if (idleTimeoutRef.current) {
       window.clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = undefined;
-    }
-  }, []);
-
-  const clearManualOnceTimeout = useCallback(() => {
-    if (manualOnceTimeoutRef.current) {
-      window.clearTimeout(manualOnceTimeoutRef.current);
-      manualOnceTimeoutRef.current = undefined;
     }
   }, []);
 
@@ -174,8 +179,9 @@ export function Clippy() {
   );
 
   const runAnimation = useCallback(
-    (key: string) => {
+    (key: string, onComplete?: () => void) => {
       if (!isSpriteReady || !agentPack.animations[key]) {
+        onComplete?.();
         return;
       }
 
@@ -201,6 +207,7 @@ export function Clippy() {
         const nextFrameIndex = getNextFrameIndex(animation, frameIndex);
 
         if (nextFrameIndex < 0 || nextFrameIndex >= animation.frames.length) {
+          onComplete?.();
           return;
         }
 
@@ -221,27 +228,41 @@ export function Clippy() {
   );
 
   const playAnimation = useCallback(
-    (key: string) => {
+    (key: string, onComplete?: () => void) => {
       if (isDisallowedChatAnimationKey(key)) {
         log("Blocked disallowed animation", { key, agent: agentPack.name });
         runAnimation("Default");
+        onComplete?.();
         return;
       }
 
       if (!agentPack.animations[key]) {
         log("Animation not found", { key, agent: agentPack.name });
+        onComplete?.();
         return;
       }
 
       log("Playing animation", { key, agent: agentPack.name });
       clearDefaultTimeout();
-      runAnimation(key);
+      let isCompleted = false;
+      const finish = () => {
+        if (isCompleted) {
+          return;
+        }
+
+        isCompleted = true;
+        clearDefaultTimeout();
+        runAnimation("Default");
+        onComplete?.();
+      };
+      runAnimation(key, finish);
 
       defaultTimeoutRef.current = window.setTimeout(
         () => {
-          runAnimation("Default");
+          log("Animation watchdog fallback", { key, agent: agentPack.name });
+          finish();
         },
-        getAnimationDuration(agentPack, key) + 200,
+        Math.max((getAnimationDuration(agentPack, key) + 200) * 3, 4000),
       );
     },
     [agentPack, clearDefaultTimeout, runAnimation],
@@ -250,6 +271,31 @@ export function Clippy() {
   const toggleChat = useCallback(() => {
     setIsChatWindowOpen(!isChatWindowOpen);
   }, [isChatWindowOpen, setIsChatWindowOpen]);
+
+  useEffect(() => {
+    if (selectedAgent === displayedAgent) {
+      return;
+    }
+
+    setManualAnimationKey(null);
+
+    if (switchPhase === "none" && isSpriteReady) {
+      setSwitchTargetAgent(selectedAgent);
+      setSwitchPhase("goodbye");
+      return;
+    }
+
+    // Initial load or unavailable sprite: switch directly.
+    if (switchPhase === "none") {
+      setDisplayedAgent(selectedAgent);
+      setSwitchTargetAgent(null);
+      setSwitchPhase("none");
+      return;
+    }
+
+    // If the user changes selection during a transition, keep latest target.
+    setSwitchTargetAgent(selectedAgent);
+  }, [displayedAgent, isSpriteReady, selectedAgent, switchPhase]);
 
   useEffect(() => {
     hasPlayedWelcomeRef.current = false;
@@ -315,23 +361,88 @@ export function Clippy() {
     }
 
     clearIdleTimeout();
-    clearManualOnceTimeout();
-    playAnimation(manualAnimationKey);
-    manualOnceTimeoutRef.current = window.setTimeout(() => {
+    playAnimation(manualAnimationKey, () => {
       setManualAnimationKey(null);
-    }, Math.max(getAnimationDuration(agentPack, manualAnimationKey) + 250, 300));
-
-    return () => {
-      clearManualOnceTimeout();
-    };
+    });
   }, [
-    agentPack,
     clearIdleTimeout,
-    clearManualOnceTimeout,
     playAnimation,
-    setManualAnimationKey,
     isSpriteReady,
     manualAnimationKey,
+  ]);
+
+  useEffect(() => {
+    if (!isAgentSwitchAnimating || manualAnimationKey) {
+      return;
+    }
+
+    clearDefaultTimeout();
+    clearIdleTimeout();
+    clearFrameTimeout();
+
+    if (switchPhase === "goodbye") {
+      if (!isSpriteReady) {
+        return;
+      }
+
+      const goodbyeAnimationKey = findFirstAnimationKey(agentPack.animations, [
+        "Goodbye",
+        "GoodBye",
+      ]);
+      const targetAgent = switchTargetAgent || selectedAgent;
+
+      if (goodbyeAnimationKey) {
+        playAnimation(goodbyeAnimationKey, () => {
+          setIsSpriteReady(false);
+          setDisplayedAgent(targetAgent);
+          setSwitchPhase("welcome");
+        });
+        return;
+      }
+
+      setIsSpriteReady(false);
+      setDisplayedAgent(targetAgent);
+      setSwitchPhase("welcome");
+      return;
+    }
+
+    if (switchPhase === "welcome") {
+      if (!isSpriteReady) {
+        return;
+      }
+
+      const targetAgent = switchTargetAgent || displayedAgent;
+
+      if (displayedAgent !== targetAgent) {
+        setIsSpriteReady(false);
+        setDisplayedAgent(targetAgent);
+        return;
+      }
+
+      const welcomeAnimationKey =
+        findFirstAnimationKey(agentPack.animations, ["Greeting", "Show"]) ??
+        "Default";
+
+      playAnimation(welcomeAnimationKey, () => {
+        setStatus("idle");
+        setSwitchTargetAgent(null);
+        setSwitchPhase("none");
+      });
+    }
+  }, [
+    agentPack.animations,
+    clearDefaultTimeout,
+    clearFrameTimeout,
+    clearIdleTimeout,
+    displayedAgent,
+    isAgentSwitchAnimating,
+    isSpriteReady,
+    manualAnimationKey,
+    playAnimation,
+    selectedAgent,
+    setStatus,
+    switchPhase,
+    switchTargetAgent,
   ]);
 
   useEffect(() => {
@@ -339,7 +450,7 @@ export function Clippy() {
       return;
     }
 
-    if (manualAnimationKey) {
+    if (manualAnimationKey || isAgentSwitchAnimating) {
       return;
     }
 
@@ -357,34 +468,22 @@ export function Clippy() {
       const randomIdleAnimationKey =
         idleAnimationKeys[Math.floor(Math.random() * idleAnimationKeys.length)];
 
-      runAnimation(randomIdleAnimationKey);
-
-      idleTimeoutRef.current = window.setTimeout(
-        () => {
-          runAnimation("Default");
-          idleTimeoutRef.current = window.setTimeout(
-            playRandomIdleAnimation,
-            WAIT_TIME,
-          );
-        },
-        getAnimationDuration(agentPack, randomIdleAnimationKey),
-      );
+      runAnimation(randomIdleAnimationKey, () => {
+        runAnimation("Default");
+        idleTimeoutRef.current = window.setTimeout(playRandomIdleAnimation, WAIT_TIME);
+      });
     };
 
     if (status === "welcome" && !hasPlayedWelcomeRef.current) {
       hasPlayedWelcomeRef.current = true;
 
-      const welcomeAnimationKey = agentPack.animations.Show
-        ? "Show"
-        : "Default";
+      const welcomeAnimationKey =
+        findFirstAnimationKey(agentPack.animations, ["Greeting", "Show"]) ??
+        "Default";
 
-      runAnimation(welcomeAnimationKey);
-      defaultTimeoutRef.current = window.setTimeout(
-        () => {
-          setStatus("idle");
-        },
-        getAnimationDuration(agentPack, welcomeAnimationKey) + 200,
-      );
+      runAnimation(welcomeAnimationKey, () => {
+        setStatus("idle");
+      });
     } else if (status === "idle") {
       playRandomIdleAnimation();
     }
@@ -404,16 +503,17 @@ export function Clippy() {
     setStatus,
     status,
     manualAnimationKey,
+    isAgentSwitchAnimating,
   ]);
 
   useEffect(() => {
-    if (!animationKey || manualAnimationKey) {
+    if (!animationKey || manualAnimationKey || isAgentSwitchAnimating) {
       return;
     }
 
     log("New animation key", { animationKey });
     playAnimation(animationKey);
-  }, [animationKey, manualAnimationKey, playAnimation]);
+  }, [animationKey, manualAnimationKey, isAgentSwitchAnimating, playAnimation]);
 
   return (
     <div style={{ position: "relative" }}>

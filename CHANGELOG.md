@@ -20,6 +20,10 @@ All notable changes to this project will be documented in this file.
 - Chat prompt generation now uses the selected agent's personality/appearance and animation keys.
 - Animation-key parsing now validates against the selected agent's animation set (instead of legacy static keys).
 - Animation selection from the context menu now plays once, then returns to automatic behavior.
+- Animation completion now waits for actual animation end, with a watchdog fallback for branch-heavy animations.
+- Agent switching now plays goodbye on the current agent, then welcome on the newly selected agent.
+- Welcome animation selection now prefers `Greeting` before `Show` for better visibility on agents with very short `Show` animations.
+- `Animation` context-menu entries are now sorted alphabetically.
 - Starting a new chat now hard-resets the model session context.
 - Selecting a chat now hard-resets the model session first, then restores that chat's saved context.
 - `Chats` view action buttons moved below the table.

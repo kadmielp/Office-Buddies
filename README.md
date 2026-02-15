@@ -5,6 +5,7 @@ This project brings classic Office-style assistants into a modern LLM chat app w
 Clippy is still here (and yes, still iconic), but this fork treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
 Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic.
+It is also a tribute to the nostalgic assistants that marked generations.
 
 ## What This Fork Is
 

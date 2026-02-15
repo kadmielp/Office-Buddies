@@ -13,11 +13,13 @@ All notable changes to this project will be documented in this file.
   - `[AGENT_APPEARANCE]`
   - `[LIST OF ANIMATIONS]`
 - New chat control button in `Chats` view.
+- Native right-click `Animation` menu for selecting agent animations.
 
 ### Changed
 
 - Chat prompt generation now uses the selected agent's personality/appearance and animation keys.
 - Animation-key parsing now validates against the selected agent's animation set (instead of legacy static keys).
+- Animation selection from the context menu now plays once, then returns to automatic behavior.
 - Starting a new chat now hard-resets the model session context.
 - Selecting a chat now hard-resets the model session first, then restores that chat's saved context.
 - `Chats` view action buttons moved below the table.

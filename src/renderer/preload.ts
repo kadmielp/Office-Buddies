@@ -28,6 +28,19 @@ const clippyApi: ClippyApi = {
     ipcRenderer.removeAllListeners(IpcMessages.SET_BUBBLE_VIEW);
   },
   popupAppMenu: () => ipcRenderer.invoke(IpcMessages.POPUP_APP_MENU),
+  setContextMenuAnimations: (animationKeys: string[]) =>
+    ipcRenderer.invoke(IpcMessages.SET_CONTEXT_MENU_ANIMATIONS, animationKeys),
+  onContextMenuSelectAnimation: (
+    callback: (animationKey: string | null) => void,
+  ) => {
+    ipcRenderer.on(
+      IpcMessages.CONTEXT_MENU_SELECT_ANIMATION,
+      (_event, animationKey: string | null) => callback(animationKey),
+    );
+  },
+  offContextMenuSelectAnimation: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.CONTEXT_MENU_SELECT_ANIMATION);
+  },
 
   // Models
   updateModelState: () =>

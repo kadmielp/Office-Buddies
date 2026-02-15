@@ -3,6 +3,7 @@ import {
   toggleChatWindow,
   maximizeChatWindow,
   minimizeChatWindow,
+  setMainWindowSize,
 } from "./windows";
 import { IpcMessages } from "../ipc-messages";
 import { getModelManager } from "./models";
@@ -20,6 +21,9 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.TOGGLE_CHAT_WINDOW, () => toggleChatWindow());
   ipcMain.handle(IpcMessages.MINIMIZE_CHAT_WINDOW, () => minimizeChatWindow());
   ipcMain.handle(IpcMessages.MAXIMIZE_CHAT_WINDOW, () => maximizeChatWindow());
+  ipcMain.handle(IpcMessages.SET_MAIN_WINDOW_SIZE, (_, width, height) =>
+    setMainWindowSize(width, height),
+  );
   ipcMain.handle(IpcMessages.POPUP_APP_MENU, () => getMainAppMenu().popup());
 
   // App

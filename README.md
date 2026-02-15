@@ -6,6 +6,14 @@ It's a love letter and homage to the late, great Clippy, the assistant from Micr
 
 It is also meant to be a reference implementation of [@electron/llm](https://github.com/electron/llm), hoping to help other developers of Electron apps make use of local language models.
 
+## Fork Notice
+
+This project is a personal fork of [felixrieseberg/clippy](https://github.com/felixrieseberg/clippy).
+
+Full credit goes to [Felix Rieseberg](https://github.com/felixrieseberg) for creating and open-sourcing the original project, and to everyone listed in the acknowledgements below.
+
+This fork exists out of nostalgia and appreciation for Clippy. It is made with respect for Microsoft, the original creators, and the work that made this possible.
+
 ## Features
 
 - Simple, familiar, and classic chat interface. Send messages to your models, get a response.
@@ -25,7 +33,8 @@ Clippy supports (thanks to Llama.cpp) most GGUF models. You can find GGUF models
 
 Thanks to:
 
-- I am so grateful to Microsoft - not only for everything they've done for Electron, but also for giving us one of the most iconic characters and designs of computing history.
+- Of course, [Felix Rieseberg](https://github.com/felixrieseberg) for creating and open-sourcing Clippy.
+- I am deeply thankful to Microsoft, both for their work on Electron and for creating one of the most iconic characters in computing history.
 - [Kevan Atteberry](https://www.kevanatteberry.com/) for Clippy
 - [Jordan Scales (@jdan)](https://github.com/jdan) for the Windows 98 design
 - [Pooya Parsa (@pi0)](https://github.com/pi0) for being the (as far as I know) person to extract the length of each frame from the Clippy spritesheet.

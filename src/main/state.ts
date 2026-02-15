@@ -52,6 +52,10 @@ export class StateManager {
       settings.temperature = 0.7;
     }
 
+    if (!settings.selectedAgent) {
+      settings.selectedAgent = "Clippy";
+    }
+
     this.store.set("settings", settings);
   }
 

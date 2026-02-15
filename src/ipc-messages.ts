@@ -3,6 +3,7 @@ export const IpcMessages = {
   TOGGLE_CHAT_WINDOW: "clippy_toggle_chat_window",
   MINIMIZE_CHAT_WINDOW: "clippy_minimize_chat_window",
   MAXIMIZE_CHAT_WINDOW: "clippy_maximize_chat_window",
+  SET_MAIN_WINDOW_SIZE: "clippy_set_main_window_size",
   SET_BUBBLE_VIEW: "clippy_set_bubble_view",
   POPUP_APP_MENU: "clippy_popup_app_menu",
 

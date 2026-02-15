@@ -9,6 +9,7 @@ export type DefaultFontSize = number;
 
 export interface SettingsState {
   selectedModel?: string;
+  selectedAgent?: string;
   systemPrompt?: string;
   clippyAlwaysOnTop?: boolean;
   chatAlwaysOnTop?: boolean;
@@ -42,6 +43,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   clippyAlwaysOnTop: true,
   chatAlwaysOnTop: true,
   alwaysOpenChat: true,
+  selectedAgent: "Clippy",
   systemPrompt: DEFAULT_SYSTEM_PROMPT,
   topK: 10,
   temperature: 0.7,

@@ -17,6 +17,8 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.MINIMIZE_CHAT_WINDOW),
   maximizeChatWindow: () =>
     ipcRenderer.invoke(IpcMessages.MAXIMIZE_CHAT_WINDOW),
+  setMainWindowSize: (width: number, height: number) =>
+    ipcRenderer.invoke(IpcMessages.SET_MAIN_WINDOW_SIZE, width, height),
   onSetBubbleView(callback: (bubbleView: BubbleView) => void) {
     ipcRenderer.on(IpcMessages.SET_BUBBLE_VIEW, (_event, bubbleView) =>
       callback(bubbleView),

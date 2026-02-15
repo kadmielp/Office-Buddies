@@ -2,6 +2,7 @@ import { DEFAULT_SETTINGS, SettingsState } from "../../sharedState";
 import { clippyApi } from "../clippyApi";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { Checkbox } from "./Checkbox";
+import { AVAILABLE_AGENTS } from "../agent-packs";
 
 export const SettingsAppearance: React.FC = () => {
   const { settings } = useSharedState();
@@ -16,6 +17,7 @@ export const SettingsAppearance: React.FC = () => {
 
   const onReset = () => {
     const defaultAppareanceSettings: SettingsState = {
+      selectedAgent: DEFAULT_SETTINGS.selectedAgent,
       defaultFont: DEFAULT_SETTINGS.defaultFont,
       defaultFontSize: DEFAULT_SETTINGS.defaultFontSize,
       clippyAlwaysOnTop: DEFAULT_SETTINGS.clippyAlwaysOnTop,
@@ -59,6 +61,27 @@ export const SettingsAppearance: React.FC = () => {
             clippyApi.setState("settings.alwaysOpenChat", checked);
           }}
         />
+      </fieldset>
+      <fieldset>
+        <legend>Agent</legend>
+        <div className="field-row" style={{ width: 300 }}>
+          <label htmlFor="selectedAgent" style={{ width: 58 }}>
+            Agent:
+          </label>
+          <select
+            id="selectedAgent"
+            value={settings.selectedAgent || "Clippy"}
+            onChange={(event) => {
+              clippyApi.setState("settings.selectedAgent", event.target.value);
+            }}
+          >
+            {AVAILABLE_AGENTS.map((agent) => (
+              <option key={agent} value={agent}>
+                {agent}
+              </option>
+            ))}
+          </select>
+        </div>
       </fieldset>
       <fieldset>
         <legend>Font Options</legend>

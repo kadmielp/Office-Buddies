@@ -263,6 +263,31 @@ export function maximizeChatWindow() {
 }
 
 /**
+ * Set the main window size while keeping it anchored to the bottom-right.
+ *
+ * @param width The window width
+ * @param height The window height
+ */
+export function setMainWindowSize(width: number, height: number) {
+  const window = getMainWindow();
+
+  if (!window) {
+    return;
+  }
+
+  const bounds = window.getBounds();
+  const x = bounds.x + bounds.width - width;
+  const y = bounds.y + bounds.height - height;
+
+  window.setBounds({
+    x,
+    y,
+    width,
+    height,
+  });
+}
+
+/**
  * Set the font size for all windows
  *
  * @param fontSize The font size to set

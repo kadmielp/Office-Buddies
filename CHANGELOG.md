@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.7] - 2026-02-15
+
+### Removed
+
+- Legacy `extract-animations` workflow from `package.json`.
+- Deprecated animation extraction script `tools/extract-animations.sh`.
+- Legacy generated animation modules:
+  - `src/renderer/clippy-animations.tsx`
+  - `src/renderer/clippy-animation-helpers.tsx`
+- Legacy source assets used only by the old extraction pipeline:
+  - `assets/animations/clippy/animations.json`
+  - `assets/animations/clippy/map.png`
+
 ## [0.4.6] - 2026-02-15
 
 ### Added

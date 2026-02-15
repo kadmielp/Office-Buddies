@@ -1,4 +1,4 @@
-# Clippy (Classic Assistants Edition)
+# Clippy + Classic Assistants
 
 This project brings classic Office-style assistants into a modern LLM chat app with a 90s desktop vibe.
 

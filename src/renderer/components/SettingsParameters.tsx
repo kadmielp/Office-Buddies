@@ -1,45 +1,33 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { clippyApi } from "../clippyApi";
 import { useSharedState } from "../contexts/SharedStateContext";
-import { DEFAULT_SYSTEM_PROMPT } from "../../sharedState";
+import { buildSystemPrompt } from "../prompt-helpers";
 
 export const SettingsParameters: React.FC = () => {
   const { settings } = useSharedState();
-  const [tempSystemPrompt, setTempSystemPrompt] = useState(
-    settings.systemPrompt,
-  );
   const [tempTopK, setTempTopK] = useState(settings.topK);
   const [tempTemperature, setTempTemperature] = useState(settings.temperature);
+  const resolvedSystemPrompt = buildSystemPrompt(
+    settings.systemPrompt,
+    settings.selectedAgent || "Clippy",
+  );
 
   // Update settings on unmount so that the user editing preferences
   // doesn't rapidly reload the model
   useEffect(() => {
     return () => {
       const isNewSettings =
-        tempSystemPrompt !== settings.systemPrompt ||
-        tempTopK !== settings.topK ||
-        tempTemperature !== settings.temperature;
+        tempTopK !== settings.topK || tempTemperature !== settings.temperature;
 
       if (isNewSettings) {
         clippyApi.setState("settings", {
           ...settings,
-          systemPrompt: tempSystemPrompt,
           topK: tempTopK,
           temperature: tempTemperature,
         });
       }
     };
-  }, [tempSystemPrompt, tempTopK, tempTemperature]);
-
-  const handleSystemPromptReset = useCallback(() => {
-    const confirmed = window.confirm(
-      "Are you sure you want to reset the system prompt to the default? This will overwrite any customizations you have made.",
-    );
-
-    if (confirmed) {
-      setTempSystemPrompt(DEFAULT_SYSTEM_PROMPT);
-    }
-  }, []);
+  }, [tempTopK, tempTemperature]);
 
   return (
     <>
@@ -47,25 +35,16 @@ export const SettingsParameters: React.FC = () => {
         <legend>Prompts</legend>
         <div className="field-row-stacked">
           <label htmlFor="systemPrompt">
-            System Prompt. Supported placeholders: "[AGENT_NAME]",
-            "[AGENT_PERSONALITY]", "[AGENT_APPEARANCE]", and
-            "[LIST OF ANIMATIONS]". They are replaced automatically based on
-            the selected agent.
+            Resolved System Prompt for "{settings.selectedAgent || "Clippy"}"
+            (read-only).
           </label>
           <textarea
             id="systemPrompt"
             rows={8}
             style={{ resize: "vertical" }}
-            value={tempSystemPrompt}
-            onChange={(e) => {
-              setTempSystemPrompt(e.target.value);
-            }}
+            value={resolvedSystemPrompt}
+            readOnly
           />
-        </div>
-        <div className="field-row-stacked">
-          <button onClick={handleSystemPromptReset} style={{ width: 100 }}>
-            Reset
-          </button>
         </div>
       </fieldset>
       <fieldset style={{ marginTop: "20px" }}>

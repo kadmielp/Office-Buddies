@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.4.5] - 2026-02-15
 
 ### Added
 
@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Chat prompt generation now uses the selected agent's personality/appearance and animation keys.
+- Agent changes now trigger a model reload so the resolved system prompt is refreshed immediately.
 - Animation-key parsing now validates against the selected agent's animation set (instead of legacy static keys).
 - Animation selection from the context menu now plays once, then returns to automatic behavior.
 - Animation completion now waits for actual animation end, with a watchdog fallback for branch-heavy animations.
@@ -29,6 +30,8 @@ All notable changes to this project will be documented in this file.
 - `Chats` view action buttons moved below the table.
 - Removed the `Back to Chat` button from `Settings`.
 - User messages are now right-aligned with the user icon on the right.
+- Parameters now show the fully resolved system prompt for the selected agent as read-only text.
+- Chat input is disabled while the model is answering.
 
 ## [0.4.4] - 2026-02-15
 

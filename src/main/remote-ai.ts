@@ -165,10 +165,6 @@ export async function fetchRemoteProviderModels(
     }
   }
 
-  if (settings.maritacaApiKey?.trim()) {
-    return ["sabia-3"];
-  }
-
   throw lastError || new Error("Unable to load Maritaca models.");
 }
 
@@ -202,7 +198,7 @@ export async function promptRemoteProvider(args: {
         return await promptOpenAiCompatible({
           endpoint,
           apiKey: args.settings.maritacaApiKey || "",
-          model: args.settings.remoteModel || "sabia-3",
+          model: args.settings.remoteModel || "",
           temperature: args.settings.temperature,
           systemPrompt: args.systemPrompt,
           history: args.history,

@@ -1,54 +1,64 @@
-# Clippy
+# Clippy (Classic Assistants Edition)
 
-[Clippy](https://felixrieseberg.github.io/clippy/) let's you run a variety of large language models (LLMs) locally on your computer while sticking with a user interface of the 1990s. Through Llama.cpp, it supports models in the popular GGUF format, which is to say most publicly available models. It comes with one-click installation support for Google's Gemma3, Meta's Llama 3.2, Microsoft's Phi-4, and Qwen's Qwen3.
+This project brings classic Office-style assistants into a modern LLM chat app with a 90s desktop vibe.
 
-It's a love letter and homage to the late, great Clippy, the assistant from Microsoft Office 1997. The character was designed by illustrator Kevan Atteberry, who created more than 15 potential characters for Microsoft's Office Assistants. This app is not affiliated, approved, or supported by Microsoft. Consider it software art. If you don't like it, consider it software satire.
+Clippy is still here (and yes, still iconic), but this fork treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
-It is also meant to be a reference implementation of [@electron/llm](https://github.com/electron/llm), hoping to help other developers of Electron apps make use of local language models.
+Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic.
 
-## Fork Notice
+## What This Fork Is
 
-This project is a personal fork of [felixrieseberg/clippy](https://github.com/felixrieseberg/clippy).
+This repository is a personal fork of [felixrieseberg/clippy](https://github.com/felixrieseberg/clippy), expanded to support multiple assistants, richer animation behavior, and multi-provider AI backends.
 
-Full credit goes to [Felix Rieseberg](https://github.com/felixrieseberg) for creating and open-sourcing the original project, and to everyone listed in the acknowledgements below.
+It is made with respect for:
 
-This fork exists out of nostalgia and appreciation for Clippy. It is made with respect for Microsoft, the original creators, and the work that made this possible.
+- The original Clippy project and its author
+- Microsoft and the Office Assistant legacy
+- The creators and preservers of these assistant assets
 
-## Features
+This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 
-- Simple, familiar, and classic chat interface. Send messages to your models, get a response.
-- Batteries included: No complicated setup. Just open the app and chat away. Thanks to llama.cpp and `node-llama-cpp`, the app will automatically discover the most efficient way to run your models (Metal, CUDA, Vulkan, etc).
-- Local and remote providers: Use local GGUF models or connect to OpenAI, Google Gemini, and Maritaca.
-- Custom models, prompts, and parameters: Load your own downloaded models and play with the settings.
-- Interactive agent animations: Right-click Clippy to pick an animation from the native context menu and play it once.
-- Offline-first local mode: Local GGUF mode runs on your computer. Remote provider mode sends prompts to the selected provider API.
+## Core Features
 
-## Non-Features
+- Multiple classic assistants, each with their own animation set and sounds.
+- Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
+- Optional remote providers: OpenAI, Google Gemini, and Maritaca.
+- Provider-aware model selection from API-backed model lists.
+- Configurable prompt and generation parameters.
+- Native-feeling context menu for choosing and previewing assistant animations.
+- Windows-98-inspired UI and interaction patterns.
 
-Countless little chat apps for local LLMs exist out there. Many of them are likely better - and that's okay. This project isn't trying to be your best chat bot. I'd like you to enjoy a weird mix of nostalgia for 1990s technology paired with one the most magical technologies we can run on our computers in 2025.
+## Providers
 
-## Downloading More Models
+Configure providers in `Settings > Model`.
 
-Clippy supports (thanks to Llama.cpp) most GGUF models. You can find GGUF models in plenty of online sources - I tend to go with models quantized by [TheBloke](https://huggingface.co/thebloke) or [Unsloth](https://huggingface.co/unsloth).
+- `Local (GGUF)`: runs on your machine via `@electron/llm`.
+- `OpenAI`: API key + model selection.
+- `Google Gemini`: API key + model selection.
+- `Maritaca`: API key + model selection.
 
-## Remote AI Providers
+Remote provider requests are executed in the Electron main process via IPC.
 
-You can switch providers in `Settings > Model`.
+## Downloading Local Models
 
-- `Local (GGUF)`: Existing local model workflow powered by `@electron/llm`.
-- `OpenAI`: Provide API key and choose a model from the fetched provider model list.
-- `Google Gemini`: Provide API key and choose a model from the fetched provider model list.
-- `Maritaca`: Provide API key and choose a model from the fetched provider model list (with fallback to `sabia-3` if listing is unavailable).
+For local mode, GGUF models are supported. Good sources include quantizations from:
 
-When using remote providers, requests are executed in the Electron main process through IPC.
+- [TheBloke](https://huggingface.co/thebloke)
+- [Unsloth](https://huggingface.co/unsloth)
+
+## Scope and Intent
+
+This project is not trying to beat every chat client in features.
+
+The goal is simpler: combine capable modern AI with a playful, classic assistant experience that feels personal and a little weird in a good way.
 
 ## Acknowledgements
 
-Thanks to:
+Special thanks to:
 
-- Of course, [Felix Rieseberg](https://github.com/felixrieseberg) for creating and open-sourcing Clippy.
-- I am deeply thankful to Microsoft, both for their work on Electron and for creating one of the most iconic characters in computing history.
-- [Kevan Atteberry](https://www.kevanatteberry.com/) for Clippy
-- [Jordan Scales (@jdan)](https://github.com/jdan) for the Windows 98 design
-- [Pooya Parsa (@pi0)](https://github.com/pi0) for being the (as far as I know) person to extract the length of each frame from the Clippy spritesheet.
-- [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for squeezing llama.cpp into Node.js
+- [Felix Rieseberg](https://github.com/felixrieseberg) for creating and open-sourcing the original Clippy app.
+- Microsoft, for the Office Assistant legacy and for Electron.
+- [Kevan Atteberry](https://www.kevanatteberry.com/) for designing Clippy.
+- [Jordan Scales (@jdan)](https://github.com/jdan) for the Windows 98 visual language.
+- [Pooya Parsa (@pi0)](https://github.com/pi0) and contributors who helped preserve/extract assistant animation data.
+- [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for making local inference practical in Node/Electron.

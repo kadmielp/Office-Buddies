@@ -106,6 +106,13 @@ const clippyApi: ClippyApi = {
   offNewChat: () => {
     ipcRenderer.removeAllListeners(IpcMessages.CHAT_NEW_CHAT);
   },
+  fetchRemoteProviderModels: (provider: "openai" | "gemini" | "maritaca") =>
+    ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
+  promptRemoteProvider: (payload: {
+    provider: "openai" | "gemini" | "maritaca";
+    systemPrompt: string;
+    history: ChatWithMessages["messages"];
+  }) => ipcRenderer.invoke(IpcMessages.AI_PROMPT, payload),
 
   // App
   getVersions: () => ipcRenderer.invoke(IpcMessages.APP_GET_VERSIONS),

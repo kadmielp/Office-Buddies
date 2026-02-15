@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import { Message } from "../components/Message";
-import { clippyApi, electronAi } from "../clippyApi";
+import { clippyApi } from "../clippyApi";
 import { SharedStateContext } from "./SharedStateContext";
 import { areAnyModelsReadyOrDownloading } from "../../helpers/model-helpers";
 import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
@@ -15,12 +15,16 @@ import { ChatRecord, MessageRecord } from "../../types/interfaces";
 import { useDebugState } from "./DebugContext";
 import { ErrorLoadModelMessageContent } from "../components/ErrorLoadModelMessageContent";
 import { buildSystemPrompt } from "../prompt-helpers";
+import {
+  createProviderSession,
+  destroyProviderSession,
+  getProviderReadiness,
+  initialPromptsFromMessages,
+} from "../ai-provider-client";
 
 import type {
   LanguageModelPrompt,
   LanguageModelCreateOptions,
-  LanguageModelPromptRole,
-  LanguageModelPromptType,
 } from "@electron/llm";
 
 type ClippyNamedStatus =
@@ -89,12 +93,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const startNewChat = useCallback(async () => {
     const resetModelSession = async () => {
-      if (!settings.selectedModel || debug?.simulateDownload) {
+      if (debug?.simulateDownload) {
+        return;
+      }
+      const readiness = getProviderReadiness(settings, models);
+
+      if (!readiness.ready) {
+        setIsModelLoaded(false);
         return;
       }
 
       try {
-        await electronAi.destroy();
+        await destroyProviderSession(settings);
       } catch (error) {
         console.error(error);
       }
@@ -110,7 +120,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       };
 
       try {
-        await electronAi.create(options);
+        await createProviderSession(settings, options);
         setIsModelLoaded(true);
       } catch (error) {
         console.error(error);
@@ -152,6 +162,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     settings.temperature,
     settings.topK,
     settings.selectedModel,
+    settings.aiProvider,
+    settings.remoteModel,
+    settings.openAiApiKey,
+    settings.geminiApiKey,
+    settings.maritacaApiKey,
+    models,
     getSystemPrompt,
   ]);
 
@@ -170,7 +186,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       console.log("Loading model with options:", options);
 
       try {
-        await electronAi.create(options);
+        const readiness = getProviderReadiness(settings, models);
+        if (!readiness.ready) {
+          setIsModelLoaded(false);
+          return;
+        }
+
+        await createProviderSession(settings, options);
         setIsModelLoaded(true);
       } catch (error) {
         console.error(error);
@@ -185,8 +207,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     },
     [
       settings.selectedModel,
+      settings.aiProvider,
+      settings.remoteModel,
+      settings.openAiApiKey,
+      settings.geminiApiKey,
+      settings.maritacaApiKey,
       settings.topK,
       settings.temperature,
+      models,
       getSystemPrompt,
       addMessage,
     ],
@@ -203,20 +231,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           setCurrentChatRecord(chatWithMessages.chat);
         }
 
-        if (settings.selectedModel && !debug?.simulateDownload) {
+        if (!debug?.simulateDownload) {
           try {
-            await electronAi.destroy();
+            await destroyProviderSession(settings);
           } catch (error) {
             console.error(error);
           }
         }
 
-        await loadModel(messagesToInitialPrompts(selectedChatMessages));
+        await loadModel(initialPromptsFromMessages(selectedChatMessages));
       } catch (error) {
         console.error(error);
       }
     },
-    [debug?.simulateDownload, loadModel, settings.selectedModel],
+    [debug?.simulateDownload, loadModel, settings],
   );
 
   const deleteChat = useCallback(
@@ -272,11 +300,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (settings.selectedModel) {
+    const readiness = getProviderReadiness(settings, models);
+
+    if (readiness.ready) {
       loadModel();
-    } else if (!settings.selectedModel && isModelLoaded) {
-      electronAi
-        .destroy()
+    } else if (isModelLoaded) {
+      destroyProviderSession(settings)
         .then(() => {
           setIsModelLoaded(false);
         })
@@ -285,15 +314,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         });
     }
   }, [
+    settings.aiProvider,
     settings.selectedModel,
+    settings.remoteModel,
+    settings.openAiApiKey,
+    settings.geminiApiKey,
+    settings.maritacaApiKey,
     settings.selectedAgent,
     settings.systemPrompt,
     settings.topK,
     settings.temperature,
+    models,
   ]);
 
   // If selectedModel is undefined or not available, set it to the first downloaded model
   useEffect(() => {
+    if (settings.aiProvider !== "local") {
+      return;
+    }
+
     if (
       !settings.selectedModel ||
       !models[settings.selectedModel] ||
@@ -307,7 +346,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         clippyApi.setState("settings.selectedModel", downloadedModel.name);
       }
     }
-  }, [models]);
+  }, [models, settings.aiProvider]);
 
   // At app startup, initially load the chat records from the main process
   useEffect(() => {
@@ -342,6 +381,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     });
 
     const downloadModelIfNoneReady = async () => {
+      if (settings.aiProvider !== "local") {
+        return;
+      }
+
       await clippyApi.downloadModelByName("Gemma 3 (1B)");
 
       setTimeout(async () => {
@@ -350,7 +393,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     };
 
     void downloadModelIfNoneReady();
-  }, [models]);
+  }, [models, settings.aiProvider]);
 
   // Subscribe to the main process's newChat event
   useEffect(() => {
@@ -416,15 +459,4 @@ function getPreviewFromMessages(messages: Message[]): string {
 
   // Remove newlines and limit to 100 characters
   return messages[0].content.replace(/\n/g, " ").substring(0, 100);
-}
-
-function messagesToInitialPrompts(messages: Message[]): LanguageModelPrompt[] {
-  return messages.map((message) => ({
-    role:
-      message.sender === "clippy"
-        ? ("assistant" as LanguageModelPromptRole)
-        : ("user" as LanguageModelPromptRole),
-    type: "text" as LanguageModelPromptType,
-    content: message.content || "",
-  }));
 }

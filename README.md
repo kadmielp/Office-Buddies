@@ -18,9 +18,10 @@ This fork exists out of nostalgia and appreciation for Clippy. It is made with r
 
 - Simple, familiar, and classic chat interface. Send messages to your models, get a response.
 - Batteries included: No complicated setup. Just open the app and chat away. Thanks to llama.cpp and `node-llama-cpp`, the app will automatically discover the most efficient way to run your models (Metal, CUDA, Vulkan, etc).
+- Local and remote providers: Use local GGUF models or connect to OpenAI, Google Gemini, and Maritaca.
 - Custom models, prompts, and parameters: Load your own downloaded models and play with the settings.
 - Interactive agent animations: Right-click Clippy to pick an animation from the native context menu and play it once.
-- Offline, local, free: Everything runs on your computers. The only network request Clippy makes is to check for updates (which you can disable).
+- Offline-first local mode: Local GGUF mode runs on your computer. Remote provider mode sends prompts to the selected provider API.
 
 ## Non-Features
 
@@ -29,6 +30,17 @@ Countless little chat apps for local LLMs exist out there. Many of them are like
 ## Downloading More Models
 
 Clippy supports (thanks to Llama.cpp) most GGUF models. You can find GGUF models in plenty of online sources - I tend to go with models quantized by [TheBloke](https://huggingface.co/thebloke) or [Unsloth](https://huggingface.co/unsloth).
+
+## Remote AI Providers
+
+You can switch providers in `Settings > Model`.
+
+- `Local (GGUF)`: Existing local model workflow powered by `@electron/llm`.
+- `OpenAI`: Provide API key and choose a model from the fetched provider model list.
+- `Google Gemini`: Provide API key and choose a model from the fetched provider model list.
+- `Maritaca`: Provide API key and choose a model from the fetched provider model list (with fallback to `sabia-3` if listing is unavailable).
+
+When using remote providers, requests are executed in the Electron main process through IPC.
 
 ## Acknowledgements
 

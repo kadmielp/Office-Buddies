@@ -56,6 +56,10 @@ export class StateManager {
       settings.selectedAgent = "Clippy";
     }
 
+    if (!settings.aiProvider) {
+      settings.aiProvider = "local";
+    }
+
     this.store.set("settings", settings);
   }
 

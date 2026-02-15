@@ -15,6 +15,7 @@ import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
 import { getClippyDebugInfo } from "./debug-clippy";
 import { getDebugManager } from "./debug";
+import { fetchRemoteProviderModels, promptRemoteProvider } from "./remote-ai";
 
 export function setupIpcListeners() {
   // Window
@@ -102,6 +103,29 @@ export function setupIpcListeners() {
   );
   ipcMain.handle(IpcMessages.CHAT_DELETE_ALL_CHATS, () =>
     getChatManager().deleteAllChats(),
+  );
+  ipcMain.handle(IpcMessages.AI_FETCH_MODELS, (_, provider: string) =>
+    fetchRemoteProviderModels(
+      provider as any,
+      getStateManager().store.get("settings"),
+    ),
+  );
+  ipcMain.handle(
+    IpcMessages.AI_PROMPT,
+    (
+      _,
+      payload: {
+        provider: "openai" | "gemini" | "maritaca";
+        systemPrompt: string;
+        history: ChatWithMessages["messages"];
+      },
+    ) =>
+      promptRemoteProvider({
+        provider: payload.provider,
+        settings: getStateManager().store.get("settings"),
+        systemPrompt: payload.systemPrompt,
+        history: payload.history,
+      }),
   );
 
   // Clipboard

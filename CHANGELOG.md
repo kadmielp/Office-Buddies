@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.6] - 2026-02-15
+
+### Added
+
+- Multi-provider chat support with selectable AI providers: Local (GGUF), OpenAI, Google Gemini, and Maritaca.
+- Provider settings in `Settings > Model` for API key and remote model configuration.
+- Remote model discovery based on the configured API key, with a model dropdown and manual refresh action.
+- New IPC channels for remote provider operations (`AI_FETCH_MODELS`, `AI_PROMPT`).
+
+### Changed
+
+- Remote provider requests now run in the Electron main process (via IPC) instead of the renderer.
+- Maritaca integration now follows OpenAI-compatible usage with internal base URL handling (`https://chat.maritaca.ai/api`).
+- Added Maritaca model-list fallback to `sabia-3` when provider model listing is unavailable.
+
 ## [0.4.5] - 2026-02-15
 
 ### Added

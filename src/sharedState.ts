@@ -6,9 +6,15 @@ export type DefaultFont =
   | "Tahoma"
   | "System Default";
 export type DefaultFontSize = number;
+export type AiProvider = "local" | "openai" | "gemini" | "maritaca";
 
 export interface SettingsState {
+  aiProvider?: AiProvider;
   selectedModel?: string;
+  remoteModel?: string;
+  openAiApiKey?: string;
+  geminiApiKey?: string;
+  maritacaApiKey?: string;
   selectedAgent?: string;
   systemPrompt?: string;
   clippyAlwaysOnTop?: boolean;
@@ -45,6 +51,7 @@ Keep replies useful, accurate, and respectful.
 ${ANIMATION_PROMPT}`;
 
 export const DEFAULT_SETTINGS: SettingsState = {
+  aiProvider: "local",
   clippyAlwaysOnTop: true,
   chatAlwaysOnTop: true,
   alwaysOpenChat: true,

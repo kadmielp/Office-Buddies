@@ -2,6 +2,7 @@ import { ElectronLlmRenderer } from "@electron/llm";
 import { SharedState } from "../sharedState";
 import {
   ChatRecord,
+  MessageRecord,
   ChatWithMessages,
   ClippyDebugInfo,
   Versions,
@@ -58,6 +59,15 @@ export type ClippyApi = {
   deleteAllChats: () => Promise<void>;
   onNewChat: (callback: () => void) => void;
   offNewChat: () => void;
+  // Remote AI Providers
+  fetchRemoteProviderModels: (
+    provider: "openai" | "gemini" | "maritaca",
+  ) => Promise<string[]>;
+  promptRemoteProvider: (payload: {
+    provider: "openai" | "gemini" | "maritaca";
+    systemPrompt: string;
+    history: MessageRecord[];
+  }) => Promise<string>;
   // Clipboard
   clipboardWrite: (data: Data) => Promise<void>;
 };

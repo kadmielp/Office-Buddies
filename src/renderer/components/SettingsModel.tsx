@@ -1,15 +1,21 @@
 import { Column, TableView } from "./TableView";
 import { Progress } from "./Progress";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { clippyApi } from "../clippyApi";
 import { prettyDownloadSpeed } from "../helpers/convert-download-speed";
 import { ManagedModel } from "../../models";
 import { isModelDownloading } from "../../helpers/model-helpers";
+import { AiProvider } from "../../sharedState";
+import { fetchProviderModels } from "../ai-provider-client";
 
 export const SettingsModel: React.FC = () => {
   const { models, settings } = useSharedState();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const selectedProvider = settings.aiProvider || "local";
+  const [remoteModelOptions, setRemoteModelOptions] = useState<string[]>([]);
+  const [isLoadingRemoteModels, setIsLoadingRemoteModels] = useState(false);
+  const [remoteModelsError, setRemoteModelsError] = useState<string>("");
 
   const columns: Array<Column> = [
     { key: "default", header: "Loaded", width: 50 },
@@ -68,76 +74,273 @@ export const SettingsModel: React.FC = () => {
     }
   };
 
+  const updateSetting = (key: string, value: string) => {
+    clippyApi.setState(key, value);
+  };
+
+  useEffect(() => {
+    if (selectedProvider === "local") {
+      setRemoteModelOptions([]);
+      setRemoteModelsError("");
+      return;
+    }
+
+    const hasApiKey =
+      (selectedProvider === "openai" && !!settings.openAiApiKey?.trim()) ||
+      (selectedProvider === "gemini" && !!settings.geminiApiKey?.trim()) ||
+      (selectedProvider === "maritaca" && !!settings.maritacaApiKey?.trim());
+
+    if (!hasApiKey) {
+      setRemoteModelOptions([]);
+      setRemoteModelsError("");
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadRemoteModels = async () => {
+      setIsLoadingRemoteModels(true);
+      setRemoteModelsError("");
+
+      try {
+        const list = await fetchProviderModels(selectedProvider, settings);
+        if (cancelled) {
+          return;
+        }
+
+        setRemoteModelOptions(list);
+
+        if (list.length > 0 && !list.includes(settings.remoteModel || "")) {
+          clippyApi.setState("settings.remoteModel", list[0]);
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setRemoteModelOptions([]);
+        setRemoteModelsError(
+          error instanceof Error ? error.message : String(error),
+        );
+      } finally {
+        if (!cancelled) {
+          setIsLoadingRemoteModels(false);
+        }
+      }
+    };
+
+    void loadRemoteModels();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    selectedProvider,
+    settings.openAiApiKey,
+    settings.geminiApiKey,
+    settings.maritacaApiKey,
+    settings.remoteModel,
+  ]);
+
+  const handleRefreshRemoteModels = async () => {
+    if (selectedProvider === "local") {
+      return;
+    }
+
+    setIsLoadingRemoteModels(true);
+    setRemoteModelsError("");
+
+    try {
+      const list = await fetchProviderModels(selectedProvider, settings);
+      setRemoteModelOptions(list);
+
+      if (list.length > 0 && !list.includes(settings.remoteModel || "")) {
+        clippyApi.setState("settings.remoteModel", list[0]);
+      }
+    } catch (error) {
+      setRemoteModelOptions([]);
+      setRemoteModelsError(
+        error instanceof Error ? error.message : String(error),
+      );
+    } finally {
+      setIsLoadingRemoteModels(false);
+    }
+  };
+
   return (
     <div>
-      <p>
-        Select the model you want to use for your chat. The larger the model,
-        the more powerful the chat, but the slower it will be - and the more
-        memory it will use. Clippy uses models in the GGUF format.{" "}
-        <a
-          href="https://github.com/felixrieseberg/clippy?tab=readme-ov-file#downloading-more-models"
-          target="_blank"
-        >
-          More information.
-        </a>
-      </p>
-
-      <button
-        style={{ marginBottom: 10 }}
-        onClick={() => clippyApi.addModelFromFile()}
-      >
-        Add model from file
-      </button>
-      <TableView
-        columns={columns}
-        data={data}
-        onRowSelect={handleRowSelect}
-        initialSelectedIndex={selectedIndex}
-      />
-
-      {selectedModel && (
-        <div
-          className="model-details sunken-panel"
-          style={{ marginTop: "20px", padding: "15px" }}
-        >
-          <strong>{selectedModel.name}</strong>
-
-          {selectedModel.description && <p>{selectedModel.description}</p>}
-
-          {selectedModel.homepage && (
-            <p>
-              <a
-                href={selectedModel.homepage}
-                target="_blank"
-                rel="noopener noreferrer"
+      <fieldset style={{ marginBottom: "16px" }}>
+        <legend>AI Provider</legend>
+        <div className="field-row">
+          <label htmlFor="aiProvider">Provider</label>
+          <select
+            id="aiProvider"
+            value={selectedProvider}
+            onChange={(e) =>
+              clippyApi.setState("settings.aiProvider", e.target.value)
+            }
+          >
+            <option value={"local" as AiProvider}>Local (GGUF)</option>
+            <option value={"openai" as AiProvider}>OpenAI</option>
+            <option value={"gemini" as AiProvider}>Google Gemini</option>
+            <option value={"maritaca" as AiProvider}>Maritaca</option>
+          </select>
+        </div>
+        {selectedProvider !== "local" && (
+          <>
+            <div className="field-row">
+              <label htmlFor="remoteModel">Model</label>
+              <select
+                id="remoteModel"
+                value={settings.remoteModel || ""}
+                onChange={(e) =>
+                  updateSetting("settings.remoteModel", e.target.value)
+                }
+                disabled={remoteModelOptions.length === 0}
               >
-                Visit Homepage
-              </a>
-            </p>
-          )}
-
-          <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
-            {!selectedModel.downloaded ? (
-              <button disabled={isDownloading} onClick={handleDownload}>
-                Download Model
+                {remoteModelOptions.length === 0 ? (
+                  <option value="">
+                    {isLoadingRemoteModels
+                      ? "Loading models..."
+                      : "No models found. Add API key and refresh."}
+                  </option>
+                ) : (
+                  remoteModelOptions.map((modelName) => (
+                    <option key={modelName} value={modelName}>
+                      {modelName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div className="field-row">
+              <label htmlFor="providerApiKey">API Key</label>
+              <input
+                id="providerApiKey"
+                type="password"
+                value={
+                  selectedProvider === "openai"
+                    ? settings.openAiApiKey || ""
+                    : selectedProvider === "gemini"
+                      ? settings.geminiApiKey || ""
+                      : settings.maritacaApiKey || ""
+                }
+                onChange={(e) =>
+                  updateSetting(
+                    selectedProvider === "openai"
+                      ? "settings.openAiApiKey"
+                      : selectedProvider === "gemini"
+                        ? "settings.geminiApiKey"
+                        : "settings.maritacaApiKey",
+                    e.target.value,
+                  )
+                }
+              />
+            </div>
+            <div className="field-row">
+              <button
+                onClick={handleRefreshRemoteModels}
+                disabled={isLoadingRemoteModels}
+              >
+                {isLoadingRemoteModels ? "Loading..." : "Refresh Models"}
               </button>
-            ) : (
-              <>
-                <button
-                  disabled={isDownloading || isDefaultModel}
-                  onClick={handleMakeDefault}
-                >
-                  {isDefaultModel
-                    ? "Clippy uses this model"
-                    : "Make Clippy use this model"}
-                </button>
-                <button onClick={handleDeleteOrRemove}>
-                  {selectedModel?.imported ? "Remove" : "Delete"} Model
-                </button>
-              </>
+            </div>
+            {remoteModelsError && (
+              <p style={{ marginTop: "8px", marginBottom: 0 }}>
+                Failed to load models: {remoteModelsError}
+              </p>
             )}
-          </div>
-          <SettingsModelDownload model={selectedModel} />
+          </>
+        )}
+      </fieldset>
+
+      {selectedProvider === "local" ? (
+        <p>
+          Select the model you want to use for your chat. The larger the model,
+          the more powerful the chat, but the slower it will be - and the more
+          memory it will use. Clippy uses models in the GGUF format.{" "}
+          <a
+            href="https://github.com/felixrieseberg/clippy?tab=readme-ov-file#downloading-more-models"
+            target="_blank"
+          >
+            More information.
+          </a>
+        </p>
+      ) : (
+        <p>
+          Configure the remote model and API key for the selected provider. The
+          chat will be sent to the configured provider instead of local GGUF
+          models.
+        </p>
+      )}
+
+      {selectedProvider === "local" ? (
+        <>
+          <button
+            style={{ marginBottom: 10 }}
+            onClick={() => clippyApi.addModelFromFile()}
+          >
+            Add model from file
+          </button>
+          <TableView
+            columns={columns}
+            data={data}
+            onRowSelect={handleRowSelect}
+            initialSelectedIndex={selectedIndex}
+          />
+
+          {selectedModel && (
+            <div
+              className="model-details sunken-panel"
+              style={{ marginTop: "20px", padding: "15px" }}
+            >
+              <strong>{selectedModel.name}</strong>
+
+              {selectedModel.description && <p>{selectedModel.description}</p>}
+
+              {selectedModel.homepage && (
+                <p>
+                  <a
+                    href={selectedModel.homepage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visit Homepage
+                  </a>
+                </p>
+              )}
+
+              <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
+                {!selectedModel.downloaded ? (
+                  <button disabled={isDownloading} onClick={handleDownload}>
+                    Download Model
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      disabled={isDownloading || isDefaultModel}
+                      onClick={handleMakeDefault}
+                    >
+                      {isDefaultModel
+                        ? "Clippy uses this model"
+                        : "Make Clippy use this model"}
+                    </button>
+                    <button onClick={handleDeleteOrRemove}>
+                      {selectedModel?.imported ? "Remove" : "Delete"} Model
+                    </button>
+                  </>
+                )}
+              </div>
+              <SettingsModelDownload model={selectedModel} />
+            </div>
+          )}
+        </>
+      ) : (
+        <div
+          className="sunken-panel"
+          style={{ marginTop: "12px", padding: 12 }}
+        >
+          Remote provider selected. Local GGUF model selection is disabled.
         </div>
       )}
     </div>

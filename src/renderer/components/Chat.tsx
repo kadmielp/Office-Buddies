@@ -3,9 +3,13 @@ import { useState } from "react";
 import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
 import { useChat } from "../contexts/ChatContext";
-import { electronAi } from "../clippyApi";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { getAnimationKeysBrackets } from "../agent-packs";
+import { buildSystemPrompt } from "../prompt-helpers";
+import {
+  abortProviderRequest,
+  promptStreamingWithProvider,
+} from "../ai-provider-client";
 
 export type ChatProps = {
   style?: React.CSSProperties;
@@ -22,7 +26,7 @@ export function Chat({ style }: ChatProps) {
   );
 
   const handleAbortMessage = () => {
-    electronAi.abortRequest(lastRequestUUID);
+    abortProviderRequest(settings, lastRequestUUID);
   };
 
   const handleSendMessage = async (message: string) => {
@@ -44,8 +48,17 @@ export function Chat({ style }: ChatProps) {
     try {
       const requestUUID = crypto.randomUUID();
       setLastRequestUUID(requestUUID);
+      const history = [...messages, userMessage];
+      const systemPrompt = buildSystemPrompt(
+        settings.systemPrompt,
+        settings.selectedAgent || "Clippy",
+      );
 
-      const response = await window.electronAi.promptStreaming(message, {
+      const response = promptStreamingWithProvider({
+        settings,
+        systemPrompt,
+        history,
+        input: message,
         requestUUID,
       });
 

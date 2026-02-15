@@ -185,10 +185,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     },
     [
       settings.selectedModel,
-      settings.systemPrompt,
       settings.topK,
       settings.temperature,
-      messages,
+      getSystemPrompt,
+      addMessage,
     ],
   );
 
@@ -265,7 +265,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, [messages]);
 
   // Load the model when the selected model changes
-  // or when the system prompt, topK, or temperature change
+  // or when the selected agent, system prompt, topK, or temperature change
   useEffect(() => {
     if (debug?.simulateDownload) {
       setIsModelLoaded(true);
@@ -286,6 +286,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [
     settings.selectedModel,
+    settings.selectedAgent,
     settings.systemPrompt,
     settings.topK,
     settings.temperature,

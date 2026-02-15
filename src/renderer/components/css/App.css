@@ -69,3 +69,8 @@ input[type="number"]::-webkit-inner-spin-button {
 fieldset:not(:first-child) {
   margin-top: 20px;
 }
+
+textarea.chat-input-busy::placeholder {
+  color: #808080 !important;
+  opacity: 1;
+}

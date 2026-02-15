@@ -10,6 +10,7 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const { isModelLoaded } = useChat();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isModelReplying = status === "thinking" || status === "responding";
 
   const handleSend = useCallback(() => {
     const trimmedMessage = message.trim();
@@ -65,11 +66,12 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end" }}>
       <textarea
+        className={isModelReplying ? "chat-input-busy" : undefined}
         rows={1}
         ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        disabled={!isModelLoaded}
+        disabled={!isModelLoaded || isModelReplying}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         style={{
@@ -78,6 +80,8 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
           resize: "vertical",
           minHeight: "23px",
           width: 80,
+          backgroundColor: isModelReplying ? "#e5e5e5" : undefined,
+          color: isModelReplying ? "#666666" : undefined,
         }}
       />
       <button

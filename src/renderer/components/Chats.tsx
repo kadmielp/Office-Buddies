@@ -15,6 +15,7 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     chatRecords,
     currentChatRecord,
     selectChat,
+    startNewChat,
     deleteChat,
     deleteAllChats,
   } = useChat();
@@ -44,6 +45,12 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     }
 
     selectChat(chatsWithPreview[selectedChatIndex].id);
+    onClose();
+  };
+
+  const handleNewChat = async () => {
+    await startNewChat();
+    setSelectedChatIndex(null);
     onClose();
   };
 
@@ -114,39 +121,46 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-end",
         }}
       >
         <h1>Chats</h1>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            onClick={handleRestoreChat}
-            disabled={selectedChatIndex === null}
-          >
-            Restore Chat
-          </button>
-          <button
-            onClick={handleDeleteSelected}
-            disabled={isDeleting || selectedChatIndex === null}
-          >
-            Delete Selected
-          </button>
-          <button onClick={handleDeleteAllChats} disabled={isDeleting}>
-            Delete All Chats
-          </button>
-        </div>
       </div>
 
       <TableView
         columns={columns}
         data={chatsWithPreview}
         onRowSelect={handleSelectChat}
-        style={{ height: "calc(80vh - 100px)", overflow: "auto" }}
+        style={{ height: "calc(80vh - 180px)", overflow: "auto" }}
         initialSelectedIndex={Object.values(chatRecords).findIndex(
           (chat) => chat.id === currentChatRecord.id,
         )}
       />
+
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          justifyContent: "flex-end",
+          flexWrap: "wrap",
+        }}
+      >
+        <button onClick={handleNewChat} disabled={isDeleting}>
+          New Chat
+        </button>
+        <button onClick={handleRestoreChat} disabled={selectedChatIndex === null}>
+          Restore Chat
+        </button>
+        <button
+          onClick={handleDeleteSelected}
+          disabled={isDeleting || selectedChatIndex === null}
+        >
+          Delete Selected
+        </button>
+        <button onClick={handleDeleteAllChats} disabled={isDeleting}>
+          Delete All Chats
+        </button>
+      </div>
     </div>
   );
 };

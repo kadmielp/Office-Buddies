@@ -4,7 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-- No unreleased changes yet.
+### Added
+
+- Agent personality profiles and appearance context for each selectable agent.
+- Dynamic prompt token expansion support for:
+  - `[AGENT_NAME]`
+  - `[AGENT_PERSONALITY]`
+  - `[AGENT_APPEARANCE]`
+  - `[LIST OF ANIMATIONS]`
+- New chat control button in `Chats` view.
+
+### Changed
+
+- Chat prompt generation now uses the selected agent's personality/appearance and animation keys.
+- Animation-key parsing now validates against the selected agent's animation set (instead of legacy static keys).
+- Starting a new chat now hard-resets the model session context.
+- Selecting a chat now hard-resets the model session first, then restores that chat's saved context.
+- `Chats` view action buttons moved below the table.
+- Removed the `Back to Chat` button from `Settings`.
+- User messages are now right-aligned with the user icon on the right.
 
 ## [0.4.4] - 2026-02-15
 

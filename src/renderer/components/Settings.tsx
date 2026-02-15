@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { TabList } from "./TabList";
 import { BubbleView, useBubbleView } from "../contexts/BubbleViewContext";
 import { SettingsModel } from "./SettingsModel";
-import { BubbleWindowBottomBar } from "./BubbleWindowBottomBar";
 import { SettingsAdvanced } from "./SettingsAdvanced";
 import { SettingsAppearance } from "./SettingsAppearance";
 import { SettingsAbout } from "./SettingsAbout";
@@ -12,10 +11,10 @@ import { SettingsParameters } from "./SettingsParameters";
 export type SettingsTab = "appearance" | "model" | "advanced" | "about";
 
 export type SettingsProps = {
-  onClose: () => void;
+  onClose?: () => void;
 };
 
-export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
+export const Settings: React.FC<SettingsProps> = () => {
   const { currentView, setCurrentView } = useBubbleView();
   const [activeTab, setActiveTab] = useState<SettingsTab>(
     bubbleViewToSettingsTab(currentView),
@@ -38,16 +37,11 @@ export const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   ];
 
   return (
-    <>
-      <TabList
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={(tab) => setCurrentView(`settings-${tab}` as BubbleView)}
-      />
-      <BubbleWindowBottomBar>
-        <button onClick={onClose}>Back to Chat</button>
-      </BubbleWindowBottomBar>
-    </>
+    <TabList
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={(tab) => setCurrentView(`settings-${tab}` as BubbleView)}
+    />
   );
 };
 

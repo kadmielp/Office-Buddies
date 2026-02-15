@@ -13,8 +13,8 @@ import { areAnyModelsReadyOrDownloading } from "../../helpers/model-helpers";
 import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
 import { ChatRecord, MessageRecord } from "../../types/interfaces";
 import { useDebugState } from "./DebugContext";
-import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 import { ErrorLoadModelMessageContent } from "../components/ErrorLoadModelMessageContent";
+import { buildSystemPrompt } from "../prompt-helpers";
 
 import type {
   LanguageModelPrompt,
@@ -74,11 +74,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     useState(false);
 
   const getSystemPrompt = useCallback(() => {
-    return settings.systemPrompt.replace(
-      "[LIST OF ANIMATIONS]",
-      ANIMATION_KEYS_BRACKETS.join(", "),
+    return buildSystemPrompt(
+      settings.systemPrompt,
+      settings.selectedAgent || "Clippy",
     );
-  }, [settings.systemPrompt]);
+  }, [settings.selectedAgent, settings.systemPrompt]);
 
   const addMessage = useCallback(
     async (message: Message) => {
@@ -87,27 +87,36 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     [currentChatRecord, messages],
   );
 
-  const selectChat = useCallback(
-    async (chatId: string) => {
+  const startNewChat = useCallback(async () => {
+    const resetModelSession = async () => {
+      if (!settings.selectedModel || debug?.simulateDownload) {
+        return;
+      }
+
       try {
-        const chatWithMessages = await clippyApi.getChatWithMessages(chatId);
-
-        if (chatWithMessages) {
-          setMessages(chatWithMessages.messages);
-          setCurrentChatRecord(chatWithMessages.chat);
-        }
-
-        await loadModel(
-          messagesToInitialPrompts(chatWithMessages?.messages || []),
-        );
+        await electronAi.destroy();
       } catch (error) {
         console.error(error);
       }
-    },
-    [currentChatRecord, messages],
-  );
 
-  const startNewChat = useCallback(async () => {
+      setIsModelLoaded(false);
+
+      const options: LanguageModelCreateOptions = {
+        modelAlias: settings.selectedModel,
+        systemPrompt: getSystemPrompt(),
+        topK: settings.topK,
+        temperature: settings.temperature,
+        initialPrompts: [],
+      };
+
+      try {
+        await electronAi.create(options);
+        setIsModelLoaded(true);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     // No need if there are no messages, we'll just keep the current chat
     // and update the timestamps
     if (messages.length === 0) {
@@ -116,6 +125,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
+
+      await resetModelSession();
 
       return;
     }
@@ -133,7 +144,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       [newChatRecord.id]: newChatRecord,
     }));
     setMessages([]);
-  }, [currentChatRecord, messages]);
+    await resetModelSession();
+  }, [
+    currentChatRecord,
+    debug?.simulateDownload,
+    messages,
+    settings.temperature,
+    settings.topK,
+    settings.selectedModel,
+    getSystemPrompt,
+  ]);
 
   const loadModel = useCallback(
     async (initialPrompts: LanguageModelPrompt[] = []) => {
@@ -170,6 +190,33 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       settings.temperature,
       messages,
     ],
+  );
+
+  const selectChat = useCallback(
+    async (chatId: string) => {
+      try {
+        const chatWithMessages = await clippyApi.getChatWithMessages(chatId);
+        const selectedChatMessages = chatWithMessages?.messages || [];
+
+        if (chatWithMessages) {
+          setMessages(selectedChatMessages);
+          setCurrentChatRecord(chatWithMessages.chat);
+        }
+
+        if (settings.selectedModel && !debug?.simulateDownload) {
+          try {
+            await electronAi.destroy();
+          } catch (error) {
+            console.error(error);
+          }
+        }
+
+        await loadModel(messagesToInitialPrompts(selectedChatMessages));
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [debug?.simulateDownload, loadModel, settings.selectedModel],
   );
 
   const deleteChat = useCallback(

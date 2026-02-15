@@ -208,6 +208,14 @@ export function getAnimationDuration(pack: AgentPack, key: string): number {
   return frames.reduce((total, frame) => total + (frame.duration ?? 100), 0);
 }
 
+export function getAnimationKeys(pack: AgentPack): string[] {
+  return Object.keys(pack.animations);
+}
+
+export function getAnimationKeysBrackets(agentName?: string): string[] {
+  return getAnimationKeys(getAgentPack(agentName)).map((key) => `[${key}]`);
+}
+
 export function getIdleAnimationKeys(pack: AgentPack): string[] {
-  return Object.keys(pack.animations).filter((key) => key.startsWith("Idle"));
+  return getAnimationKeys(pack).filter((key) => key.startsWith("Idle"));
 }

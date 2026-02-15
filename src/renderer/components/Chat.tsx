@@ -2,15 +2,17 @@ import { useState } from "react";
 
 import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
-import { ANIMATION_KEYS_BRACKETS } from "../clippy-animation-helpers";
 import { useChat } from "../contexts/ChatContext";
 import { electronAi } from "../clippyApi";
+import { useSharedState } from "../contexts/SharedStateContext";
+import { getAnimationKeysBrackets } from "../agent-packs";
 
 export type ChatProps = {
   style?: React.CSSProperties;
 };
 
 export function Chat({ style }: ChatProps) {
+  const { settings } = useSharedState();
   const { setAnimationKey, setStatus, status, messages, addMessage } =
     useChat();
   const [streamingMessageContent, setStreamingMessageContent] =
@@ -59,6 +61,7 @@ export function Chat({ style }: ChatProps) {
         if (!hasSetAnimationKey) {
           const { text, animationKey } = filterMessageContent(
             fullContent + chunk,
+            settings.selectedAgent || "Clippy",
           );
 
           filteredContent = text;
@@ -119,12 +122,16 @@ export function Chat({ style }: ChatProps) {
  * @param content - The content of the message
  * @returns The text and animation key
  */
-function filterMessageContent(content: string): {
+function filterMessageContent(
+  content: string,
+  selectedAgent: string,
+): {
   text: string;
   animationKey: string;
 } {
   let text = content;
   let animationKey = "";
+  const animationKeysBrackets = getAnimationKeysBrackets(selectedAgent);
 
   if (content === "[") {
     text = "";
@@ -132,7 +139,7 @@ function filterMessageContent(content: string): {
     text = content.replace(/^\[[A-Za-z]*$/m, "").trim();
   } else {
     // Check for animation keys in brackets
-    for (const key of ANIMATION_KEYS_BRACKETS) {
+    for (const key of animationKeysBrackets) {
       if (content.startsWith(key)) {
         animationKey = key.slice(1, -1);
         text = content.slice(key.length).trim();

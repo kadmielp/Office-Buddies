@@ -47,8 +47,10 @@ export const SettingsParameters: React.FC = () => {
         <legend>Prompts</legend>
         <div className="field-row-stacked">
           <label htmlFor="systemPrompt">
-            System Prompt. The key "[LIST OF ANIMATIONS]" will be automatically
-            replaced by a full list of all available animations.
+            System Prompt. Supported placeholders: "[AGENT_NAME]",
+            "[AGENT_PERSONALITY]", "[AGENT_APPEARANCE]", and
+            "[LIST OF ANIMATIONS]". They are replaced automatically based on
+            the selected agent.
           </label>
           <textarea
             id="systemPrompt"

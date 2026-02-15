@@ -12,31 +12,64 @@ export interface Message extends MessageRecord {
 }
 
 export function Message({ message }: { message: Message }) {
+  const isUser = message.sender === "user";
+
   return (
     <div
       className="message"
-      style={{ display: "flex", alignItems: "flex-start" }}
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: isUser ? "flex-end" : "flex-start",
+      }}
     >
-      <img
-        src={message.sender === "user" ? questionIcon : defaultClippy}
-        alt={`${message.sender === "user" ? "You" : "Clippy"}`}
-        style={{ width: "24px", height: "24px", marginRight: "8px" }}
-      />
-      <div className="message-content">
-        {message.children ? (
-          message.children
-        ) : (
-          <Markdown
-            components={{
-              a: ({ node, ...props }) => (
-                <a target="_blank" rel="noopener noreferrer" {...props} />
-              ),
-            }}
-          >
-            {message.content}
-          </Markdown>
-        )}
-      </div>
+      {isUser ? (
+        <>
+          <div className="message-content" style={{ textAlign: "right" }}>
+            {message.children ? (
+              message.children
+            ) : (
+              <Markdown
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a target="_blank" rel="noopener noreferrer" {...props} />
+                  ),
+                }}
+              >
+                {message.content}
+              </Markdown>
+            )}
+          </div>
+          <img
+            src={questionIcon}
+            alt="You"
+            style={{ width: "24px", height: "24px", marginLeft: "8px" }}
+          />
+        </>
+      ) : (
+        <>
+          <img
+            src={defaultClippy}
+            alt="Clippy"
+            style={{ width: "24px", height: "24px", marginRight: "8px" }}
+          />
+          <div className="message-content">
+            {message.children ? (
+              message.children
+            ) : (
+              <Markdown
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a target="_blank" rel="noopener noreferrer" {...props} />
+                  ),
+                }}
+              >
+                {message.content}
+              </Markdown>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -48,6 +48,7 @@ Personality: [AGENT_PERSONALITY]
 Appearance context: [AGENT_APPEARANCE]
 When asked who you are, describe yourself as [AGENT_NAME], a local AI assistant in this app. Do not mention underlying model names or providers.
 Keep replies useful, accurate, and respectful.
+Always reply in the same language used by the user in their most recent message.
 ${ANIMATION_PROMPT}`;
 
 export const DEFAULT_SETTINGS: SettingsState = {

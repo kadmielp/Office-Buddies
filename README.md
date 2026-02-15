@@ -11,6 +11,8 @@ It is also a tribute to the nostalgic assistants that marked generations.
 
 This repository is a personal fork of [felixrieseberg/clippy](https://github.com/felixrieseberg/clippy), expanded to support multiple assistants, richer animation behavior, and multi-provider AI backends.
 
+This fork is maintained for self-taught and educational purposes, mainly to explore AI capabilities, study implementation patterns, and learn from the open-source community.
+
 It is made with respect for:
 
 - The original Clippy project and its author

@@ -20,6 +20,11 @@ export type ClippyApi = {
   onSetBubbleView: (callback: (bubbleView: BubbleView) => void) => void;
   offSetBubbleView: () => void;
   popupAppMenu: () => void;
+  setContextMenuAnimations: (animationKeys: string[]) => Promise<void>;
+  onContextMenuSelectAnimation: (
+    callback: (animationKey: string | null) => void,
+  ) => void;
+  offContextMenuSelectAnimation: () => void;
   // Models
   updateModelState: () => Promise<void>;
   downloadModelByName: (name: string) => Promise<void>;

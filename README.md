@@ -19,6 +19,7 @@ This fork exists out of nostalgia and appreciation for Clippy. It is made with r
 - Simple, familiar, and classic chat interface. Send messages to your models, get a response.
 - Batteries included: No complicated setup. Just open the app and chat away. Thanks to llama.cpp and `node-llama-cpp`, the app will automatically discover the most efficient way to run your models (Metal, CUDA, Vulkan, etc).
 - Custom models, prompts, and parameters: Load your own downloaded models and play with the settings.
+- Interactive agent animations: Right-click Clippy to pick an animation from the native context menu and play it once.
 - Offline, local, free: Everything runs on your computers. The only network request Clippy makes is to check for updates (which you can disable).
 
 ## Non-Features

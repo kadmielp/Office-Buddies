@@ -2,8 +2,10 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 
 import {
   getAgentPack,
+  getChatAnimationKeys,
   getAnimationDuration,
   getIdleAnimationKeys,
+  isDisallowedChatAnimationKey,
   AgentAnimation,
   AgentFrame,
 } from "../agent-packs";
@@ -21,7 +23,10 @@ function getFrameTimeout(frame: AgentFrame): number {
   return Math.max(frame.duration ?? 100, 10);
 }
 
-function getNextFrameIndex(animation: AgentAnimation, currentIndex: number): number {
+function getNextFrameIndex(
+  animation: AgentAnimation,
+  currentIndex: number,
+): number {
   const frame = animation.frames[currentIndex];
 
   if (!frame) {
@@ -31,7 +36,10 @@ function getNextFrameIndex(animation: AgentAnimation, currentIndex: number): num
   const branches = frame.branching?.branches ?? [];
 
   if (branches.length > 0) {
-    const totalWeight = branches.reduce((sum, branch) => sum + branch.weight, 0);
+    const totalWeight = branches.reduce(
+      (sum, branch) => sum + branch.weight,
+      0,
+    );
     const random = Math.random() * totalWeight;
     let cumulative = 0;
 
@@ -67,13 +75,21 @@ export function Clippy() {
   const frameTimeoutRef = useRef<number | undefined>(undefined);
   const defaultTimeoutRef = useRef<number | undefined>(undefined);
   const idleTimeoutRef = useRef<number | undefined>(undefined);
+  const manualOnceTimeoutRef = useRef<number | undefined>(undefined);
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
 
   const [isSpriteReady, setIsSpriteReady] = useState(false);
+  const [manualAnimationKey, setManualAnimationKey] = useState<string | null>(
+    null,
+  );
 
   const agentPack = useMemo(
     () => getAgentPack(settings.selectedAgent),
+    [settings.selectedAgent],
+  );
+  const contextMenuAnimations = useMemo(
+    () => getChatAnimationKeys(settings.selectedAgent),
     [settings.selectedAgent],
   );
 
@@ -95,6 +111,13 @@ export function Clippy() {
     if (idleTimeoutRef.current) {
       window.clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = undefined;
+    }
+  }, []);
+
+  const clearManualOnceTimeout = useCallback(() => {
+    if (manualOnceTimeoutRef.current) {
+      window.clearTimeout(manualOnceTimeoutRef.current);
+      manualOnceTimeoutRef.current = undefined;
     }
   }, []);
 
@@ -188,11 +211,23 @@ export function Clippy() {
 
       tick(0);
     },
-    [agentPack.animations, clearFrameTimeout, drawFrame, isSpriteReady, playSound],
+    [
+      agentPack.animations,
+      clearFrameTimeout,
+      drawFrame,
+      isSpriteReady,
+      playSound,
+    ],
   );
 
   const playAnimation = useCallback(
     (key: string) => {
+      if (isDisallowedChatAnimationKey(key)) {
+        log("Blocked disallowed animation", { key, agent: agentPack.name });
+        runAnimation("Default");
+        return;
+      }
+
       if (!agentPack.animations[key]) {
         log("Animation not found", { key, agent: agentPack.name });
         return;
@@ -202,9 +237,12 @@ export function Clippy() {
       clearDefaultTimeout();
       runAnimation(key);
 
-      defaultTimeoutRef.current = window.setTimeout(() => {
-        runAnimation("Default");
-      }, getAnimationDuration(agentPack, key) + 200);
+      defaultTimeoutRef.current = window.setTimeout(
+        () => {
+          runAnimation("Default");
+        },
+        getAnimationDuration(agentPack, key) + 200,
+      );
     },
     [agentPack, clearDefaultTimeout, runAnimation],
   );
@@ -240,7 +278,68 @@ export function Clippy() {
   }, [agentPack.frameHeight, agentPack.frameWidth]);
 
   useEffect(() => {
+    clippyApi.setContextMenuAnimations(contextMenuAnimations).catch((error) => {
+      console.error(error);
+    });
+  }, [contextMenuAnimations]);
+
+  useEffect(() => {
+    clippyApi.offContextMenuSelectAnimation();
+    clippyApi.onContextMenuSelectAnimation((key) => {
+      if (!key) {
+        setManualAnimationKey(null);
+        return;
+      }
+
+      setManualAnimationKey(key);
+    });
+
+    return () => {
+      clippyApi.offContextMenuSelectAnimation();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!manualAnimationKey) {
+      return;
+    }
+
+    if (!agentPack.animations[manualAnimationKey]) {
+      setManualAnimationKey(null);
+    }
+  }, [agentPack.animations, manualAnimationKey]);
+
+  useEffect(() => {
+    if (!isSpriteReady || !manualAnimationKey) {
+      return;
+    }
+
+    clearIdleTimeout();
+    clearManualOnceTimeout();
+    playAnimation(manualAnimationKey);
+    manualOnceTimeoutRef.current = window.setTimeout(() => {
+      setManualAnimationKey(null);
+    }, Math.max(getAnimationDuration(agentPack, manualAnimationKey) + 250, 300));
+
+    return () => {
+      clearManualOnceTimeout();
+    };
+  }, [
+    agentPack,
+    clearIdleTimeout,
+    clearManualOnceTimeout,
+    playAnimation,
+    setManualAnimationKey,
+    isSpriteReady,
+    manualAnimationKey,
+  ]);
+
+  useEffect(() => {
     if (!isSpriteReady) {
+      return;
+    }
+
+    if (manualAnimationKey) {
       return;
     }
 
@@ -260,21 +359,32 @@ export function Clippy() {
 
       runAnimation(randomIdleAnimationKey);
 
-      idleTimeoutRef.current = window.setTimeout(() => {
-        runAnimation("Default");
-        idleTimeoutRef.current = window.setTimeout(playRandomIdleAnimation, WAIT_TIME);
-      }, getAnimationDuration(agentPack, randomIdleAnimationKey));
+      idleTimeoutRef.current = window.setTimeout(
+        () => {
+          runAnimation("Default");
+          idleTimeoutRef.current = window.setTimeout(
+            playRandomIdleAnimation,
+            WAIT_TIME,
+          );
+        },
+        getAnimationDuration(agentPack, randomIdleAnimationKey),
+      );
     };
 
     if (status === "welcome" && !hasPlayedWelcomeRef.current) {
       hasPlayedWelcomeRef.current = true;
 
-      const welcomeAnimationKey = agentPack.animations.Show ? "Show" : "Default";
+      const welcomeAnimationKey = agentPack.animations.Show
+        ? "Show"
+        : "Default";
 
       runAnimation(welcomeAnimationKey);
-      defaultTimeoutRef.current = window.setTimeout(() => {
-        setStatus("idle");
-      }, getAnimationDuration(agentPack, welcomeAnimationKey) + 200);
+      defaultTimeoutRef.current = window.setTimeout(
+        () => {
+          setStatus("idle");
+        },
+        getAnimationDuration(agentPack, welcomeAnimationKey) + 200,
+      );
     } else if (status === "idle") {
       playRandomIdleAnimation();
     }
@@ -293,19 +403,20 @@ export function Clippy() {
     runAnimation,
     setStatus,
     status,
+    manualAnimationKey,
   ]);
 
   useEffect(() => {
-    if (!animationKey) {
+    if (!animationKey || manualAnimationKey) {
       return;
     }
 
     log("New animation key", { animationKey });
     playAnimation(animationKey);
-  }, [animationKey, playAnimation]);
+  }, [animationKey, manualAnimationKey, playAnimation]);
 
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       <div
         className="app-drag"
         style={{

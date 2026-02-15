@@ -6,6 +6,8 @@ export const IpcMessages = {
   SET_MAIN_WINDOW_SIZE: "clippy_set_main_window_size",
   SET_BUBBLE_VIEW: "clippy_set_bubble_view",
   POPUP_APP_MENU: "clippy_popup_app_menu",
+  SET_CONTEXT_MENU_ANIMATIONS: "clippy_set_context_menu_animations",
+  CONTEXT_MENU_SELECT_ANIMATION: "clippy_context_menu_select_animation",
 
   // Model messages
   DOWNLOAD_MODEL_BY_NAME: "clippy_download_model_by_name",

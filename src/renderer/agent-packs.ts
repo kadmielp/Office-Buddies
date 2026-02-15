@@ -148,7 +148,9 @@ function evaluateAgentScript(script: string, collector: AgentCollector) {
   };
 
   // eslint-disable-next-line no-new-func
-  const run = new Function("clippy", script) as (clippyApi: typeof clippy) => void;
+  const run = new Function("clippy", script) as (
+    clippyApi: typeof clippy,
+  ) => void;
   run(clippy);
 }
 
@@ -212,8 +214,18 @@ export function getAnimationKeys(pack: AgentPack): string[] {
   return Object.keys(pack.animations);
 }
 
+export function isDisallowedChatAnimationKey(key: string): boolean {
+  return /^hide/i.test(key);
+}
+
+export function getChatAnimationKeys(agentName?: string): string[] {
+  return getAnimationKeys(getAgentPack(agentName)).filter(
+    (key) => !isDisallowedChatAnimationKey(key),
+  );
+}
+
 export function getAnimationKeysBrackets(agentName?: string): string[] {
-  return getAnimationKeys(getAgentPack(agentName)).map((key) => `[${key}]`);
+  return getChatAnimationKeys(agentName).map((key) => `[${key}]`);
 }
 
 export function getIdleAnimationKeys(pack: AgentPack): string[] {

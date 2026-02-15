@@ -20,6 +20,8 @@ import {
   openInspector,
 } from "./debugger";
 
+let contextMenuAnimationKeys: string[] = [];
+
 /**
  * Setup the application menu
  */
@@ -34,6 +36,10 @@ export function setupAppMenu() {
  */
 export function popupAppMenu(options: Electron.PopupOptions = {}) {
   getMainAppMenu().popup(options);
+}
+
+export function setContextMenuAnimations(animationKeys: string[]) {
+  contextMenuAnimationKeys = [...animationKeys];
 }
 
 /**
@@ -56,6 +62,9 @@ export function getMainAppMenu(): Menu {
       role: "windowMenu",
       id: "windowMenu",
     },
+    ...(contextMenuAnimationKeys.length > 0
+      ? [{ label: "Animation", submenu: getAnimationMenu() }]
+      : []),
     { role: "help", submenu: getHelpMenu() },
   ];
   const menu = Menu.buildFromTemplate(template);
@@ -118,6 +127,30 @@ export function getMainAppMenu(): Menu {
   );
 
   return menu;
+}
+
+function getAnimationMenu(): MenuItemConstructorOptions[] {
+  return [
+    {
+      label: "Resume Auto Animations",
+      click: () => {
+        getMainWindow()?.webContents.send(
+          IpcMessages.CONTEXT_MENU_SELECT_ANIMATION,
+          null,
+        );
+      },
+    },
+    { type: "separator" },
+    ...contextMenuAnimationKeys.map((key) => ({
+      label: key,
+      click: () => {
+        getMainWindow()?.webContents.send(
+          IpcMessages.CONTEXT_MENU_SELECT_ANIMATION,
+          key,
+        );
+      },
+    })),
+  ];
 }
 
 function getFileMenu(): MenuItemConstructorOptions[] {

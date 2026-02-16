@@ -116,5 +116,6 @@ Special thanks to:
 - Microsoft, for the Office Assistant legacy and for Electron.
 - [Kevan Atteberry](https://www.kevanatteberry.com/) for designing Clippy.
 - [Jordan Scales (@jdan)](https://github.com/jdan) for the Windows 98 visual language.
+- [Alex Meub's Windows 98 Icons](https://win98icons.alexmeub.com/) as the source for some icons used in this project.
 - [Pooya Parsa (@pi0)](https://github.com/pi0) and contributors who helped preserve/extract assistant animation data.
 - [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for making local inference practical in Node/Electron.

@@ -62,7 +62,7 @@ export async function checkForUpdates() {
       type: "info",
       title: "Update Check",
       message:
-        "You are running a development version of Clippy, so the auto updater is disabled.",
+        "You are running a development version of Office Buddies, so the auto updater is disabled.",
     });
   }
 
@@ -82,7 +82,7 @@ export async function checkForUpdates() {
       await dialog.showMessageBox({
         type: "info",
         title: "You're Up-to-Date",
-        message: `${comparisonString} You are already using the latest version of Clippy.`,
+        message: `${comparisonString} You are already using the latest version of Office Buddies.`,
       });
     }
   } catch (error) {

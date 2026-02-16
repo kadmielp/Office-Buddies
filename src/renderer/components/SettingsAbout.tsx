@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Versions } from "../../types/interfaces";
 import { clippyApi } from "../clippyApi";
+import infoIcon from "../images/icons/info.png";
 
 export const SettingsAbout: React.FC = () => {
   const [versions, setVersions] = useState<Partial<Versions>>({});
@@ -13,11 +14,19 @@ export const SettingsAbout: React.FC = () => {
 
   return (
     <div>
-      <h1>About</h1>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <img
+          src={infoIcon}
+          alt=""
+          aria-hidden="true"
+          style={{ width: "24px", height: "24px" }}
+        />
+        <h1>About</h1>
+      </div>
       <fieldset>
         <legend>Version</legend>
         <p>
-          Clippy <code>{versions.clippy || "Unknown"}</code> (with Electron{" "}
+          Office Buddies <code>{versions.clippy || "Unknown"}</code> (with Electron{" "}
           <code>{versions.electron || "Unknown"}</code> and Node-llama-cpp:{" "}
           <code>{versions.nodeLlamaCpp || "Unknown"})</code>
         </p>
@@ -30,11 +39,15 @@ export const SettingsAbout: React.FC = () => {
       </p>
       <h3>Acknowledgments</h3>
       <p>
-        This app was made by{" "}
+        Office Buddies is a spinoff fork of the original app{" "}
+        <a href="https://github.com/felixrieseberg/clippy" target="_blank">
+          Clippy
+        </a>{" "}
+        by{" "}
         <a href="https://github.com/felixrieseberg" target="_blank">
           Felix Rieseberg
-        </a>{" "}
-        using{" "}
+        </a>
+        . The original app was built using{" "}
         <a href="https://electronjs.org/" target="_blank">
           Electron
         </a>{" "}

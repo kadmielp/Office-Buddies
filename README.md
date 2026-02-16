@@ -1,8 +1,8 @@
-# Clippy + Classic Assistants
+# Office Buddies
 
 This project brings classic Office-style assistants into a modern LLM chat app with a 90s desktop vibe.
 
-Clippy is still here (and yes, still iconic), but this fork treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
+Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
 Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic.
 It is also a tribute to the nostalgic assistants that marked generations.
@@ -25,7 +25,7 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 
 - Multiple classic assistants, each with their own animation set and sounds.
 - Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
-- Optional remote providers: OpenAI, Google Gemini, and Maritaca.
+- Optional remote providers: OpenAI, Google, and Maritaca.
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
 - Native-feeling context menu for choosing and previewing assistant animations.
@@ -37,7 +37,7 @@ Configure providers in `Settings > Model`.
 
 - `Local (GGUF)`: runs on your machine via `@electron/llm`.
 - `OpenAI`: API key + model selection.
-- `Google Gemini`: API key + model selection.
+- `Google`: API key + model selection.
 - `Maritaca`: API key + model selection.
 
 Remote provider requests are executed in the Electron main process via IPC.

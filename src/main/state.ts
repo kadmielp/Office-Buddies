@@ -1,9 +1,20 @@
 import Store from "electron-store";
 
-import { getChatWindow, getMainWindow, setFont, setFontSize } from "./windows";
+import {
+  getMainWindow,
+  setMainWindowAlwaysOnTop,
+  setChatWindowAlwaysOnTop,
+  setFont,
+  setFontSize,
+} from "./windows";
 import { IpcMessages } from "../ipc-messages";
 import { getModelManager, getModelPath, isModelOnDisk } from "./models";
-import { EMPTY_SHARED_STATE, SettingsState, SharedState } from "../sharedState";
+import {
+  DEFAULT_SYSTEM_PROMPT,
+  EMPTY_SHARED_STATE,
+  SettingsState,
+  SharedState,
+} from "../sharedState";
 import { BUILT_IN_MODELS } from "../models";
 import { getLogger } from "./logger";
 import { setupAppMenu } from "./menu";
@@ -58,6 +69,10 @@ export class StateManager {
 
     if (!settings.aiProvider) {
       settings.aiProvider = "local";
+    }
+
+    if (!settings.systemPrompt) {
+      settings.systemPrompt = DEFAULT_SYSTEM_PROMPT;
     }
 
     this.store.set("settings", settings);
@@ -115,11 +130,11 @@ export class StateManager {
     }
 
     if (oldValue.clippyAlwaysOnTop !== newValue.clippyAlwaysOnTop) {
-      getMainWindow()?.setAlwaysOnTop(newValue.clippyAlwaysOnTop);
+      setMainWindowAlwaysOnTop(newValue.clippyAlwaysOnTop);
     }
 
     if (oldValue.chatAlwaysOnTop !== newValue.chatAlwaysOnTop) {
-      getChatWindow()?.setAlwaysOnTop(newValue.chatAlwaysOnTop);
+      setChatWindowAlwaysOnTop(newValue.chatAlwaysOnTop);
     }
 
     if (oldValue.defaultFontSize !== newValue.defaultFontSize) {

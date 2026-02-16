@@ -40,7 +40,7 @@ export const SettingsParameters: React.FC = () => {
           </label>
           <textarea
             id="systemPrompt"
-            rows={8}
+            rows={25}
             style={{ resize: "vertical" }}
             value={resolvedSystemPrompt}
             readOnly

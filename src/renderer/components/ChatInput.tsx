@@ -45,6 +45,17 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     }
   }, [isModelLoaded]);
 
+  useEffect(() => {
+    if (!isModelLoaded || isModelReplying || !textareaRef.current) {
+      return;
+    }
+
+    // Restore typing focus after a response completes.
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+    });
+  }, [isModelLoaded, isModelReplying]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       const trimmedMessage = message.trim();
@@ -87,6 +98,7 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
       <button
         disabled={!isModelLoaded}
         style={buttonStyle}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={handleSendOrAbort}
       >
         {status === "responding" ? "Abort" : "Send"}

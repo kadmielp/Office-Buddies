@@ -162,18 +162,22 @@ class ModelManager {
   /**
    * Deletes all models
    */
-  public async deleteAllModels() {
+  public async deleteAllModels(): Promise<boolean> {
     this.cancelAllDownloads();
 
     try {
       await fs.promises.rm(path.join(app.getPath("userData"), "models"), {
         recursive: true,
+        force: true,
       });
     } catch (error) {
       getLogger().error(`ModelManager: Error deleting all models`, error);
+      this.pollRendererModelState();
+      return false;
     }
 
     this.pollRendererModelState();
+    return true;
   }
 
   /**
@@ -286,7 +290,7 @@ class ModelManager {
           buttons: ["Overwrite", "Cancel"],
           defaultId: 1,
           title: "Model Already Exists",
-          message: `A model with the name "${fileName}" already exists. Do you want to overwrite the entry in Clippy? This will not delete the file on disk.`,
+          message: `A model with the name "${fileName}" already exists. Do you want to overwrite the entry in Office Buddies? This will not delete the file on disk.`,
         });
 
         if (overwrite.response !== 0) {

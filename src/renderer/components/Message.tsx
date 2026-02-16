@@ -1,6 +1,6 @@
 import Markdown from "react-markdown";
 import questionIcon from "../images/icons/question.png";
-import defaultClippy from "../images/animations/Default.png";
+import defaultClippy from "../images/icons/msagent.png";
 import { MessageRecord } from "../../types/interfaces";
 
 export interface Message extends MessageRecord {
@@ -43,7 +43,12 @@ export function Message({ message }: { message: Message }) {
           <img
             src={questionIcon}
             alt="You"
-            style={{ width: "24px", height: "24px", marginLeft: "8px" }}
+            style={{
+              width: "24px",
+              height: "24px",
+              marginLeft: "8px",
+              marginTop: "10px",
+            }}
           />
         </>
       ) : (
@@ -51,7 +56,12 @@ export function Message({ message }: { message: Message }) {
           <img
             src={defaultClippy}
             alt="Clippy"
-            style={{ width: "24px", height: "24px", marginRight: "8px" }}
+            style={{
+              width: "24px",
+              height: "24px",
+              marginRight: "8px",
+              marginTop: "10px",
+            }}
           />
           <div className="message-content">
             {message.children ? (

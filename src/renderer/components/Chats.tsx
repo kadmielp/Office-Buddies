@@ -3,6 +3,7 @@ import { TableView } from "./TableView";
 import { formatDistance } from "date-fns";
 import { clippyApi } from "../clippyApi";
 import { useState } from "react";
+import chatsIcon from "../images/icons/file_question.png";
 
 export type SettingsTab = "general" | "model" | "advanced" | "about";
 
@@ -18,6 +19,7 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     startNewChat,
     deleteChat,
     deleteAllChats,
+    setAnimationKey,
   } = useChat();
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedChatIndex, setSelectedChatIndex] = useState<number | null>(
@@ -63,6 +65,10 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     try {
       await deleteChat(chatId);
       setSelectedChatIndex(null);
+      setAnimationKey("");
+      window.setTimeout(() => {
+        setAnimationKey("EmptyTrash");
+      }, 0);
     } catch (error) {
       console.error("Failed to delete chat:", error);
     } finally {
@@ -95,6 +101,10 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     try {
       await deleteAllChats();
       setSelectedChatIndex(null);
+      setAnimationKey("");
+      window.setTimeout(() => {
+        setAnimationKey("EmptyTrash");
+      }, 0);
     } catch (error) {
       console.error("Failed to delete all chats:", error);
     } finally {
@@ -121,9 +131,16 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
       <div
         style={{
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "center",
+          gap: "8px",
         }}
       >
+        <img
+          src={chatsIcon}
+          alt=""
+          aria-hidden="true"
+          style={{ width: "24px", height: "24px" }}
+        />
         <h1>Chats</h1>
       </div>
 
@@ -148,7 +165,10 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
         <button onClick={handleNewChat} disabled={isDeleting}>
           New Chat
         </button>
-        <button onClick={handleRestoreChat} disabled={selectedChatIndex === null}>
+        <button
+          onClick={handleRestoreChat}
+          disabled={selectedChatIndex === null}
+        >
           Restore Chat
         </button>
         <button

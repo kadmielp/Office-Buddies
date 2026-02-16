@@ -8,9 +8,27 @@ import { ManagedModel } from "../../models";
 import { isModelDownloading } from "../../helpers/model-helpers";
 import { AiProvider } from "../../sharedState";
 import { fetchProviderModels } from "../ai-provider-client";
+import { useChat } from "../contexts/ChatContext";
+import localProviderIcon from "../images/icons/network_drive_off.png";
+import remoteProviderIcon from "../images/icons/network_drive_on.png";
+
+function filterRemoteModelsByProvider(
+  provider: AiProvider,
+  models: string[],
+): string[] {
+  if (provider !== "gemini") {
+    return models;
+  }
+
+  return models.filter((modelName) => {
+    const normalized = modelName.trim().toLowerCase();
+    return normalized.startsWith("gemini") || normalized.startsWith("gemma");
+  });
+}
 
 export const SettingsModel: React.FC = () => {
   const { models, settings } = useSharedState();
+  const { setAnimationKey } = useChat();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const selectedProvider = settings.aiProvider || "local";
   const [remoteModelOptions, setRemoteModelOptions] = useState<string[]>([]);
@@ -63,8 +81,18 @@ export const SettingsModel: React.FC = () => {
   const handleDeleteOrRemove = async () => {
     if (selectedModel?.imported) {
       await clippyApi.removeModelByName(selectedModel.name);
+      setAnimationKey("");
+      window.setTimeout(() => {
+        setAnimationKey("EmptyTrash");
+      }, 0);
     } else if (selectedModel) {
-      await clippyApi.deleteModelByName(selectedModel.name);
+      const isDeleted = await clippyApi.deleteModelByName(selectedModel.name);
+      if (isDeleted) {
+        setAnimationKey("");
+        window.setTimeout(() => {
+          setAnimationKey("EmptyTrash");
+        }, 0);
+      }
     }
   };
 
@@ -104,14 +132,18 @@ export const SettingsModel: React.FC = () => {
 
       try {
         const list = await fetchProviderModels(selectedProvider, settings);
+        const filteredList = filterRemoteModelsByProvider(selectedProvider, list);
         if (cancelled) {
           return;
         }
 
-        setRemoteModelOptions(list);
+        setRemoteModelOptions(filteredList);
 
-        if (list.length > 0 && !list.includes(settings.remoteModel || "")) {
-          clippyApi.setState("settings.remoteModel", list[0]);
+        if (
+          filteredList.length > 0 &&
+          !filteredList.includes(settings.remoteModel || "")
+        ) {
+          clippyApi.setState("settings.remoteModel", filteredList[0]);
         }
       } catch (error) {
         if (cancelled) {
@@ -152,10 +184,14 @@ export const SettingsModel: React.FC = () => {
 
     try {
       const list = await fetchProviderModels(selectedProvider, settings);
-      setRemoteModelOptions(list);
+      const filteredList = filterRemoteModelsByProvider(selectedProvider, list);
+      setRemoteModelOptions(filteredList);
 
-      if (list.length > 0 && !list.includes(settings.remoteModel || "")) {
-        clippyApi.setState("settings.remoteModel", list[0]);
+      if (
+        filteredList.length > 0 &&
+        !filteredList.includes(settings.remoteModel || "")
+      ) {
+        clippyApi.setState("settings.remoteModel", filteredList[0]);
       }
     } catch (error) {
       setRemoteModelOptions([]);
@@ -182,9 +218,21 @@ export const SettingsModel: React.FC = () => {
           >
             <option value={"local" as AiProvider}>Local (GGUF)</option>
             <option value={"openai" as AiProvider}>OpenAI</option>
-            <option value={"gemini" as AiProvider}>Google Gemini</option>
+            <option value={"gemini" as AiProvider}>Google</option>
             <option value={"maritaca" as AiProvider}>Maritaca</option>
           </select>
+          <img
+            src={
+              selectedProvider === "local" ? localProviderIcon : remoteProviderIcon
+            }
+            alt=""
+            aria-hidden="true"
+            style={{
+              marginLeft: "auto",
+              width: "32px",
+              height: "32px",
+            }}
+          />
         </div>
         {selectedProvider !== "local" && (
           <>
@@ -258,7 +306,7 @@ export const SettingsModel: React.FC = () => {
         <p>
           Select the model you want to use for your chat. The larger the model,
           the more powerful the chat, but the slower it will be - and the more
-          memory it will use. Clippy uses models in the GGUF format.{" "}
+          memory it will use. Office Buddies uses models in the GGUF format.{" "}
           <a
             href="https://github.com/felixrieseberg/clippy?tab=readme-ov-file#downloading-more-models"
             target="_blank"
@@ -322,8 +370,8 @@ export const SettingsModel: React.FC = () => {
                       onClick={handleMakeDefault}
                     >
                       {isDefaultModel
-                        ? "Clippy uses this model"
-                        : "Make Clippy use this model"}
+                        ? "Office Buddies uses this model"
+                        : "Make Office Buddies use this model"}
                     </button>
                     <button onClick={handleDeleteOrRemove}>
                       {selectedModel?.imported ? "Remove" : "Delete"} Model

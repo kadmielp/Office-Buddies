@@ -14,6 +14,7 @@ import { log } from "../logging";
 import { useDebugState } from "../contexts/DebugContext";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { clippyApi } from "../clippyApi";
+import { useBubbleView } from "../contexts/BubbleViewContext";
 
 const WAIT_TIME = 6000;
 const WINDOW_PADDING_WIDTH = 1;
@@ -69,14 +70,18 @@ function findFirstAnimationKey(
 export function Clippy() {
   const {
     animationKey,
+    setAnimationKey,
     status,
     setStatus,
     setIsChatWindowOpen,
     isChatWindowOpen,
   } = useChat();
   const { settings } = useSharedState();
+  const { currentView, setCurrentView } = useBubbleView();
   const { enableDragDebug } = useDebugState();
   const selectedAgent = settings.selectedAgent || "Clippy";
+  const isAssistantGalleryOpen =
+    currentView === "assistant-gallery" && isChatWindowOpen;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const spriteImageRef = useRef<HTMLImageElement | null>(null);
@@ -94,12 +99,15 @@ export function Clippy() {
   const [switchTargetAgent, setSwitchTargetAgent] = useState<string | null>(
     null,
   );
-  const [switchPhase, setSwitchPhase] = useState<"none" | "goodbye" | "welcome">(
-    "none",
-  );
+  const [switchPhase, setSwitchPhase] = useState<
+    "none" | "goodbye" | "welcome"
+  >("none");
   const isAgentSwitchAnimating = switchPhase !== "none";
 
-  const agentPack = useMemo(() => getAgentPack(displayedAgent), [displayedAgent]);
+  const agentPack = useMemo(
+    () => getAgentPack(displayedAgent),
+    [displayedAgent],
+  );
   const contextMenuAnimations = useMemo(
     () => getChatAnimationKeys(displayedAgent),
     [displayedAgent],
@@ -143,7 +151,23 @@ export function Clippy() {
 
       context.clearRect(0, 0, agentPack.frameWidth, agentPack.frameHeight);
 
-      for (const [sourceX, sourceY] of frame.images ?? []) {
+      const mapColumns = Math.max(
+        1,
+        Math.floor(spriteImage.width / agentPack.frameWidth),
+      );
+      const sources = frame.images ?? [];
+
+      for (const imageRef of sources) {
+        let sourceX = 0;
+        let sourceY = 0;
+
+        if (typeof imageRef === "number") {
+          sourceX = (imageRef % mapColumns) * agentPack.frameWidth;
+          sourceY = Math.floor(imageRef / mapColumns) * agentPack.frameHeight;
+        } else {
+          [sourceX, sourceY] = imageRef;
+        }
+
         context.drawImage(
           spriteImage,
           sourceX,
@@ -269,8 +293,14 @@ export function Clippy() {
   );
 
   const toggleChat = useCallback(() => {
-    setIsChatWindowOpen(!isChatWindowOpen);
-  }, [isChatWindowOpen, setIsChatWindowOpen]);
+    if (isChatWindowOpen) {
+      setIsChatWindowOpen(false);
+      return;
+    }
+
+    setCurrentView("chat");
+    setIsChatWindowOpen(true);
+  }, [isChatWindowOpen, setCurrentView, setIsChatWindowOpen]);
 
   useEffect(() => {
     if (selectedAgent === displayedAgent) {
@@ -364,12 +394,7 @@ export function Clippy() {
     playAnimation(manualAnimationKey, () => {
       setManualAnimationKey(null);
     });
-  }, [
-    clearIdleTimeout,
-    playAnimation,
-    isSpriteReady,
-    manualAnimationKey,
-  ]);
+  }, [clearIdleTimeout, playAnimation, isSpriteReady, manualAnimationKey]);
 
   useEffect(() => {
     if (!isAgentSwitchAnimating || manualAnimationKey) {
@@ -470,7 +495,10 @@ export function Clippy() {
 
       runAnimation(randomIdleAnimationKey, () => {
         runAnimation("Default");
-        idleTimeoutRef.current = window.setTimeout(playRandomIdleAnimation, WAIT_TIME);
+        idleTimeoutRef.current = window.setTimeout(
+          playRandomIdleAnimation,
+          WAIT_TIME,
+        );
       });
     };
 
@@ -512,11 +540,25 @@ export function Clippy() {
     }
 
     log("New animation key", { animationKey });
-    playAnimation(animationKey);
-  }, [animationKey, manualAnimationKey, isAgentSwitchAnimating, playAnimation]);
+    playAnimation(animationKey, () => {
+      setAnimationKey("");
+    });
+  }, [
+    animationKey,
+    isAgentSwitchAnimating,
+    manualAnimationKey,
+    playAnimation,
+    setAnimationKey,
+  ]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        position: "relative",
+        visibility: isAssistantGalleryOpen ? "hidden" : "visible",
+        pointerEvents: isAssistantGalleryOpen ? "none" : "auto",
+      }}
+    >
       <div
         className="app-drag"
         style={{

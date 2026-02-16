@@ -20,7 +20,7 @@ dotenv.config();
 let nativeModuleDependenciesToPackage: string[] = [];
 
 const FLAGS = {
-  IS_CODESIGNING_ENABLED: process.env.IS_CODESIGNING_ENABLED !== "false",
+  IS_CODESIGNING_ENABLED: process.env.IS_CODESIGNING_ENABLED === "true",
   SIGNTOOL_PATH:
     process.env.SIGNTOOL_PATH ||
     path.join(
@@ -202,7 +202,7 @@ const config: ForgeConfig = {
     appCategoryType: "public.app-category.productivity",
     win32metadata: {
       CompanyName: "Felix Rieseberg",
-      OriginalFilename: "Clippy",
+      OriginalFilename: "OfficeBuddies",
     },
     osxSign: FLAGS.IS_CODESIGNING_ENABLED
       ? {
@@ -229,15 +229,15 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel(
       (arch) => ({
-        name: "Clippy",
+        name: "OfficeBuddies",
         authors: "Felix Rieseberg",
-        exe: "Clippy.exe",
+        exe: "OfficeBuddies.exe",
         noMsi: true,
         remoteReleases: "",
         iconUrl:
           "https://raw.githubusercontent.com/felixrieseberg/windows95/master/assets/icon.ico",
         loadingGif: "./assets/boot.gif",
-        setupExe: `Clippy-${packageJson.version}-setup-${arch}.exe`,
+        setupExe: `OfficeBuddies-${packageJson.version}-setup-${arch}.exe`,
         setupIcon: path.resolve(__dirname, "assets", "icon.ico"),
         windowsSign: FLAGS.IS_CODESIGNING_ENABLED ? windowsSign : undefined,
       }),
@@ -447,6 +447,10 @@ async function getExternalNestedDependencies(
  */
 function setup() {
   if (process.platform === "win32") {
+    if (!FLAGS.IS_CODESIGNING_ENABLED) {
+      return;
+    }
+
     // Ensure windows codesigning files exist
     if (!fs.existsSync(FLAGS.SIGNTOOL_PATH)) {
       console.warn("SignTool path does not exist");
@@ -486,7 +490,9 @@ function getArch() {
   // If we're running in CI, we want to use the arch passed in
   // If someone is passing in a flag, we want to use that, too
   if (process.env.CI || process.argv.some((s) => s.includes("arch"))) {
-    return process.argv.some((s) => s.includes("--arch=arm64")) ? "arm64" : "x64";
+    return process.argv.some((s) => s.includes("--arch=arm64"))
+      ? "arm64"
+      : "x64";
   }
 
   return process.arch;

@@ -43,6 +43,7 @@ export type ChatContextType = {
   status: ClippyNamedStatus;
   setStatus: (status: ClippyNamedStatus) => void;
   isModelLoaded: boolean;
+  isStartingNewChat: boolean;
   isChatWindowOpen: boolean;
   setIsChatWindowOpen: (isChatWindowOpen: boolean) => void;
   chatRecords: Record<string, ChatRecord>;
@@ -71,6 +72,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [animationKey, setAnimationKey] = useState<string>("");
   const [status, setStatus] = useState<ClippyNamedStatus>("welcome");
   const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [isStartingNewChat, setIsStartingNewChat] = useState(false);
   const { settings, models } = useContext(SharedStateContext);
   const debug = useDebugState();
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
@@ -92,6 +94,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const startNewChat = useCallback(async () => {
+    setIsStartingNewChat(true);
+
     const resetModelSession = async () => {
       if (debug?.simulateDownload) {
         return;
@@ -129,32 +133,35 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     // No need if there are no messages, we'll just keep the current chat
     // and update the timestamps
-    if (messages.length === 0) {
-      setCurrentChatRecord({
-        ...currentChatRecord,
+    try {
+      if (messages.length === 0) {
+        setCurrentChatRecord({
+          ...currentChatRecord,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        });
+
+        await resetModelSession();
+        return;
+      }
+
+      const newChatRecord = {
+        id: crypto.randomUUID(),
         createdAt: Date.now(),
         updatedAt: Date.now(),
-      });
+        preview: "",
+      };
 
+      setCurrentChatRecord(newChatRecord);
+      setChatRecords((prevChatRecords) => ({
+        ...prevChatRecords,
+        [newChatRecord.id]: newChatRecord,
+      }));
+      setMessages([]);
       await resetModelSession();
-
-      return;
+    } finally {
+      setIsStartingNewChat(false);
     }
-
-    const newChatRecord = {
-      id: crypto.randomUUID(),
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      preview: "",
-    };
-
-    setCurrentChatRecord(newChatRecord);
-    setChatRecords((prevChatRecords) => ({
-      ...prevChatRecords,
-      [newChatRecord.id]: newChatRecord,
-    }));
-    setMessages([]);
-    await resetModelSession();
   }, [
     currentChatRecord,
     debug?.simulateDownload,
@@ -169,6 +176,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     settings.maritacaApiKey,
     models,
     getSystemPrompt,
+    setIsStartingNewChat,
   ]);
 
   const loadModel = useCallback(
@@ -286,6 +294,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     };
 
     setCurrentChatRecord(updatedChatRecord);
+    setChatRecords((prevChatRecords) => ({
+      ...prevChatRecords,
+      [updatedChatRecord.id]: updatedChatRecord,
+    }));
 
     clippyApi.writeChatWithMessages(chatWithMessages).catch((error) => {
       console.error(error);
@@ -358,15 +370,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   // At app startup, check if any models are ready. If none are, kick off a download
   // for our smallest model and tell the user about it.
   useEffect(() => {
-    if (
-      messages.length > 0 ||
-      Object.keys(models).length === 0 ||
-      areAnyModelsReadyOrDownloading(models)
-    ) {
+    if (hasPerformedStartupCheck) {
       return;
     }
 
-    if (hasPerformedStartupCheck) {
+    if (Object.keys(models).length === 0) {
+      return;
+    }
+
+    // This is a startup-only check. Once we know the app already has chat history
+    // or any ready/downloading model, do not auto-trigger downloads later due to
+    // user actions like deleting models.
+    if (messages.length > 0 || areAnyModelsReadyOrDownloading(models)) {
+      setHasPerformedStartupCheck(true);
       return;
     }
 
@@ -375,7 +391,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     addMessage({
       id: crypto.randomUUID(),
       children: <WelcomeMessageContent />,
-      content: "Welcome to Clippy!",
+      content: "Welcome to Office Buddies!",
       sender: "clippy",
       createdAt: Date.now(),
     });
@@ -393,7 +409,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     };
 
     void downloadModelIfNoneReady();
-  }, [models, settings.aiProvider]);
+  }, [hasPerformedStartupCheck, messages.length, models, settings.aiProvider]);
 
   // Subscribe to the main process's newChat event
   useEffect(() => {
@@ -422,6 +438,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     status,
     setStatus,
     isModelLoaded,
+    isStartingNewChat,
     isChatWindowOpen,
     setIsChatWindowOpen,
   };
@@ -454,7 +471,7 @@ function getPreviewFromMessages(messages: Message[]): string {
   }
 
   if (messages[0].sender === "clippy") {
-    return "Welcome to Clippy!";
+    return "Welcome to Office Buddies!";
   }
 
   // Remove newlines and limit to 100 characters

@@ -16,7 +16,7 @@ export const WelcomeMessageContent: React.FC = () => {
 
   return (
     <div>
-      <strong>Welcome to Clippy!</strong>
+      <strong>Welcome to Office Buddies!</strong>
       <p>
         This little app is a love letter and homage to the late, great Clippy,
         the assistant from Microsoft Office 1997. The character was designed by
@@ -26,7 +26,7 @@ export const WelcomeMessageContent: React.FC = () => {
         art or satire.
       </p>
       <p>
-        This version of Clippy can run a Large Language Model (LLM) locally, so
+        This version of Office Buddies can run a Large Language Model (LLM) locally, so
         that you can chat with it offline.
       </p>
       <p>
@@ -58,8 +58,7 @@ export const WelcomeMessageContent: React.FC = () => {
       {!downloadingModel && readyModel && (
         <div style={{ marginTop: "15px", marginBottom: "15px" }}>
           <p style={{ color: "green", fontWeight: "bold" }}>
-            ✓ {readyModel.name} is ready! You can now start chatting with
-            Clippy.
+            ✓ {readyModel.name} is ready! You can now start chatting.
           </p>
         </div>
       )}
@@ -70,3 +69,4 @@ export const WelcomeMessageContent: React.FC = () => {
     </div>
   );
 };
+

@@ -35,7 +35,7 @@ export function setupAppMenu() {
  * @param options {Electron.PopupOptions} Options for the popup
  */
 export function popupAppMenu(options: Electron.PopupOptions = {}) {
-  getMainAppMenu().popup(options);
+  getAssistantContextMenu().popup(options);
 }
 
 export function setContextMenuAnimations(animationKeys: string[]) {
@@ -91,7 +91,7 @@ export function getMainAppMenu(): Menu {
   windowMenu?.submenu?.append(new MenuItem({ type: "separator" }));
   windowMenu?.submenu?.append(
     new MenuItem({
-      label: "Always Show Clippy on Top",
+      label: "Always Show Office Buddies on Top",
       type: "checkbox",
       checked: getStateManager().store.get("settings").clippyAlwaysOnTop,
       click: (menuItem) => {
@@ -153,6 +153,40 @@ function getAnimationMenu(): MenuItemConstructorOptions[] {
       },
     })),
   ];
+}
+
+function getAssistantContextMenu(): Menu {
+  const hideAnimationKey =
+    contextMenuAnimationKeys.find((key) => /^hide/i.test(key)) || "Hide";
+
+  return Menu.buildFromTemplate([
+    {
+      label: "Hide",
+      click: () => {
+        getMainWindow()?.webContents.send(
+          IpcMessages.CONTEXT_MENU_SELECT_ANIMATION,
+          hideAnimationKey,
+        );
+      },
+    },
+    { type: "separator" },
+    {
+      label: "Options...",
+      click: () => openView("settings-general"),
+    },
+    {
+      label: "Choose Assistant...",
+      click: () => openView("assistant-gallery"),
+    },
+    { type: "separator" },
+    {
+      label: "Animate!",
+      submenu:
+        contextMenuAnimationKeys.length > 0
+          ? getAnimationMenu()
+          : [{ label: "No animations available", enabled: false }],
+    },
+  ]);
 }
 
 function getFileMenu(): MenuItemConstructorOptions[] {
@@ -237,7 +271,7 @@ function getSettingsMenuItem(): MenuItem {
 function getHelpMenu(): MenuItemConstructorOptions[] {
   return [
     {
-      label: "Open Clippy Website",
+      label: "Open Office Buddies Website",
       click: () => {
         shell.openExternal("https://felixrieseberg.github.io/clippy/");
       },

@@ -9,6 +9,28 @@ import { popupAppMenu } from "./menu";
 
 let mainWindow: BrowserWindow | undefined;
 
+function setWindowAlwaysOnTop(
+  window: BrowserWindow | undefined,
+  enabled: boolean | undefined,
+) {
+  if (!window) {
+    return;
+  }
+
+  const shouldStayOnTop = Boolean(enabled);
+  window.setAlwaysOnTop(shouldStayOnTop);
+
+  if (shouldStayOnTop) {
+    window.moveTop();
+  }
+}
+
+function syncAlwaysOnTopWithSettings() {
+  const settings = getStateManager().store.get("settings");
+  setWindowAlwaysOnTop(getMainWindow(), settings.clippyAlwaysOnTop);
+  setWindowAlwaysOnTop(getChatWindow(), settings.chatAlwaysOnTop);
+}
+
 /**
  * Get the main window
  *
@@ -32,10 +54,19 @@ export async function createMainWindow() {
   }
 
   const settings = getStateManager().store.get("settings");
+  const DEFAULT_WIDTH = 125;
+  const DEFAULT_HEIGHT = 100;
+  const DEFAULT_MARGIN = 20;
+  const { workArea } = screen.getPrimaryDisplay();
+  const defaultX = workArea.x + workArea.width - DEFAULT_WIDTH - DEFAULT_MARGIN;
+  const defaultY =
+    workArea.y + workArea.height - DEFAULT_HEIGHT - DEFAULT_MARGIN;
 
   mainWindow = new BrowserWindow({
-    width: 125,
-    height: 100,
+    width: DEFAULT_WIDTH,
+    height: DEFAULT_HEIGHT,
+    x: defaultX,
+    y: defaultY,
     transparent: true,
     hasShadow: false,
     frame: false,
@@ -46,12 +77,13 @@ export async function createMainWindow() {
     maximizable: false,
     roundedCorners: false,
     thickFrame: false,
-    title: "Clippy",
-    alwaysOnTop: settings.clippyAlwaysOnTop,
+    title: "Office Buddies",
+    alwaysOnTop: Boolean(settings.clippyAlwaysOnTop),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
+  setMainWindowAlwaysOnTop(settings.clippyAlwaysOnTop);
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -100,6 +132,7 @@ export function setupWindowListener() {
         setFont(getStateManager().store.get("settings").defaultFont, [
           browserWindow,
         ]);
+        syncAlwaysOnTopWithSettings();
       });
     },
   );
@@ -138,7 +171,9 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         roundedCorners: false,
         minHeight: 400,
         minWidth: 400,
-        alwaysOnTop: getStateManager().store.get("settings").chatAlwaysOnTop,
+        alwaysOnTop: Boolean(
+          getStateManager().store.get("settings").chatAlwaysOnTop,
+        ),
         parent: browserWindow,
       },
     };
@@ -218,7 +253,7 @@ export function getChatWindow(): BrowserWindow | undefined {
  * @returns True if the window is a chat window
  */
 function isChatWindow(window: BrowserWindow): boolean {
-  return window.webContents.getTitle() === "Clippy Chat";
+  return window.webContents.getTitle() === "Office Buddies Chat";
 }
 
 /**
@@ -234,6 +269,7 @@ export function toggleChatWindow() {
   if (chatWindow.isVisible()) {
     chatWindow.hide();
   } else {
+    syncAlwaysOnTopWithSettings();
     const mainWindow = getMainWindow();
     const [width, height] = chatWindow.getSize();
     const position = getPopoverWindowPosition(mainWindow, { width, height });
@@ -260,6 +296,18 @@ export function maximizeChatWindow() {
   }
 
   return getChatWindow()?.maximize();
+}
+
+export function setMainWindowAlwaysOnTop(enabled: boolean | undefined) {
+  setWindowAlwaysOnTop(getMainWindow(), enabled);
+}
+
+export function setChatWindowAlwaysOnTop(enabled: boolean | undefined) {
+  setWindowAlwaysOnTop(getChatWindow(), enabled);
+  // Keep main-window policy authoritative after changing chat's top-most flag.
+  setMainWindowAlwaysOnTop(
+    getStateManager().store.get("settings").clippyAlwaysOnTop,
+  );
 }
 
 /**

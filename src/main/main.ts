@@ -14,7 +14,7 @@ import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
 
 async function onReady() {
-  console.info(`Welcome to Clippy v${app.getVersion()}`);
+  console.info(`Welcome to Office Buddies v${app.getVersion()}`);
 
   await setupAutoUpdater();
   await loadLlm();

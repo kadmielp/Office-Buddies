@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
 import { clippyApi } from "../clippyApi";
@@ -24,17 +24,22 @@ export function WindowPortal({
   children,
   width = 400,
   height = 700,
-  title = "Clippy Chat",
+  title = "Office Buddies Chat",
 }: WindowPortalProps) {
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);
   const { isChatWindowOpen, setIsChatWindowOpen } = useChat();
   const { settings } = useSharedState();
+  const isNativeWindowVisibleRef = useRef(false);
 
   useEffect(() => {
-    if (settings.alwaysOpenChat && !_externalWindow) {
+    if (
+      settings.alwaysOpenChat === true &&
+      !_externalWindow &&
+      !isChatWindowOpen
+    ) {
       setIsChatWindowOpen(true);
     }
-  }, [settings.alwaysOpenChat]);
+  }, [settings.alwaysOpenChat, isChatWindowOpen, setIsChatWindowOpen]);
 
   // Initialize the singleton container only once
   useEffect(() => {
@@ -92,13 +97,18 @@ export function WindowPortal({
         // Setup close event
         _externalWindow.addEventListener("beforeunload", () => {
           console.log("Window closed by user");
+          isNativeWindowVisibleRef.current = false;
           setIsChatWindowOpen(false);
         });
 
         externalDoc.body.innerHTML = "";
         externalDoc.body.appendChild(containerDiv);
+        isNativeWindowVisibleRef.current = true;
       } else {
-        await clippyApi.toggleChatWindow();
+        if (!isNativeWindowVisibleRef.current) {
+          await clippyApi.toggleChatWindow();
+          isNativeWindowVisibleRef.current = true;
+        }
       }
 
       _externalWindow.focus();
@@ -107,8 +117,13 @@ export function WindowPortal({
     // Close window function
     const hideWindow = async () => {
       // Don't destroy the window, just hide it
-      if (_externalWindow && !_externalWindow.closed) {
+      if (
+        _externalWindow &&
+        !_externalWindow.closed &&
+        isNativeWindowVisibleRef.current
+      ) {
         await clippyApi.toggleChatWindow();
+        isNativeWindowVisibleRef.current = false;
       }
     };
 

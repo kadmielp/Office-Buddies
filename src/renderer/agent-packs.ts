@@ -36,7 +36,7 @@ export interface AgentBranch {
 
 export interface AgentFrame {
   duration?: number;
-  images?: number[][];
+  images?: Array<[number, number] | number>;
   sound?: string;
   exitBranch?: number;
   branching?: {

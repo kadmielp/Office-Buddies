@@ -1,6 +1,5 @@
 import { getAgentProfile } from "../agent-profiles";
 import { getAnimationKeysBrackets } from "./agent-packs";
-import { DEFAULT_SYSTEM_PROMPT } from "../sharedState";
 
 function applyTokens(prompt: string, selectedAgent: string): string {
   const profile = getAgentProfile(selectedAgent);
@@ -20,19 +19,43 @@ export function buildSystemPrompt(
   promptTemplate: string | undefined,
   selectedAgent: string,
 ): string {
-  const prompt = applyTokens(promptTemplate || DEFAULT_SYSTEM_PROMPT, selectedAgent);
+  const template = promptTemplate || "";
+  const prompt = applyTokens(template, selectedAgent);
 
   if (prompt.includes("[AGENT_") || prompt.includes("[LIST OF ANIMATIONS]")) {
     return prompt;
   }
 
+  const missingName = !template.includes("[AGENT_NAME]");
+  const missingPersonality = !template.includes("[AGENT_PERSONALITY]");
+  const missingAppearance = !template.includes("[AGENT_APPEARANCE]");
+  const missingAnimations = !template.includes("[LIST OF ANIMATIONS]");
+
+  if (
+    !missingName &&
+    !missingPersonality &&
+    !missingAppearance &&
+    !missingAnimations
+  ) {
+    return prompt;
+  }
+
   const profile = getAgentProfile(selectedAgent);
+  const fallbackLines: string[] = [];
+
+  if (missingName) fallbackLines.push(`- Name: ${selectedAgent}`);
+  if (missingPersonality)
+    fallbackLines.push(`- Personality: ${profile.personality}`);
+  if (missingAppearance)
+    fallbackLines.push(`- Appearance: ${profile.appearance}`);
+  if (missingAnimations) {
+    fallbackLines.push(
+      `- Animation keys you may use at response start: ${getAnimationKeysBrackets(selectedAgent).join(", ")}`,
+    );
+  }
 
   return `${prompt}
 
 Agent context:
-- Name: ${selectedAgent}
-- Personality: ${profile.personality}
-- Appearance: ${profile.appearance}
-- Animation keys you may use at response start: ${getAnimationKeysBrackets(selectedAgent).join(", ")}`;
+${fallbackLines.join("\n")}`;
 }

@@ -7,6 +7,7 @@ const EMPTY_SHARED_STATE: SharedState = {
   models: {},
   settings: {
     ...DEFAULT_SETTINGS,
+    alwaysOpenChat: undefined,
     selectedModel: undefined,
     systemPrompt: undefined,
   },

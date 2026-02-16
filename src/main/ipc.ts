@@ -10,7 +10,7 @@ import { getModelManager } from "./models";
 import { getStateManager } from "./state";
 import { getChatManager } from "./chats";
 import { ChatWithMessages } from "../types/interfaces";
-import { getMainAppMenu, setContextMenuAnimations } from "./menu";
+import { popupAppMenu, setContextMenuAnimations } from "./menu";
 import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
 import { getClippyDebugInfo } from "./debug-clippy";
@@ -25,7 +25,7 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.SET_MAIN_WINDOW_SIZE, (_, width, height) =>
     setMainWindowSize(width, height),
   );
-  ipcMain.handle(IpcMessages.POPUP_APP_MENU, () => getMainAppMenu().popup());
+  ipcMain.handle(IpcMessages.POPUP_APP_MENU, () => popupAppMenu());
   ipcMain.handle(
     IpcMessages.SET_CONTEXT_MENU_ANIMATIONS,
     (_, animationKeys: string[]) => setContextMenuAnimations(animationKeys),

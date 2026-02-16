@@ -1,11 +1,11 @@
 {
-  "name": "Clippy",
-  "productName": "Clippy",
-  "version": "0.4.3",
-  "description": "Clippy",
+  "name": "office-buddies",
+  "productName": "Office Buddies",
+  "version": "0.5.1",
+  "description": "Office Buddies",
   "main": ".vite/build/main.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "set NODE_LLAMA_CPP_GPU=auto&& electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",

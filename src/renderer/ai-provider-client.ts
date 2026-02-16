@@ -18,6 +18,42 @@ type ProviderReadiness = {
 };
 
 const remoteAbortControllers = new Map<string, AbortController>();
+let localSessionOperation: Promise<void> = Promise.resolve();
+const LOCAL_SYSTEM_PROMPT_FALLBACK = "You are a helpful assistant.";
+
+function queueLocalSessionOperation(operation: () => Promise<void>) {
+  const nextOperation = localSessionOperation.then(operation, operation);
+  localSessionOperation = nextOperation.catch(() => {});
+  return nextOperation;
+}
+
+function isStoppedSessionError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /Unexpected message type:\s*stopped/i.test(error.message);
+}
+
+function buildLocalTurnInput(systemPrompt: string, input: string): string {
+  const prompt = systemPrompt.trim() || LOCAL_SYSTEM_PROMPT_FALLBACK;
+  const userInput = input.trim();
+
+  return [
+    "System instructions (highest priority):",
+    prompt,
+    "",
+    "User message:",
+    userInput,
+    "",
+    "Assistant response rules:",
+    "- Obey the system instructions above.",
+    "- Reply to the user message directly.",
+    "- Respond in the same language used in the user's latest message.",
+    "- Never leave the response empty.",
+    "- If you output an animation key, always include normal text after it.",
+  ].join("\n");
+}
 
 export async function createProviderSession(
   settings: SettingsState,
@@ -27,7 +63,20 @@ export async function createProviderSession(
     return;
   }
 
-  await electronAi.create(options);
+  await queueLocalSessionOperation(async () => {
+    try {
+      await electronAi.create(options);
+      return;
+    } catch (error) {
+      if (!isStoppedSessionError(error)) {
+        throw error;
+      }
+
+      // Recovery path for transient renderer/main session desync.
+      await electronAi.destroy().catch(() => {});
+      await electronAi.create(options);
+    }
+  });
 }
 
 export async function destroyProviderSession(settings: SettingsState) {
@@ -35,7 +84,9 @@ export async function destroyProviderSession(settings: SettingsState) {
     return;
   }
 
-  await electronAi.destroy();
+  await queueLocalSessionOperation(async () => {
+    await electronAi.destroy();
+  });
 }
 
 export function abortProviderRequest(
@@ -102,7 +153,8 @@ export async function* promptStreamingWithProvider(args: {
   const provider = (args.settings.aiProvider || "local") as ProviderName;
 
   if (provider === "local") {
-    const stream = await electronAi.promptStreaming(args.input, {
+    const localInput = buildLocalTurnInput(args.systemPrompt, args.input);
+    const stream = await electronAi.promptStreaming(localInput, {
       requestUUID: args.requestUUID,
     });
 

@@ -2,6 +2,95 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2026-02-16
+
+### Changed
+
+- Local model prompt wrapper now reinforces language-following behavior by instructing replies to match the user's latest message language and avoid mixed-language answers unless explicitly requested.
+- Development start script now sets `NODE_LLAMA_CPP_GPU=auto` by default to avoid invalid or stale environment values and improve backend auto-selection reliability.
+
+## [0.5.0] - 2026-02-16
+
+### Added
+
+- Added `address_book-0.png` next to the `Chats` page title.
+- Added `info.png` next to the `About` page title.
+- Added provider-status icon to the AI Provider row:
+  - Local provider shows `network_drive_off.png`
+  - Remote providers show `network_drive_on.png`
+- Added state-based icon for `Advanced > Automatic Updates`:
+  - `satellite_updates_on.png` when updates are enabled
+  - `satellite_updates_off.png` when updates are disabled
+- Added `tools/generate-map-reference.ps1` to generate per-agent frame-reference overlays for `assets/agents/*/map.png`.
+- Generated `map-reference-overlay.png` (pixel coordinates) and `map-reference-frame-overlay.png` (frame indices) files for all agents to support manual frame-map validation.
+- Added support for numeric frame references in animation frames: `images` can now use frame indices in addition to pixel coordinates.
+- Added a classic assistant right-click context menu with:
+  - `Hide`
+  - `Options...`
+  - `Choose Assistant...`
+  - `Animate!`
+- Added a dedicated Win98-style `Office Assistant` gallery view for `Choose Assistant...`, including Back/Next navigation and OK/Cancel selection flow.
+- Added per-assistant gallery copy (speech bubble + name/description) for Clippit, F1, Merlin, Links, Rocky, Bonzi, Genie, Genius, Peedy, and Rover.
+- Added live assistant preview rendering in the gallery selector box using agent sprite animations.
+- Added sound playback to assistant gallery previews by honoring frame-level sound keys from each assistant's sound pack.
+
+### Changed
+
+- Main assistant window now defaults to the lower-right corner of the primary display work area (with margin) instead of centered startup placement.
+- Restored startup chat behavior to follow `Appearance > Window Options > Always open chat when Office Buddies starts`.
+- Fixed startup setting hydration race for `alwaysOpenChat` so persisted `false` no longer auto-opens chat during initialization.
+- Improved always-on-top reliability for both assistant and chat windows by reapplying settings after window lifecycle events and chat show/toggle transitions.
+- Improved z-order consistency when toggling `chatAlwaysOnTop` so assistant and chat top-most policies stay independent.
+- Added a blocking `Preparing new chat...` loading overlay (using `assets/loading.gif`) during `New Chat` model/session reset to prevent accidental clicks.
+- Chat input focus is now restored automatically after responses complete, so you can continue typing without clicking the textarea again.
+- Local model session lifecycle operations are now serialized, with recovery for transient `Unexpected message type: stopped` startup/session errors.
+- Updated the Google provider label in `Settings > Model` from `Google Gemini` to `Google`.
+- Google provider remote model list now only shows models whose names start with `gemini` or `gemma`.
+- Assistant message avatar now uses `src/renderer/images/icons/msagent.png` instead of `src/renderer/images/animations/Default.png`.
+- Shifted chat avatars down by 3px for improved message alignment.
+- Prompt source behavior is now stricter:
+  - `settings.systemPrompt` is seeded from `DEFAULT_SYSTEM_PROMPT` only when missing.
+  - Existing `settings.systemPrompt` values in `config.json` are no longer auto-overwritten by legacy-default migration logic.
+- Improved `Advanced > Delete All Models` UX:
+  - Shows `recycle_bin_full.png` when local models are downloaded and `recycle_bin_empty.png` otherwise.
+  - Delete button is disabled when no local models are downloaded.
+  - Deleting all models now always asks for confirmation.
+  - Layout was adjusted for more consistent icon/text/button alignment.
+- Deletion actions now trigger the `EmptyTrash` assistant animation in more places:
+  - `Settings > Model > Delete Model`
+  - `Settings > Advanced > Delete All Models`
+  - `Chats > Delete Selected`
+  - `Chats > Delete All Chats`
+- Animation trigger reliability was improved by resetting the animation key after playback and before re-triggering, so repeated deletes continue to animate.
+- Fixed startup auto-download behavior so deleting local models later does not unintentionally re-trigger the "download default model" startup path.
+- Fixed startup failure when `config.json` is saved with a UTF-8 BOM (`EF BB BF`), which previously caused `electron-store` JSON parse errors (`Unexpected token 'ï»¿'`) during app initialization.
+- `deleteAllModels` in the main process now returns a success boolean and uses `force: true` for folder removal to improve deletion robustness.
+- Fixed chat-list refresh behavior so new chats appear in `Chats` immediately after sending messages, without requiring app restart.
+- Frame overlay labels now show source coordinates only (for example, `0,0`) without reference-count suffixes.
+- Updated renderer frame resolution to convert frame indices to source coordinates using each agent map's grid.
+- `Choose Assistant...` now opens the new assistant gallery view instead of the general settings tab.
+- Menu-driven view changes now force-open the chat window so `Options...` and `Choose Assistant...` reliably display their target UI.
+- While the assistant gallery is open, the desktop assistant is hidden to reduce overlap with selection UI.
+- Gallery preview animation now plays `GetAttention` once (with fallback to `Greeting`/`Show`/`Default`) and does not loop continuously.
+- Updated assistant-gallery descriptions to remove the `Name:` prefix in the body copy.
+- Moved gallery navigation buttons (`< Back`, `Next >`) inside the assistant fieldset and centered them.
+- Stabilized assistant-gallery layout so navigation buttons stay in a fixed position regardless of description length (including longer text like Merlin).
+- Moved `Gallery` and `Options` controls into the title bar for assistant/settings flows, matching the existing header control pattern.
+- `Options` in the assistant header now opens the shared settings view (`settings-general`) instead of being disabled.
+- Added persistent pressed-state visual feedback for selected header controls:
+  - `Gallery` is pressed in assistant gallery view
+  - `Options` is pressed in settings views
+  - `Chats` is pressed in chat-history view
+- Assistant left-click now toggles chat window visibility (open/close) and forces `chat` view when opening.
+- Fixed chat-window visibility synchronization to avoid unintended open/close toggles and improve chooser open reliability.
+- Closing the chat window while on assistant gallery now resets view state to `chat`, preventing stale hidden-assistant states.
+- Assistant visibility logic now hides the desktop assistant only when assistant gallery is active and the chat window is actually open.
+
+### Removed
+
+- Removed the `Agent` selector section from `Settings > Appearance`; assistant selection is now handled via `Choose Assistant...` / assistant gallery.
+- Removed the `Settings` button from the main chat title-bar controls.
+
 ## [0.4.7] - 2026-02-15
 
 ### Removed

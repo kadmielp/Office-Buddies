@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.2] - 2026-02-16
+
+### Added
+
+- Added animation-authoring workflow documentation in `README.md`, including:
+  - frame-array targeting (`frameIndex`/`exitBranch`)
+  - branch weight behavior
+  - map/frame reference overlay usage
+  - flow overlay generation and interpretation
+- Added `tools/generate-animation-flow-overlay.ps1` to generate per-animation flow diagnostics with:
+  - path probabilities
+  - reachable vs unreachable timeline frames
+  - dual output modes (`frame#` and pixel coordinates)
+
+### Changed
+
+- Added or refreshed inline `// #<index>` frame-array comments in agent animation timelines to make editing and branching references easier.
+
 ## [0.5.1] - 2026-02-16
 
 ### Changed

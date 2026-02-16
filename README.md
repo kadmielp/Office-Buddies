@@ -49,6 +49,59 @@ For local mode, GGUF models are supported. Good sources include quantizations fr
 - [TheBloke](https://huggingface.co/thebloke)
 - [Unsloth](https://huggingface.co/unsloth)
 
+## Editing Agent Animations (Frame Arrays)
+
+Animation files live at `assets/agents/<Agent>/agent.js`.
+
+### 1) Understand frame targets
+
+- `frames: [...]` is the animation timeline array.
+- `branching.branches[].frameIndex` points to a frame index in that timeline array.
+- `exitBranch` is a fallback jump target in the same timeline array.
+- `weight` is branch probability percentage (remaining percentage falls back to `exitBranch`, or next frame when no `exitBranch`).
+
+To make timeline editing easier, this fork uses inline frame comments (for example `// #23`) before each frame object.
+
+### 2) Generate sprite-map references
+
+Use the map reference script to generate both coordinate and frame-number overlays:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/generate-map-reference.ps1 -Agent F1
+```
+
+Outputs in `assets/agents/F1/`:
+
+- `map-reference-overlay.png` (pixel coordinates)
+- `map-reference-frame-overlay.png` (sprite frame numbers)
+
+### 3) Visualize animation flow paths
+
+Use the flow overlay script to inspect reachable paths, branch probabilities, and unused timeline frames:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/generate-animation-flow-overlay.ps1 -Agent F1 -Animation Congratulate
+```
+
+Outputs:
+
+- `*-flow-overlay-frame.png` (labels as sprite `#frame`)
+- `*-flow-overlay-coordinates.png` (labels as `x,y`)
+
+Optional mode:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/generate-animation-flow-overlay.ps1 -Agent F1 -Animation Congratulate -LabelMode FrameIndex
+powershell -ExecutionPolicy Bypass -File tools/generate-animation-flow-overlay.ps1 -Agent F1 -Animation Congratulate -LabelMode Coordinates
+```
+
+### 4) Iterate safely
+
+- Edit `agent.js`
+- Regenerate overlays
+- Reload app and test
+- Verify that intended frames are reachable in flow overlays (and that unexpected frames are not)
+
 ## Scope and Intent
 
 This project is not trying to beat every chat client in features.

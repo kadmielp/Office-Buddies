@@ -37,14 +37,14 @@ function getNextFrameIndex(
   const branches = frame.branching?.branches ?? [];
 
   if (branches.length > 0) {
-    const totalWeight = branches.reduce(
-      (sum, branch) => sum + branch.weight,
-      0,
-    );
-    const random = Math.random() * totalWeight;
+    const random = Math.random() * 100;
     let cumulative = 0;
 
     for (const branch of branches) {
+      if (!Number.isFinite(branch.weight) || branch.weight <= 0) {
+        continue;
+      }
+
       cumulative += branch.weight;
 
       if (random <= cumulative) {

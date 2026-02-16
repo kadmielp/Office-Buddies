@@ -37,68 +37,119 @@ clippy.ready("F1", {
   animations: {
     Congratulate: {
       frames: [
+        // #0
         {
           duration: 100,
           images: [[0, 0]],
           exitBranch: 46,
           sound: "29",
-          branching: { branches: [{ frameIndex: 23, weight: 85 }] },
+          branching: { branches: [
+            { frameIndex: 1, weight: 33 },
+            { frameIndex: 23, weight: 33 },
+            { frameIndex: 28, weight: 33 }]
+           },
         },
+        // #1
         { duration: 100, images: [[124, 0]] },
+        // #2
         { duration: 100, images: [[248, 0]] },
+        // #3
         { duration: 100, images: [[372, 0]] },
+        // #4
         { duration: 100, images: [[496, 0]] },
+        // #5
         { duration: 100, images: [[620, 0]] },
+        // #6
         { duration: 100, images: [[744, 0]] },
+        // #7
         { duration: 100, images: [[868, 0]], sound: "15" },
+        // #8
         { duration: 100, images: [[992, 0]] },
+        // #9
         { duration: 1000, images: [[1116, 0]], exitBranch: 20 },
+        // #10
         { duration: 330, images: [[1240, 0]] },
+        // #11
         { duration: 500, images: [[1116, 0]], exitBranch: 20 },
+        // #12
         { duration: 100, images: [[1240, 0]] },
+        // #13
         { duration: 300, images: [[1116, 0]], exitBranch: 20 },
+        // #14
         { duration: 100, images: [[1240, 0]] },
+        // #15
         { duration: 600, images: [[1116, 0]], exitBranch: 20 },
+        // #16
         { duration: 100, images: [[1240, 0]] },
+        // #17
         { duration: 1000, images: [[1116, 0]], exitBranch: 20 },
+        // #18
         { duration: 330, images: [[1240, 0]] },
+        // #19
         { duration: 660, images: [[1364, 0]] },
+        // #20
         { duration: 200, images: [[1488, 0]], sound: "22" },
-        { duration: 130, images: [[1612, 0]] },
+        // #21
+        { duration: 130, images: [[1612, 0]], exitBranch: 46 },
+        // #22
         {
           duration: 100,
           images: [[124, 0]],
           exitBranch: 46,
           branching: { branches: [{ frameIndex: 46, weight: 100 }] },
         },
+        // #23
         { duration: 100, images: [[1736, 0]] },
+        // #24
         { duration: 100, images: [[1860, 0]] },
+        // #25
         { duration: 100, images: [[1984, 0]] },
+        // #26
         { duration: 100, images: [[2108, 0]] },
-        { duration: 100, images: [[2232, 0]], exitBranch: 46, sound: "11" },
+        // #27
+        { duration: 100, images: [[2232, 0]], sound: "11" },
+        // #28
         { duration: 100, images: [[2356, 0]] },
+        // #29
         { duration: 100, images: [[2480, 0]] },
-        { duration: 100, images: [[2604, 0]], exitBranch: 35 },
+        // #30
+        { duration: 100, images: [[2604, 0]], exitBranch: 34 },
+        // #31
         { duration: 160, images: [[2728, 0]] },
+        // #32
         { duration: 200, images: [[2852, 0]], exitBranch: 35 },
+        // #33
         { duration: 300, images: [[2976, 0]] },
+        // #34
         { duration: 200, images: [[3100, 0]], sound: "19" },
+        // #35
         { duration: 160, images: [[0, 93]] },
+        // #36
         {
           duration: 100,
           images: [[124, 93]],
           exitBranch: 46,
           branching: { branches: [{ frameIndex: 46, weight: 80 }] },
         },
+        // #37
         { duration: 130, images: [[248, 93]] },
+        // #38
         { duration: 100, images: [[372, 93]], sound: "12" },
+        // #39
         { duration: 100, images: [[496, 93]] },
+        // #40
         { duration: 100, images: [[620, 93]] },
+        // #41
         { duration: 100, images: [[744, 93]] },
+        // #42
         { duration: 100, images: [[868, 93]] },
+        // #43
         { duration: 100, images: [[992, 93]], sound: "8" },
+        // #44
         { duration: 130, images: [[1116, 93]] },
+        // #45
         { duration: 130, images: [[1240, 93]], exitBranch: 46 },
+        // #46
         { duration: 100, images: [[1364, 93]] },
       ],
     },

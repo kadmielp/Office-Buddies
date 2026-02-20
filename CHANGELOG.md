@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.5] - 2026-02-20
+
+### Added
+
+- Added `Seq Add` mode in Animation Studio map toolbar to append frames by clicking map cells in sequence order.
+- Added global preview path controls so branch-path selection can be changed regardless of currently selected frame.
+- Added Windows launcher at repo root: `run-animation-studio.cmd`.
+
+### Changed
+
+- Animation Studio save flow now reloads the saved agent definition from disk after each save to keep UI and file state in sync.
+- Improved frame list branch summary rendering to include all branch targets/weights for a frame.
+- Updated multi-frame duplicate behavior to keep duplicated frames selected for immediate reordering.
+
+### Fixed
+
+- Fixed branch edit behavior when fields are cleared: clearing both `Branch Frame Index` and `Weight` now removes the branch entry.
+- Fixed persistence issues where apply/save feedback could look successful while stale state remained in editor.
+- Fixed Merlin animation integrity issue with an out-of-range `frameIndex` in `Announce`.
+
+### Removed
+
+- Removed `DoMagic1` and `DoMagic2` from Merlin and consolidated into `DoMagic`.
+- Removed old Animation Studio launchers from `tools/animation-studio` (`run.cmd`, `run.sh`).
+
 ## [0.5.4] - 2026-02-20
 
 ### Added

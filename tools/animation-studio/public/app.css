@@ -98,6 +98,10 @@ body {
   gap: 6px;
 }
 
+.map-zoom-spacer {
+  margin-left: auto;
+}
+
 #zoomLabel {
   margin-left: 6px;
   min-width: 48px;

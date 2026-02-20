@@ -6345,14 +6345,7 @@ clippy.ready("Clippy", {
               2976
             ]
           ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 37,
-                weight: 100
-              }
-            ]
-          }
+          exitBranch: 37
         },
         {
           duration: 100,
@@ -8747,23 +8740,7 @@ clippy.ready("Clippy", {
               3224,
               1860
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 26,
-                weight: 45
-              },
-              {
-                frameIndex: 32,
-                weight: 25
-              },
-              {
-                frameIndex: 42,
-                weight: 15
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -8880,19 +8857,7 @@ clippy.ready("Clippy", {
               1488,
               1953
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 32,
-                weight: 20
-              },
-              {
-                frameIndex: 42,
-                weight: 15
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -8901,7 +8866,16 @@ clippy.ready("Clippy", {
               1612,
               1953
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 53,
+                weight: 50
+              }
+            ]
+          },
+          exitBranch: 37
         },
         {
           duration: 100,
@@ -8919,15 +8893,7 @@ clippy.ready("Clippy", {
               1860,
               1953
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 28,
-                weight: 80
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -8945,15 +8911,7 @@ clippy.ready("Clippy", {
               2108,
               1953
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 30,
-                weight: 75
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -8962,19 +8920,7 @@ clippy.ready("Clippy", {
               2232,
               1953
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 13,
-                weight: 25
-              },
-              {
-                frameIndex: 42,
-                weight: 20
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -9064,23 +9010,7 @@ clippy.ready("Clippy", {
               124,
               2046
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 13,
-                weight: 25
-              },
-              {
-                frameIndex: 26,
-                weight: 25
-              },
-              {
-                frameIndex: 32,
-                weight: 25
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -9171,7 +9101,16 @@ clippy.ready("Clippy", {
               1364,
               2046
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 39,
+                weight: 60
+              }
+            ]
+          },
+          exitBranch: 52
         },
         {
           duration: 100,
@@ -9189,23 +9128,7 @@ clippy.ready("Clippy", {
               1612,
               2046
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 26,
-                weight: 33
-              },
-              {
-                frameIndex: 32,
-                weight: 33
-              },
-              {
-                frameIndex: 13,
-                weight: 34
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,

@@ -14,7 +14,7 @@ This is a standalone Win98-style GUI tool for editing assistant animations.
 From repo root:
 
 ```powershell
-node tools/animation-studio/server.js
+run-animation-studio.cmd
 ```
 
 Then open:
@@ -24,22 +24,28 @@ Then open:
 You can override the port with:
 
 ```powershell
-$env:ANIM_STUDIO_PORT=4300
+run-animation-studio.cmd 4300
+```
+
+Alternative:
+
+```powershell
 node tools/animation-studio/server.js
 ```
 
 ## What it does
 
 - Lists available assistants from `assets/agents/*`
-- Loads `agent.js`, `map.png`, and `sounds-mp3.js`
+- Loads `agent.js`, `map.png`, and assistant sound maps
 - Shows a frame grid on top of `map.png` with zoom controls
 - Lets you edit animations and frames:
   - add/remove/duplicate/reorder frames
   - multi-select frames and invert selected order
-  - edit `duration`, `sound`, `exitBranch`, and `images`
+  - edit `duration`, `sound`, `exitBranch`, branch `frameIndex`/`weight`, and `images`
   - pick sprite cells directly from the map
+- Includes `Seq Add` map mode to append multiple frames by clicking map cells in order
 - Includes a dedicated assistant-specific `Sound Library` tab with per-sound play buttons
-- Includes a looping animation preview that follows `exitBranch`
+- Includes a looping animation preview with manual branch-path selector (`<` / `>`)
 - Saves back to `assets/agents/<Agent>/agent.js`
 
 ## Quick usage

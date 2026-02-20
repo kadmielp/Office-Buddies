@@ -17,6 +17,7 @@
   historyStack: [],
   previewSoundEnabled: false,
   previewPathChoice: 0,
+  sequenceCaptureEnabled: false,
 };
 
 const elements = {
@@ -44,6 +45,7 @@ const elements = {
   zoomResetBtn: document.getElementById('zoomResetBtn'),
   zoomInBtn: document.getElementById('zoomInBtn'),
   zoomLabel: document.getElementById('zoomLabel'),
+  sequenceCaptureBtn: document.getElementById('sequenceCaptureBtn'),
   mapCanvas: document.getElementById('mapCanvas'),
   appendFrameBtn: document.getElementById('appendFrameBtn'),
   replaceImageBtn: document.getElementById('replaceImageBtn'),
@@ -100,6 +102,14 @@ function updatePreviewPlayToggle() {
   const isPlaying = Boolean(state.previewTimer);
   elements.toggleAnimationPlayBtn.textContent = isPlaying ? 'Stop' : 'Play';
   elements.toggleAnimationPlayBtn.title = isPlaying ? 'Stop preview' : 'Play preview';
+}
+
+function updateSequenceCaptureToggle() {
+  const enabled = state.sequenceCaptureEnabled;
+  elements.sequenceCaptureBtn.textContent = enabled ? 'Seq Add: On' : 'Seq Add: Off';
+  elements.sequenceCaptureBtn.title = enabled
+    ? 'Click map cells to append frames in order'
+    : 'Enable to append frames while clicking map cells';
 }
 
 async function fetchJson(endpoint, options) {
@@ -807,6 +817,7 @@ async function loadAgent(name) {
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
   state.previewPathChoice = 0;
+  state.sequenceCaptureEnabled = false;
   state.selectedCell = null;
   state.mapZoom = 1;
   state.previewSoundEnabled = false;
@@ -823,6 +834,7 @@ async function loadAgent(name) {
   renderMapMeta();
   setMapZoom(1);
   updatePreviewSoundToggle();
+  updateSequenceCaptureToggle();
   renderSoundOptions();
   renderSoundLibrary();
   renderAnimationList();
@@ -989,6 +1001,12 @@ function bindEvents() {
 
   elements.zoomResetBtn.addEventListener('click', () => {
     setMapZoom(1);
+  });
+
+  elements.sequenceCaptureBtn.addEventListener('click', () => {
+    state.sequenceCaptureEnabled = !state.sequenceCaptureEnabled;
+    updateSequenceCaptureToggle();
+    setStatus(state.sequenceCaptureEnabled ? 'Sequence add enabled' : 'Sequence add disabled');
   });
 
   elements.loadAgentBtn.addEventListener('click', async () => {
@@ -1233,17 +1251,24 @@ function bindEvents() {
 
   elements.duplicateFrameBtn.addEventListener('click', () => {
     const frames = getCurrentFrames();
-    const frame = frames[state.selectedFrameIndex];
-    if (!frame) {
+    const selected = (state.selectedFrameIndices || [])
+      .filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length)
+      .sort((a, b) => a - b);
+
+    if (!selected.length) {
       return;
     }
 
     pushHistorySnapshot();
-    frames.splice(state.selectedFrameIndex + 1, 0, deepClone(frame));
-    state.selectedFrameIndex += 1;
-    state.selectedFrameIndices = [state.selectedFrameIndex];
+
+    const clones = selected.map((index) => deepClone(frames[index]));
+    const insertAt = selected[selected.length - 1] + 1;
+    frames.splice(insertAt, 0, ...clones);
+
+    state.selectedFrameIndices = clones.map((_, i) => insertAt + i);
+    state.selectedFrameIndex = state.selectedFrameIndices[0];
     renderFrameList();
-    setStatus(`Duplicated frame ${state.selectedFrameIndex}`);
+    setStatus(`Duplicated ${clones.length} frame(s)`);
   });
 
   elements.removeFrameBtn.addEventListener('click', () => {
@@ -1431,6 +1456,32 @@ function bindEvents() {
 
     state.selectedCell = row * state.payload.map.cols + col;
     renderMapMeta();
+    if (state.sequenceCaptureEnabled) {
+      const frames = getCurrentFrames();
+      if (!frames) {
+        setStatus('Select an animation first');
+        drawMap();
+        return;
+      }
+
+      let duration = Number(elements.durationInput.value || '100');
+      if (!Number.isFinite(duration) || duration < 0) {
+        duration = 100;
+      }
+
+      pushHistorySnapshot();
+      const newFrame = {
+        duration,
+        images: [[col * fw, row * fh]],
+      };
+      frames.push(newFrame);
+      state.selectedFrameIndex = frames.length - 1;
+      state.selectedFrameIndices = [state.selectedFrameIndex];
+      renderFrameList();
+      setStatus(`Added sequence frame ${state.selectedFrameIndex}`);
+      return;
+    }
+
     drawMap();
   });
 }
@@ -1440,6 +1491,7 @@ async function bootstrap() {
   setEditorTab('frames');
   updatePreviewSoundToggle();
   updatePreviewPlayToggle();
+  updateSequenceCaptureToggle();
 
   try {
     const data = await fetchJson('/api/agents');

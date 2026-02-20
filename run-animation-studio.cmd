@@ -14,5 +14,5 @@ if not "%~1"=="" (
   set "ANIM_STUDIO_PORT=%~1"
 )
 
-node server.js
+node tools/animation-studio/server.js
 endlocal

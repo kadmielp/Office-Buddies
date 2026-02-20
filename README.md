@@ -59,6 +59,10 @@ Animation Studio is a standalone Win98-style visual editor for assistant animati
 
 Its purpose is to speed up animation authoring and reduce manual timeline editing mistakes.
 
+Quick start on Windows:
+
+- `run-animation-studio.cmd`
+
 Detailed docs:
 
 - [`tools/animation-studio/README.md`](tools/animation-studio/README.md)

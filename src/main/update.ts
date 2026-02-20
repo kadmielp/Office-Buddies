@@ -2,6 +2,10 @@ import { app, autoUpdater, dialog, shell } from "electron";
 import { updateElectronApp, UpdateSourceType } from "update-electron-app";
 import { getLogger } from "./logger";
 import { getStateManager } from "./state";
+import fs from "fs";
+import path from "path";
+
+const DEFAULT_UPDATE_REPO = "felixrieseberg/clippy";
 
 /**
  * Setup the auto updater
@@ -17,10 +21,11 @@ export function setupAutoUpdater() {
   }
 
   if (!disableAutoUpdate) {
+    const repo = getUpdateRepo();
     updateElectronApp({
       updateSource: {
         type: UpdateSourceType.ElectronPublicUpdateService,
-        repo: "felixrieseberg/clippy",
+        repo,
       },
       updateInterval: "1 hour",
       logger: require("electron-log"),
@@ -105,7 +110,7 @@ export async function checkForUpdates() {
  * @returns {Promise<string>} The version comparison string
  */
 export async function getVersionComparisonString() {
-  const latestVersionTagName = await getLatestVersionFromGitHub();
+  const latestVersionTagName = await getLatestVersionFromGitHub(getUpdateRepo());
   const latestVersionString = latestVersionTagName
     ? `  The latest published version is ${latestVersionTagName}.`
     : "";
@@ -118,11 +123,11 @@ export async function getVersionComparisonString() {
  *
  * @returns {Promise<string>} The latest version from GitHub
  */
-export async function getLatestVersionFromGitHub(): Promise<string | null> {
+export async function getLatestVersionFromGitHub(
+  repo: string,
+): Promise<string | null> {
   try {
-    const response = await fetch(
-      "https://api.github.com/repos/felixrieseberg/clippy/releases/latest",
-    );
+    const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
     const data = await response.json();
     return data.tag_name;
   } catch (error) {
@@ -130,4 +135,48 @@ export async function getLatestVersionFromGitHub(): Promise<string | null> {
 
     return null;
   }
+}
+
+function getUpdateRepo(): string {
+  try {
+    const packageJsonPath = path.join(app.getAppPath(), "package.json");
+    const packageJsonString = fs.readFileSync(packageJsonPath, "utf-8");
+    const packageJson = JSON.parse(packageJsonString) as {
+      repository?: string | { url?: string };
+    };
+    const repository = packageJson.repository;
+    const repositoryUrl =
+      typeof repository === "string" ? repository : repository?.url;
+    const parsedRepo = parseGithubRepo(repositoryUrl);
+
+    if (parsedRepo) {
+      return parsedRepo;
+    }
+  } catch (error) {
+    getLogger().warn("Failed to determine update repository from package.json", error);
+  }
+
+  return DEFAULT_UPDATE_REPO;
+}
+
+function parseGithubRepo(repositoryUrl?: string): string | null {
+  if (!repositoryUrl) {
+    return null;
+  }
+
+  const trimmed = repositoryUrl.trim();
+  const withoutGitSuffix = trimmed.replace(/\.git$/i, "");
+  const normalized = withoutGitSuffix.replace(/^git\+/, "");
+
+  const httpsMatch = normalized.match(/github\.com[/:]([^/]+\/[^/]+)$/i);
+  if (httpsMatch?.[1]) {
+    return httpsMatch[1];
+  }
+
+  const shortMatch = normalized.match(/^([^/]+\/[^/]+)$/);
+  if (shortMatch?.[1]) {
+    return shortMatch[1];
+  }
+
+  return null;
 }

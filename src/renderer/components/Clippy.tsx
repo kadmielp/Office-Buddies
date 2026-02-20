@@ -16,7 +16,7 @@ import { useSharedState } from "../contexts/SharedStateContext";
 import { clippyApi } from "../clippyApi";
 import { useBubbleView } from "../contexts/BubbleViewContext";
 
-const WAIT_TIME = 6000;
+const WAIT_TIME = 60000;
 const WINDOW_PADDING_WIDTH = 1;
 const WINDOW_PADDING_HEIGHT = 7;
 
@@ -186,6 +186,10 @@ export function Clippy() {
 
   const playSound = useCallback(
     (soundKey?: string) => {
+      if (settings.disableSound) {
+        return;
+      }
+
       if (!soundKey) {
         return;
       }
@@ -199,7 +203,7 @@ export function Clippy() {
       const audio = new Audio(source);
       void audio.play().catch(() => {});
     },
-    [agentPack.sounds],
+    [agentPack.sounds, settings.disableSound],
   );
 
   const runAnimation = useCallback(

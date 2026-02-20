@@ -25,6 +25,7 @@ export interface SettingsState {
   defaultFont: DefaultFont;
   defaultFontSize: number;
   disableAutoUpdate?: boolean;
+  disableSound?: boolean;
 }
 
 export interface SharedState {
@@ -63,6 +64,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   defaultFont: "Tahoma",
   defaultFontSize: 12,
   disableAutoUpdate: false,
+  disableSound: false,
 };
 
 export const EMPTY_SHARED_STATE: SharedState = {

@@ -126,7 +126,13 @@ function pickPreviewAnimationKey(animations: Record<string, AgentAnimation>): st
   return candidates.find((key) => animations[key]) || "Default";
 }
 
-function AssistantPreview({ agentName }: { agentName: string }) {
+function AssistantPreview({
+  agentName,
+  isSoundEnabled,
+}: {
+  agentName: string;
+  isSoundEnabled: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
 
@@ -188,6 +194,10 @@ function AssistantPreview({ agentName }: { agentName: string }) {
     };
 
     const playSound = (soundKey?: string) => {
+      if (!isSoundEnabled) {
+        return;
+      }
+
       if (!soundKey) {
         return;
       }
@@ -248,7 +258,7 @@ function AssistantPreview({ agentName }: { agentName: string }) {
       isDisposed = true;
       clearTimer();
     };
-  }, [agentName]);
+  }, [agentName, isSoundEnabled]);
 
   const pack = getAgentPack(agentName);
 
@@ -283,6 +293,7 @@ export function AssistantGallery() {
     return ordered;
   }, []);
   const selectedAgent = settings.selectedAgent || "Clippy";
+  const isSoundEnabled = !settings.disableSound;
   const initialIndex = Math.max(galleryAgents.indexOf(selectedAgent), 0);
   const [agentIndex, setAgentIndex] = useState(initialIndex);
 
@@ -347,7 +358,10 @@ export function AssistantGallery() {
                 overflow: "hidden",
               }}
             >
-              <AssistantPreview agentName={currentAgent} />
+              <AssistantPreview
+                agentName={currentAgent}
+                isSoundEnabled={isSoundEnabled}
+              />
             </div>
             <div style={{ flex: 1 }}>
               <div

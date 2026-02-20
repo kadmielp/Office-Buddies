@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.6] - 2026-02-20
+
+### Added
+
+- Added `Advanced > Sound` mute/unmute control with state icon feedback:
+  - `speaker_on.png` when sound is enabled
+  - `speaker_off.png` when sound is muted
+- Added persisted `settings.disableSound` state to control app-wide assistant audio behavior.
+
+### Changed
+
+- Assistant sound playback now respects the global sound setting in both:
+  - desktop assistant animations
+  - assistant gallery previews
+- Auto-update repository configuration now resolves from this app's `package.json` repository field instead of a hardcoded upstream repo.
+- Update comparison lookup for latest GitHub release now uses the resolved repository.
+- Increased idle animation wait interval from `6s` to `60s` between idle animation runs.
+
 ## [0.5.5] - 2026-02-20
 
 ### Added

@@ -6,10 +6,13 @@ import recycleBinEmptyIcon from "../images/icons/recycle_bin_empty.png";
 import recycleBinFullIcon from "../images/icons/recycle_bin_full.png";
 import automaticUpdatesOffIcon from "../images/icons/satellite_updates_off.png";
 import automaticUpdatesOnIcon from "../images/icons/satellite_updates_on.png";
+import speakerOffIcon from "../images/icons/speaker_off.png";
+import speakerOnIcon from "../images/icons/speaker_on.png";
 
 export const SettingsAdvanced: React.FC = () => {
   const { settings, models } = useSharedState();
   const { setAnimationKey } = useChat();
+  const soundEnabled = !settings.disableSound;
   const downloadedLocalModelCount = Object.values(models).filter(
     (model) => model.downloaded,
   ).length;
@@ -70,6 +73,36 @@ export const SettingsAdvanced: React.FC = () => {
                 ? automaticUpdatesOffIcon
                 : automaticUpdatesOnIcon
             }
+            alt=""
+            aria-hidden="true"
+            style={{ width: "32px", height: "32px", flexShrink: 0 }}
+          />
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Sound</legend>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <p style={{ marginTop: 0 }}>
+              Mute or unmute assistant sounds throughout the app.
+            </p>
+            <button
+              onClick={() => {
+                clippyApi.setState("settings.disableSound", soundEnabled);
+              }}
+            >
+              {soundEnabled ? "Mute Sound" : "Unmute Sound"}
+            </button>
+          </div>
+          <img
+            src={soundEnabled ? speakerOnIcon : speakerOffIcon}
             alt=""
             aria-hidden="true"
             style={{ width: "32px", height: "32px", flexShrink: 0 }}

@@ -16,7 +16,7 @@
   selectedLibrarySoundId: '',
   historyStack: [],
   previewSoundEnabled: false,
-  previewPathOverrides: {},
+  previewPathChoice: 0,
 };
 
 const elements = {
@@ -143,24 +143,25 @@ function getPreviewPathOptions(frameIndex) {
   const options = [];
   const seen = new Set();
 
-  const pushOption = (targetIndex, kind) => {
+  const pushOption = (targetIndex, kind, branchIndex = null) => {
     if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= frames.length) {
       return;
     }
-    const key = `${kind}:${targetIndex}`;
+    const key = `${kind}:${targetIndex}:${branchIndex ?? ''}`;
     if (seen.has(key)) {
       return;
     }
     seen.add(key);
-    options.push({ frameIndex: targetIndex, kind });
+    options.push({ frameIndex: targetIndex, kind, branchIndex });
   };
 
   const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
-  for (const branch of branches) {
+  for (let i = 0; i < branches.length; i += 1) {
+    const branch = branches[i];
     const target = Number(branch?.frameIndex);
     const weight = Number(branch?.weight);
     if (Number.isInteger(target) && Number.isFinite(weight) && weight > 0) {
-      pushOption(target, 'branch');
+      pushOption(target, 'branch', i);
     }
   }
 
@@ -173,31 +174,51 @@ function getPreviewPathOptions(frameIndex) {
   return options;
 }
 
-function renderPreviewPathSelector() {
-  const options = getPreviewPathOptions(state.selectedFrameIndex);
-  const count = options.length;
+function getAnimationPathChoiceCount() {
+  const frames = getCurrentFrames();
+  let maxOptions = 1;
+  for (let i = 0; i < frames.length; i += 1) {
+    const count = getPreviewPathOptions(i).length;
+    if (count > maxOptions) {
+      maxOptions = count;
+    }
+  }
+  return Math.max(1, maxOptions);
+}
 
-  if (!count) {
-    elements.branchPositionText.textContent = 'Branch -/-';
-    elements.prevBranchBtn.disabled = true;
-    elements.nextBranchBtn.disabled = true;
-    elements.prevBranchBtn.style.visibility = 'hidden';
-    elements.nextBranchBtn.style.visibility = 'hidden';
-    return;
+function getActiveEditableBranchIndex() {
+  const frame = getCurrentFrames()[state.selectedFrameIndex];
+  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  if (!branches.length) {
+    return 0;
   }
 
-  const key = String(state.selectedFrameIndex);
-  let choice = Number(state.previewPathOverrides[key]);
+  const options = getPreviewPathOptions(state.selectedFrameIndex);
+  const choice = Number(state.previewPathChoice);
+  if (Number.isInteger(choice) && choice >= 0 && choice < options.length) {
+    const selectedOption = options[choice];
+    if (selectedOption?.kind === 'branch' && Number.isInteger(selectedOption.branchIndex)) {
+      return Math.max(0, Math.min(selectedOption.branchIndex, branches.length - 1));
+    }
+  }
+
+  return 0;
+}
+
+function renderPreviewPathSelector() {
+  const count = getAnimationPathChoiceCount();
+
+  let choice = Number(state.previewPathChoice);
   if (!Number.isInteger(choice) || choice < 0 || choice >= count) {
     choice = 0;
-    state.previewPathOverrides[key] = choice;
+    state.previewPathChoice = 0;
   }
 
   elements.branchPositionText.textContent = `Branch ${choice + 1}/${count}`;
   elements.prevBranchBtn.disabled = count <= 1;
   elements.nextBranchBtn.disabled = count <= 1;
-  elements.prevBranchBtn.style.visibility = count > 1 ? 'visible' : 'hidden';
-  elements.nextBranchBtn.style.visibility = count > 1 ? 'visible' : 'hidden';
+  elements.prevBranchBtn.style.visibility = 'visible';
+  elements.nextBranchBtn.style.visibility = 'visible';
 }
 
 function getFrameImageCoordsList(frame) {
@@ -282,16 +303,16 @@ function playAnimationPreview(options = {}) {
   let cursor = startIndex;
 
   const getNextFrameIndex = (currentIndex) => {
-    const frame = frames[currentIndex] || {};
     const pathOptions = getPreviewPathOptions(currentIndex);
     if (pathOptions.length > 1) {
-      const key = String(currentIndex);
-      const override = Number(state.previewPathOverrides[key]);
-      if (Number.isInteger(override) && override >= 0 && override < pathOptions.length) {
-        return pathOptions[override].frameIndex;
-      }
+      const choice = Number(state.previewPathChoice);
+      const boundedChoice = Number.isInteger(choice)
+        ? Math.max(0, Math.min(choice, pathOptions.length - 1))
+        : 0;
+      return pathOptions[boundedChoice].frameIndex;
     }
 
+    const frame = frames[currentIndex] || {};
     const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
     const weightedBranches = branches
       .map((branch) => ({
@@ -385,7 +406,7 @@ function restoreSnapshot(snapshot) {
   }
   state.selectedCell = snapshot.selectedCell;
   state.previewFrameIndex = Math.max(0, Number(snapshot.previewFrameIndex) || 0);
-  state.previewPathOverrides = {};
+  state.previewPathChoice = 0;
 
   renderAnimationList();
   renderFrameList();
@@ -575,14 +596,15 @@ function describeFrame(frame, index) {
   const imageCell = frameToCell(frame);
   const sound = frame?.sound ? ` sound:${frame.sound}` : '';
   const branch = Number.isInteger(frame?.exitBranch) ? ` ->${frame.exitBranch}` : '';
-  const firstBranch = Array.isArray(frame?.branching?.branches) ? frame.branching.branches[0] : null;
-  const branchWeight = Number(firstBranch?.weight);
-  const branchFrameIndex = Number(firstBranch?.frameIndex);
-  const weighted = (
-    Number.isFinite(branchWeight)
-    && Number.isInteger(branchFrameIndex)
-    && branchFrameIndex >= 0
-  ) ? ` w:${branchWeight}@${branchFrameIndex}` : '';
+  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  const branchLabels = branches
+    .map((item) => ({
+      frameIndex: Number(item?.frameIndex),
+      weight: Number(item?.weight),
+    }))
+    .filter((item) => Number.isInteger(item.frameIndex) && item.frameIndex >= 0 && Number.isFinite(item.weight) && item.weight > 0)
+    .map((item) => `${item.weight}@${item.frameIndex}`);
+  const weighted = branchLabels.length ? ` w:${branchLabels.join('|')}` : '';
   const img = imageCell ? ` #${imageCell.index}` : ' n/a';
   return `${index.toString().padStart(3, '0')} | ${duration}ms | ${img}${branch}${weighted}${sound}`;
 }
@@ -644,9 +666,11 @@ function renderFrameEditor() {
   elements.durationInput.value = Number(frame.duration ?? 0);
   elements.soundSelect.value = frame.sound ? String(frame.sound) : '';
   elements.exitBranchInput.value = Number.isInteger(frame.exitBranch) ? String(frame.exitBranch) : '';
-  const firstBranch = Array.isArray(frame?.branching?.branches) ? frame.branching.branches[0] : null;
-  elements.branchFrameIndexInput.value = Number.isInteger(firstBranch?.frameIndex) ? String(firstBranch.frameIndex) : '';
-  elements.weightInput.value = Number.isFinite(Number(firstBranch?.weight)) ? String(Number(firstBranch.weight)) : '';
+  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  const editableBranchIndex = getActiveEditableBranchIndex();
+  const activeBranch = branches[editableBranchIndex] || null;
+  elements.branchFrameIndexInput.value = Number.isInteger(activeBranch?.frameIndex) ? String(activeBranch.frameIndex) : '';
+  elements.weightInput.value = Number.isFinite(Number(activeBranch?.weight)) ? String(Number(activeBranch.weight)) : '';
   elements.imagesInput.value = formatImages(frame.images);
   renderPreviewPathSelector();
 }
@@ -705,9 +729,20 @@ function applyFrameEditor() {
 
   const branchFrameIndexRaw = elements.branchFrameIndexInput.value.trim();
   const weightRaw = elements.weightInput.value.trim();
-  if (branchFrameIndexRaw || weightRaw) {
-    if (!branchFrameIndexRaw || !weightRaw) {
-      throw new Error('Branch Frame Index and Weight must both be set');
+  const hasBranchFrameIndex = branchFrameIndexRaw.length > 0;
+  const hasWeight = weightRaw.length > 0;
+  const editableBranchIndex = getActiveEditableBranchIndex();
+
+  if (!hasBranchFrameIndex && !hasWeight) {
+    if (frame.branching && Array.isArray(frame.branching.branches) && frame.branching.branches.length > editableBranchIndex) {
+      frame.branching.branches.splice(editableBranchIndex, 1);
+      if (frame.branching.branches.length === 0) {
+        delete frame.branching;
+      }
+    }
+  } else {
+    if (!hasBranchFrameIndex || !hasWeight) {
+      throw new Error('Set both Branch Frame Index and Weight, or clear both to remove branch');
     }
 
     const branchFrameIndex = Number(branchFrameIndexRaw);
@@ -726,12 +761,15 @@ function applyFrameEditor() {
     if (!Array.isArray(frame.branching.branches)) {
       frame.branching.branches = [];
     }
-    if (!frame.branching.branches[0] || typeof frame.branching.branches[0] !== 'object') {
-      frame.branching.branches[0] = {};
+    while (frame.branching.branches.length <= editableBranchIndex) {
+      frame.branching.branches.push({});
+    }
+    if (!frame.branching.branches[editableBranchIndex] || typeof frame.branching.branches[editableBranchIndex] !== 'object') {
+      frame.branching.branches[editableBranchIndex] = {};
     }
 
-    frame.branching.branches[0].frameIndex = branchFrameIndex;
-    frame.branching.branches[0].weight = weight;
+    frame.branching.branches[editableBranchIndex].frameIndex = branchFrameIndex;
+    frame.branching.branches[editableBranchIndex].weight = weight;
   }
 
   frame.images = parseImages(elements.imagesInput.value);
@@ -744,6 +782,7 @@ function selectAnimation(name) {
   const wasPlaying = Boolean(state.previewTimer);
   const previousPreviewFrameIndex = state.previewFrameIndex;
   stopAnimationPreview();
+  state.previewPathChoice = 0;
   state.selectedAnimation = name;
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
@@ -767,7 +806,7 @@ async function loadAgent(name) {
   state.selectedAnimation = animationNames().at(0) || null;
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
-  state.previewPathOverrides = {};
+  state.previewPathChoice = 0;
   state.selectedCell = null;
   state.mapZoom = 1;
   state.previewSoundEnabled = false;
@@ -831,7 +870,28 @@ async function saveAgent(options = {}) {
     body: JSON.stringify({ definition: state.payload.definition }),
   });
 
-  setStatus(`Saved: ${result.savedPath}`);
+  // Read back from disk after save so UI state always matches the actual file content.
+  const reloaded = await fetchJson(`/api/agent/${encodeURIComponent(state.currentAgent)}`);
+  if (!reloaded?.definition || typeof reloaded.definition !== 'object') {
+    throw new Error('Save verification failed: could not reload agent definition');
+  }
+  state.payload.definition = reloaded.definition;
+  if (!getAnimationsObject()[state.selectedAnimation]) {
+    state.selectedAnimation = animationNames().at(0) || null;
+  }
+  const frames = getCurrentFrames();
+  if (frames.length === 0) {
+    state.selectedFrameIndex = -1;
+    state.selectedFrameIndices = [];
+  } else {
+    state.selectedFrameIndex = Math.max(0, Math.min(state.selectedFrameIndex, frames.length - 1));
+    state.selectedFrameIndices = [state.selectedFrameIndex];
+  }
+  renderAnimationList();
+  renderFrameList();
+
+  const savedPath = result?.savedPath || `assets/agents/${state.currentAgent}/agent.js`;
+  setStatus(`Saved: ${savedPath}`);
 }
 
 async function applyAndPersistFrame() {
@@ -1119,15 +1179,14 @@ function bindEvents() {
   elements.imagesInput.addEventListener('keydown', applyOnTextareaEnter);
 
   elements.prevBranchBtn.addEventListener('click', () => {
-    const options = getPreviewPathOptions(state.selectedFrameIndex);
-    if (options.length <= 1) {
+    const count = getAnimationPathChoiceCount();
+    if (count <= 1) {
       return;
     }
-    const key = String(state.selectedFrameIndex);
-    const current = Number(state.previewPathOverrides[key]);
+    const current = Number(state.previewPathChoice);
     const currentIndex = Number.isInteger(current) ? current : 0;
-    state.previewPathOverrides[key] = (currentIndex - 1 + options.length) % options.length;
-    renderPreviewPathSelector();
+    state.previewPathChoice = (currentIndex - 1 + count) % count;
+    renderFrameEditor();
     if (state.previewTimer) {
       playAnimationPreview({ startIndex: 0 });
     } else {
@@ -1136,15 +1195,14 @@ function bindEvents() {
   });
 
   elements.nextBranchBtn.addEventListener('click', () => {
-    const options = getPreviewPathOptions(state.selectedFrameIndex);
-    if (options.length <= 1) {
+    const count = getAnimationPathChoiceCount();
+    if (count <= 1) {
       return;
     }
-    const key = String(state.selectedFrameIndex);
-    const current = Number(state.previewPathOverrides[key]);
+    const current = Number(state.previewPathChoice);
     const currentIndex = Number.isInteger(current) ? current : 0;
-    state.previewPathOverrides[key] = (currentIndex + 1) % options.length;
-    renderPreviewPathSelector();
+    state.previewPathChoice = (currentIndex + 1) % count;
+    renderFrameEditor();
     if (state.previewTimer) {
       playAnimationPreview({ startIndex: 0 });
     } else {

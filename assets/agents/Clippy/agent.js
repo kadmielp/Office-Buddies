@@ -6042,7 +6042,7 @@ clippy.ready("Clippy", {
               }
             ]
           },
-          exitBranch: 34
+          exitBranch: 1
         },
         {
           duration: 100,
@@ -10670,8 +10670,8 @@ clippy.ready("Clippy", {
           branching: {
             branches: [
               {
-                frameIndex: 19,
-                weight: 40
+                frameIndex: 0,
+                weight: 0
               }
             ]
           }
@@ -10799,15 +10799,7 @@ clippy.ready("Clippy", {
               1364,
               2604
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 32,
-                weight: 75
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,

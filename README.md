@@ -55,42 +55,13 @@ Animation files live at `assets/agents/<Agent>/agent.js`.
 
 ### Animation Studio (Recommended)
 
-Use the Win98-style Animation Studio to edit animations visually instead of manually editing `agent.js`.
+Animation Studio is a standalone Win98-style visual editor for assistant animations (`agent.js`), sprite-map frame picking (`map.png`), and sound assignment (`sounds-mp3.js` / `sounds-ogg.js`).
 
-Start it from repo root:
+Its purpose is to speed up animation authoring and reduce manual timeline editing mistakes.
 
-```powershell
-node tools/animation-studio/server.js
-```
+For complete setup, workflow tutorials, and branching behavior details (`exitBranch` vs `branch frame index`), see:
 
-Open:
-
-- `http://127.0.0.1:4177`
-
-Optional custom port:
-
-```powershell
-$env:ANIM_STUDIO_PORT=4300
-node tools/animation-studio/server.js
-```
-
-Workflow:
-
-1. Select an assistant and click `Load`.
-2. Pick an animation from the left list.
-3. Use `Map Frame Picker` to choose sprite cells from `map.png`.
-4. Edit frame properties on the right (`duration`, `sound`, `exitBranch`, `images`).
-5. Use frame actions (`Add`, `Duplicate`, `Remove`, `Up/Down`, `Select All`, `Invert Selected`).
-6. Use `Apply` (or press `Enter` on `Duration` / `Exit Branch`) to apply current frame edits.
-7. Use `Save agent.js` to persist changes to `assets/agents/<Agent>/agent.js`.
-
-Included tooling:
-
-- Live looping animation preview (supports multi-image frames and `exitBranch` flow).
-- Preview sound toggle (`Sound: Off/On`) plus frame sound test.
-- Assistant-specific `Sound Library` tab with per-sound play buttons and `Use In Frame`.
-- Session undo button for recent edits.
-- Animation create, rename, and delete actions.
+- [`tools/animation-studio/TUTORIAL.md`](tools/animation-studio/TUTORIAL.md)
 
 ### 1) Understand frame targets
 

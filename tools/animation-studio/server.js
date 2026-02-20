@@ -18,6 +18,7 @@ function sendJson(res, status, payload) {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Content-Length': Buffer.byteLength(body),
+    'Cache-Control': 'no-store',
   });
   res.end(body);
 }
@@ -26,6 +27,7 @@ function sendText(res, status, text, contentType = 'text/plain; charset=utf-8') 
   res.writeHead(status, {
     'Content-Type': contentType,
     'Content-Length': Buffer.byteLength(text),
+    'Cache-Control': 'no-store',
   });
   res.end(text);
 }
@@ -219,6 +221,7 @@ function serveFile(res, filePath, contentType) {
   res.writeHead(200, {
     'Content-Type': contentType,
     'Content-Length': data.length,
+    'Cache-Control': 'no-store',
   });
   res.end(data);
 }

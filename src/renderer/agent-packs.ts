@@ -231,3 +231,7 @@ export function getAnimationKeysBrackets(agentName?: string): string[] {
 export function getIdleAnimationKeys(pack: AgentPack): string[] {
   return getAnimationKeys(pack).filter((key) => key.startsWith("Idle"));
 }
+
+export function getDeepIdleAnimationKeys(pack: AgentPack): string[] {
+  return getAnimationKeys(pack).filter((key) => /^deepidle/i.test(key));
+}

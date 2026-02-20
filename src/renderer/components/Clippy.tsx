@@ -5,6 +5,7 @@ import {
   getChatAnimationKeys,
   getAnimationDuration,
   getIdleAnimationKeys,
+  getDeepIdleAnimationKeys,
   isDisallowedChatAnimationKey,
   AgentAnimation,
   AgentFrame,
@@ -17,6 +18,7 @@ import { clippyApi } from "../clippyApi";
 import { useBubbleView } from "../contexts/BubbleViewContext";
 
 const WAIT_TIME = 60000;
+const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
 const WINDOW_PADDING_WIDTH = 1;
 const WINDOW_PADDING_HEIGHT = 7;
 
@@ -90,6 +92,7 @@ export function Clippy() {
   const idleTimeoutRef = useRef<number | undefined>(undefined);
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
+  const idleStartedAtRef = useRef<number | null>(null);
 
   const [isSpriteReady, setIsSpriteReady] = useState(false);
   const [displayedAgent, setDisplayedAgent] = useState<string>(selectedAgent);
@@ -488,7 +491,17 @@ export function Clippy() {
         return;
       }
 
-      const idleAnimationKeys = getIdleAnimationKeys(agentPack);
+      if (idleStartedAtRef.current === null) {
+        idleStartedAtRef.current = Date.now();
+      }
+
+      const deepIdleAnimationKeys = getDeepIdleAnimationKeys(agentPack);
+      const hasReachedDeepIdleWindow =
+        Date.now() - idleStartedAtRef.current >= DEEP_IDLE_WAIT_TIME;
+      const idleAnimationKeys =
+        hasReachedDeepIdleWindow && deepIdleAnimationKeys.length > 0
+          ? deepIdleAnimationKeys
+          : getIdleAnimationKeys(agentPack);
 
       if (idleAnimationKeys.length === 0) {
         return;
@@ -507,6 +520,7 @@ export function Clippy() {
     };
 
     if (status === "welcome" && !hasPlayedWelcomeRef.current) {
+      idleStartedAtRef.current = null;
       hasPlayedWelcomeRef.current = true;
 
       const welcomeAnimationKey =
@@ -517,7 +531,12 @@ export function Clippy() {
         setStatus("idle");
       });
     } else if (status === "idle") {
+      if (idleStartedAtRef.current === null) {
+        idleStartedAtRef.current = Date.now();
+      }
       playRandomIdleAnimation();
+    } else {
+      idleStartedAtRef.current = null;
     }
 
     return () => {

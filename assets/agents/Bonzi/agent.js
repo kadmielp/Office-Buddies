@@ -222,7 +222,7 @@ clippy.ready("Bonzi", {
         }
       ]
     },
-    Hide: {
+    GoodBye: {
       frames: [
         {
           duration: 100,
@@ -719,6 +719,591 @@ clippy.ready("Bonzi", {
     },
     Announce: {
       frames: [
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1200,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 400,
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 400,
+          images: [
+            [
+              3000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 400,
+          images: [
+            [
+              3000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 400,
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              1120
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              960
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1200,
+              960
+            ]
+          ]
+        },
         {
           duration: 100,
           images: [
@@ -1621,9 +2206,6 @@ clippy.ready("Bonzi", {
               1280
             ]
           ]
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -3225,19 +3807,6 @@ clippy.ready("Bonzi", {
       ],
       useExitBranching: true
     },
-    GetAttentionContinued: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
     WriteContinued: {
       frames: [
         {
@@ -3648,9 +4217,6 @@ clippy.ready("Bonzi", {
               0
             ]
           ]
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -3920,9 +4486,6 @@ clippy.ready("Bonzi", {
               }
             ]
           }
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -4147,6 +4710,96 @@ clippy.ready("Bonzi", {
               2080
             ]
           ]
+        },
+        {
+          duration: 200,
+          images: [
+            [
+              2200,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1400,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1200,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1000,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              800,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -4335,19 +4988,6 @@ clippy.ready("Bonzi", {
         }
       ]
     },
-    GetAttentionReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
     GestureRight: {
       frames: [
         {
@@ -4412,9 +5052,6 @@ clippy.ready("Bonzi", {
               3040
             ]
           ]
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -5237,9 +5874,6 @@ clippy.ready("Bonzi", {
               0
             ]
           ]
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -5895,7 +6529,7 @@ clippy.ready("Bonzi", {
           ]
         },
         {
-          duration: 100,
+          duration: 3000,
           images: [
             [
               600,
@@ -5904,7 +6538,58 @@ clippy.ready("Bonzi", {
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              400,
+              2240
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              2240
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              2240
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -6360,9 +7045,6 @@ clippy.ready("Bonzi", {
               0
             ]
           ]
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true

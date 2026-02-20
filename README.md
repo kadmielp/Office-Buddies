@@ -49,6 +49,27 @@ For local mode, GGUF models are supported. Good sources include quantizations fr
 - [TheBloke](https://huggingface.co/thebloke)
 - [Unsloth](https://huggingface.co/unsloth)
 
+## Build Windows EXE
+
+To generate a Windows installer `.exe`, run:
+
+```bash
+npm install
+npm run make
+```
+
+The generated installer is placed under `out/make/squirrel.windows/<arch>/`, for example:
+
+- `out/make/squirrel.windows/x64/OfficeBuddies-<version>-setup-x64.exe`
+
+If you only want an unpacked app build (no installer), run:
+
+```bash
+npm run package
+```
+
+That output goes to `out/Office Buddies-win32-<arch>/`.
+
 ## Editing Agent Animations (Frame Arrays)
 
 Animation files live at `assets/agents/<Agent>/agent.js`.

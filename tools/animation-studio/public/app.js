@@ -16,6 +16,7 @@
   selectedLibrarySoundId: '',
   historyStack: [],
   previewSoundEnabled: false,
+  previewPathOverrides: {},
 };
 
 const elements = {
@@ -56,6 +57,11 @@ const elements = {
   soundSelect: document.getElementById('soundSelect'),
   playFrameSoundBtn: document.getElementById('playFrameSoundBtn'),
   exitBranchInput: document.getElementById('exitBranchInput'),
+  prevBranchBtn: document.getElementById('prevBranchBtn'),
+  nextBranchBtn: document.getElementById('nextBranchBtn'),
+  branchPositionText: document.getElementById('branchPositionText'),
+  branchFrameIndexInput: document.getElementById('branchFrameIndexInput'),
+  weightInput: document.getElementById('weightInput'),
   imagesInput: document.getElementById('imagesInput'),
   addFrameBtn: document.getElementById('addFrameBtn'),
   duplicateFrameBtn: document.getElementById('duplicateFrameBtn'),
@@ -127,6 +133,73 @@ function getCurrentFrames() {
   return animation.frames;
 }
 
+function getPreviewPathOptions(frameIndex) {
+  const frames = getCurrentFrames();
+  if (!frames.length || frameIndex < 0 || frameIndex >= frames.length) {
+    return [];
+  }
+
+  const frame = frames[frameIndex] || {};
+  const options = [];
+  const seen = new Set();
+
+  const pushOption = (targetIndex, kind) => {
+    if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= frames.length) {
+      return;
+    }
+    const key = `${kind}:${targetIndex}`;
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    options.push({ frameIndex: targetIndex, kind });
+  };
+
+  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  for (const branch of branches) {
+    const target = Number(branch?.frameIndex);
+    const weight = Number(branch?.weight);
+    if (Number.isInteger(target) && Number.isFinite(weight) && weight > 0) {
+      pushOption(target, 'branch');
+    }
+  }
+
+  if (Number.isInteger(frame.exitBranch)) {
+    pushOption(frame.exitBranch, 'exit');
+  } else if (frames.length > 0) {
+    pushOption((frameIndex + 1) % frames.length, 'next');
+  }
+
+  return options;
+}
+
+function renderPreviewPathSelector() {
+  const options = getPreviewPathOptions(state.selectedFrameIndex);
+  const count = options.length;
+
+  if (!count) {
+    elements.branchPositionText.textContent = 'Branch -/-';
+    elements.prevBranchBtn.disabled = true;
+    elements.nextBranchBtn.disabled = true;
+    elements.prevBranchBtn.style.visibility = 'hidden';
+    elements.nextBranchBtn.style.visibility = 'hidden';
+    return;
+  }
+
+  const key = String(state.selectedFrameIndex);
+  let choice = Number(state.previewPathOverrides[key]);
+  if (!Number.isInteger(choice) || choice < 0 || choice >= count) {
+    choice = 0;
+    state.previewPathOverrides[key] = choice;
+  }
+
+  elements.branchPositionText.textContent = `Branch ${choice + 1}/${count}`;
+  elements.prevBranchBtn.disabled = count <= 1;
+  elements.nextBranchBtn.disabled = count <= 1;
+  elements.prevBranchBtn.style.visibility = count > 1 ? 'visible' : 'hidden';
+  elements.nextBranchBtn.style.visibility = count > 1 ? 'visible' : 'hidden';
+}
+
 function getFrameImageCoordsList(frame) {
   if (!frame || !Array.isArray(frame.images) || !state.payload) {
     return [];
@@ -192,7 +265,7 @@ function renderAnimationPreview(frameIndex = 0) {
   elements.previewFrameText.textContent = `Frame: ${bounded}`;
 }
 
-function playAnimationPreview() {
+function playAnimationPreview(options = {}) {
   const frames = getCurrentFrames();
   if (!frames.length) {
     stopAnimationPreview();
@@ -200,11 +273,50 @@ function playAnimationPreview() {
     return;
   }
 
+  const requestedStart = Number(options.startIndex);
+  const startIndex = Number.isInteger(requestedStart)
+    ? Math.max(0, Math.min(requestedStart, frames.length - 1))
+    : Math.max(0, Math.min(state.previewFrameIndex, frames.length - 1));
+
   stopAnimationPreview();
-  let cursor = 0;
+  let cursor = startIndex;
 
   const getNextFrameIndex = (currentIndex) => {
     const frame = frames[currentIndex] || {};
+    const pathOptions = getPreviewPathOptions(currentIndex);
+    if (pathOptions.length > 1) {
+      const key = String(currentIndex);
+      const override = Number(state.previewPathOverrides[key]);
+      if (Number.isInteger(override) && override >= 0 && override < pathOptions.length) {
+        return pathOptions[override].frameIndex;
+      }
+    }
+
+    const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+    const weightedBranches = branches
+      .map((branch) => ({
+        frameIndex: Number(branch?.frameIndex),
+        weight: Number(branch?.weight),
+      }))
+      .filter((branch) => (
+        Number.isInteger(branch.frameIndex)
+        && branch.frameIndex >= 0
+        && branch.frameIndex < frames.length
+        && Number.isFinite(branch.weight)
+        && branch.weight > 0
+      ));
+
+    if (weightedBranches.length) {
+      const roll = Math.random() * 100;
+      let cumulative = 0;
+      for (const branch of weightedBranches) {
+        cumulative += branch.weight;
+        if (roll < cumulative) {
+          return branch.frameIndex;
+        }
+      }
+    }
+
     if (Number.isInteger(frame.exitBranch)) {
       if (frame.exitBranch >= 0 && frame.exitBranch < frames.length) {
         return frame.exitBranch;
@@ -273,6 +385,7 @@ function restoreSnapshot(snapshot) {
   }
   state.selectedCell = snapshot.selectedCell;
   state.previewFrameIndex = Math.max(0, Number(snapshot.previewFrameIndex) || 0);
+  state.previewPathOverrides = {};
 
   renderAnimationList();
   renderFrameList();
@@ -462,8 +575,16 @@ function describeFrame(frame, index) {
   const imageCell = frameToCell(frame);
   const sound = frame?.sound ? ` sound:${frame.sound}` : '';
   const branch = Number.isInteger(frame?.exitBranch) ? ` ->${frame.exitBranch}` : '';
+  const firstBranch = Array.isArray(frame?.branching?.branches) ? frame.branching.branches[0] : null;
+  const branchWeight = Number(firstBranch?.weight);
+  const branchFrameIndex = Number(firstBranch?.frameIndex);
+  const weighted = (
+    Number.isFinite(branchWeight)
+    && Number.isInteger(branchFrameIndex)
+    && branchFrameIndex >= 0
+  ) ? ` w:${branchWeight}@${branchFrameIndex}` : '';
   const img = imageCell ? ` #${imageCell.index}` : ' n/a';
-  return `${index.toString().padStart(3, '0')} | ${duration}ms | ${img}${branch}${sound}`;
+  return `${index.toString().padStart(3, '0')} | ${duration}ms | ${img}${branch}${weighted}${sound}`;
 }
 
 function renderFrameList() {
@@ -491,6 +612,7 @@ function renderFrameList() {
   });
 
   renderFrameEditor();
+  renderPreviewPathSelector();
   drawMap();
   renderAnimationPreview(state.previewFrameIndex);
 }
@@ -512,14 +634,21 @@ function renderFrameEditor() {
     elements.durationInput.value = '';
     elements.soundSelect.value = '';
     elements.exitBranchInput.value = '';
+    elements.branchFrameIndexInput.value = '';
+    elements.weightInput.value = '';
     elements.imagesInput.value = '';
+    renderPreviewPathSelector();
     return;
   }
 
   elements.durationInput.value = Number(frame.duration ?? 0);
   elements.soundSelect.value = frame.sound ? String(frame.sound) : '';
   elements.exitBranchInput.value = Number.isInteger(frame.exitBranch) ? String(frame.exitBranch) : '';
+  const firstBranch = Array.isArray(frame?.branching?.branches) ? frame.branching.branches[0] : null;
+  elements.branchFrameIndexInput.value = Number.isInteger(firstBranch?.frameIndex) ? String(firstBranch.frameIndex) : '';
+  elements.weightInput.value = Number.isFinite(Number(firstBranch?.weight)) ? String(Number(firstBranch.weight)) : '';
   elements.imagesInput.value = formatImages(frame.images);
+  renderPreviewPathSelector();
 }
 
 function parseImages(text) {
@@ -574,6 +703,37 @@ function applyFrameEditor() {
     delete frame.exitBranch;
   }
 
+  const branchFrameIndexRaw = elements.branchFrameIndexInput.value.trim();
+  const weightRaw = elements.weightInput.value.trim();
+  if (branchFrameIndexRaw || weightRaw) {
+    if (!branchFrameIndexRaw || !weightRaw) {
+      throw new Error('Branch Frame Index and Weight must both be set');
+    }
+
+    const branchFrameIndex = Number(branchFrameIndexRaw);
+    if (!Number.isInteger(branchFrameIndex) || branchFrameIndex < 0) {
+      throw new Error('Branch Frame Index must be a whole number >= 0');
+    }
+
+    const weight = Number(weightRaw);
+    if (!Number.isInteger(weight) || weight < 0 || weight > 100) {
+      throw new Error('Weight must be a whole number between 0 and 100');
+    }
+
+    if (!frame.branching || typeof frame.branching !== 'object') {
+      frame.branching = {};
+    }
+    if (!Array.isArray(frame.branching.branches)) {
+      frame.branching.branches = [];
+    }
+    if (!frame.branching.branches[0] || typeof frame.branching.branches[0] !== 'object') {
+      frame.branching.branches[0] = {};
+    }
+
+    frame.branching.branches[0].frameIndex = branchFrameIndex;
+    frame.branching.branches[0].weight = weight;
+  }
+
   frame.images = parseImages(elements.imagesInput.value);
 
   renderFrameList();
@@ -581,14 +741,19 @@ function applyFrameEditor() {
 }
 
 function selectAnimation(name) {
+  const wasPlaying = Boolean(state.previewTimer);
+  const previousPreviewFrameIndex = state.previewFrameIndex;
   stopAnimationPreview();
   state.selectedAnimation = name;
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
-  state.previewFrameIndex = 0;
   renderAnimationList();
   renderFrameList();
-  playAnimationPreview();
+  if (wasPlaying) {
+    playAnimationPreview({ startIndex: previousPreviewFrameIndex });
+  } else {
+    renderAnimationPreview(previousPreviewFrameIndex);
+  }
 }
 
 async function loadAgent(name) {
@@ -602,6 +767,7 @@ async function loadAgent(name) {
   state.selectedAnimation = animationNames().at(0) || null;
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
+  state.previewPathOverrides = {};
   state.selectedCell = null;
   state.mapZoom = 1;
   state.previewSoundEnabled = false;
@@ -917,11 +1083,7 @@ function bindEvents() {
     })();
   });
 
-  const applyOnEnter = (event) => {
-    if (event.key !== 'Enter') {
-      return;
-    }
-    event.preventDefault();
+  const runApplyAndPersist = () => {
     (async () => {
       try {
         await applyAndPersistFrame();
@@ -931,8 +1093,64 @@ function bindEvents() {
     })();
   };
 
+  const applyOnEnter = (event) => {
+    if (event.key !== 'Enter') {
+      return;
+    }
+    event.preventDefault();
+    runApplyAndPersist();
+  };
+
+  const applyOnTextareaEnter = (event) => {
+    if (event.key !== 'Enter') {
+      return;
+    }
+    if (!event.ctrlKey && !event.metaKey) {
+      return;
+    }
+    event.preventDefault();
+    runApplyAndPersist();
+  };
+
   elements.durationInput.addEventListener('keydown', applyOnEnter);
   elements.exitBranchInput.addEventListener('keydown', applyOnEnter);
+  elements.branchFrameIndexInput.addEventListener('keydown', applyOnEnter);
+  elements.weightInput.addEventListener('keydown', applyOnEnter);
+  elements.imagesInput.addEventListener('keydown', applyOnTextareaEnter);
+
+  elements.prevBranchBtn.addEventListener('click', () => {
+    const options = getPreviewPathOptions(state.selectedFrameIndex);
+    if (options.length <= 1) {
+      return;
+    }
+    const key = String(state.selectedFrameIndex);
+    const current = Number(state.previewPathOverrides[key]);
+    const currentIndex = Number.isInteger(current) ? current : 0;
+    state.previewPathOverrides[key] = (currentIndex - 1 + options.length) % options.length;
+    renderPreviewPathSelector();
+    if (state.previewTimer) {
+      playAnimationPreview({ startIndex: 0 });
+    } else {
+      renderAnimationPreview(state.selectedFrameIndex);
+    }
+  });
+
+  elements.nextBranchBtn.addEventListener('click', () => {
+    const options = getPreviewPathOptions(state.selectedFrameIndex);
+    if (options.length <= 1) {
+      return;
+    }
+    const key = String(state.selectedFrameIndex);
+    const current = Number(state.previewPathOverrides[key]);
+    const currentIndex = Number.isInteger(current) ? current : 0;
+    state.previewPathOverrides[key] = (currentIndex + 1) % options.length;
+    renderPreviewPathSelector();
+    if (state.previewTimer) {
+      playAnimationPreview({ startIndex: 0 });
+    } else {
+      renderAnimationPreview(state.selectedFrameIndex);
+    }
+  });
 
   elements.addFrameBtn.addEventListener('click', () => {
     pushHistorySnapshot();
@@ -982,6 +1200,39 @@ function bindEvents() {
     state.selectedFrameIndices = [state.selectedFrameIndex];
     renderFrameList();
     setStatus('Frame removed');
+  });
+
+  elements.frameList.addEventListener('keydown', (event) => {
+    if (event.key !== 'Delete') {
+      return;
+    }
+    event.preventDefault();
+
+    const frames = getCurrentFrames();
+    const selected = Array.from(new Set((state.selectedFrameIndices || [])
+      .filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length)))
+      .sort((a, b) => b - a);
+
+    if (!selected.length) {
+      return;
+    }
+
+    pushHistorySnapshot();
+    for (const index of selected) {
+      frames.splice(index, 1);
+    }
+
+    if (frames.length === 0) {
+      state.selectedFrameIndex = -1;
+      state.selectedFrameIndices = [];
+    } else {
+      const nextIndex = Math.max(0, Math.min(selected[selected.length - 1], frames.length - 1));
+      state.selectedFrameIndex = nextIndex;
+      state.selectedFrameIndices = [nextIndex];
+    }
+
+    renderFrameList();
+    setStatus(`Removed ${selected.length} frame(s)`);
   });
 
   elements.moveUpBtn.addEventListener('click', () => {

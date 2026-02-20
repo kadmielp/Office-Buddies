@@ -129,6 +129,13 @@ body {
   min-height: 640px;
 }
 
+.frame-list-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
 textarea {
   resize: vertical;
 }
@@ -147,6 +154,25 @@ textarea {
 .sound-row select {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.branch-selector {
+  align-items: center;
+  gap: 6px;
+}
+
+.branch-selector button {
+  min-width: 26px;
+  padding: 0;
+}
+
+#branchPositionText {
+  min-width: 88px;
+  text-align: center;
+}
+
+.branch-selector-under-preview {
+  justify-content: center;
 }
 
 .sound-browser {

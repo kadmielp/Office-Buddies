@@ -43,6 +43,11 @@
                   <button id="togglePreviewSoundBtn" type="button" title="Preview sound off">Sound: Off</button>
                   <span id="previewFrameText">Frame: -</span>
                 </div>
+                <div class="field-row branch-selector branch-selector-under-preview">
+                  <button id="prevBranchBtn" type="button">&lt;</button>
+                  <span id="branchPositionText">Branch 1/1</span>
+                  <button id="nextBranchBtn" type="button">&gt;</button>
+                </div>
               </fieldset>
             </div>
           </fieldset>
@@ -79,7 +84,9 @@
             <fieldset id="framesTabContent" class="frames-panel tab-content active-tab">
               <legend>Frames</legend>
               <div class="frames-grid">
-                <select id="frameList" size="14" multiple></select>
+                <div class="frame-list-column">
+                  <select id="frameList" size="14" multiple></select>
+                </div>
                 <div class="field-row-stacked">
                   <label for="durationInput">Duration (ms)</label>
                   <input id="durationInput" type="number" min="0" step="10" />
@@ -92,6 +99,12 @@
 
                   <label for="exitBranchInput">Exit Branch</label>
                   <input id="exitBranchInput" type="number" min="0" step="1" />
+
+                  <label for="branchFrameIndexInput">Branch Frame Index</label>
+                  <input id="branchFrameIndexInput" type="number" min="0" step="1" />
+
+                  <label for="weightInput">Weight (%)</label>
+                  <input id="weightInput" type="number" min="0" max="100" step="1" />
 
                   <label for="imagesInput">Images (x,y pairs, one per line)</label>
                   <textarea id="imagesInput" rows="6"></textarea>

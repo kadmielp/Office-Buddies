@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.4] - 2026-02-20
+
+### Added
+
+- Animation Studio frame editor support for branch-weight editing (`Branch Frame Index` + `Weight (%)`).
+- Preview path selector (`<` / `>`) under `Animation Preview` to force which available branch path is shown when multiple next-path options exist.
+- Keyboard frame deletion in Animation Studio: pressing `Delete` on the frame list removes selected frame(s).
+- Expanded Enter-to-apply behavior in Animation Studio typed fields:
+  - `Duration`
+  - `Exit Branch`
+  - `Branch Frame Index`
+  - `Weight`
+  - `Images` via `Ctrl+Enter` / `Cmd+Enter`
+
+### Changed
+
+- Animation Studio preview no longer hard-resets to frame `0` every time a different animation is selected.
+- Animation Studio preview path forcing now restarts playback immediately so selected endings can be verified quickly.
+
+### Removed
+
+- Removed `exitBranch` properties from all agent definitions under `assets/agents/*/agent.js`.
+
 ## [0.5.3] - 2026-02-20
 
 ### Added

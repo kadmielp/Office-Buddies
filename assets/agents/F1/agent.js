@@ -41,7 +41,6 @@
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 46,
           sound: "29",
           branching: { branches: [
             { frameIndex: 1, weight: 33 },
@@ -66,23 +65,23 @@
         // #8
         { duration: 100, images: [[992, 0]] },
         // #9
-        { duration: 1000, images: [[1116, 0]], exitBranch: 20 },
+        { duration: 1000, images: [[1116, 0]] },
         // #10
         { duration: 330, images: [[1240, 0]] },
         // #11
-        { duration: 500, images: [[1116, 0]], exitBranch: 20 },
+        { duration: 500, images: [[1116, 0]] },
         // #12
         { duration: 100, images: [[1240, 0]] },
         // #13
-        { duration: 300, images: [[1116, 0]], exitBranch: 20 },
+        { duration: 300, images: [[1116, 0]] },
         // #14
         { duration: 100, images: [[1240, 0]] },
         // #15
-        { duration: 600, images: [[1116, 0]], exitBranch: 20 },
+        { duration: 600, images: [[1116, 0]] },
         // #16
         { duration: 100, images: [[1240, 0]] },
         // #17
-        { duration: 1000, images: [[1116, 0]], exitBranch: 20 },
+        { duration: 1000, images: [[1116, 0]] },
         // #18
         { duration: 330, images: [[1240, 0]] },
         // #19
@@ -90,12 +89,11 @@
         // #20
         { duration: 200, images: [[1488, 0]], sound: "22" },
         // #21
-        { duration: 130, images: [[1612, 0]], exitBranch: 46 },
+        { duration: 130, images: [[1612, 0]] },
         // #22
         {
           duration: 100,
           images: [[124, 0]],
-          exitBranch: 46,
           branching: { branches: [{ frameIndex: 46, weight: 100 }] },
         },
         // #23
@@ -113,11 +111,11 @@
         // #29
         { duration: 100, images: [[2480, 0]] },
         // #30
-        { duration: 100, images: [[2604, 0]], exitBranch: 34 },
+        { duration: 100, images: [[2604, 0]] },
         // #31
         { duration: 160, images: [[2728, 0]] },
         // #32
-        { duration: 200, images: [[2852, 0]], exitBranch: 35 },
+        { duration: 200, images: [[2852, 0]] },
         // #33
         { duration: 300, images: [[2976, 0]] },
         // #34
@@ -128,7 +126,6 @@
         {
           duration: 100,
           images: [[124, 93]],
-          exitBranch: 46,
           branching: { branches: [{ frameIndex: 46, weight: 80 }] },
         },
         // #37
@@ -148,7 +145,7 @@
         // #44
         { duration: 130, images: [[1116, 93]] },
         // #45
-        { duration: 130, images: [[1240, 93]], exitBranch: 46 },
+        { duration: 130, images: [[1240, 93]] },
         // #46
         { duration: 100, images: [[1364, 93]] },
       ],
@@ -168,7 +165,7 @@
         // #5
         { duration: 100, images: [[1116, 744]] },
         // #6
-        { duration: 100, images: [[1240, 744]], exitBranch: 7 },
+        { duration: 100, images: [[1240, 744]] },
         // #7
         { duration: 100, images: [[0, 0]] },
       ],
@@ -181,7 +178,6 @@
         {
           duration: 330,
           images: [[1860, 93]],
-          exitBranch: 10,
           branching: { branches: [{ frameIndex: 1, weight: 75 }] },
         },
         // #2
@@ -190,26 +186,24 @@
         {
           duration: 330,
           images: [[2108, 93]],
-          exitBranch: 10,
           branching: { branches: [{ frameIndex: 3, weight: 75 }] },
         },
         // #4
         { duration: 100, images: [[2232, 93]] },
         // #5
-        { duration: 100, images: [[2356, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2356, 93]] },
         // #6
         {
           duration: 100,
           images: [[2480, 93]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 3, weight: 30 }] },
         },
         // #7
-        { duration: 400, images: [[2604, 93]], exitBranch: 10 },
+        { duration: 400, images: [[2604, 93]] },
         // #8
         { duration: 100, images: [[2728, 93]] },
         // #9
-        { duration: 100, images: [[2852, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2852, 93]] },
         // #10
         { duration: 100, images: [[0, 0]] },
       ],
@@ -220,7 +214,6 @@
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 27,
           sound: "29",
           branching: { branches: [{ frameIndex: 22, weight: 50 }] },
         },
@@ -235,7 +228,7 @@
         // #5
         { duration: 100, images: [[248, 186]], sound: "15" },
         // #6
-        { duration: 100, images: [[372, 186]], exitBranch: 14 },
+        { duration: 100, images: [[372, 186]] },
         // #7
         { duration: 100, images: [[496, 186]] },
         // #8
@@ -246,7 +239,6 @@
         {
           duration: 100,
           images: [[868, 186]],
-          exitBranch: 19,
           branching: { branches: [{ frameIndex: 19, weight: 100 }] },
         },
         // #11
@@ -273,7 +265,6 @@
         {
           duration: 100,
           images: [[2232, 186]],
-          exitBranch: 27,
           branching: { branches: [{ frameIndex: 27, weight: 100 }] },
         },
         // #22
@@ -285,7 +276,7 @@
         // #25
         { duration: 100, images: [[2728, 186]] },
         // #26
-        { duration: 100, images: [[2604, 186]], exitBranch: 27 },
+        { duration: 100, images: [[2604, 186]] },
         // #27
         { duration: 100, images: [[0, 0]] },
       ],
@@ -296,7 +287,6 @@
         {
           duration: 100,
           images: [[1364, 93]],
-          exitBranch: 38,
           branching: {
             branches: [
               { frameIndex: 18, weight: 33 },
@@ -305,7 +295,7 @@
           },
         },
         // #1
-        { duration: 100, images: [[1736, 0]], exitBranch: 38 },
+        { duration: 100, images: [[1736, 0]] },
         // #2
         { duration: 100, images: [[1860, 0]] },
         // #3
@@ -340,7 +330,6 @@
         {
           duration: 100,
           images: [[124, 93]],
-          exitBranch: 38,
           branching: { branches: [{ frameIndex: 38, weight: 100 }] },
         },
         // #18
@@ -373,7 +362,6 @@
         {
           duration: 100,
           images: [[1612, 279]],
-          exitBranch: 38,
           branching: { branches: [{ frameIndex: 38, weight: 100 }] },
         },
         // #32
@@ -387,7 +375,7 @@
         // #36
         { duration: 100, images: [[2604, 186]] },
         // #37
-        { duration: 100, images: [[2480, 186]], exitBranch: 38 },
+        { duration: 100, images: [[2480, 186]] },
         // #38
         { duration: 50, images: [[0, 0]] },
       ],
@@ -398,7 +386,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 18,
           branching: { branches: [{ frameIndex: 0, weight: 85 }] },
         },
         // #1
@@ -407,14 +394,12 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 18,
           branching: { branches: [{ frameIndex: 0, weight: 50 }] },
         },
         // #3
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 18,
           branching: { branches: [{ frameIndex: 3, weight: 50 }] },
         },
         // #4
@@ -423,11 +408,10 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 18,
           branching: { branches: [{ frameIndex: 3, weight: 50 }] },
         },
         // #6
-        { duration: 100, images: [[1984, 279]], exitBranch: 18 },
+        { duration: 100, images: [[1984, 279]] },
         // #7
         { duration: 100, images: [[2108, 279]] },
         // #8
@@ -449,7 +433,7 @@
         // #16
         { duration: 100, images: [[0, 372]] },
         // #17
-        { duration: 330, images: [[124, 0]], exitBranch: 18 },
+        { duration: 330, images: [[124, 0]] },
         // #18
         { duration: 100, images: [[0, 0]] },
       ],
@@ -483,7 +467,7 @@
         // #12
         { duration: 100, images: [[992, 1488]] },
         // #13
-        { duration: 100, images: [[1116, 1488]], exitBranch: 66 },
+        { duration: 100, images: [[1116, 1488]] },
         // #14
         { duration: 100, images: [[1240, 1488]] },
         // #15
@@ -493,7 +477,7 @@
         // #17
         { duration: 100, images: [[1612, 1488]] },
         // #18
-        { duration: 100, images: [[1736, 1488]], exitBranch: 66 },
+        { duration: 100, images: [[1736, 1488]] },
         // #19
         { duration: 100, images: [[1860, 1488]] },
         // #20
@@ -509,7 +493,7 @@
         // #25
         { duration: 100, images: [[2604, 1488]] },
         // #26
-        { duration: 100, images: [[2728, 1488]], exitBranch: 66 },
+        { duration: 100, images: [[2728, 1488]] },
         // #27
         { duration: 100, images: [[2852, 1488]] },
         // #28
@@ -519,7 +503,7 @@
         // #30
         { duration: 100, images: [[0, 1581]] },
         // #31
-        { duration: 100, images: [[124, 1581]], exitBranch: 66 },
+        { duration: 100, images: [[124, 1581]] },
         // #32
         { duration: 100, images: [[248, 1581]] },
         // #33
@@ -531,7 +515,7 @@
         // #36
         { duration: 100, images: [[744, 1581]] },
         // #37
-        { duration: 100, images: [[868, 1581]], exitBranch: 66 },
+        { duration: 100, images: [[868, 1581]] },
         // #38
         { duration: 100, images: [[992, 1581]] },
         // #39
@@ -553,7 +537,7 @@
         // #45
         { duration: 330, images: [[1860, 1581]] },
         // #46
-        { duration: 100, images: [[1984, 1581]], exitBranch: 66 },
+        { duration: 100, images: [[1984, 1581]] },
         // #47
         { duration: 100, images: [[2108, 1581]] },
         // #48
@@ -736,7 +720,7 @@
         // #84
         { duration: 100, images: [[2976, 1674]] },
         // #85
-        { duration: 100, images: [[3100, 1674]], exitBranch: 86 },
+        { duration: 100, images: [[3100, 1674]] },
         // #86
         { duration: 100, images: [[0, 0]] },
       ],
@@ -746,25 +730,23 @@
         // #0
         { duration: 100, images: [[0, 0]] },
         // #1
-        { duration: 330, images: [[1860, 93]], exitBranch: 10 },
+        { duration: 330, images: [[1860, 93]] },
         // #2
         { duration: 100, images: [[1984, 93]] },
         // #3
         {
           duration: 330,
           images: [[2108, 93]],
-          exitBranch: 4,
           branching: { branches: [{ frameIndex: 3, weight: 75 }] },
         },
         // #4
         { duration: 100, images: [[2232, 93]] },
         // #5
-        { duration: 100, images: [[2356, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2356, 93]] },
         // #6
         {
           duration: 100,
           images: [[2480, 93]],
-          exitBranch: 10,
           branching: { branches: [{ frameIndex: 3, weight: 100 }] },
         },
         // #7
@@ -772,7 +754,7 @@
         // #8
         { duration: 100, images: [[2728, 93]] },
         // #9
-        { duration: 100, images: [[2852, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2852, 93]] },
         // #10
         { duration: 100, images: [[0, 0]] },
       ],
@@ -785,7 +767,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 2,
           branching: { branches: [{ frameIndex: 1, weight: 50 }] },
         },
         // #2
@@ -794,7 +775,6 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 4,
           branching: { branches: [{ frameIndex: 1, weight: 85 }] },
         },
         // #4
@@ -958,7 +938,6 @@
             [620, 465],
             [2356, 465],
           ],
-          exitBranch: 57,
         },
         // #23
         {
@@ -1016,7 +995,6 @@
             [620, 465],
             [0, 558],
           ],
-          exitBranch: 57,
         },
         // #30
         {
@@ -1049,7 +1027,6 @@
             [620, 465],
             [496, 558],
           ],
-          exitBranch: 57,
         },
         // #34
         {
@@ -1108,7 +1085,6 @@
             [620, 465],
             [2356, 465],
           ],
-          exitBranch: 57,
         },
         // #41
         {
@@ -1166,7 +1142,6 @@
             [620, 465],
             [0, 558],
           ],
-          exitBranch: 57,
         },
         // #48
         {
@@ -1231,7 +1206,6 @@
             [620, 465],
             [1612, 558],
           ],
-          exitBranch: 57,
         },
         // #56
         {
@@ -1363,7 +1337,6 @@
             [248, 465],
             [0, 0],
           ],
-          exitBranch: 72,
         },
         // #72
         { duration: 100, images: [[0, 0]] },
@@ -1408,7 +1381,7 @@
         // #10
         { duration: 200, images: [[1488, 651]] },
         // #11
-        { duration: 100, images: [[1612, 651]], exitBranch: 23 },
+        { duration: 100, images: [[1612, 651]] },
         // #12
         { duration: 100, images: [[1736, 651]] },
         // #13
@@ -1444,7 +1417,7 @@
         // #28
         { duration: 100, images: [[372, 744]] },
         // #29
-        { duration: 100, images: [[496, 744]], exitBranch: 30 },
+        { duration: 100, images: [[496, 744]] },
         // #30
         { duration: 100, images: [[0, 0]] },
       ],
@@ -1452,7 +1425,7 @@
     Alert: {
       frames: [
         // #0
-        { duration: 100, images: [[0, 0]], exitBranch: 15 },
+        { duration: 100, images: [[0, 0]] },
         // #1
         { duration: 100, images: [[0, 279]] },
         // #2
@@ -1472,7 +1445,7 @@
         // #9
         { duration: 500, images: [[992, 279]] },
         // #10
-        { duration: 100, images: [[1116, 279]], exitBranch: 11 },
+        { duration: 100, images: [[1116, 279]] },
         // #11
         { duration: 100, images: [[1240, 279]] },
         // #12
@@ -1480,7 +1453,7 @@
         // #13
         { duration: 100, images: [[1488, 279]] },
         // #14
-        { duration: 100, images: [[1612, 279]], exitBranch: 15 },
+        { duration: 100, images: [[1612, 279]] },
         // #15
         { duration: 100, images: [[0, 0]] },
       ],
@@ -1491,7 +1464,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 42,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #1
@@ -1500,7 +1472,6 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 42,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #3
@@ -1514,7 +1485,7 @@
         // #7
         { duration: 100, images: [[1860, 744]] },
         // #8
-        { duration: 100, images: [[1984, 744]], exitBranch: 42 },
+        { duration: 100, images: [[1984, 744]] },
         // #9
         { duration: 100, images: [[2108, 744]] },
         // #10
@@ -1524,7 +1495,7 @@
         // #12
         { duration: 100, images: [[2480, 744]] },
         // #13
-        { duration: 300, images: [[2604, 744]], exitBranch: 34 },
+        { duration: 300, images: [[2604, 744]] },
         // #14
         { duration: 100, images: [[2728, 744]] },
         // #15
@@ -1535,7 +1506,6 @@
         {
           duration: 300,
           images: [[3100, 744]],
-          exitBranch: 34,
           branching: { branches: [{ frameIndex: 13, weight: 85 }] },
         },
         // #18
@@ -1545,7 +1515,7 @@
         // #20
         { duration: 100, images: [[248, 837]] },
         // #21
-        { duration: 300, images: [[372, 837]], exitBranch: 34 },
+        { duration: 300, images: [[372, 837]] },
         // #22
         { duration: 100, images: [[496, 837]] },
         // #23
@@ -1556,7 +1526,6 @@
         {
           duration: 300,
           images: [[868, 837]],
-          exitBranch: 34,
           branching: { branches: [{ frameIndex: 21, weight: 85 }] },
         },
         // #26
@@ -1568,7 +1537,7 @@
         // #29
         { duration: 100, images: [[1364, 837]] },
         // #30
-        { duration: 300, images: [[1488, 837]], exitBranch: 34 },
+        { duration: 300, images: [[1488, 837]] },
         // #31
         { duration: 100, images: [[1612, 837]] },
         // #32
@@ -1577,7 +1546,6 @@
         {
           duration: 300,
           images: [[1860, 837]],
-          exitBranch: 34,
           branching: {
             branches: [
               { frameIndex: 13, weight: 80 },
@@ -1600,7 +1568,7 @@
         // #40
         { duration: 100, images: [[2728, 837]] },
         // #41
-        { duration: 100, images: [[2852, 837]], exitBranch: 42 },
+        { duration: 100, images: [[2852, 837]] },
         // #42
         { duration: 100, images: [[0, 0]] },
       ],
@@ -1620,25 +1588,25 @@
         // #5
         { duration: 60, images: [[248, 930]] },
         // #6
-        { duration: 60, images: [[372, 930]], exitBranch: 17 },
+        { duration: 60, images: [[372, 930]] },
         // #7
         { duration: 60, images: [[496, 930]] },
         // #8
-        { duration: 60, images: [[620, 930]], exitBranch: 17 },
+        { duration: 60, images: [[620, 930]] },
         // #9
         { duration: 60, images: [[744, 930]] },
         // #10
-        { duration: 60, images: [[868, 930]], exitBranch: 17 },
+        { duration: 60, images: [[868, 930]] },
         // #11
         { duration: 60, images: [[992, 930]] },
         // #12
-        { duration: 60, images: [[1116, 930]], exitBranch: 17 },
+        { duration: 60, images: [[1116, 930]] },
         // #13
         { duration: 60, images: [[1240, 930]] },
         // #14
-        { duration: 60, images: [[1364, 930]], exitBranch: 17 },
+        { duration: 60, images: [[1364, 930]] },
         // #15
-        { duration: 60, images: [[1488, 930]], exitBranch: 17 },
+        { duration: 60, images: [[1488, 930]] },
         // #16
         { duration: 60, images: [[1612, 930]] },
         // #17
@@ -1656,21 +1624,19 @@
         // #23
         { duration: 100, images: [[2480, 930]], sound: "28" },
         // #24
-        { duration: 100, images: [[2604, 930]], exitBranch: 28 },
+        { duration: 100, images: [[2604, 930]] },
         // #25
         { duration: 100, images: [[2728, 930]] },
         // #26
         {
           duration: 500,
           images: [[2852, 930]],
-          exitBranch: 27,
           branching: { branches: [{ frameIndex: 26, weight: 85 }] },
         },
         // #27
         {
           duration: 500,
           images: [[2976, 930]],
-          exitBranch: 28,
           branching: {
             branches: [
               { frameIndex: 27, weight: 65 },
@@ -1707,7 +1673,7 @@
         // #41
         { duration: 60, images: [[1488, 1023]], sound: "28" },
         // #42
-        { duration: 330, images: [[124, 0]], exitBranch: 43 },
+        { duration: 330, images: [[124, 0]] },
         // #43
         { duration: 100, images: [[0, 0]] },
       ],
@@ -1727,7 +1693,7 @@
         // #5
         { duration: 100, images: [[1116, 744]] },
         // #6
-        { duration: 100, images: [[1240, 744]], exitBranch: 7 },
+        { duration: 100, images: [[1240, 744]] },
         // #7
         { duration: 100, images: [[0, 0]] },
       ],
@@ -1738,7 +1704,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #1
@@ -1747,7 +1712,6 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #3
@@ -1760,13 +1724,11 @@
               { frameIndex: 59, weight: 30 },
             ],
           },
-          exitBranch: 118,
         },
         // #4
         {
           duration: 0,
           branching: { branches: [{ frameIndex: 75, weight: 50 }] },
-          exitBranch: 118,
         },
         // #5
         {
@@ -1783,7 +1745,7 @@
         // #9
         { duration: 100, images: [[1860, 744]] },
         // #10
-        { duration: 100, images: [[1984, 744]], exitBranch: 118 },
+        { duration: 100, images: [[1984, 744]] },
         // #11
         { duration: 100, images: [[2108, 744]] },
         // #12
@@ -1793,7 +1755,7 @@
         // #14
         { duration: 100, images: [[2480, 744]] },
         // #15
-        { duration: 250, images: [[2604, 744]], exitBranch: 36 },
+        { duration: 250, images: [[2604, 744]] },
         // #16
         { duration: 100, images: [[2728, 744]] },
         // #17
@@ -1804,7 +1766,6 @@
         {
           duration: 250,
           images: [[3100, 744]],
-          exitBranch: 36,
           branching: { branches: [{ frameIndex: 16, weight: 85 }] },
         },
         // #20
@@ -1814,7 +1775,7 @@
         // #22
         { duration: 100, images: [[248, 837]] },
         // #23
-        { duration: 250, images: [[372, 837]], exitBranch: 36 },
+        { duration: 250, images: [[372, 837]] },
         // #24
         { duration: 100, images: [[496, 837]] },
         // #25
@@ -1825,7 +1786,6 @@
         {
           duration: 250,
           images: [[868, 837]],
-          exitBranch: 36,
           branching: { branches: [{ frameIndex: 24, weight: 85 }] },
         },
         // #28
@@ -1837,7 +1797,7 @@
         // #31
         { duration: 100, images: [[1364, 837]] },
         // #32
-        { duration: 250, images: [[1488, 837]], exitBranch: 36 },
+        { duration: 250, images: [[1488, 837]] },
         // #33
         { duration: 100, images: [[1612, 837]] },
         // #34
@@ -1846,7 +1806,6 @@
         {
           duration: 250,
           images: [[1860, 837]],
-          exitBranch: 36,
           branching: {
             branches: [
               { frameIndex: 16, weight: 80 },
@@ -1872,26 +1831,23 @@
         {
           duration: 100,
           images: [[2852, 837]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 118, weight: 100 }] },
         },
         // #44
         {
           duration: 0,
           branching: { branches: [{ frameIndex: 118, weight: 30 }] },
-          exitBranch: 118,
         },
         // #45
         { duration: 100, images: [[0, 0]] },
         // #46
-        { duration: 330, images: [[620, 744]], exitBranch: 118 },
+        { duration: 330, images: [[620, 744]] },
         // #47
         { duration: 100, images: [[744, 744]] },
         // #48
         {
           duration: 450,
           images: [[868, 744]],
-          exitBranch: 49,
           branching: { branches: [{ frameIndex: 48, weight: 75 }] },
         },
         // #49
@@ -1900,14 +1856,12 @@
         {
           duration: 100,
           images: [[1116, 744]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 48, weight: 65 }] },
         },
         // #51
         {
           duration: 100,
           images: [[1240, 744]],
-          exitBranch: 118,
           branching: {
             branches: [
               { frameIndex: 48, weight: 30 },
@@ -1920,13 +1874,11 @@
         {
           duration: 0,
           branching: { branches: [{ frameIndex: 118, weight: 10 }] },
-          exitBranch: 118,
         },
         // #53
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 53, weight: 50 }] },
         },
         // #54
@@ -1937,7 +1889,6 @@
         {
           duration: 330,
           images: [[1860, 1023]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 56, weight: 90 }] },
         },
         // #57
@@ -1948,7 +1899,6 @@
         {
           duration: 100,
           images: [[2232, 1023]],
-          exitBranch: 118,
           branching: {
             branches: [
               { frameIndex: 56, weight: 85 },
@@ -1961,13 +1911,11 @@
         {
           duration: 0,
           branching: { branches: [{ frameIndex: 118, weight: 80 }] },
-          exitBranch: 118,
         },
         // #61
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 61, weight: 50 }] },
         },
         // #62
@@ -1976,11 +1924,10 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 61, weight: 50 }] },
         },
         // #64
-        { duration: 100, images: [[1984, 279]], exitBranch: 74 },
+        { duration: 100, images: [[1984, 279]] },
         // #65
         { duration: 100, images: [[2108, 279]] },
         // #66
@@ -2005,14 +1952,12 @@
         {
           duration: 330,
           images: [[124, 0]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 118, weight: 100 }] },
         },
         // #76
         {
           duration: 0,
           branching: { branches: [{ frameIndex: 118, weight: 85 }] },
-          exitBranch: 118,
         },
         // #77
         { duration: 100, images: [[2356, 1023]] },
@@ -2031,64 +1976,61 @@
         // #84
         { duration: 100, images: [[0, 1116]] },
         // #85
-        { duration: 100, images: [[124, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[124, 1116]] },
         // #86
         { duration: 100, images: [[248, 1116]] },
         // #87
-        { duration: 100, images: [[372, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[372, 1116]] },
         // #88
         { duration: 100, images: [[496, 1116]] },
         // #89
-        { duration: 500, images: [[124, 1116]], exitBranch: 109 },
+        { duration: 500, images: [[124, 1116]] },
         // #90
         { duration: 100, images: [[248, 1116]] },
         // #91
-        { duration: 100, images: [[372, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[372, 1116]] },
         // #92
         { duration: 100, images: [[496, 1116]] },
         // #93
         {
           duration: 500,
           images: [[124, 1116]],
-          exitBranch: 109,
           branching: { branches: [{ frameIndex: 90, weight: 80 }] },
         },
         // #94
         { duration: 100, images: [[620, 1116]] },
         // #95
-        { duration: 100, images: [[744, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[744, 1116]] },
         // #96
         { duration: 100, images: [[868, 1116]] },
         // #97
-        { duration: 100, images: [[992, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[992, 1116]] },
         // #98
         { duration: 400, images: [[1116, 1116]] },
         // #99
-        { duration: 100, images: [[1240, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[1240, 1116]] },
         // #100
         { duration: 100, images: [[1364, 1116]] },
         // #101
-        { duration: 100, images: [[1488, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[1488, 1116]] },
         // #102
         {
           duration: 500,
           images: [[1116, 1116]],
-          exitBranch: 109,
           branching: { branches: [{ frameIndex: 99, weight: 80 }] },
         },
         // #103
-        { duration: 100, images: [[1612, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[1612, 1116]] },
         // #104
         { duration: 100, images: [[1736, 1116]] },
         // #105
-        { duration: 100, images: [[1860, 1116]], exitBranch: 109 },
+        { duration: 100, images: [[1860, 1116]] },
         // #106
         { duration: 100, images: [[1984, 1116]] },
         // #107
         {
           duration: 200,
           images: [[2108, 1116]],
-          exitBranch: 108,
           branching: { branches: [{ frameIndex: 93, weight: 85 }] },
         },
         // #108
@@ -2113,7 +2055,6 @@
         {
           duration: 100,
           images: [[124, 1209]],
-          exitBranch: 118,
           branching: { branches: [{ frameIndex: 118, weight: 100 }] },
         },
         // #118
@@ -2156,7 +2097,6 @@
         {
           duration: 400,
           images: [[1984, 1209]],
-          exitBranch: 34,
           branching: {
             branches: [
               { frameIndex: 10, weight: 33 },
@@ -2165,46 +2105,45 @@
           },
         },
         // #16
-        { duration: 80, images: [[2108, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2108, 1209]] },
         // #17
         { duration: 80, images: [[2232, 1209]] },
         // #18
-        { duration: 80, images: [[2356, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2356, 1209]] },
         // #19
         { duration: 80, images: [[2480, 1209]] },
         // #20
-        { duration: 80, images: [[2604, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2604, 1209]] },
         // #21
         { duration: 80, images: [[2728, 1209]] },
         // #22
-        { duration: 80, images: [[2852, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2852, 1209]] },
         // #23
         { duration: 80, images: [[2976, 1209]] },
         // #24
-        { duration: 80, images: [[3100, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[3100, 1209]] },
         // #25
         { duration: 80, images: [[2108, 1209]] },
         // #26
-        { duration: 80, images: [[2232, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2232, 1209]] },
         // #27
         { duration: 80, images: [[2356, 1209]] },
         // #28
-        { duration: 80, images: [[2480, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2480, 1209]] },
         // #29
         { duration: 80, images: [[2604, 1209]] },
         // #30
-        { duration: 80, images: [[2728, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2728, 1209]] },
         // #31
         { duration: 80, images: [[2852, 1209]] },
         // #32
-        { duration: 80, images: [[2976, 1209]], exitBranch: 34 },
+        { duration: 80, images: [[2976, 1209]] },
         // #33
         { duration: 80, images: [[3100, 1209]] },
         // #34
         {
           duration: 80,
           images: [[0, 1302]],
-          exitBranch: 35,
           branching: {
             branches: [
               { frameIndex: 5, weight: 33 },
@@ -2214,7 +2153,7 @@
           },
         },
         // #35
-        { duration: 80, images: [[124, 0]], exitBranch: 36 },
+        { duration: 80, images: [[124, 0]] },
         // #36
         { duration: 100, images: [[0, 0]] },
       ],
@@ -2222,7 +2161,7 @@
     Hearing_1: {
       frames: [
         // #0
-        { duration: 100, images: [[0, 0]], exitBranch: 15 },
+        { duration: 100, images: [[0, 0]] },
         // #1
         { duration: 100, images: [[0, 279]] },
         // #2
@@ -2245,7 +2184,6 @@
         {
           duration: 100,
           images: [[1116, 279]],
-          exitBranch: 11,
           branching: { branches: [{ frameIndex: 10, weight: 100 }] },
         },
         // #11
@@ -2255,7 +2193,7 @@
         // #13
         { duration: 100, images: [[1488, 279]] },
         // #14
-        { duration: 100, images: [[1612, 279]], exitBranch: 15 },
+        { duration: 100, images: [[1612, 279]] },
         // #15
         { duration: 100, images: [[0, 0]] },
       ],
@@ -2275,7 +2213,7 @@
         // #5
         { duration: 100, images: [[1116, 744]] },
         // #6
-        { duration: 100, images: [[1240, 744]], exitBranch: 7 },
+        { duration: 100, images: [[1240, 744]] },
         // #7
         { duration: 100, images: [[0, 0]] },
       ],
@@ -2398,7 +2336,6 @@
             [620, 465],
             [1860, 1302],
           ],
-          exitBranch: 40,
           sound: "18",
         },
         // #19
@@ -2416,7 +2353,6 @@
             [620, 465],
             [2108, 1302],
           ],
-          exitBranch: 40,
         },
         // #21
         {
@@ -2433,7 +2369,6 @@
             [620, 465],
             [2356, 1302],
           ],
-          exitBranch: 40,
         },
         // #23
         {
@@ -2450,7 +2385,6 @@
             [620, 465],
             [2604, 1302],
           ],
-          exitBranch: 40,
         },
         // #25
         {
@@ -2467,7 +2401,6 @@
             [620, 465],
             [2852, 1302],
           ],
-          exitBranch: 40,
         },
         // #27
         {
@@ -2484,7 +2417,6 @@
             [620, 465],
             [3100, 1302],
           ],
-          exitBranch: 40,
         },
         // #29
         {
@@ -2501,7 +2433,6 @@
             [620, 465],
             [124, 1395],
           ],
-          exitBranch: 40,
         },
         // #31
         {
@@ -2518,7 +2449,6 @@
             [620, 465],
             [372, 1395],
           ],
-          exitBranch: 40,
         },
         // #33
         {
@@ -2535,7 +2465,6 @@
             [620, 465],
             [620, 1395],
           ],
-          exitBranch: 40,
         },
         // #35
         {
@@ -2552,7 +2481,6 @@
             [620, 465],
             [868, 1395],
           ],
-          exitBranch: 40,
         },
         // #37
         {
@@ -2569,7 +2497,6 @@
             [620, 465],
             [1116, 1395],
           ],
-          exitBranch: 40,
         },
         // #39
         {
@@ -2675,7 +2602,6 @@
             [248, 465],
             [2728, 1395],
           ],
-          exitBranch: 52,
         },
         // #52
         { duration: 100, images: [[0, 0]] },
@@ -2700,7 +2626,7 @@
         // #7
         { duration: 100, images: [[744, 1767]] },
         // #8
-        { duration: 100, images: [[868, 1767]], exitBranch: 9 },
+        { duration: 100, images: [[868, 1767]] },
         // #9
         { duration: 100, images: [[0, 0]] },
       ],
@@ -2724,7 +2650,7 @@
         // #7
         { duration: 100, images: [[744, 1767]] },
         // #8
-        { duration: 100, images: [[868, 1767]], exitBranch: 9 },
+        { duration: 100, images: [[868, 1767]] },
         // #9
         { duration: 100, images: [[0, 0]] },
       ],
@@ -2758,7 +2684,7 @@
         // #12
         { duration: 100, images: [[992, 1488]] },
         // #13
-        { duration: 100, images: [[1116, 1488]], exitBranch: 66 },
+        { duration: 100, images: [[1116, 1488]] },
         // #14
         { duration: 100, images: [[1240, 1488]] },
         // #15
@@ -2768,7 +2694,7 @@
         // #17
         { duration: 100, images: [[1612, 1488]] },
         // #18
-        { duration: 100, images: [[1736, 1488]], exitBranch: 66 },
+        { duration: 100, images: [[1736, 1488]] },
         // #19
         { duration: 100, images: [[1860, 1488]] },
         // #20
@@ -2784,7 +2710,7 @@
         // #25
         { duration: 100, images: [[2604, 1488]] },
         // #26
-        { duration: 100, images: [[2728, 1488]], exitBranch: 66 },
+        { duration: 100, images: [[2728, 1488]] },
         // #27
         { duration: 100, images: [[2852, 1488]] },
         // #28
@@ -2794,7 +2720,7 @@
         // #30
         { duration: 100, images: [[0, 1581]] },
         // #31
-        { duration: 100, images: [[124, 1581]], exitBranch: 66 },
+        { duration: 100, images: [[124, 1581]] },
         // #32
         { duration: 100, images: [[248, 1581]] },
         // #33
@@ -2806,7 +2732,7 @@
         // #36
         { duration: 100, images: [[744, 1581]] },
         // #37
-        { duration: 100, images: [[868, 1581]], exitBranch: 66 },
+        { duration: 100, images: [[868, 1581]] },
         // #38
         { duration: 100, images: [[992, 1581]] },
         // #39
@@ -2828,7 +2754,7 @@
         // #45
         { duration: 330, images: [[1860, 1581]] },
         // #46
-        { duration: 100, images: [[1984, 1581]], exitBranch: 66 },
+        { duration: 100, images: [[1984, 1581]] },
         // #47
         { duration: 100, images: [[2108, 1581]] },
         // #48
@@ -3011,7 +2937,7 @@
         // #84
         { duration: 100, images: [[2976, 1674]] },
         // #85
-        { duration: 100, images: [[3100, 1674]], exitBranch: 86 },
+        { duration: 100, images: [[3100, 1674]] },
         // #86
         { duration: 100, images: [[0, 0]] },
       ],
@@ -3029,15 +2955,15 @@
         // #4
         { duration: 100, images: [[496, 372]] },
         // #5
-        { duration: 100, images: [[620, 372]], exitBranch: 11, sound: "3" },
+        { duration: 100, images: [[620, 372]], sound: "3" },
         // #6
         { duration: 100, images: [[744, 372]] },
         // #7
-        { duration: 100, images: [[868, 372]], exitBranch: 11, sound: "9" },
+        { duration: 100, images: [[868, 372]], sound: "9" },
         // #8
         { duration: 100, images: [[992, 372]] },
         // #9
-        { duration: 100, images: [[1116, 372]], exitBranch: 11 },
+        { duration: 100, images: [[1116, 372]] },
         // #10
         { duration: 100, images: [[1240, 372]], sound: "9" },
         // #11
@@ -3063,7 +2989,7 @@
         // #21
         { duration: 100, images: [[2604, 372]] },
         // #22
-        { duration: 100, images: [[2728, 372]], exitBranch: 23 },
+        { duration: 100, images: [[2728, 372]] },
         // #23
         { duration: 100, images: [[0, 0]] },
       ],
@@ -3074,7 +3000,6 @@
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 39,
           sound: "29",
           branching: { branches: [{ frameIndex: 19, weight: 50 }] },
         },
@@ -3085,26 +3010,25 @@
         // #3
         { duration: 100, images: [[1240, 1767]] },
         // #4
-        { duration: 100, images: [[1364, 1767]], exitBranch: 15 },
+        { duration: 100, images: [[1364, 1767]] },
         // #5
         { duration: 100, images: [[1488, 1767]], sound: "15" },
         // #6
-        { duration: 100, images: [[1612, 1767]], exitBranch: 15 },
+        { duration: 100, images: [[1612, 1767]] },
         // #7
         { duration: 100, images: [[1736, 1767]] },
         // #8
-        { duration: 100, images: [[1860, 1767]], exitBranch: 15 },
+        { duration: 100, images: [[1860, 1767]] },
         // #9
         { duration: 100, images: [[1984, 1767]] },
         // #10
-        { duration: 100, images: [[2108, 1767]], exitBranch: 15 },
+        { duration: 100, images: [[2108, 1767]] },
         // #11
         { duration: 100, images: [[2232, 1767]] },
         // #12
         {
           duration: 100,
           images: [[2356, 1767]],
-          exitBranch: 15,
           branching: { branches: [{ frameIndex: 4, weight: 30 }] },
         },
         // #13
@@ -3121,7 +3045,6 @@
         {
           duration: 100,
           images: [[3100, 1767]],
-          exitBranch: 39,
           branching: { branches: [{ frameIndex: 39, weight: 100 }] },
         },
         // #19
@@ -3163,7 +3086,7 @@
         // #37
         { duration: 100, images: [[2232, 1860]] },
         // #38
-        { duration: 100, images: [[2356, 1860]], exitBranch: 39 },
+        { duration: 100, images: [[2356, 1860]] },
         // #39
         { duration: 100, images: [[0, 0]] },
       ],
@@ -3174,7 +3097,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 6,
           branching: { branches: [{ frameIndex: 0, weight: 90 }] },
         },
         // #1
@@ -3186,12 +3108,11 @@
         // #4
         { duration: 100, images: [[2728, 186]] },
         // #5
-        { duration: 100, images: [[2604, 186]], exitBranch: 7 },
+        { duration: 100, images: [[2604, 186]] },
         // #6
         {
           duration: 100,
           images: [[2480, 186]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 0, weight: 85 }] },
         },
         // #7
@@ -3206,7 +3127,6 @@
         {
           duration: 330,
           images: [[0, 1767]],
-          exitBranch: 2,
           branching: { branches: [{ frameIndex: 1, weight: 60 }] },
         },
         // #2
@@ -3217,14 +3137,12 @@
         {
           duration: 500,
           images: [[372, 1767]],
-          exitBranch: 5,
           branching: { branches: [{ frameIndex: 4, weight: 60 }] },
         },
         // #5
         {
           duration: 100,
           images: [[496, 1767]],
-          exitBranch: 6,
           branching: { branches: [{ frameIndex: 4, weight: 70 }] },
         },
         // #6
@@ -3235,7 +3153,6 @@
         {
           duration: 100,
           images: [[868, 1767]],
-          exitBranch: 9,
           branching: { branches: [{ frameIndex: 1, weight: 40 }] },
         },
         // #9
@@ -3248,7 +3165,6 @@
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 47,
           sound: "29",
           branching: { branches: [{ frameIndex: 29, weight: 50 }] },
         },
@@ -3257,11 +3173,11 @@
         // #2
         { duration: 100, images: [[2604, 1860]] },
         // #3
-        { duration: 100, images: [[2728, 1860]], exitBranch: 8 },
+        { duration: 100, images: [[2728, 1860]] },
         // #4
         { duration: 100, images: [[2852, 1860]] },
         // #5
-        { duration: 100, images: [[2976, 1860]], exitBranch: 8 },
+        { duration: 100, images: [[2976, 1860]] },
         // #6
         { duration: 100, images: [[3100, 1860]] },
         // #7
@@ -3310,7 +3226,6 @@
         {
           duration: 100,
           images: [[2604, 1953]],
-          exitBranch: 47,
           branching: { branches: [{ frameIndex: 47, weight: 100 }] },
         },
         // #29
@@ -3339,7 +3254,6 @@
         {
           duration: 100,
           images: [[2356, 1767]],
-          exitBranch: 41,
           branching: { branches: [{ frameIndex: 3, weight: 30 }] },
         },
         // #41
@@ -3353,7 +3267,7 @@
         // #45
         { duration: 100, images: [[2976, 1767]] },
         // #46
-        { duration: 100, images: [[3100, 1767]], exitBranch: 47 },
+        { duration: 100, images: [[3100, 1767]] },
         // #47
         { duration: 100, images: [[0, 0]] },
       ],
@@ -3394,7 +3308,6 @@
             [620, 465],
             [0, 0],
           ],
-          exitBranch: 60,
           branching: {
             branches: [
               { frameIndex: 20, weight: 33 },
@@ -3517,7 +3430,6 @@
             [620, 465],
             [1240, 2046],
           ],
-          exitBranch: 129,
           branching: { branches: [{ frameIndex: 129, weight: 100 }] },
         },
         // #19
@@ -3716,7 +3628,6 @@
         {
           duration: 100,
           images: [[3100, 2139]],
-          exitBranch: 129,
           branching: { branches: [{ frameIndex: 129, weight: 100 }] },
         },
         // #60
@@ -4252,7 +4163,7 @@
         // #127
         { duration: 100, images: [[372, 465]], sound: "7" },
         // #128
-        { duration: 100, images: [[248, 465]], exitBranch: 129 },
+        { duration: 100, images: [[248, 465]] },
         // #129
         { duration: 50 },
       ],
@@ -4265,7 +4176,6 @@
         {
           duration: 330,
           images: [[620, 744]],
-          exitBranch: 2,
           branching: { branches: [{ frameIndex: 1, weight: 85 }] },
         },
         // #2
@@ -4274,7 +4184,6 @@
         {
           duration: 330,
           images: [[868, 744]],
-          exitBranch: 4,
           branching: { branches: [{ frameIndex: 3, weight: 75 }] },
         },
         // #4
@@ -4283,14 +4192,12 @@
         {
           duration: 100,
           images: [[1116, 744]],
-          exitBranch: 6,
           branching: { branches: [{ frameIndex: 4, weight: 65 }] },
         },
         // #6
         {
           duration: 100,
           images: [[1240, 744]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 1, weight: 40 }] },
         },
         // #7
@@ -4307,7 +4214,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 46,
           branching: { branches: [{ frameIndex: 2, weight: 80 }] },
         },
         // #3
@@ -4316,7 +4222,6 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 46,
           branching: { branches: [{ frameIndex: 2, weight: 80 }] },
         },
         // #5
@@ -4336,64 +4241,61 @@
         // #12
         { duration: 100, images: [[0, 1116]] },
         // #13
-        { duration: 100, images: [[124, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[124, 1116]] },
         // #14
         { duration: 100, images: [[248, 1116]] },
         // #15
-        { duration: 100, images: [[372, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[372, 1116]] },
         // #16
         { duration: 100, images: [[496, 1116]] },
         // #17
-        { duration: 500, images: [[124, 1116]], exitBranch: 37 },
+        { duration: 500, images: [[124, 1116]] },
         // #18
         { duration: 100, images: [[248, 1116]] },
         // #19
-        { duration: 100, images: [[372, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[372, 1116]] },
         // #20
         { duration: 100, images: [[496, 1116]] },
         // #21
         {
           duration: 500,
           images: [[124, 1116]],
-          exitBranch: 37,
           branching: { branches: [{ frameIndex: 13, weight: 80 }] },
         },
         // #22
         { duration: 100, images: [[620, 1116]] },
         // #23
-        { duration: 100, images: [[744, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[744, 1116]] },
         // #24
         { duration: 100, images: [[868, 1116]] },
         // #25
-        { duration: 100, images: [[992, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[992, 1116]] },
         // #26
         { duration: 400, images: [[1116, 1116]] },
         // #27
-        { duration: 100, images: [[1240, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[1240, 1116]] },
         // #28
         { duration: 100, images: [[1364, 1116]] },
         // #29
-        { duration: 100, images: [[1488, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[1488, 1116]] },
         // #30
         {
           duration: 500,
           images: [[1116, 1116]],
-          exitBranch: 31,
           branching: { branches: [{ frameIndex: 27, weight: 80 }] },
         },
         // #31
-        { duration: 100, images: [[1612, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[1612, 1116]] },
         // #32
         { duration: 100, images: [[1736, 1116]] },
         // #33
-        { duration: 100, images: [[1860, 1116]], exitBranch: 37 },
+        { duration: 100, images: [[1860, 1116]] },
         // #34
         { duration: 100, images: [[1984, 1116]] },
         // #35
         {
           duration: 200,
           images: [[2108, 1116]],
-          exitBranch: 37,
           branching: { branches: [{ frameIndex: 13, weight: 85 }] },
         },
         // #36
@@ -4415,7 +4317,7 @@
         // #44
         { duration: 100, images: [[0, 1209]] },
         // #45
-        { duration: 100, images: [[124, 1209]], exitBranch: 46 },
+        { duration: 100, images: [[124, 1209]] },
         // #46
         { duration: 100, images: [[0, 0]] },
       ],
@@ -4426,7 +4328,6 @@
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 0, weight: 50 }] },
         },
         // #1
@@ -4437,7 +4338,6 @@
         {
           duration: 330,
           images: [[1860, 1023]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 3, weight: 90 }] },
         },
         // #4
@@ -4445,7 +4345,7 @@
         // #5
         { duration: 100, images: [[2108, 1023]] },
         // #6
-        { duration: 100, images: [[2232, 1023]], exitBranch: 7 },
+        { duration: 100, images: [[2232, 1023]] },
         // #7
         {
           duration: 500,
@@ -4467,7 +4367,6 @@
         {
           duration: 330,
           images: [[620, 744]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 1, weight: 85 }] },
         },
         // #2
@@ -4476,7 +4375,6 @@
         {
           duration: 330,
           images: [[868, 744]],
-          exitBranch: 4,
           branching: { branches: [{ frameIndex: 3, weight: 75 }] },
         },
         // #4
@@ -4485,14 +4383,12 @@
         {
           duration: 100,
           images: [[1116, 744]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 4, weight: 65 }] },
         },
         // #6
         {
           duration: 100,
           images: [[1240, 744]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 1, weight: 40 }] },
         },
         // #7
@@ -4505,7 +4401,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 58,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #1
@@ -4514,72 +4409,68 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 58,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #3
         { duration: 100, images: [[1860, 2418]] },
         // #4
-        { duration: 100, images: [[1984, 2418]], exitBranch: 58 },
+        { duration: 100, images: [[1984, 2418]] },
         // #5
         { duration: 100, images: [[2108, 2418]] },
         // #6
-        { duration: 100, images: [[2232, 2418]], exitBranch: 58 },
+        { duration: 100, images: [[2232, 2418]] },
         // #7
         { duration: 100, images: [[2356, 2418]] },
         // #8
-        { duration: 100, images: [[2480, 2418]], exitBranch: 58 },
+        { duration: 100, images: [[2480, 2418]] },
         // #9
         { duration: 100, images: [[2604, 2418]] },
         // #10
-        { duration: 100, images: [[2728, 372]], exitBranch: 58 },
+        { duration: 100, images: [[2728, 372]] },
         // #11
         { duration: 100, images: [[2728, 2418]] },
         // #12
-        { duration: 100, images: [[2604, 372]], exitBranch: 58 },
+        { duration: 100, images: [[2604, 372]] },
         // #13
         { duration: 100, images: [[2480, 372]] },
         // #14
-        { duration: 100, images: [[2852, 2418]], exitBranch: 58 },
+        { duration: 100, images: [[2852, 2418]] },
         // #15
         { duration: 100, images: [[2976, 2418]] },
         // #16
-        { duration: 100, images: [[3100, 2418]], exitBranch: 28 },
+        { duration: 100, images: [[3100, 2418]] },
         // #17
         { duration: 100, images: [[0, 2511]] },
         // #18
-        { duration: 100, images: [[124, 2511]], exitBranch: 28 },
+        { duration: 100, images: [[124, 2511]] },
         // #19
         { duration: 100, images: [[248, 2511]] },
         // #20
-        { duration: 100, images: [[372, 2511]], exitBranch: 28 },
+        { duration: 100, images: [[372, 2511]] },
         // #21
         { duration: 100, images: [[496, 2511]] },
         // #22
-        { duration: 100, images: [[620, 2511]], exitBranch: 28 },
+        { duration: 100, images: [[620, 2511]] },
         // #23
         { duration: 100, images: [[744, 2511]] },
         // #24
         {
           duration: 500,
           images: [[868, 2511]],
-          exitBranch: 28,
           branching: { branches: [{ frameIndex: 24, weight: 65 }] },
         },
         // #25
         {
           duration: 500,
           images: [[2356, 372]],
-          exitBranch: 28,
           branching: { branches: [{ frameIndex: 25, weight: 50 }] },
         },
         // #26
-        { duration: 100, images: [[992, 2511]], exitBranch: 28 },
+        { duration: 100, images: [[992, 2511]] },
         // #27
         {
           duration: 500,
           images: [[1116, 2511]],
-          exitBranch: 28,
           branching: {
             branches: [
               { frameIndex: 24, weight: 50 },
@@ -4604,7 +4495,7 @@
         // #35
         { duration: 100, images: [[2108, 2511]] },
         // #36
-        { duration: 100, images: [[2232, 2511]], exitBranch: 48 },
+        { duration: 100, images: [[2232, 2511]] },
         // #37
         { duration: 100, images: [[2356, 2511]] },
         // #38
@@ -4646,7 +4537,7 @@
         // #56
         { duration: 100, images: [[1488, 2604]] },
         // #57
-        { duration: 100, images: [[1612, 2604]], exitBranch: 58 },
+        { duration: 100, images: [[1612, 2604]] },
         // #58
         { duration: 100, images: [[0, 0]] },
       ],
@@ -4672,7 +4563,7 @@
         // #8
         { duration: 100, images: [[2728, 93]] },
         // #9
-        { duration: 100, images: [[2852, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2852, 93]] },
         // #10
         { duration: 100, images: [[0, 0]] },
       ],
@@ -4683,7 +4574,6 @@
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 49,
           sound: "29",
           branching: { branches: [{ frameIndex: 29, weight: 50 }] },
         },
@@ -4745,7 +4635,6 @@
         {
           duration: 100,
           images: [[2604, 1953]],
-          exitBranch: 49,
           branching: { branches: [{ frameIndex: 49, weight: 100 }] },
         },
         // #29
@@ -4787,7 +4676,7 @@
         // #47
         { duration: 100, images: [[2232, 1860]] },
         // #48
-        { duration: 100, images: [[2356, 1860]], exitBranch: 49 },
+        { duration: 100, images: [[2356, 1860]] },
         // #49
         { duration: 100, images: [[0, 0]] },
       ],
@@ -4812,7 +4701,6 @@
         {
           duration: 500,
           images: [[0, 0]],
-          exitBranch: 20,
           branching: { branches: [{ frameIndex: 0, weight: 85 }] },
         },
         // #1
@@ -4821,7 +4709,6 @@
         {
           duration: 100,
           images: [[1860, 279]],
-          exitBranch: 20,
           branching: { branches: [{ frameIndex: 0, weight: 80 }] },
         },
         // #3
@@ -4842,7 +4729,6 @@
         {
           duration: 750,
           images: [[2604, 2604]],
-          exitBranch: 11,
           branching: { branches: [{ frameIndex: 10, weight: 85 }] },
         },
         // #11
@@ -4862,7 +4748,7 @@
         // #18
         { duration: 100, images: [[372, 2697]] },
         // #19
-        { duration: 100, images: [[496, 2697]], exitBranch: 20 },
+        { duration: 100, images: [[496, 2697]] },
         // #20
         { duration: 100, images: [[0, 0]] },
       ],
@@ -4888,7 +4774,7 @@
         // #8
         { duration: 100, images: [[2728, 93]] },
         // #9
-        { duration: 100, images: [[2852, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2852, 93]] },
         // #10
         { duration: 100, images: [[0, 0]] },
       ],
@@ -4904,7 +4790,7 @@
         // #3
         { duration: 100, images: [[3100, 1395]] },
         // #4
-        { duration: 100, images: [[620, 2697]], exitBranch: 42, sound: "5" },
+        { duration: 100, images: [[620, 2697]], sound: "5" },
         // #5
         { duration: 600, images: [[744, 2697]] },
         // #6
@@ -4921,7 +4807,6 @@
         {
           duration: 330,
           images: [[1488, 2697]],
-          exitBranch: 12,
           branching: {
             branches: [
               { frameIndex: 11, weight: 65 },
@@ -4935,7 +4820,6 @@
         {
           duration: 330,
           images: [[1736, 2697]],
-          exitBranch: 14,
           branching: {
             branches: [
               { frameIndex: 13, weight: 65 },
@@ -4955,7 +4839,6 @@
         {
           duration: 100,
           images: [[2232, 2697]],
-          exitBranch: 42,
           sound: "26",
           branching: { branches: [{ frameIndex: 19, weight: 50 }] },
         },
@@ -4973,7 +4856,6 @@
         {
           duration: 300,
           images: [[2976, 2697]],
-          exitBranch: 25,
           branching: { branches: [{ frameIndex: 24, weight: 70 }] },
         },
         // #25
@@ -4984,28 +4866,25 @@
         {
           duration: 100,
           images: [[124, 2790]],
-          exitBranch: 42,
           sound: "5",
           branching: { branches: [{ frameIndex: 33, weight: 50 }] },
         },
         // #28
-        { duration: 100, images: [[248, 2790]], exitBranch: 42 },
+        { duration: 100, images: [[248, 2790]] },
         // #29
         { duration: 160, images: [[372, 2790]] },
         // #30
         {
           duration: 660,
           images: [[496, 2790]],
-          exitBranch: 31,
           branching: { branches: [{ frameIndex: 30, weight: 40 }] },
         },
         // #31
-        { duration: 160, images: [[372, 2790]], exitBranch: 42 },
+        { duration: 160, images: [[372, 2790]] },
         // #32
         {
           duration: 600,
           images: [[248, 2790]],
-          exitBranch: 33,
           branching: { branches: [{ frameIndex: 32, weight: 70 }] },
         },
         // #33
@@ -5016,7 +4895,6 @@
         {
           duration: 400,
           images: [[868, 2790]],
-          exitBranch: 36,
           branching: {
             branches: [
               { frameIndex: 35, weight: 65 },
@@ -5031,7 +4909,7 @@
         // #38
         { duration: 100, images: [[992, 2697]] },
         // #39
-        { duration: 100, images: [[868, 2697]], exitBranch: 42, sound: "23" },
+        { duration: 100, images: [[868, 2697]], sound: "23" },
         // #40
         { duration: 100, images: [[744, 2697]] },
         // #41
@@ -5041,7 +4919,7 @@
         // #43
         { duration: 100, images: [[2976, 1395]] },
         // #44
-        { duration: 100, images: [[2852, 1395]], exitBranch: 45 },
+        { duration: 100, images: [[2852, 1395]] },
         // #45
         { duration: 100, images: [[0, 0]] },
       ],
@@ -5089,19 +4967,19 @@
         // #19
         { duration: 100, images: [[372, 2139]] },
         // #20
-        { duration: 100, images: [[496, 2139]], exitBranch: 29, sound: "25" },
+        { duration: 100, images: [[496, 2139]], sound: "25" },
         // #21
         { duration: 100, images: [[620, 2139]] },
         // #22
-        { duration: 100, images: [[744, 2139]], exitBranch: 29 },
+        { duration: 100, images: [[744, 2139]] },
         // #23
         { duration: 100, images: [[868, 2139]] },
         // #24
-        { duration: 100, images: [[992, 2139]], exitBranch: 29 },
+        { duration: 100, images: [[992, 2139]] },
         // #25
         { duration: 100, images: [[1116, 2139]] },
         // #26
-        { duration: 100, images: [[1240, 2139]], exitBranch: 29 },
+        { duration: 100, images: [[1240, 2139]] },
         // #27
         { duration: 100, images: [[1364, 2139]] },
         // #28
@@ -5191,7 +5069,6 @@
             [248, 465],
             [1736, 2790],
           ],
-          exitBranch: 53,
         },
         // #53
         { duration: 100, images: [[0, 0]] },
@@ -5209,7 +5086,6 @@
         {
           duration: 100,
           images: [[496, 465]],
-          exitBranch: 4,
           branching: {
             branches: [
               { frameIndex: 64, weight: 25 },
@@ -5266,7 +5142,6 @@
             [620, 465],
             [1736, 2790],
           ],
-          exitBranch: 112,
           branching: { branches: [{ frameIndex: 112, weight: 100 }] },
         },
         // #10
@@ -5391,7 +5266,6 @@
             [620, 465],
             [0, 0],
           ],
-          exitBranch: 112,
           branching: { branches: [{ frameIndex: 112, weight: 100 }] },
         },
         // #25
@@ -5442,7 +5316,6 @@
             [620, 465],
             [992, 2883],
           ],
-          exitBranch: 112,
           branching: { branches: [{ frameIndex: 112, weight: 100 }] },
         },
         // #31
@@ -5710,7 +5583,6 @@
             [620, 465],
             [1860, 2976],
           ],
-          exitBranch: 112,
           branching: { branches: [{ frameIndex: 112, weight: 100 }] },
         },
         // #64
@@ -6133,7 +6005,6 @@
             [1488, 3162],
             [248, 465],
           ],
-          exitBranch: 116,
         },
         // #116
         { duration: 20, images: [[0, 0]] },
@@ -6154,7 +6025,7 @@
         // #5
         { duration: 100, images: [[1116, 744]] },
         // #6
-        { duration: 100, images: [[1240, 744]], exitBranch: 7 },
+        { duration: 100, images: [[1240, 744]] },
         // #7
         { duration: 100, images: [[0, 0]] },
       ],
@@ -6167,7 +6038,6 @@
         {
           duration: 330,
           images: [[1860, 93]],
-          exitBranch: 2,
           branching: { branches: [{ frameIndex: 1, weight: 75 }] },
         },
         // #2
@@ -6176,7 +6046,6 @@
         {
           duration: 330,
           images: [[2108, 93]],
-          exitBranch: 4,
           branching: { branches: [{ frameIndex: 3, weight: 75 }] },
         },
         // #4
@@ -6187,7 +6056,6 @@
         {
           duration: 100,
           images: [[2480, 93]],
-          exitBranch: 7,
           branching: { branches: [{ frameIndex: 3, weight: 30 }] },
         },
         // #7
@@ -6195,7 +6063,7 @@
         // #8
         { duration: 100, images: [[2728, 93]] },
         // #9
-        { duration: 100, images: [[2852, 93]], exitBranch: 10 },
+        { duration: 100, images: [[2852, 93]] },
         // #10
         { duration: 100, images: [[0, 0]] },
       ],
@@ -6208,7 +6076,6 @@
         {
           duration: 330,
           images: [[0, 1767]],
-          exitBranch: 9,
           branching: { branches: [{ frameIndex: 1, weight: 60 }] },
         },
         // #2
@@ -6219,14 +6086,12 @@
         {
           duration: 500,
           images: [[372, 1767]],
-          exitBranch: 5,
           branching: { branches: [{ frameIndex: 4, weight: 60 }] },
         },
         // #5
         {
           duration: 100,
           images: [[496, 1767]],
-          exitBranch: 9,
           branching: { branches: [{ frameIndex: 4, weight: 70 }] },
         },
         // #6
@@ -6237,7 +6102,6 @@
         {
           duration: 100,
           images: [[868, 1767]],
-          exitBranch: 9,
           branching: { branches: [{ frameIndex: 1, weight: 40 }] },
         },
         // #9
@@ -6264,10 +6128,11 @@
         // #7
         { duration: 400, images: [[2604, 93]] },
         // #8
-        { duration: 100, images: [[2728, 93]], exitBranch: 9 },
+        { duration: 100, images: [[2728, 93]] },
         // #9
         { duration: 100, images: [[2852, 93]] },
       ],
     },
   },
 });
+

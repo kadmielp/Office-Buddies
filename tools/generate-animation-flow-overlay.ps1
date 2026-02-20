@@ -1,6 +1,6 @@
 param(
-  [string]$Agent = 'F1',
-  [string]$Animation = 'Explain',
+  [string]$Agent = 'Merlin',
+  [string]$Animation = 'Idle1_1',
   [ValidateSet('Both', 'FrameIndex', 'Coordinates')]
   [string]$LabelMode = 'Both'
 )

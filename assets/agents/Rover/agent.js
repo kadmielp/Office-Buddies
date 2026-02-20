@@ -1,4 +1,4 @@
-clippy.ready("Rover", {
+﻿clippy.ready("Rover", {
   overlayCount: 1,
   sounds: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
   framesize: [80, 80],
@@ -85,13 +85,11 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[320, 160]],
-          exitBranch: 8,
           branching: { branches: [{ frameIndex: 7, weight: 30 }] },
         },
         {
           duration: 100,
           images: [[400, 160]],
-          exitBranch: 23,
           branching: {
             branches: [
               { frameIndex: 4, weight: 75 },
@@ -110,7 +108,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1120, 160]],
-          exitBranch: 20,
           branching: {
             branches: [
               { frameIndex: 13, weight: 75 },
@@ -125,7 +122,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1520, 160]],
-          exitBranch: 23,
           branching: { branches: [{ frameIndex: 4, weight: 90 }] },
         },
         { duration: 100, images: [[1600, 160]] },
@@ -162,7 +158,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[800, 240]],
-          exitBranch: 16,
           branching: { branches: [{ frameIndex: 9, weight: 100 }] },
         },
         { duration: 100, images: [[880, 240]] },
@@ -195,13 +190,12 @@ clippy.ready("Rover", {
         { duration: 100, images: [[400, 320]] },
         { duration: 100, images: [[480, 320]] },
         { duration: 100, images: [[560, 320]] },
-        { duration: 100, images: [[640, 320]], exitBranch: 21 },
+        { duration: 100, images: [[640, 320]] },
         { duration: 100, images: [[720, 320]] },
         { duration: 100, images: [[800, 320]] },
         {
           duration: 100,
           images: [[880, 320]],
-          exitBranch: 21,
           branching: { branches: [{ frameIndex: 21, weight: 90 }] },
         },
         { duration: 100, images: [[960, 320]] },
@@ -210,7 +204,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1200, 320]],
-          exitBranch: 24,
           branching: { branches: [{ frameIndex: 17, weight: 98 }] },
         },
         { duration: 100, images: [[1280, 320]] },
@@ -325,7 +318,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[640, 560]],
-          exitBranch: 15,
           branching: { branches: [{ frameIndex: 9, weight: 100 }] },
         },
         { duration: 100, images: [[720, 560]] },
@@ -370,7 +362,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1200, 640]],
-          exitBranch: 26,
           branching: { branches: [{ frameIndex: 21, weight: 100 }] },
         },
         { duration: 100, images: [[1280, 640]] },
@@ -413,7 +404,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1360, 720]],
-          exitBranch: 24,
           branching: { branches: [{ frameIndex: 19, weight: 100 }] },
         },
         { duration: 100, images: [[1440, 720]] },
@@ -463,7 +453,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 0, weight: 90 },
@@ -474,7 +463,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 206, weight: 10 },
@@ -486,7 +474,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 270, weight: 20 },
@@ -502,14 +489,12 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[960, 800]],
-          exitBranch: 5,
           branching: { branches: [{ frameIndex: 7, weight: 50 }] },
         },
         { duration: 100, images: [[1040, 800]] },
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 6, weight: 96 },
@@ -521,7 +506,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1120, 800]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 0, weight: 50 },
@@ -533,7 +517,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1280, 800]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 9, weight: 80 },
@@ -557,7 +540,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1280, 800]],
-          exitBranch: 388,
           branching: { branches: [{ frameIndex: 10, weight: 90 }] },
         },
         {
@@ -565,15 +547,14 @@ clippy.ready("Rover", {
           images: [[1760, 800]],
           branching: { branches: [{ frameIndex: 18, weight: 25 }] },
         },
-        { duration: 100, images: [[1840, 800]], exitBranch: 388 },
+        { duration: 100, images: [[1840, 800]] },
         { duration: 100, images: [[1920, 800]] },
         {
           duration: 100,
           images: [[2000, 800]],
-          exitBranch: 388,
           branching: { branches: [{ frameIndex: 21, weight: 25 }] },
         },
-        { duration: 100, images: [[1840, 800]], exitBranch: 388 },
+        { duration: 100, images: [[1840, 800]] },
         {
           duration: 100,
           images: [[1760, 800]],
@@ -588,7 +569,7 @@ clippy.ready("Rover", {
         { duration: 100, images: [[1280, 800]] },
         { duration: 100, images: [[0, 880]] },
         { duration: 100, images: [[80, 880]] },
-        { duration: 100, images: [[160, 880]], exitBranch: 388 },
+        { duration: 100, images: [[160, 880]] },
         {
           duration: 100,
           images: [[1280, 800]],
@@ -600,7 +581,6 @@ clippy.ready("Rover", {
         {
           duration: 300,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 0, weight: 50 },
@@ -616,7 +596,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[2000, 720]],
-          exitBranch: 46,
           branching: {
             branches: [
               { frameIndex: 37, weight: 95 },
@@ -628,7 +607,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[2000, 720]],
-          exitBranch: 46,
           branching: { branches: [{ frameIndex: 39, weight: 90 }] },
         },
         { duration: 100, images: [[2080, 720]] },
@@ -642,7 +620,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: {
             branches: [
               { frameIndex: 0, weight: 50 },
@@ -675,7 +652,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1600, 80]],
-          exitBranch: 74,
           branching: { branches: [{ frameIndex: 63, weight: 90 }] },
         },
         {
@@ -686,11 +662,10 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1680, 80]],
-          exitBranch: 72,
           branching: { branches: [{ frameIndex: 67, weight: 25 }] },
         },
         { duration: 100, images: [[1840, 880]] },
-        { duration: 100, images: [[1760, 80]], exitBranch: 73 },
+        { duration: 100, images: [[1760, 80]] },
         {
           duration: 100,
           images: [[1840, 80]],
@@ -722,7 +697,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[2080, 80]],
-          exitBranch: 85,
           branching: { branches: [{ frameIndex: 77, weight: 90 }] },
         },
         { duration: 100, images: [[80, 160]] },
@@ -730,11 +704,10 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[240, 160]],
-          exitBranch: 86,
           branching: { branches: [{ frameIndex: 81, weight: 90 }] },
         },
         { duration: 100, images: [[320, 160]] },
-        { duration: 100, images: [[400, 160]], exitBranch: 86 },
+        { duration: 100, images: [[400, 160]] },
         {
           duration: 100,
           images: [[480, 160]],
@@ -772,7 +745,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[800, 960]],
-          exitBranch: 185,
           branching: { branches: [{ frameIndex: 98, weight: 95 }] },
         },
         { duration: 100, images: [[880, 960]] },
@@ -780,7 +752,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[800, 960]],
-          exitBranch: 185,
           branching: {
             branches: [
               { frameIndex: 101, weight: 50 },
@@ -805,7 +776,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1840, 960]],
-          exitBranch: 159,
           branching: {
             branches: [
               { frameIndex: 112, weight: 95 },
@@ -819,7 +789,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1840, 960]],
-          exitBranch: 159,
           branching: {
             branches: [
               { frameIndex: 116, weight: 50 },
@@ -846,13 +815,11 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[640, 1040]],
-          exitBranch: 155,
           branching: { branches: [{ frameIndex: 129, weight: 95 }] },
         },
         {
           duration: 100,
           images: [[880, 1040]],
-          exitBranch: 156,
           branching: { branches: [{ frameIndex: 126, weight: 25 }] },
         },
         { duration: 100, images: [[960, 1040]] },
@@ -879,7 +846,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[80, 1120]],
-          exitBranch: 159,
           branching: { branches: [{ frameIndex: 139, weight: 75 }] },
         },
         { duration: 100, images: [[160, 1120]] },
@@ -890,7 +856,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[640, 1040]],
-          exitBranch: 155,
           branching: { branches: [{ frameIndex: 126, weight: 85 }] },
         },
         { duration: 100, images: [[560, 1120]] },
@@ -916,25 +881,23 @@ clippy.ready("Rover", {
         { duration: 100, images: [[1760, 1120]] },
         { duration: 100, images: [[1840, 1120]] },
         { duration: 0, images: [[1920, 1120]] },
-        { duration: 100, images: [[2000, 1120]], exitBranch: 181 },
+        { duration: 100, images: [[2000, 1120]] },
         { duration: 1450, images: [[2080, 1120]] },
         { duration: 100, images: [[0, 1200]] },
         { duration: 100, images: [[80, 1200]] },
-        { duration: 100, images: [[160, 1200]], exitBranch: 181 },
-        { duration: 1450, images: [[240, 1200]], exitBranch: 181 },
+        { duration: 100, images: [[160, 1200]] },
+        { duration: 1450, images: [[240, 1200]] },
         {
           duration: 100,
           images: [[320, 1200]],
-          exitBranch: 181,
           branching: { branches: [{ frameIndex: 173, weight: 95 }] },
         },
         { duration: 100, images: [[1840, 1120]] },
         { duration: 100, images: [[1520, 1120]] },
-        { duration: 100, images: [[1440, 1120]], exitBranch: 185 },
+        { duration: 100, images: [[1440, 1120]] },
         {
           duration: 450,
           images: [[1280, 1120]],
-          exitBranch: 186,
           branching: { branches: [{ frameIndex: 166, weight: 95 }] },
         },
         { duration: 100, images: [[1280, 960]] },
@@ -948,7 +911,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: { branches: [{ frameIndex: 0, weight: 100 }] },
         },
         { duration: 100, images: [[0, 0]] },
@@ -965,7 +927,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 388,
           branching: { branches: [{ frameIndex: 0, weight: 100 }] },
         },
         { duration: 100, images: [[1040, 480]] },
@@ -990,7 +951,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[560, 1200]],
-          exitBranch: 228,
           branching: { branches: [{ frameIndex: 221, weight: 90 }] },
         },
         { duration: 100, images: [[640, 1200]] },
@@ -1000,7 +960,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[960, 1200]],
-          exitBranch: 227,
           branching: { branches: [{ frameIndex: 221, weight: 75 }] },
         },
         { duration: 100, images: [[1040, 1200]] },
@@ -1032,7 +991,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[880, 320]],
-          exitBranch: 251,
           branching: { branches: [{ frameIndex: 251, weight: 90 }] },
         },
         { duration: 100, images: [[960, 320]] },
@@ -1041,7 +999,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1200, 320]],
-          exitBranch: 254,
           branching: { branches: [{ frameIndex: 247, weight: 99 }] },
         },
         { duration: 100, images: [[1280, 320]] },
@@ -1079,7 +1036,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[80, 1280]],
-          exitBranch: 315,
           branching: { branches: [{ frameIndex: 282, weight: 80 }] },
         },
         { duration: 100, images: [[160, 1280]] },
@@ -1098,13 +1054,11 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1200, 1280]],
-          exitBranch: 315,
           branching: { branches: [{ frameIndex: 287, weight: 50 }] },
         },
         {
           duration: 100,
           images: [[1280, 1280]],
-          exitBranch: 315,
           branching: { branches: [{ frameIndex: 282, weight: 75 }] },
         },
         { duration: 100, images: [[1360, 1280]] },
@@ -1123,7 +1077,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[240, 1360]],
-          exitBranch: 312,
           branching: { branches: [{ frameIndex: 281, weight: 90 }] },
         },
         { duration: 100, images: [[320, 1360]] },
@@ -1163,14 +1116,12 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1360, 400]],
-          exitBranch: 341,
           branching: { branches: [{ frameIndex: 340, weight: 50 }] },
         },
         { duration: 100, images: [[1440, 400]] },
         {
           duration: 100,
           images: [[1520, 400]],
-          exitBranch: 341,
           branching: { branches: [{ frameIndex: 335, weight: 99 }] },
         },
         { duration: 100, images: [[1600, 400]] },
@@ -1185,7 +1136,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 194,
           branching: { branches: [{ frameIndex: 0, weight: 100 }] },
         },
         {
@@ -1220,7 +1170,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1200, 640]],
-          exitBranch: 377,
           branching: { branches: [{ frameIndex: 372, weight: 95 }] },
         },
         { duration: 100, images: [[1280, 640]] },
@@ -1321,7 +1270,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1520, 400]],
-          exitBranch: 17,
           branching: { branches: [{ frameIndex: 11, weight: 100 }] },
         },
         { duration: 100, images: [[1600, 400]] },
@@ -1379,7 +1327,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1840, 1520]],
-          exitBranch: 15,
           branching: { branches: [{ frameIndex: 15, weight: 95 }] },
         },
         { duration: 100, images: [[1920, 1520]] },
@@ -1388,7 +1335,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 1600]],
-          exitBranch: 18,
           branching: { branches: [{ frameIndex: 12, weight: 100 }] },
         },
         { duration: 100, images: [[80, 1600]] },
@@ -1429,7 +1375,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[80, 1280]],
-          exitBranch: 29,
           branching: { branches: [{ frameIndex: 13, weight: 80 }] },
         },
         { duration: 100, images: [[160, 1280]] },
@@ -1444,7 +1389,7 @@ clippy.ready("Rover", {
         { duration: 100, images: [[880, 1280]] },
         { duration: 100, images: [[960, 1280]] },
         { duration: 100, images: [[1040, 1280]] },
-        { duration: 100, images: [[1120, 1280]], exitBranch: 29 },
+        { duration: 100, images: [[1120, 1280]] },
         {
           duration: 100,
           images: [[1200, 1280]],
@@ -1453,7 +1398,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1280, 1280]],
-          exitBranch: 29,
           branching: { branches: [{ frameIndex: 13, weight: 75 }] },
         },
         { duration: 100, images: [[1360, 1280]] },
@@ -1472,7 +1416,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[240, 1360]],
-          exitBranch: 43,
           branching: { branches: [{ frameIndex: 12, weight: 90 }] },
         },
         { duration: 100, images: [[320, 1360]] },
@@ -1490,7 +1433,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[0, 0]],
-          exitBranch: 160,
           branching: { branches: [{ frameIndex: 160, weight: 100 }] },
         },
         { duration: 100, images: [[640, 1600]] },
@@ -1500,7 +1442,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[960, 1600]],
-          exitBranch: 78,
           branching: { branches: [{ frameIndex: 60, weight: 50 }] },
         },
         { duration: 100, images: [[1040, 1600]] },
@@ -1525,11 +1466,10 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[400, 1680]],
-          exitBranch: 81,
           branching: { branches: [{ frameIndex: 80, weight: 50 }] },
         },
         { duration: 100, images: [[480, 1680]] },
-        { duration: 100, images: [[560, 1680]], exitBranch: 90 },
+        { duration: 100, images: [[560, 1680]] },
         {
           duration: 100,
           images: [[640, 1680]],
@@ -1543,13 +1483,11 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1120, 1680]],
-          exitBranch: 90,
           branching: { branches: [{ frameIndex: 89, weight: 80 }] },
         },
         {
           duration: 100,
           images: [[1200, 1680]],
-          exitBranch: 91,
           branching: {
             branches: [
               { frameIndex: 62, weight: 90 },
@@ -1557,10 +1495,10 @@ clippy.ready("Rover", {
             ],
           },
         },
-        { duration: 100, images: [[1280, 1680]], exitBranch: 92 },
-        { duration: 100, images: [[1360, 1680]], exitBranch: 93 },
-        { duration: 100, images: [[1440, 1680]], exitBranch: 94 },
-        { duration: 100, images: [[1520, 1680]], exitBranch: 160 },
+        { duration: 100, images: [[1280, 1680]] },
+        { duration: 100, images: [[1360, 1680]] },
+        { duration: 100, images: [[1440, 1680]] },
+        { duration: 100, images: [[1520, 1680]] },
         { duration: 100, images: [[0, 0]] },
         { duration: 100, images: [[1600, 1680]] },
         { duration: 100, images: [[1680, 1680]] },
@@ -1585,12 +1523,11 @@ clippy.ready("Rover", {
         { duration: 100, images: [[0, 1760]] },
         { duration: 100, images: [[320, 1760]] },
         { duration: 100, images: [[400, 1760]] },
-        { duration: 100, images: [[480, 1760]], exitBranch: 132 },
+        { duration: 100, images: [[480, 1760]] },
         { duration: 100, images: [[560, 1760]] },
         {
           duration: 100,
           images: [[0, 1760]],
-          exitBranch: 133,
           branching: {
             branches: [
               { frameIndex: 108, weight: 20 },
@@ -1606,7 +1543,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1040, 1760]],
-          exitBranch: 124,
           branching: { branches: [{ frameIndex: 115, weight: 80 }] },
         },
         { duration: 100, images: [[800, 1760]] },
@@ -1616,14 +1552,12 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[800, 1760]],
-          exitBranch: 124,
           branching: { branches: [{ frameIndex: 115, weight: 75 }] },
         },
-        { duration: 100, images: [[640, 1760]], exitBranch: 133 },
+        { duration: 100, images: [[640, 1760]] },
         {
           duration: 100,
           images: [[0, 1760]],
-          exitBranch: 133,
           branching: { branches: [{ frameIndex: 103, weight: 50 }] },
         },
         {
@@ -1638,13 +1572,11 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[1680, 1760]],
-          exitBranch: 132,
           branching: { branches: [{ frameIndex: 126, weight: 75 }] },
         },
         {
           duration: 100,
           images: [[1520, 1760]],
-          exitBranch: 133,
           branching: { branches: [{ frameIndex: 103, weight: 100 }] },
         },
         { duration: 100, images: [[1760, 1760]] },
@@ -1753,7 +1685,6 @@ clippy.ready("Rover", {
         {
           duration: 100,
           images: [[560, 2000]],
-          exitBranch: 19,
           branching: { branches: [{ frameIndex: 13, weight: 100 }] },
         },
         { duration: 100, images: [[640, 2000]] },
@@ -1852,3 +1783,4 @@ clippy.ready("Rover", {
     },
   },
 });
+

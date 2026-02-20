@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.3] - 2026-02-20
+
+### Added
+
+- Added a standalone Win98-style Animation Studio at `tools/animation-studio` for visual editing of assistant animation data.
+- Added Animation Studio support for:
+  - loading assistant `agent.js`, `map.png`, and `sounds-mp3.js`
+  - map-based frame picking with zoom controls
+  - frame CRUD and reordering
+  - multi-frame selection with invert-order action
+  - animation create/rename/delete
+  - sound-library tab with per-sound play buttons and frame assignment
+  - looping animation preview with optional sound and `exitBranch` path following
+  - inline edit apply via Enter key on `Duration` and `Exit Branch`
+  - session undo support
+- Added Animation Studio documentation in `README.md` with setup and end-to-end usage flow.
+
+### Changed
+
+- Animation Studio save behavior now writes directly to `assets/agents/<Agent>/agent.js` without generating `.bak` files.
+- Refined Animation Studio preview/audio controls to use:
+  - a single Play/Stop toggle button
+  - a text-based `Sound: Off/On` toggle for preview audio.
+
 ## [0.5.2] - 2026-02-16
 
 ### Added

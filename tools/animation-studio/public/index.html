@@ -1,0 +1,130 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation Studio</title>
+    <link rel="stylesheet" href="/vendor/98.css" />
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+  <body>
+    <main class="window app-shell">
+      <div class="title-bar">
+        <div class="title-bar-text">Animation Studio (Win98)</div>
+      </div>
+      <div class="window-body app-body">
+        <section class="toolbar field-row">
+          <label for="agentSelect">Assistant</label>
+          <select id="agentSelect"></select>
+          <button id="loadAgentBtn">Load</button>
+          <button id="saveBtn">Save agent.js</button>
+          <button id="undoBtn" type="button">Undo</button>
+          <span id="statusText" class="status-text"></span>
+        </section>
+
+        <section class="layout-grid">
+          <fieldset class="animation-panel">
+            <legend>Animations</legend>
+            <div class="field-row-stacked">
+              <input id="animationSearch" placeholder="Filter animations" />
+              <select id="animationList" size="20"></select>
+              <div class="field-row">
+                <button id="newAnimationBtn">New</button>
+                <button id="renameAnimationBtn">Rename</button>
+                <button id="deleteAnimationBtn">Delete</button>
+              </div>
+              <fieldset class="animation-preview">
+                <legend>Animation Preview</legend>
+                <div class="animation-preview-wrap sunken-panel">
+                  <canvas id="animationPreviewCanvas"></canvas>
+                </div>
+                <div class="field-row preview-controls">
+                  <button id="toggleAnimationPlayBtn" type="button">Play</button>
+                  <button id="togglePreviewSoundBtn" type="button" title="Preview sound off">Sound: Off</button>
+                  <span id="previewFrameText">Frame: -</span>
+                </div>
+              </fieldset>
+            </div>
+          </fieldset>
+
+          <fieldset class="map-panel">
+            <legend>Map Frame Picker</legend>
+            <div class="map-toolbar field-row">
+              <span id="mapMeta"></span>
+              <span id="selectedCell"></span>
+            </div>
+            <div class="field-row map-zoom-row">
+              <span>Zoom</span>
+              <button id="zoomOutBtn" type="button">-</button>
+              <button id="zoomResetBtn" type="button">100%</button>
+              <button id="zoomInBtn" type="button">+</button>
+              <span id="zoomLabel">100%</span>
+            </div>
+            <div class="canvas-wrap sunken-panel">
+              <canvas id="mapCanvas"></canvas>
+            </div>
+            <div class="field-row map-actions">
+              <button id="appendFrameBtn">Append Frame</button>
+              <button id="replaceImageBtn">Replace Selected Image</button>
+              <button id="previewSoundBtn">Preview Sound</button>
+            </div>
+          </fieldset>
+
+          <section class="right-panel">
+            <menu role="tablist" aria-label="Editor Tabs">
+              <button id="framesTabBtn" role="tab" aria-selected="true" aria-controls="framesTabContent">Frames</button>
+              <button id="soundsTabBtn" role="tab" aria-selected="false" aria-controls="soundsTabContent">Sound Library</button>
+            </menu>
+
+            <fieldset id="framesTabContent" class="frames-panel tab-content active-tab">
+              <legend>Frames</legend>
+              <div class="frames-grid">
+                <select id="frameList" size="14" multiple></select>
+                <div class="field-row-stacked">
+                  <label for="durationInput">Duration (ms)</label>
+                  <input id="durationInput" type="number" min="0" step="10" />
+
+                  <label for="soundSelect">Sound</label>
+                  <div class="field-row sound-row">
+                    <select id="soundSelect"></select>
+                    <button id="playFrameSoundBtn" type="button">Play</button>
+                  </div>
+
+                  <label for="exitBranchInput">Exit Branch</label>
+                  <input id="exitBranchInput" type="number" min="0" step="1" />
+
+                  <label for="imagesInput">Images (x,y pairs, one per line)</label>
+                  <textarea id="imagesInput" rows="6"></textarea>
+
+                  <div class="field-row wrap">
+                    <button id="addFrameBtn">Add</button>
+                    <button id="duplicateFrameBtn">Duplicate</button>
+                    <button id="removeFrameBtn">Remove</button>
+                    <button id="moveUpBtn">Up</button>
+                    <button id="moveDownBtn">Down</button>
+                    <button id="selectAllFramesBtn">Select All</button>
+                    <button id="invertFramesBtn">Invert Selected</button>
+                    <button id="applyFrameBtn">Apply</button>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset id="soundsTabContent" class="sound-browser tab-content">
+              <legend>Sound Library</legend>
+              <label for="soundButtonGrid">Detected sounds for current assistant</label>
+              <div id="soundButtonGrid" class="sound-button-grid sunken-panel"></div>
+              <div class="field-row wrap">
+                <button id="stopLibrarySoundBtn">Stop</button>
+                <button id="useLibrarySoundBtn">Use In Frame</button>
+                <span id="selectedLibrarySoundText">Selected: (none)</span>
+              </div>
+            </fieldset>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,6 +1,9 @@
 import { getAgentProfile } from "../agent-profiles";
 import { getAnimationKeysBrackets } from "./agent-packs";
 
+const STRUCTURE_RULE =
+  "Format every response using neat, readable structure (clear sections, short paragraphs, and bullets when useful).";
+
 function applyTokens(prompt: string, selectedAgent: string): string {
   const profile = getAgentProfile(selectedAgent);
 
@@ -23,7 +26,7 @@ export function buildSystemPrompt(
   const prompt = applyTokens(template, selectedAgent);
 
   if (prompt.includes("[AGENT_") || prompt.includes("[LIST OF ANIMATIONS]")) {
-    return prompt;
+    return ensureStructureRule(prompt);
   }
 
   const missingName = !template.includes("[AGENT_NAME]");
@@ -37,7 +40,7 @@ export function buildSystemPrompt(
     !missingAppearance &&
     !missingAnimations
   ) {
-    return prompt;
+    return ensureStructureRule(prompt);
   }
 
   const profile = getAgentProfile(selectedAgent);
@@ -54,8 +57,16 @@ export function buildSystemPrompt(
     );
   }
 
-  return `${prompt}
+  return ensureStructureRule(`${prompt}
 
 Agent context:
-${fallbackLines.join("\n")}`;
+${fallbackLines.join("\n")}`);
+}
+
+function ensureStructureRule(prompt: string): string {
+  if (prompt.includes(STRUCTURE_RULE)) {
+    return prompt;
+  }
+
+  return `${prompt}\n${STRUCTURE_RULE}`;
 }

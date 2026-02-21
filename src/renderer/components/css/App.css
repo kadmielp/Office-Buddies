@@ -112,6 +112,24 @@ textarea.chat-input-busy::placeholder {
   margin-right: 24px;
 }
 
+.buddy-speech-content p {
+  margin: 0 0 6px 0;
+}
+
+.buddy-speech-content p:last-child {
+  margin-bottom: 0;
+}
+
+.buddy-speech-content ul,
+.buddy-speech-content ol {
+  margin: 0 0 6px 18px;
+  padding: 0;
+}
+
+.buddy-speech-content li {
+  margin: 0 0 2px 0;
+}
+
 .buddy-speech-tail {
   position: absolute;
   right: 32px;
@@ -157,8 +175,8 @@ textarea.chat-input-busy::placeholder {
   margin-top: 8px;
   border-top: 1px solid rgba(0, 0, 0, 0.25);
   padding-top: 6px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 3px;
 }
 
@@ -168,15 +186,17 @@ textarea.chat-input-busy::placeholder {
   box-shadow: none;
   background: transparent;
   color: #111;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   width: 100%;
+  min-width: 0;
   padding: 1px 0;
   font-size: 12px;
   font-family: inherit;
   line-height: 1.25;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
 }
 

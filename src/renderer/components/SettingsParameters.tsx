@@ -7,6 +7,9 @@ export const SettingsParameters: React.FC = () => {
   const { settings } = useSharedState();
   const [tempTopK, setTempTopK] = useState(settings.topK);
   const [tempTemperature, setTempTemperature] = useState(settings.temperature);
+  const [tempRemoteMaxTokens, setTempRemoteMaxTokens] = useState(
+    settings.remoteMaxTokens ?? 512,
+  );
   const resolvedSystemPrompt = buildSystemPrompt(
     settings.systemPrompt,
     settings.selectedAgent || "Clippy",
@@ -17,17 +20,20 @@ export const SettingsParameters: React.FC = () => {
   useEffect(() => {
     return () => {
       const isNewSettings =
-        tempTopK !== settings.topK || tempTemperature !== settings.temperature;
+        tempTopK !== settings.topK ||
+        tempTemperature !== settings.temperature ||
+        tempRemoteMaxTokens !== (settings.remoteMaxTokens ?? 512);
 
       if (isNewSettings) {
         clippyApi.setState("settings", {
           ...settings,
           topK: tempTopK,
           temperature: tempTemperature,
+          remoteMaxTokens: tempRemoteMaxTokens,
         });
       }
     };
-  }, [tempTopK, tempTemperature]);
+  }, [tempTopK, tempTemperature, tempRemoteMaxTokens]);
 
   return (
     <>
@@ -67,6 +73,23 @@ export const SettingsParameters: React.FC = () => {
             value={tempTemperature}
             step="0.1"
             onChange={(e) => setTempTemperature(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="field-row">
+          <label htmlFor="remoteMaxTokens">Remote Max Tokens</label>
+          <input
+            id="remoteMaxTokens"
+            type="number"
+            value={tempRemoteMaxTokens}
+            min={64}
+            max={8192}
+            step={1}
+            onChange={(e) => {
+              const parsed = parseInt(e.target.value, 10);
+              if (Number.isFinite(parsed)) {
+                setTempRemoteMaxTokens(parsed);
+              }
+            }}
           />
         </div>
       </fieldset>

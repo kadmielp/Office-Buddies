@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import Markdown from "react-markdown";
 
 import {
   getAgentPack,
@@ -72,7 +73,9 @@ function findFirstAnimationKey(
 }
 
 function getBuddyChatPrompt(payload: BuddySpeechPayload): string {
-  const selectedText = payload.selectedText?.trim();
+  const selectedText = normalizeSelectedTextForChat(
+    payload.selectedText?.trim() || "",
+  );
 
   if (!selectedText) {
     return "Help me with this.";
@@ -93,6 +96,29 @@ function getBuddyChatPrompt(payload: BuddySpeechPayload): string {
   return `Explain this in simple terms:\n\n${selectedText}`;
 }
 
+function normalizeSelectedTextForChat(value: string): string {
+  if (!value) {
+    return "";
+  }
+
+  const lines = value.replace(/\r/g, "").split("\n");
+  const nonEmptyLines = lines.filter((line) => line.trim().length > 0);
+
+  if (nonEmptyLines.length === 0) {
+    return value.trim();
+  }
+
+  const minIndent = nonEmptyLines.reduce((currentMin, line) => {
+    const indentLength = (line.match(/^[ \t]*/) || [""])[0].length;
+    return Math.min(currentMin, indentLength);
+  }, Number.MAX_SAFE_INTEGER);
+
+  return lines
+    .map((line) => line.slice(Math.min(minIndent, line.length)).trimEnd())
+    .join("\n")
+    .trim();
+}
+
 export function Clippy() {
   const {
     animationKey,
@@ -103,6 +129,7 @@ export function Clippy() {
     setIsChatWindowOpen,
     isChatWindowOpen,
     addMessage,
+    startNewChat,
   } = useChat();
   const { settings, models } = useSharedState();
   const { currentView, setCurrentView } = useBubbleView();
@@ -117,6 +144,7 @@ export function Clippy() {
   const defaultTimeoutRef = useRef<number | undefined>(undefined);
   const idleTimeoutRef = useRef<number | undefined>(undefined);
   const speechTimeoutRef = useRef<number | undefined>(undefined);
+  const copyFeedbackTimeoutRef = useRef<number | undefined>(undefined);
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
   const idleStartedAtRef = useRef<number | null>(null);
@@ -132,7 +160,12 @@ export function Clippy() {
   const [buddySpeech, setBuddySpeech] = useState<BuddySpeechPayload | null>(
     null,
   );
+  const [hasCopiedBuddySpeech, setHasCopiedBuddySpeech] = useState(false);
   const [isBuddyThinking, setIsBuddyThinking] = useState(false);
+  const [hasShownStartupGreeting, setHasShownStartupGreeting] =
+    useState<boolean>(false);
+  const [isStartupGreetingPlaying, setIsStartupGreetingPlaying] =
+    useState<boolean>(false);
   const [switchPhase, setSwitchPhase] = useState<
     "none" | "goodbye" | "welcome"
   >("none");
@@ -151,10 +184,12 @@ export function Clippy() {
     [models],
   );
   const shouldUseChatProcessingAnimation =
-    isAnyModelDownloading || status === "thinking" || isStartingNewChat;
+    isAnyModelDownloading || isStartingNewChat;
   const shouldUseBuddyProcessingAnimation = isBuddyThinking;
   const shouldUseProcessingAnimation =
-    shouldUseChatProcessingAnimation || shouldUseBuddyProcessingAnimation;
+    hasShownStartupGreeting &&
+    !isStartupGreetingPlaying &&
+    (shouldUseChatProcessingAnimation || shouldUseBuddyProcessingAnimation);
 
   const clearFrameTimeout = useCallback(() => {
     if (frameTimeoutRef.current) {
@@ -181,6 +216,13 @@ export function Clippy() {
     if (speechTimeoutRef.current) {
       window.clearTimeout(speechTimeoutRef.current);
       speechTimeoutRef.current = undefined;
+    }
+  }, []);
+
+  const clearCopyFeedbackTimeout = useCallback(() => {
+    if (copyFeedbackTimeoutRef.current) {
+      window.clearTimeout(copyFeedbackTimeoutRef.current);
+      copyFeedbackTimeoutRef.current = undefined;
     }
   }, []);
 
@@ -390,6 +432,8 @@ export function Clippy() {
 
   useEffect(() => {
     hasPlayedWelcomeRef.current = false;
+    setHasShownStartupGreeting(false);
+    setIsStartupGreetingPlaying(false);
     setIsSpriteReady(false);
 
     const spriteImage = new Image();
@@ -406,6 +450,44 @@ export function Clippy() {
       spriteImageRef.current = null;
     };
   }, [agentPack.mapSrc, runAnimation]);
+
+  useEffect(() => {
+    if (
+      !isSpriteReady ||
+      hasShownStartupGreeting ||
+      isStartupGreetingPlaying ||
+      manualAnimationKey ||
+      isAgentSwitchAnimating
+    ) {
+      return;
+    }
+
+    const welcomeAnimationKey =
+      findFirstAnimationKey(agentPack.animations, ["Greeting", "Show"]) ??
+      "Default";
+
+    hasPlayedWelcomeRef.current = true;
+    setIsStartupGreetingPlaying(true);
+
+    runAnimation(welcomeAnimationKey, () => {
+      setHasShownStartupGreeting(true);
+      setIsStartupGreetingPlaying(false);
+
+      if (status === "welcome") {
+        setStatus("idle");
+      }
+    });
+  }, [
+    agentPack.animations,
+    hasShownStartupGreeting,
+    isAgentSwitchAnimating,
+    isSpriteReady,
+    isStartupGreetingPlaying,
+    manualAnimationKey,
+    runAnimation,
+    setStatus,
+    status,
+  ]);
 
   useEffect(() => {
     const speechPaddingWidth = buddySpeech ? 220 : 0;
@@ -443,6 +525,7 @@ export function Clippy() {
     clippyApi.offBuddySpeech();
     clippyApi.onBuddySpeech((payload) => {
       setBuddySpeech(payload);
+      setHasCopiedBuddySpeech(false);
       setIsBuddyThinking(Boolean(payload.isLoading));
       scheduleBuddySpeechDismiss();
     });
@@ -450,13 +533,16 @@ export function Clippy() {
     return () => {
       clippyApi.offBuddySpeech();
       clearSpeechTimeout();
+      clearCopyFeedbackTimeout();
     };
-  }, [clearSpeechTimeout, scheduleBuddySpeechDismiss]);
+  }, [clearCopyFeedbackTimeout, clearSpeechTimeout, scheduleBuddySpeechDismiss]);
 
   const closeBuddySpeech = useCallback(() => {
     clearSpeechTimeout();
+    clearCopyFeedbackTimeout();
     setBuddySpeech(null);
-  }, [clearSpeechTimeout]);
+    setHasCopiedBuddySpeech(false);
+  }, [clearCopyFeedbackTimeout, clearSpeechTimeout]);
 
   const retryBuddySpeech = useCallback(() => {
     if (!buddySpeech || !buddySpeech.selectedText) {
@@ -472,25 +558,56 @@ export function Clippy() {
   }, [buddySpeech, scheduleBuddySpeechDismiss]);
 
   const openBuddySpeechInChat = useCallback(() => {
-    if (buddySpeech) {
-      void addMessage({
-        id: crypto.randomUUID(),
-        content: getBuddyChatPrompt(buddySpeech),
-        sender: "user",
-        createdAt: Date.now(),
-      });
-      void addMessage({
-        id: crypto.randomUUID(),
-        content: buddySpeech.speech,
-        sender: "clippy",
-        createdAt: Date.now(),
-      });
+    void (async () => {
+      if (buddySpeech) {
+        await startNewChat(true);
+        await addMessage({
+          id: crypto.randomUUID(),
+          content: getBuddyChatPrompt(buddySpeech),
+          sender: "user",
+          createdAt: Date.now(),
+        });
+        await addMessage({
+          id: crypto.randomUUID(),
+          content: buddySpeech.speech,
+          sender: "clippy",
+          createdAt: Date.now(),
+        });
+      }
+
+      setCurrentView("chat");
+      setIsChatWindowOpen(true);
+      closeBuddySpeech();
+    })().catch((error) => {
+      console.error(error);
+    });
+  }, [
+    addMessage,
+    buddySpeech,
+    closeBuddySpeech,
+    setCurrentView,
+    setIsChatWindowOpen,
+    startNewChat,
+  ]);
+
+  const copyBuddySpeech = useCallback(() => {
+    if (!buddySpeech?.speech) {
+      return;
     }
 
-    setCurrentView("chat");
-    setIsChatWindowOpen(true);
-    closeBuddySpeech();
-  }, [addMessage, buddySpeech, closeBuddySpeech, setCurrentView, setIsChatWindowOpen]);
+    clippyApi
+      .clipboardWrite({ text: buddySpeech.speech } as any)
+      .then(() => {
+        setHasCopiedBuddySpeech(true);
+        clearCopyFeedbackTimeout();
+        copyFeedbackTimeoutRef.current = window.setTimeout(() => {
+          setHasCopiedBuddySpeech(false);
+        }, 2200);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [buddySpeech, clearCopyFeedbackTimeout]);
 
   useEffect(() => {
     if (!manualAnimationKey) {
@@ -633,18 +750,7 @@ export function Clippy() {
       });
     };
 
-    if (status === "welcome" && !hasPlayedWelcomeRef.current) {
-      idleStartedAtRef.current = null;
-      hasPlayedWelcomeRef.current = true;
-
-      const welcomeAnimationKey =
-        findFirstAnimationKey(agentPack.animations, ["Greeting", "Show"]) ??
-        "Default";
-
-      runAnimation(welcomeAnimationKey, () => {
-        setStatus("idle");
-      });
-    } else if (status === "idle") {
+    if (status === "idle") {
       if (idleStartedAtRef.current === null) {
         idleStartedAtRef.current = Date.now();
       }
@@ -760,7 +866,17 @@ export function Clippy() {
           >
             x
           </button>
-          <div className="buddy-speech-content">{buddySpeech.speech}</div>
+          <div className="buddy-speech-content">
+            <Markdown
+              components={{
+                a: ({ node, ...props }) => (
+                  <a target="_blank" rel="noopener noreferrer" {...props} />
+                ),
+              }}
+            >
+              {buddySpeech.speech}
+            </Markdown>
+          </div>
           <div className="buddy-speech-options">
             <button className="buddy-speech-option" onClick={retryBuddySpeech}>
               <span className="buddy-speech-option-dot" />
@@ -772,6 +888,10 @@ export function Clippy() {
             >
               <span className="buddy-speech-option-dot" />
               Open in chat
+            </button>
+            <button className="buddy-speech-option" onClick={copyBuddySpeech}>
+              <span className="buddy-speech-option-dot" />
+              {hasCopiedBuddySpeech ? "Copied" : "Copy"}
             </button>
           </div>
           <div className="buddy-speech-tail" />

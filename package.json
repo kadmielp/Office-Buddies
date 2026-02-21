@@ -5,7 +5,7 @@
   "description": "Office Buddies",
   "main": ".vite/build/main.js",
   "scripts": {
-    "start": "set NODE_LLAMA_CPP_GPU=auto&& electron-forge start",
+    "start": "cross-env NODE_LLAMA_CPP_GPU=auto electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -13,12 +13,12 @@
   },
   "keywords": [],
   "author": {
-    "name": "Felix Rieseberg",
-    "email": "fr@makenotion.com"
+    "name": "kadmielp",
+    "email": "kadmiel.git@aspis.slmail.me"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/felixrieseberg/clippy"
+    "url": "https://github.com/kadmielp/Office-Buddies.git"
   },
   "license": "MIT",
   "devDependencies": {
@@ -36,6 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "electron": "35.1.4",
     "eslint": "^8.57.1",

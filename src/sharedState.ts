@@ -12,6 +12,7 @@ export interface SettingsState {
   aiProvider?: AiProvider;
   selectedModel?: string;
   remoteModel?: string;
+  remoteMaxTokens?: number;
   openAiApiKey?: string;
   geminiApiKey?: string;
   maritacaApiKey?: string;
@@ -50,6 +51,7 @@ Appearance context: [AGENT_APPEARANCE]
 When asked who you are, describe yourself as [AGENT_NAME], a local AI assistant in this app. Do not mention underlying model names or providers.
 Keep replies useful, accurate, and respectful.
 Always reply in the same language used by the user in their most recent message.
+Format every response using neat, readable structure (clear sections, short paragraphs, and bullets when useful).
 ${ANIMATION_PROMPT}`;
 
 export const DEFAULT_SETTINGS: SettingsState = {
@@ -59,6 +61,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   alwaysOpenChat: true,
   selectedAgent: "Clippy",
   systemPrompt: DEFAULT_SYSTEM_PROMPT,
+  remoteMaxTokens: 512,
   topK: 10,
   temperature: 0.7,
   defaultFont: "Tahoma",

@@ -49,7 +49,7 @@ export type ChatContextType = {
   chatRecords: Record<string, ChatRecord>;
   currentChatRecord: ChatRecord;
   selectChat: (chatId: string) => void;
-  startNewChat: () => Promise<void>;
+  startNewChat: (force?: boolean) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
   deleteAllChats: () => Promise<void>;
 };
@@ -93,7 +93,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     [currentChatRecord, messages],
   );
 
-  const startNewChat = useCallback(async () => {
+  const startNewChat = useCallback(async (force = false) => {
     setStatus("thinking");
     setIsStartingNewChat(true);
 
@@ -135,7 +135,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     // No need if there are no messages, we'll just keep the current chat
     // and update the timestamps
     try {
-      if (messages.length === 0) {
+      if (messages.length === 0 && !force) {
         setCurrentChatRecord({
           ...currentChatRecord,
           createdAt: Date.now(),
@@ -184,7 +184,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const loadModel = useCallback(
     async (initialPrompts: LanguageModelPrompt[] = []) => {
-      setStatus("thinking");
+      const shouldShowLoadThinking = status !== "welcome";
+
+      if (shouldShowLoadThinking) {
+        setStatus("thinking");
+      }
       setIsModelLoaded(false);
 
       const options: LanguageModelCreateOptions = {
@@ -216,7 +220,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           createdAt: Date.now(),
         });
       } finally {
-        setStatus("idle");
+        if (shouldShowLoadThinking) {
+          setStatus("idle");
+        }
       }
     },
     [
@@ -228,6 +234,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       settings.maritacaApiKey,
       settings.topK,
       settings.temperature,
+      status,
       models,
       getSystemPrompt,
       addMessage,

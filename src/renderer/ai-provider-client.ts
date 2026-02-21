@@ -6,9 +6,6 @@ import { clippyApi, electronAi } from "./clippyApi";
 import { Message } from "./components/Message";
 import { ModelState } from "../models";
 import { SettingsState } from "../sharedState";
-import { MessageRecord } from "../types/interfaces";
-
-export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
 type ProviderName = NonNullable<SettingsState["aiProvider"]>;
 
@@ -183,58 +180,6 @@ export async function* promptStreamingWithProvider(args: {
   }
 }
 
-function toChatHistoryMessages(history: Message[]) {
-  return history
-    .filter((msg) => !!msg.content)
-    .map((msg) => ({
-      role: msg.sender === "clippy" ? "assistant" : "user",
-      content: msg.content || "",
-    }));
-}
-
-function toGeminiHistory(history: Message[]) {
-  return history
-    .filter((msg) => !!msg.content)
-    .map((msg) => ({
-      role: msg.sender === "clippy" ? "model" : "user",
-      parts: [{ text: msg.content || "" }],
-    }));
-}
-
-function getGeminiText(payload: any): string {
-  const candidates = payload?.candidates;
-  if (!Array.isArray(candidates) || candidates.length === 0) {
-    return "";
-  }
-
-  const parts = candidates[0]?.content?.parts;
-  if (!Array.isArray(parts)) {
-    return "";
-  }
-
-  return parts
-    .map((part: any) => part?.text || "")
-    .join("")
-    .trim();
-}
-
-function getOpenAiCompatibleText(payload: any): string {
-  const content = payload?.choices?.[0]?.message?.content;
-
-  if (typeof content === "string") {
-    return content;
-  }
-
-  if (Array.isArray(content)) {
-    return content
-      .map((item) => (typeof item?.text === "string" ? item.text : ""))
-      .join("")
-      .trim();
-  }
-
-  return "";
-}
-
 async function promptRemoteProvider(args: {
   provider: ProviderName;
   settings: SettingsState;
@@ -247,7 +192,7 @@ async function promptRemoteProvider(args: {
   }
 
   const provider = args.provider as "openai" | "gemini" | "maritaca";
-  const history: MessageRecord[] = args.history.map((msg) => ({
+  const history = args.history.map((msg) => ({
     id: msg.id,
     sender: msg.sender,
     content: msg.content,

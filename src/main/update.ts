@@ -14,8 +14,7 @@ export function setupAutoUpdater() {
   let disableAutoUpdate = false;
 
   try {
-    disableAutoUpdate =
-      getStateManager().store.get("settings")?.disableAutoUpdate;
+    disableAutoUpdate = getStateManager().getSettings()?.disableAutoUpdate;
   } catch (error) {
     getLogger().warn("Failed to get settings from state manager", error);
   }

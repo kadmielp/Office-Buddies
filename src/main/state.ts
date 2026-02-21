@@ -1,4 +1,5 @@
 import Store from "electron-store";
+import { safeStorage } from "electron";
 
 import {
   getMainWindow,
@@ -19,6 +20,65 @@ import { BUILT_IN_MODELS } from "../models";
 import { getLogger } from "./logger";
 import { setupAppMenu } from "./menu";
 
+const ENCRYPTED_PREFIX = "ob_enc_v1:";
+type SensitiveSettingsKey = "openAiApiKey" | "geminiApiKey" | "maritacaApiKey";
+
+const SENSITIVE_SETTINGS_KEYS: SensitiveSettingsKey[] = [
+  "openAiApiKey",
+  "geminiApiKey",
+  "maritacaApiKey",
+];
+
+function isSensitiveSettingsPath(path: string): boolean {
+  return SENSITIVE_SETTINGS_KEYS.some((key) => path === `settings.${key}`);
+}
+
+function isSensitiveSettingsKey(
+  key: keyof SettingsState,
+): key is SensitiveSettingsKey {
+  return (SENSITIVE_SETTINGS_KEYS as string[]).includes(key);
+}
+
+function isEncryptedValue(value: unknown): value is string {
+  return typeof value === "string" && value.startsWith(ENCRYPTED_PREFIX);
+}
+
+function encryptSecret(value: unknown): unknown {
+  if (typeof value !== "string" || value.length === 0 || isEncryptedValue(value)) {
+    return value;
+  }
+
+  if (!safeStorage.isEncryptionAvailable()) {
+    return value;
+  }
+
+  try {
+    const encrypted = safeStorage.encryptString(value).toString("base64");
+    return `${ENCRYPTED_PREFIX}${encrypted}`;
+  } catch (error) {
+    getLogger().warn("Failed to encrypt API key for storage", error);
+    return value;
+  }
+}
+
+function decryptSecret(value: unknown): unknown {
+  if (!isEncryptedValue(value)) {
+    return value;
+  }
+
+  if (!safeStorage.isEncryptionAvailable()) {
+    return value;
+  }
+
+  try {
+    const payload = value.slice(ENCRYPTED_PREFIX.length);
+    return safeStorage.decryptString(Buffer.from(payload, "base64"));
+  } catch (error) {
+    getLogger().warn("Failed to decrypt API key from storage", error);
+    return value;
+  }
+}
+
 export class StateManager {
   public store = new Store<SharedState>({
     defaults: {
@@ -31,7 +91,7 @@ export class StateManager {
     this.ensureCorrectModelState();
     this.ensureCorrectSettingsState();
 
-    this.store.onDidAnyChange(this.onDidAnyChange);
+    this.store.onDidAnyChange((newValue) => this.onDidAnyChange(newValue));
 
     // Handle settings changes
     this.store.onDidChange("settings", (newValue, oldValue) => {
@@ -43,8 +103,46 @@ export class StateManager {
     this.store.set("models", getModelManager().getRendererModelState());
   }
 
+  public getSettings(): SettingsState {
+    return this.fromStoredSettings(this.store.get("settings"));
+  }
+
+  public getSharedStateForRenderer(): SharedState {
+    const state = this.store.store;
+    return {
+      ...state,
+      settings: this.fromStoredSettings(state.settings),
+    };
+  }
+
+  public getStateValueForRenderer(key: string): any {
+    if (key === "settings") {
+      return this.getSettings();
+    }
+
+    if (isSensitiveSettingsPath(key)) {
+      return decryptSecret(this.store.get(key as any));
+    }
+
+    return this.store.get(key as any);
+  }
+
+  public setStateValue(key: string, value: any) {
+    if (key === "settings") {
+      this.store.set("settings", this.toStoredSettings(value || {}));
+      return;
+    }
+
+    if (isSensitiveSettingsPath(key)) {
+      this.store.set(key as any, encryptSecret(value) as any);
+      return;
+    }
+
+    this.store.set(key as any, value);
+  }
+
   private ensureCorrectSettingsState() {
-    const settings = this.store.get("settings");
+    const settings = this.getSettings();
 
     // Default model exists?
     if (settings.selectedModel) {
@@ -63,6 +161,10 @@ export class StateManager {
       settings.temperature = 0.7;
     }
 
+    if (settings.remoteMaxTokens === undefined) {
+      settings.remoteMaxTokens = 512;
+    }
+
     if (!settings.selectedAgent) {
       settings.selectedAgent = "Clippy";
     }
@@ -75,7 +177,7 @@ export class StateManager {
       settings.systemPrompt = DEFAULT_SYSTEM_PROMPT;
     }
 
-    this.store.set("settings", settings);
+    this.store.set("settings", this.toStoredSettings(settings));
   }
 
   private ensureCorrectModelState() {
@@ -129,31 +231,36 @@ export class StateManager {
       return;
     }
 
-    if (oldValue.clippyAlwaysOnTop !== newValue.clippyAlwaysOnTop) {
-      setMainWindowAlwaysOnTop(newValue.clippyAlwaysOnTop);
+    const nextSettings = this.fromStoredSettings(newValue);
+    const previousSettings = this.fromStoredSettings(oldValue);
+
+    if (previousSettings.clippyAlwaysOnTop !== nextSettings.clippyAlwaysOnTop) {
+      setMainWindowAlwaysOnTop(nextSettings.clippyAlwaysOnTop);
     }
 
-    if (oldValue.chatAlwaysOnTop !== newValue.chatAlwaysOnTop) {
-      setChatWindowAlwaysOnTop(newValue.chatAlwaysOnTop);
+    if (previousSettings.chatAlwaysOnTop !== nextSettings.chatAlwaysOnTop) {
+      setChatWindowAlwaysOnTop(nextSettings.chatAlwaysOnTop);
     }
 
-    if (oldValue.defaultFontSize !== newValue.defaultFontSize) {
-      setFontSize(newValue.defaultFontSize);
+    if (previousSettings.defaultFontSize !== nextSettings.defaultFontSize) {
+      setFontSize(nextSettings.defaultFontSize);
     }
 
-    if (oldValue.defaultFont !== newValue.defaultFont) {
-      setFont(newValue.defaultFont);
+    if (previousSettings.defaultFont !== nextSettings.defaultFont) {
+      setFont(nextSettings.defaultFont);
     }
 
     // Update the menu, which contains state
     setupAppMenu();
 
     // Log the settings change by getting a deep diff
-    const diff = Object.keys(newValue).reduce(
+    const diff = Object.keys(nextSettings).reduce(
       (acc, key) => {
         const typedKey = key as keyof SettingsState;
-        if (newValue[typedKey] !== oldValue[typedKey]) {
-          acc[typedKey] = newValue[typedKey];
+        if (nextSettings[typedKey] !== previousSettings[typedKey]) {
+          acc[typedKey] = isSensitiveSettingsKey(typedKey)
+            ? "[REDACTED]"
+            : nextSettings[typedKey];
         }
 
         return acc;
@@ -168,8 +275,31 @@ export class StateManager {
    *
    * @param newValue
    */
-  public onDidAnyChange(newValue: SharedState = this.store.store) {
-    getMainWindow()?.webContents.send(IpcMessages.STATE_CHANGED, newValue);
+  public onDidAnyChange(_newValue: SharedState = this.store.store) {
+    getMainWindow()?.webContents.send(
+      IpcMessages.STATE_CHANGED,
+      this.getSharedStateForRenderer(),
+    );
+  }
+
+  private toStoredSettings(settings: SettingsState): SettingsState {
+    const storedSettings = { ...settings };
+
+    for (const key of SENSITIVE_SETTINGS_KEYS) {
+      storedSettings[key] = encryptSecret(storedSettings[key]) as string | undefined;
+    }
+
+    return storedSettings;
+  }
+
+  private fromStoredSettings(settings: SettingsState): SettingsState {
+    const runtimeSettings = { ...settings };
+
+    for (const key of SENSITIVE_SETTINGS_KEYS) {
+      runtimeSettings[key] = decryptSecret(runtimeSettings[key]) as string | undefined;
+    }
+
+    return runtimeSettings;
   }
 }
 

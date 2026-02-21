@@ -65,13 +65,13 @@ export function setupIpcListeners() {
   );
   ipcMain.handle(
     IpcMessages.STATE_GET_FULL,
-    () => getStateManager().store.store,
+    () => getStateManager().getSharedStateForRenderer(),
   );
   ipcMain.handle(IpcMessages.STATE_SET, (_, key: string, value: any) =>
-    getStateManager().store.set(key, value),
+    getStateManager().setStateValue(key, value),
   );
   ipcMain.handle(IpcMessages.STATE_GET, (_, key: string) =>
-    getStateManager().store.get(key),
+    getStateManager().getStateValueForRenderer(key),
   );
   ipcMain.handle(IpcMessages.STATE_OPEN_IN_EDITOR, () =>
     getStateManager().store.openInEditor(),
@@ -112,10 +112,7 @@ export function setupIpcListeners() {
     getChatManager().deleteAllChats(),
   );
   ipcMain.handle(IpcMessages.AI_FETCH_MODELS, (_, provider: string) =>
-    fetchRemoteProviderModels(
-      provider as any,
-      getStateManager().store.get("settings"),
-    ),
+    fetchRemoteProviderModels(provider as any, getStateManager().getSettings()),
   );
   ipcMain.handle(
     IpcMessages.AI_PROMPT,
@@ -129,7 +126,7 @@ export function setupIpcListeners() {
     ) =>
       promptRemoteProvider({
         provider: payload.provider,
-        settings: getStateManager().store.get("settings"),
+        settings: getStateManager().getSettings(),
         systemPrompt: payload.systemPrompt,
         history: payload.history,
       }),

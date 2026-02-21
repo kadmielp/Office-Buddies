@@ -4,6 +4,22 @@ import { MessageRecord } from "../types/interfaces";
 export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
 type RemoteProvider = "openai" | "gemini" | "maritaca";
+const DEFAULT_REMOTE_MAX_TOKENS = 512;
+const MIN_REMOTE_MAX_TOKENS = 64;
+const MAX_REMOTE_MAX_TOKENS = 8192;
+
+function resolveRemoteMaxTokens(settings: SettingsState): number {
+  const value = settings.remoteMaxTokens;
+
+  if (!Number.isFinite(value)) {
+    return DEFAULT_REMOTE_MAX_TOKENS;
+  }
+
+  return Math.max(
+    MIN_REMOTE_MAX_TOKENS,
+    Math.min(MAX_REMOTE_MAX_TOKENS, Math.floor(value as number)),
+  );
+}
 
 function toChatHistoryMessages(history: MessageRecord[]) {
   return history
@@ -79,6 +95,7 @@ async function promptOpenAiCompatible(args: {
   apiKey: string;
   model: string;
   temperature?: number;
+  maxTokens: number;
   systemPrompt: string;
   history: MessageRecord[];
 }) {
@@ -95,7 +112,7 @@ async function promptOpenAiCompatible(args: {
         ...toChatHistoryMessages(args.history),
       ],
       temperature: args.temperature,
-      max_tokens: 512,
+      max_tokens: args.maxTokens,
       stream: false,
     }),
   });
@@ -180,6 +197,7 @@ export async function promptRemoteProvider(args: {
       apiKey: args.settings.openAiApiKey || "",
       model: args.settings.remoteModel || "",
       temperature: args.settings.temperature,
+      maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
       history: args.history,
     });
@@ -200,6 +218,7 @@ export async function promptRemoteProvider(args: {
           apiKey: args.settings.maritacaApiKey || "",
           model: args.settings.remoteModel || "",
           temperature: args.settings.temperature,
+          maxTokens: resolveRemoteMaxTokens(args.settings),
           systemPrompt: args.systemPrompt,
           history: args.history,
         });

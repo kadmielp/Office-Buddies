@@ -10,7 +10,7 @@
 </p>
 <h1 align="center">Office Buddies</h1>
 <p align="center">
-  <img src="assets/screenshots/clippy.png" alt="Logo" width="128" />
+  <img src="assets/screenshots/clippy.png" alt="Logo" width="512" />
 </p>
 <p align="center">
 

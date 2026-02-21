@@ -148,6 +148,7 @@ export function Clippy() {
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
   const idleStartedAtRef = useRef<number | null>(null);
+  const wasBuddySpeechLoadingRef = useRef<boolean>(false);
 
   const [isSpriteReady, setIsSpriteReady] = useState(false);
   const [displayedAgent, setDisplayedAgent] = useState<string>(selectedAgent);
@@ -524,9 +525,18 @@ export function Clippy() {
   useEffect(() => {
     clippyApi.offBuddySpeech();
     clippyApi.onBuddySpeech((payload) => {
+      const isLoading = Boolean(payload.isLoading);
+      const wasLoading = wasBuddySpeechLoadingRef.current;
+      wasBuddySpeechLoadingRef.current = isLoading;
+
       setBuddySpeech(payload);
       setHasCopiedBuddySpeech(false);
-      setIsBuddyThinking(Boolean(payload.isLoading));
+      setIsBuddyThinking(isLoading);
+
+      if (wasLoading && !isLoading) {
+        setManualAnimationKey("GetAttention");
+      }
+
       scheduleBuddySpeechDismiss();
     });
 

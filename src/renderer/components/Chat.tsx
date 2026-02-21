@@ -103,6 +103,18 @@ export function Chat({ style }: ChatProps) {
       addMessage(assistantMessage);
     } catch (error) {
       console.error(error);
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unknown error while contacting remote provider.";
+
+      await addMessage({
+        id: crypto.randomUUID(),
+        content: `⚠️ Falha ao obter resposta: ${errorMessage}`,
+        sender: "clippy",
+        createdAt: Date.now(),
+      });
     } finally {
       setStreamingMessageContent("");
       setStatus("idle");

@@ -121,13 +121,50 @@ const clippyApi: ClippyApi = {
   offNewChat: () => {
     ipcRenderer.removeAllListeners(IpcMessages.CHAT_NEW_CHAT);
   },
-  fetchRemoteProviderModels: (provider: "openai" | "gemini" | "maritaca") =>
+  fetchRemoteProviderModels: (provider: "openai" | "gemini" | "maritaca" | "openclaw") =>
     ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
   promptRemoteProvider: (payload: {
-    provider: "openai" | "gemini" | "maritaca";
+    provider: "openai" | "gemini" | "maritaca" | "openclaw";
     systemPrompt: string;
     history: ChatWithMessages["messages"];
-  }) => ipcRenderer.invoke(IpcMessages.AI_PROMPT, payload),
+    requestUUID?: string;
+    onChunk?: (chunk: string) => void;
+    onDone?: () => void;
+    onError?: (error: string) => void;
+  }) => {
+    if (payload.requestUUID && payload.onChunk) {
+      // Streaming mode
+      const { requestUUID } = payload;
+      const chunkListener = (_event: any, data: { chunk: string }) => payload.onChunk!(data.chunk);
+      const doneListener = () => {
+        cleanup();
+        payload.onDone?.();
+      };
+      const errorListener = (_event: any, data: { error: string }) => {
+        cleanup();
+        payload.onError?.(data.error);
+      };
+
+      const cleanup = () => {
+        ipcRenderer.removeListener(`clippy_ai_prompt_chunk_${requestUUID}`, chunkListener);
+        ipcRenderer.removeListener(`clippy_ai_prompt_done_${requestUUID}`, doneListener);
+        ipcRenderer.removeListener(`clippy_ai_prompt_error_${requestUUID}`, errorListener);
+      };
+
+      ipcRenderer.on(`clippy_ai_prompt_chunk_${requestUUID}`, chunkListener);
+      ipcRenderer.on(`clippy_ai_prompt_done_${requestUUID}`, doneListener);
+      ipcRenderer.on(`clippy_ai_prompt_error_${requestUUID}`, errorListener);
+
+      ipcRenderer.send("clippy_ai_prompt_streaming", {
+        provider: payload.provider,
+        systemPrompt: payload.systemPrompt,
+        history: payload.history,
+        requestUUID: payload.requestUUID,
+      });
+    } else {
+      return ipcRenderer.invoke(IpcMessages.AI_PROMPT, payload);
+    }
+  },
 
   // App
   getVersions: () => ipcRenderer.invoke(IpcMessages.APP_GET_VERSIONS),

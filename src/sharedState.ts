@@ -6,7 +6,7 @@ export type DefaultFont =
   | "Tahoma"
   | "System Default";
 export type DefaultFontSize = number;
-export type AiProvider = "local" | "openai" | "gemini" | "maritaca";
+export type AiProvider = "local" | "openai" | "gemini" | "maritaca" | "openclaw";
 
 export interface SettingsState {
   aiProvider?: AiProvider;
@@ -16,6 +16,8 @@ export interface SettingsState {
   openAiApiKey?: string;
   geminiApiKey?: string;
   maritacaApiKey?: string;
+  openclawApiKey?: string;
+  openclawEndpoint?: string;
   selectedAgent?: string;
   systemPrompt?: string;
   clippyAlwaysOnTop?: boolean;

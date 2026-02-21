@@ -15,7 +15,7 @@ import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
 import { getClippyDebugInfo } from "./debug-clippy";
 import { getDebugManager } from "./debug";
-import { fetchRemoteProviderModels, promptRemoteProvider } from "./remote-ai";
+import { fetchRemoteProviderModels, promptRemoteProvider, promptStreamingRemoteProvider } from "./remote-ai";
 import { runBuddyAction } from "./buddy-actions";
 import { BuddyAction } from "../types/interfaces";
 
@@ -114,22 +114,57 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.AI_FETCH_MODELS, (_, provider: string) =>
     fetchRemoteProviderModels(provider as any, getStateManager().getSettings()),
   );
+
   ipcMain.handle(
     IpcMessages.AI_PROMPT,
-    (
+    async (
       _,
       payload: {
-        provider: "openai" | "gemini" | "maritaca";
+        provider: "openai" | "gemini" | "maritaca" | "openclaw";
         systemPrompt: string;
         history: ChatWithMessages["messages"];
       },
     ) =>
       promptRemoteProvider({
-        provider: payload.provider,
+        provider: payload.provider as any,
         settings: getStateManager().getSettings(),
         systemPrompt: payload.systemPrompt,
         history: payload.history,
       }),
+  );
+
+  ipcMain.on(
+    "clippy_ai_prompt_streaming",
+    async (
+      event,
+      payload: {
+        provider: "openai" | "gemini" | "maritaca" | "openclaw";
+        systemPrompt: string;
+        history: ChatWithMessages["messages"];
+        requestUUID: string;
+      },
+    ) => {
+      try {
+        const stream = promptStreamingRemoteProvider({
+          provider: payload.provider as any,
+          settings: getStateManager().getSettings(),
+          systemPrompt: payload.systemPrompt,
+          history: payload.history,
+        });
+
+        for await (const chunk of stream) {
+          event.reply(`clippy_ai_prompt_chunk_${payload.requestUUID}`, {
+            chunk,
+          });
+        }
+
+        event.reply(`clippy_ai_prompt_done_${payload.requestUUID}`);
+      } catch (error) {
+        event.reply(`clippy_ai_prompt_error_${payload.requestUUID}`, {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
   );
 
   // Clipboard

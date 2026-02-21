@@ -66,13 +66,17 @@ export type ClippyApi = {
   offNewChat: () => void;
   // Remote AI Providers
   fetchRemoteProviderModels: (
-    provider: "openai" | "gemini" | "maritaca",
+    provider: "openai" | "gemini" | "maritaca" | "openclaw",
   ) => Promise<string[]>;
   promptRemoteProvider: (payload: {
-    provider: "openai" | "gemini" | "maritaca";
+    provider: "openai" | "gemini" | "maritaca" | "openclaw";
     systemPrompt: string;
     history: MessageRecord[];
-  }) => Promise<string>;
+    requestUUID?: string;
+    onChunk?: (chunk: string) => void;
+    onDone?: () => void;
+    onError?: (error: string) => void;
+  }) => Promise<string> | void;
   // Clipboard
   clipboardWrite: (data: Data) => Promise<void>;
 };

@@ -3,7 +3,15 @@ import { MessageRecord } from "../types/interfaces";
 
 export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
-type RemoteProvider = "openai" | "gemini" | "maritaca";
+export const OPENCLAW_DEFAULT_MODEL = "google-antigravity/gemini-3-flash";
+export const OPENCLAW_STATIC_MODELS = [
+  "google-antigravity/gemini-3-flash",
+  "google-antigravity/claude-opus-4-6-thinking",
+  "google-antigravity/claude-sonnet-4-6",
+  "openai-codex/gpt-5.3-codex",
+];
+
+type RemoteProvider = "openai" | "gemini" | "maritaca" | "openclaw";
 const DEFAULT_REMOTE_MAX_TOKENS = 512;
 const MIN_REMOTE_MAX_TOKENS = 64;
 const MAX_REMOTE_MAX_TOKENS = 8192;
@@ -87,7 +95,12 @@ async function fetchJson(url: string, headers?: Record<string, string>) {
     throw new Error(`Request failed (${response.status}) at ${url}: ${body}`);
   }
 
-  return response.json();
+  const rawText = await response.text();
+  try {
+    return JSON.parse(rawText);
+  } catch (err) {
+    throw new Error(`Failed to parse JSON response from ${url}. Raw response: ${rawText.slice(0, 500)}`);
+  }
 }
 
 async function promptOpenAiCompatible(args: {
@@ -99,12 +112,17 @@ async function promptOpenAiCompatible(args: {
   systemPrompt: string;
   history: MessageRecord[];
 }) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (args.apiKey && args.apiKey.trim()) {
+    headers.Authorization = `Bearer ${args.apiKey.trim()}`;
+  }
+
   const response = await fetch(args.endpoint, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${args.apiKey}`,
-    },
+    headers,
     body: JSON.stringify({
       model: args.model,
       messages: [
@@ -128,14 +146,55 @@ async function promptOpenAiCompatible(args: {
   return getOpenAiCompatibleText(payload);
 }
 
+function ensureProtocol(url: string): string {
+  if (!url) return "";
+  let normalized = url.trim();
+  if (!/^https?:\/\//i.test(normalized)) {
+    normalized = `http://${normalized}`;
+  }
+  return normalized;
+}
+
 export async function fetchRemoteProviderModels(
   provider: RemoteProvider,
   settings: SettingsState,
 ): Promise<string[]> {
+  if (provider === "openclaw") {
+    return OPENCLAW_STATIC_MODELS;
+  }
+
   if (provider === "openai") {
     const payload = await fetchJson("https://api.openai.com/v1/models", {
       Authorization: `Bearer ${settings.openAiApiKey || ""}`,
     });
+
+    return ((payload?.data as Array<any>) || [])
+      .map((item) => item?.id)
+      .filter((id) => typeof id === "string")
+      .sort();
+  }
+
+  if (provider === "openclaw") {
+    if (!settings.openclawEndpoint) {
+      throw new Error("OpenClaw endpoint is missing.");
+    }
+
+    let baseUrl = ensureProtocol(settings.openclawEndpoint).replace(/\/+$/, "");
+    
+    // OpenClaw OpenAI-compatible routes are actually at the root /v1
+    // The previous /api attempt returned the Control UI HTML.
+    if (!baseUrl.endsWith("/v1")) {
+      baseUrl += "/v1";
+    }
+
+    const modelsUrl = `${baseUrl}/models`;
+
+    const headers: Record<string, string> = {};
+    if (settings.openclawApiKey?.trim()) {
+      headers.Authorization = `Bearer ${settings.openclawApiKey.trim()}`;
+    }
+
+    const payload = await fetchJson(modelsUrl, headers);
 
     return ((payload?.data as Array<any>) || [])
       .map((item) => item?.id)
@@ -185,6 +244,128 @@ export async function fetchRemoteProviderModels(
   throw lastError || new Error("Unable to load Maritaca models.");
 }
 
+async function* streamOpenAiCompatible(args: {
+  endpoint: string;
+  apiKey: string;
+  model: string;
+  temperature?: number;
+  maxTokens: number;
+  systemPrompt: string;
+  history: MessageRecord[];
+}): AsyncGenerator<string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (args.apiKey && args.apiKey.trim()) {
+    headers.Authorization = `Bearer ${args.apiKey.trim()}`;
+  }
+
+  const response = await fetch(args.endpoint, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model: args.model,
+      messages: [
+        { role: "system", content: args.systemPrompt },
+        ...toChatHistoryMessages(args.history),
+      ],
+      temperature: args.temperature,
+      max_tokens: args.maxTokens,
+      stream: true,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Provider request failed (${response.status}) at ${args.endpoint}: ${body}`,
+    );
+  }
+
+  if (!response.body) {
+    throw new Error("No response body");
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === "data: [DONE]") continue;
+
+      if (trimmed.startsWith("data: ")) {
+        try {
+          const json = JSON.parse(trimmed.slice(6));
+          const chunk = json.choices?.[0]?.delta?.content || "";
+          if (chunk) yield chunk;
+        } catch (e) {
+          // Ignore parse errors for partial lines
+        }
+      }
+    }
+  }
+}
+
+export async function* promptStreamingRemoteProvider(args: {
+  provider: RemoteProvider;
+  settings: SettingsState;
+  systemPrompt: string;
+  history: MessageRecord[];
+}): AsyncGenerator<string> {
+  if (args.provider === "openai") {
+    yield* streamOpenAiCompatible({
+      endpoint: "https://api.openai.com/v1/chat/completions",
+      apiKey: args.settings.openAiApiKey || "",
+      model: args.settings.remoteModel || "",
+      temperature: args.settings.temperature,
+      maxTokens: resolveRemoteMaxTokens(args.settings),
+      systemPrompt: args.systemPrompt,
+      history: args.history,
+    });
+    return;
+  }
+
+  if (args.provider === "openclaw") {
+    if (!args.settings.openclawEndpoint) {
+      throw new Error("OpenClaw endpoint is missing.");
+    }
+
+    let baseUrl = ensureProtocol(args.settings.openclawEndpoint).replace(
+      /\/+$/,
+      "",
+    );
+    if (!baseUrl.endsWith("/v1")) {
+      baseUrl += "/v1";
+    }
+    const chatUrl = `${baseUrl}/chat/completions`;
+
+    yield* streamOpenAiCompatible({
+      endpoint: chatUrl,
+      apiKey: args.settings.openclawApiKey || "",
+      model: args.settings.remoteModel || OPENCLAW_DEFAULT_MODEL,
+      temperature: args.settings.temperature,
+      maxTokens: resolveRemoteMaxTokens(args.settings),
+      systemPrompt: args.systemPrompt,
+      history: args.history,
+    });
+    return;
+  }
+
+  // Fallback to non-streaming for others for now or implement them
+  const result = await promptRemoteProvider(args);
+  yield result;
+}
+
 export async function promptRemoteProvider(args: {
   provider: RemoteProvider;
   settings: SettingsState;
@@ -195,6 +376,28 @@ export async function promptRemoteProvider(args: {
     return promptOpenAiCompatible({
       endpoint: "https://api.openai.com/v1/chat/completions",
       apiKey: args.settings.openAiApiKey || "",
+      model: args.settings.remoteModel || "",
+      temperature: args.settings.temperature,
+      maxTokens: resolveRemoteMaxTokens(args.settings),
+      systemPrompt: args.systemPrompt,
+      history: args.history,
+    });
+  }
+
+  if (args.provider === "openclaw") {
+    if (!args.settings.openclawEndpoint) {
+      throw new Error("OpenClaw endpoint is missing.");
+    }
+
+    let baseUrl = ensureProtocol(args.settings.openclawEndpoint).replace(/\/+$/, "");
+    if (!baseUrl.endsWith("/v1")) {
+      baseUrl += "/v1";
+    }
+    const chatUrl = `${baseUrl}/chat/completions`;
+
+    return promptOpenAiCompatible({
+      endpoint: chatUrl,
+      apiKey: args.settings.openclawApiKey || "",
       model: args.settings.remoteModel || "",
       temperature: args.settings.temperature,
       maxTokens: resolveRemoteMaxTokens(args.settings),

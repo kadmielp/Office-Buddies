@@ -116,9 +116,14 @@ export const SettingsModel: React.FC = () => {
     const hasApiKey =
       (selectedProvider === "openai" && !!settings.openAiApiKey?.trim()) ||
       (selectedProvider === "gemini" && !!settings.geminiApiKey?.trim()) ||
-      (selectedProvider === "maritaca" && !!settings.maritacaApiKey?.trim());
+      (selectedProvider === "maritaca" && !!settings.maritacaApiKey?.trim()) ||
+      (selectedProvider === "openclaw" && !!settings.openclawEndpoint?.trim());
 
-    if (!hasApiKey) {
+    // In OpenClaw, if we have endpoint, we always show the static models
+    if (selectedProvider === "openclaw" && !!settings.openclawEndpoint?.trim()) {
+      // In a real app we might want to fetch, but we know the Gateway models
+      // and we just updated the main process to return static ones.
+    } else if (!hasApiKey) {
       setRemoteModelOptions([]);
       setRemoteModelsError("");
       return;
@@ -174,6 +179,26 @@ export const SettingsModel: React.FC = () => {
     settings.remoteModel,
   ]);
 
+  const getProviderApiKey = () => {
+    switch (selectedProvider) {
+      case "openai": return settings.openAiApiKey || "";
+      case "gemini": return settings.geminiApiKey || "";
+      case "maritaca": return settings.maritacaApiKey || "";
+      case "openclaw": return settings.openclawApiKey || "";
+      default: return "";
+    }
+  };
+
+  const getProviderApiKeySettingName = () => {
+    switch (selectedProvider) {
+      case "openai": return "settings.openAiApiKey";
+      case "gemini": return "settings.geminiApiKey";
+      case "maritaca": return "settings.maritacaApiKey";
+      case "openclaw": return "settings.openclawApiKey";
+      default: return "";
+    }
+  };
+
   const handleRefreshRemoteModels = async () => {
     if (selectedProvider === "local") {
       return;
@@ -220,6 +245,7 @@ export const SettingsModel: React.FC = () => {
             <option value={"openai" as AiProvider}>OpenAI</option>
             <option value={"gemini" as AiProvider}>Google</option>
             <option value={"maritaca" as AiProvider}>Maritaca</option>
+            <option value={"openclaw" as AiProvider}>OpenClaw</option>
           </select>
           <img
             src={
@@ -250,7 +276,9 @@ export const SettingsModel: React.FC = () => {
                   <option value="">
                     {isLoadingRemoteModels
                       ? "Loading models..."
-                      : "No models found. Add API key and refresh."}
+                      : selectedProvider === "openclaw" 
+                        ? "Enter endpoint and refresh."
+                        : "Add credentials and refresh."}
                   </option>
                 ) : (
                   remoteModelOptions.map((modelName) => (
@@ -261,28 +289,34 @@ export const SettingsModel: React.FC = () => {
                 )}
               </select>
             </div>
+
+            {selectedProvider === "openclaw" && (
+              <div className="field-row">
+                <label htmlFor="providerEndpoint">Endpoint URL</label>
+                <input
+                  id="providerEndpoint"
+                  type="text"
+                  value={settings.openclawEndpoint || ""}
+                  placeholder="e.g., http://tailscale-ip:1337"
+                  onChange={(e) =>
+                    updateSetting("settings.openclawEndpoint", e.target.value)
+                  }
+                />
+              </div>
+            )}
+
             <div className="field-row">
               <label htmlFor="providerApiKey">API Key</label>
               <input
                 id="providerApiKey"
                 type="password"
-                value={
-                  selectedProvider === "openai"
-                    ? settings.openAiApiKey || ""
-                    : selectedProvider === "gemini"
-                      ? settings.geminiApiKey || ""
-                      : settings.maritacaApiKey || ""
-                }
-                onChange={(e) =>
-                  updateSetting(
-                    selectedProvider === "openai"
-                      ? "settings.openAiApiKey"
-                      : selectedProvider === "gemini"
-                        ? "settings.geminiApiKey"
-                        : "settings.maritacaApiKey",
-                    e.target.value,
-                  )
-                }
+                value={getProviderApiKey()}
+                onChange={(e) => {
+                  const settingName = getProviderApiKeySettingName();
+                  if (settingName) {
+                    updateSetting(settingName, e.target.value);
+                  }
+                }}
               />
             </div>
             <div className="field-row">

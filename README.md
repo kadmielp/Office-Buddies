@@ -1,4 +1,14 @@
-# Office Buddies
+<p align="center">
+  <img src="assets/logo.png" alt="Logo" width="128" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/github/languages/top/kadmielp/Office-Buddies" alt="GitHub top language" />
+  <img src="https://img.shields.io/github/repo-size/kadmielp/Office-Buddies" alt="GitHub repo size" />
+  <img src="https://img.shields.io/github/last-commit/kadmielp/Office-Buddies" alt="GitHub last commit" />
+  <img alt="GitHub License" src="https://img.shields.io/github/license/kadmielp/Office-Buddies">
+  <img alt="Vibecoded" src="https://img.shields.io/badge/vibecoded-yes-8A2BE2">
+</p>
+<h1 align="center">Office Buddies</h1>
 
 This project brings classic Office-style assistants into a modern LLM chat app with a 90s desktop vibe.
 

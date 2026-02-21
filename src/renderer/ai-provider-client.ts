@@ -20,7 +20,7 @@ const LOCAL_SYSTEM_PROMPT_FALLBACK = "You are a helpful assistant.";
 
 function queueLocalSessionOperation(operation: () => Promise<void>) {
   const nextOperation = localSessionOperation.then(operation, operation);
-  localSessionOperation = nextOperation.catch(() => {});
+  localSessionOperation = nextOperation.catch(() => { });
   return nextOperation;
 }
 
@@ -70,7 +70,7 @@ export async function createProviderSession(
       }
 
       // Recovery path for transient renderer/main session desync.
-      await electronAi.destroy().catch(() => {});
+      await electronAi.destroy().catch(() => { });
       await electronAi.create(options);
     }
   });
@@ -137,6 +137,10 @@ export function getProviderReadiness(
     return { ready: false, reason: "Maritaca API key is missing." };
   }
 
+  if (provider === "openclaw" && !settings.openclawEndpoint?.trim()) {
+    return { ready: false, reason: "OpenClaw endpoint is missing." };
+  }
+
   return { ready: true };
 }
 
@@ -166,6 +170,61 @@ export async function* promptStreamingWithProvider(args: {
   remoteAbortControllers.set(args.requestUUID, controller);
 
   try {
+    if (provider === "openai" || provider === "openclaw") {
+      const chunks: string[] = [];
+      let isDone = false;
+      let error: string | null = null;
+      let resolveNext: (() => void) | null = null;
+
+      const history = args.history.map((msg) => ({
+        id: msg.id,
+        sender: msg.sender,
+        content: msg.content,
+        createdAt: msg.createdAt,
+      }));
+
+      clippyApi.promptRemoteProvider({
+        provider: provider as any,
+        systemPrompt: args.systemPrompt,
+        history,
+        requestUUID: args.requestUUID,
+        onChunk: (chunk) => {
+          chunks.push(chunk);
+          if (resolveNext) {
+            resolveNext();
+            resolveNext = null;
+          }
+        },
+        onDone: () => {
+          isDone = true;
+          if (resolveNext) {
+            resolveNext();
+            resolveNext = null;
+          }
+        },
+        onError: (err) => {
+          error = err;
+          if (resolveNext) {
+            resolveNext();
+            resolveNext = null;
+          }
+        }
+      });
+
+      while (!isDone || chunks.length > 0) {
+        if (error) throw new Error(error);
+        if (chunks.length > 0) {
+          yield chunks.shift()!;
+        } else {
+          await new Promise<void>((resolve) => {
+            resolveNext = resolve;
+          });
+        }
+      }
+      return;
+    }
+
+    // Fallback for others (Gemini/Maritaca non-streaming for now)
     const text = await promptRemoteProvider({
       provider,
       settings: args.settings,
@@ -191,7 +250,7 @@ async function promptRemoteProvider(args: {
     throw new Error("Request aborted");
   }
 
-  const provider = args.provider as "openai" | "gemini" | "maritaca";
+  const provider = args.provider as "openai" | "gemini" | "maritaca" | "openclaw";
   const history = args.history.map((msg) => ({
     id: msg.id,
     sender: msg.sender,
@@ -199,11 +258,17 @@ async function promptRemoteProvider(args: {
     createdAt: msg.createdAt,
   }));
 
-  return clippyApi.promptRemoteProvider({
-    provider,
+  const result = clippyApi.promptRemoteProvider({
+    provider: provider as any,
     systemPrompt: args.systemPrompt,
     history,
   });
+
+  if (result instanceof Promise) {
+    return result;
+  }
+
+  return "";
 }
 
 export function initialPromptsFromMessages(messages: Message[]) {
@@ -224,6 +289,6 @@ export async function fetchProviderModels(
     return [];
   }
 
-  const remoteProvider = provider as "openai" | "gemini" | "maritaca";
-  return clippyApi.fetchRemoteProviderModels(remoteProvider);
+  const remoteProvider = provider as "openai" | "gemini" | "maritaca" | "openclaw";
+  return clippyApi.fetchRemoteProviderModels(remoteProvider as any) as any;
 }

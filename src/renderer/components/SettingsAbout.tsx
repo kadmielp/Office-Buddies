@@ -32,14 +32,15 @@ export const SettingsAbout: React.FC = () => {
         </p>
       </fieldset>
       <p>
-        This app is a love letter and homage to the late, great Clippy, the
-        assistant from Microsoft Office 1997. It is <i>not</i> affiliated,
-        approved, or supported by Microsoft. Consider it software art. If you
-        don't like it, consider it software satire.
+        Office Buddies brings classic Office-style assistants into a modern LLM
+        chat app with a 90s desktop vibe. It supports local GGUF models and
+        optional remote providers while keeping the UI intentionally nostalgic.
+        This app is a tribute to the assistant era and is <i>not</i> affiliated
+        with, endorsed by, or sponsored by Microsoft.
       </p>
       <h3>Acknowledgments</h3>
       <p>
-        Office Buddies is a spinoff fork of the original app{" "}
+        Office Buddies began as a fork of{" "}
         <a href="https://github.com/felixrieseberg/clippy" target="_blank">
           Clippy
         </a>{" "}
@@ -47,40 +48,53 @@ export const SettingsAbout: React.FC = () => {
         <a href="https://github.com/felixrieseberg" target="_blank">
           Felix Rieseberg
         </a>
-        . The original app was built using{" "}
+        , and has since grown into a broader assistant-focused app with
+        multiple characters, richer animations, and multi-provider AI support.
+        Local inference is powered by{" "}
         <a href="https://electronjs.org/" target="_blank">
           Electron
-        </a>{" "}
-        and{" "}
-        <a href="https://node-llama-cpp.withcat.ai/" target="_blank">
-          node-llama-cpp
         </a>
-        , embedded using{" "}
+        ,{" "}
         <a href="https://github.com/electron/llm" target="_blank">
           @electron/llm
         </a>
-        . The whimsical retro design was made possible by{" "}
+        , and{" "}
+        <a href="https://github.com/withcatai/node-llama-cpp" target="_blank">
+          node-llama-cpp
+        </a>
+        . The Windows 98 visual language was shaped by{" "}
         <a href="https://github.com/jdan" target="_blank">
           Jordan Scales
         </a>
-        . Quantized GGUF models provided by{" "}
+        , with icon inspiration from{" "}
+        <a href="https://win98icons.alexmeub.com/" target="_blank">
+          Alex Meub's Windows 98 Icons
+        </a>
+        . Assistant animation preservation and extraction work by{" "}
+        <a href="https://github.com/pi0" target="_blank">
+          Pooya Parsa
+        </a>{" "}
+        and contributors helped keep these characters available. GGUF models
+        are available from creators such as{" "}
         <a href="https://www.unsloth.ai" target="_blank">
           Unsloth
+        </a>
+        {" "}and{" "}
+        <a href="https://huggingface.co/thebloke" target="_blank">
+          TheBloke
         </a>
         .
       </p>
       <p>
-        The character was designed by illustrator{" "}
+        Special thanks to illustrator{" "}
         <a href="https://www.kevanatteberry.com/" target="_blank">
           Kevan Atteberry
         </a>
         , who created more than 15 potential characters for Microsoft's Office
-        Assistants. "He's a guy that just wants to help, and he's a little bit
-        too helpful sometimes — and there's something fun and vulnerable about
-        that.", he once said about Clippy.
+        Assistants.
       </p>
       <p>
-        Clippy and all visual assets related to Clippy are owned by Microsoft.
+        Clippy and all visual assets related to Office Assistants are owned by Microsoft.
         This app is not affiliated with Microsoft.
       </p>
     </div>

@@ -9,8 +9,10 @@
   <img alt="Vibecoded" src="https://img.shields.io/badge/vibecoded-yes-8A2BE2">
 </p>
 <h1 align="center">Office Buddies</h1>
-
-This project brings classic Office-style assistants into a modern LLM chat app with a 90s desktop vibe.
+<p align="center">
+  <img src="assets/screenshots/clippy.png" alt="Logo" width="128" />
+</p>
+<p align="center">
 
 Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
@@ -102,6 +104,11 @@ That output goes to `out/Office Buddies-win32-<arch>/`.
 Animation files live at `assets/agents/<Agent>/agent.js`.
 
 ### Animation Studio (Recommended)
+<p align="center">
+  <img src="assets/screenshots/animation_studio.png" alt="Logo" width="512" />
+</p>
+<p align="center">
+
 
 Animation Studio is a standalone Win98-style visual editor for assistant animations (`agent.js`), sprite-map frame picking (`map.png`), and sound assignment (`sounds-mp3.js` / `sounds-ogg.js`).
 

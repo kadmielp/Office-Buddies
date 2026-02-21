@@ -94,6 +94,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   );
 
   const startNewChat = useCallback(async () => {
+    setStatus("thinking");
     setIsStartingNewChat(true);
 
     const resetModelSession = async () => {
@@ -161,6 +162,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       await resetModelSession();
     } finally {
       setIsStartingNewChat(false);
+      setStatus("idle");
     }
   }, [
     currentChatRecord,
@@ -177,10 +179,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     models,
     getSystemPrompt,
     setIsStartingNewChat,
+    setStatus,
   ]);
 
   const loadModel = useCallback(
     async (initialPrompts: LanguageModelPrompt[] = []) => {
+      setStatus("thinking");
       setIsModelLoaded(false);
 
       const options: LanguageModelCreateOptions = {
@@ -211,6 +215,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           sender: "clippy",
           createdAt: Date.now(),
         });
+      } finally {
+        setStatus("idle");
       }
     },
     [
@@ -225,6 +231,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       models,
       getSystemPrompt,
       addMessage,
+      setStatus,
     ],
   );
 

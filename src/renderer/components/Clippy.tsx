@@ -16,6 +16,7 @@ import { useDebugState } from "../contexts/DebugContext";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { clippyApi } from "../clippyApi";
 import { useBubbleView } from "../contexts/BubbleViewContext";
+import { isModelDownloading } from "../../helpers/model-helpers";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
@@ -75,10 +76,11 @@ export function Clippy() {
     setAnimationKey,
     status,
     setStatus,
+    isStartingNewChat,
     setIsChatWindowOpen,
     isChatWindowOpen,
   } = useChat();
-  const { settings } = useSharedState();
+  const { settings, models } = useSharedState();
   const { currentView, setCurrentView } = useBubbleView();
   const { enableDragDebug } = useDebugState();
   const selectedAgent = settings.selectedAgent || "Clippy";
@@ -115,6 +117,12 @@ export function Clippy() {
     () => getChatAnimationKeys(displayedAgent),
     [displayedAgent],
   );
+  const isAnyModelDownloading = useMemo(
+    () => Object.values(models || {}).some(isModelDownloading),
+    [models],
+  );
+  const shouldUseProcessingAnimation =
+    isAnyModelDownloading || status === "thinking" || isStartingNewChat;
 
   const clearFrameTimeout = useCallback(() => {
     if (frameTimeoutRef.current) {
@@ -482,7 +490,11 @@ export function Clippy() {
       return;
     }
 
-    if (manualAnimationKey || isAgentSwitchAnimating) {
+    if (
+      manualAnimationKey ||
+      isAgentSwitchAnimating ||
+      shouldUseProcessingAnimation
+    ) {
       return;
     }
 
@@ -555,6 +567,53 @@ export function Clippy() {
     status,
     manualAnimationKey,
     isAgentSwitchAnimating,
+    shouldUseProcessingAnimation,
+  ]);
+
+  useEffect(() => {
+    if (!isSpriteReady || manualAnimationKey || isAgentSwitchAnimating) {
+      return;
+    }
+
+    if (!shouldUseProcessingAnimation) {
+      return;
+    }
+
+    const processingAnimationKey =
+      findFirstAnimationKey(agentPack.animations, [
+        "Processing",
+        "Thinking",
+        "Searching",
+      ]) ?? "Default";
+    let isCancelled = false;
+
+    const playProcessingLoop = () => {
+      if (isCancelled) {
+        return;
+      }
+
+      runAnimation(processingAnimationKey, () => {
+        if (isCancelled) {
+          return;
+        }
+
+        playProcessingLoop();
+      });
+    };
+
+    playProcessingLoop();
+
+    return () => {
+      isCancelled = true;
+      runAnimation("Default");
+    };
+  }, [
+    agentPack.animations,
+    isAgentSwitchAnimating,
+    isSpriteReady,
+    manualAnimationKey,
+    runAnimation,
+    shouldUseProcessingAnimation,
   ]);
 
   useEffect(() => {

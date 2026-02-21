@@ -12,6 +12,10 @@ import { createMainWindow, setupWindowListener } from "./windows";
 import { getModelManager } from "./models";
 import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
+import {
+  registerGlobalShortcuts,
+  unregisterGlobalShortcuts,
+} from "./shortcuts";
 
 async function onReady() {
   console.info(`Welcome to Office Buddies v${app.getVersion()}`);
@@ -22,6 +26,7 @@ async function onReady() {
   setupIpcListeners();
   setupWindowListener();
   await createMainWindow();
+  registerGlobalShortcuts();
 }
 
 async function loadLlm() {
@@ -44,6 +49,10 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+app.on("will-quit", () => {
+  unregisterGlobalShortcuts();
 });
 
 app.on("activate", () => {

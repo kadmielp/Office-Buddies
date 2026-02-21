@@ -8,6 +8,8 @@ export const IpcMessages = {
   POPUP_APP_MENU: "clippy_popup_app_menu",
   SET_CONTEXT_MENU_ANIMATIONS: "clippy_set_context_menu_animations",
   CONTEXT_MENU_SELECT_ANIMATION: "clippy_context_menu_select_animation",
+  CONTEXT_MENU_BUDDY_SPEECH: "clippy_context_menu_buddy_speech",
+  BUDDY_RUN_ACTION: "clippy_buddy_run_action",
 
   // Model messages
   DOWNLOAD_MODEL_BY_NAME: "clippy_download_model_by_name",

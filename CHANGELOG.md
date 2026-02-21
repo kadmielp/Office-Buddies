@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.7] - 2026-02-21
+
+### Added
+
+- Added Buddy selected-text actions:
+  - `Define`
+  - `Summarize`
+  - `Explain Like I'm 5`
+  - `Rewrite Friendly`
+- Added Windows global shortcut support for Buddy actions:
+  - `Win+F2` for define
+  - `Win+F3` for summarize
+  - `Win+F5` for rewrite
+- Added classic speech balloon controls:
+  - close (`X`) button
+  - `Try again` action (reruns current Buddy action)
+  - `Open in chat` action (moves context into chat view)
+- Added new main-process modules for Buddy workflow:
+  - `src/main/buddy-actions.ts`
+  - `src/main/shortcuts.ts`
+
+### Changed
+
+- Buddy summarize/rewrite now use configured remote provider generation when available, with fallback behavior when not configured.
+- Improved Windows selected-text capture reliability for shortcut actions by:
+  - delaying key-send to avoid modifier conflicts
+  - polling clipboard for capture completion
+  - adding copy-method fallback
+  - restoring original clipboard content after capture
+- Improved speech balloon readability and compatibility with vintage styling:
+  - better multiline formatting for definition output
+  - refined option row visuals and spacing
+  - larger scroll-safe balloon area for longer responses
+- Shortcut-driven Buddy actions now prefer `Thinking`/`Processing` animation behavior and are separated from chat response-driven animation selection.
+
 ## [0.5.6] - 2026-02-20
 
 ### Added

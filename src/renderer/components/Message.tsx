@@ -25,7 +25,16 @@ export function Message({ message }: { message: Message }) {
     >
       {isUser ? (
         <>
-          <div className="message-content" style={{ textAlign: "right" }}>
+          <div
+            className="message-content"
+            style={{
+              minWidth: 0,
+              width: "calc(100% - 72px)",
+              maxWidth: "calc(100% - 72px)",
+              textAlign: "justify",
+              textAlignLast: "left",
+            }}
+          >
             {message.children ? (
               message.children
             ) : (
@@ -63,7 +72,16 @@ export function Message({ message }: { message: Message }) {
               marginTop: "10px",
             }}
           />
-          <div className="message-content">
+          <div
+            className="message-content"
+            style={{
+              minWidth: 0,
+              width: "calc(100% - 72px)",
+              maxWidth: "calc(100% - 72px)",
+              textAlign: "justify",
+              textAlignLast: "left",
+            }}
+          >
             {message.children ? (
               message.children
             ) : (

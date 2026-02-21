@@ -29,7 +29,24 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
 - Native-feeling context menu for choosing and previewing assistant animations.
+- Buddy actions for selected text (define, summarize, simplify, rewrite).
+- Windows global shortcuts for Buddy actions:
+  - `Win + F2`: Define
+  - `Win + F3`: Summarize
+  - `Win + F5`: Rewrite in a friendlier tone
 - Windows-98-inspired UI and interaction patterns.
+
+## Buddy Actions and Speech Balloon
+
+When text is selected, Office Buddies can respond in a classic speech balloon flow.
+
+- In app windows, use right-click `Buddy` actions on selected text.
+- On Windows, global shortcuts can trigger Buddy actions for selected foreground text.
+- Buddy replies are shown in a classic assistant balloon with:
+  - close (`X`) control
+  - quick actions (`Try again`, `Open in chat`)
+  - improved multiline formatting for long definitions and rewrites
+- During shortcut-driven actions, the assistant uses `Thinking` / `Processing` animation behavior.
 
 ## Providers
 

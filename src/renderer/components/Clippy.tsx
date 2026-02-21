@@ -17,6 +17,7 @@ import { useSharedState } from "../contexts/SharedStateContext";
 import { clippyApi } from "../clippyApi";
 import { useBubbleView } from "../contexts/BubbleViewContext";
 import { isModelDownloading } from "../../helpers/model-helpers";
+import { BuddySpeechPayload } from "../../types/interfaces";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
@@ -70,6 +71,28 @@ function findFirstAnimationKey(
   return candidates.find((key) => Boolean(animations[key]));
 }
 
+function getBuddyChatPrompt(payload: BuddySpeechPayload): string {
+  const selectedText = payload.selectedText?.trim();
+
+  if (!selectedText) {
+    return "Help me with this.";
+  }
+
+  if (payload.action === "define") {
+    return `Define this word and include context examples: ${selectedText}`;
+  }
+
+  if (payload.action === "summarize") {
+    return `Summarize this text in a concise way:\n\n${selectedText}`;
+  }
+
+  if (payload.action === "rewrite-friendly") {
+    return `Rewrite this in a friendlier tone while keeping the meaning:\n\n${selectedText}`;
+  }
+
+  return `Explain this in simple terms:\n\n${selectedText}`;
+}
+
 export function Clippy() {
   const {
     animationKey,
@@ -79,6 +102,7 @@ export function Clippy() {
     isStartingNewChat,
     setIsChatWindowOpen,
     isChatWindowOpen,
+    addMessage,
   } = useChat();
   const { settings, models } = useSharedState();
   const { currentView, setCurrentView } = useBubbleView();
@@ -92,6 +116,7 @@ export function Clippy() {
   const frameTimeoutRef = useRef<number | undefined>(undefined);
   const defaultTimeoutRef = useRef<number | undefined>(undefined);
   const idleTimeoutRef = useRef<number | undefined>(undefined);
+  const speechTimeoutRef = useRef<number | undefined>(undefined);
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
   const idleStartedAtRef = useRef<number | null>(null);
@@ -104,6 +129,10 @@ export function Clippy() {
   const [switchTargetAgent, setSwitchTargetAgent] = useState<string | null>(
     null,
   );
+  const [buddySpeech, setBuddySpeech] = useState<BuddySpeechPayload | null>(
+    null,
+  );
+  const [isBuddyThinking, setIsBuddyThinking] = useState(false);
   const [switchPhase, setSwitchPhase] = useState<
     "none" | "goodbye" | "welcome"
   >("none");
@@ -121,8 +150,11 @@ export function Clippy() {
     () => Object.values(models || {}).some(isModelDownloading),
     [models],
   );
-  const shouldUseProcessingAnimation =
+  const shouldUseChatProcessingAnimation =
     isAnyModelDownloading || status === "thinking" || isStartingNewChat;
+  const shouldUseBuddyProcessingAnimation = isBuddyThinking;
+  const shouldUseProcessingAnimation =
+    shouldUseChatProcessingAnimation || shouldUseBuddyProcessingAnimation;
 
   const clearFrameTimeout = useCallback(() => {
     if (frameTimeoutRef.current) {
@@ -144,6 +176,20 @@ export function Clippy() {
       idleTimeoutRef.current = undefined;
     }
   }, []);
+
+  const clearSpeechTimeout = useCallback(() => {
+    if (speechTimeoutRef.current) {
+      window.clearTimeout(speechTimeoutRef.current);
+      speechTimeoutRef.current = undefined;
+    }
+  }, []);
+
+  const scheduleBuddySpeechDismiss = useCallback(() => {
+    clearSpeechTimeout();
+    speechTimeoutRef.current = window.setTimeout(() => {
+      setBuddySpeech(null);
+    }, 20000);
+  }, [clearSpeechTimeout]);
 
   const drawFrame = useCallback(
     (frame: AgentFrame) => {
@@ -362,11 +408,14 @@ export function Clippy() {
   }, [agentPack.mapSrc, runAnimation]);
 
   useEffect(() => {
+    const speechPaddingWidth = buddySpeech ? 220 : 0;
+    const speechPaddingHeight = buddySpeech ? 340 : 0;
+
     clippyApi.setMainWindowSize(
-      agentPack.frameWidth + WINDOW_PADDING_WIDTH,
-      agentPack.frameHeight + WINDOW_PADDING_HEIGHT,
+      agentPack.frameWidth + WINDOW_PADDING_WIDTH + speechPaddingWidth,
+      agentPack.frameHeight + WINDOW_PADDING_HEIGHT + speechPaddingHeight,
     );
-  }, [agentPack.frameHeight, agentPack.frameWidth]);
+  }, [agentPack.frameHeight, agentPack.frameWidth, buddySpeech]);
 
   useEffect(() => {
     clippyApi.setContextMenuAnimations(contextMenuAnimations).catch((error) => {
@@ -389,6 +438,59 @@ export function Clippy() {
       clippyApi.offContextMenuSelectAnimation();
     };
   }, []);
+
+  useEffect(() => {
+    clippyApi.offBuddySpeech();
+    clippyApi.onBuddySpeech((payload) => {
+      setBuddySpeech(payload);
+      setIsBuddyThinking(Boolean(payload.isLoading));
+      scheduleBuddySpeechDismiss();
+    });
+
+    return () => {
+      clippyApi.offBuddySpeech();
+      clearSpeechTimeout();
+    };
+  }, [clearSpeechTimeout, scheduleBuddySpeechDismiss]);
+
+  const closeBuddySpeech = useCallback(() => {
+    clearSpeechTimeout();
+    setBuddySpeech(null);
+  }, [clearSpeechTimeout]);
+
+  const retryBuddySpeech = useCallback(() => {
+    if (!buddySpeech || !buddySpeech.selectedText) {
+      return;
+    }
+
+    clippyApi
+      .runBuddyAction(buddySpeech.action, buddySpeech.selectedText)
+      .catch((error) => {
+        console.error(error);
+      });
+    scheduleBuddySpeechDismiss();
+  }, [buddySpeech, scheduleBuddySpeechDismiss]);
+
+  const openBuddySpeechInChat = useCallback(() => {
+    if (buddySpeech) {
+      void addMessage({
+        id: crypto.randomUUID(),
+        content: getBuddyChatPrompt(buddySpeech),
+        sender: "user",
+        createdAt: Date.now(),
+      });
+      void addMessage({
+        id: crypto.randomUUID(),
+        content: buddySpeech.speech,
+        sender: "clippy",
+        createdAt: Date.now(),
+      });
+    }
+
+    setCurrentView("chat");
+    setIsChatWindowOpen(true);
+    closeBuddySpeech();
+  }, [addMessage, buddySpeech, closeBuddySpeech, setCurrentView, setIsChatWindowOpen]);
 
   useEffect(() => {
     if (!manualAnimationKey) {
@@ -580,11 +682,12 @@ export function Clippy() {
     }
 
     const processingAnimationKey =
-      findFirstAnimationKey(agentPack.animations, [
-        "Processing",
-        "Thinking",
-        "Searching",
-      ]) ?? "Default";
+      findFirstAnimationKey(
+        agentPack.animations,
+        shouldUseBuddyProcessingAnimation
+          ? ["Thinking", "Processing"]
+          : ["Processing", "Thinking", "Searching"],
+      ) ?? "Default";
     let isCancelled = false;
 
     const playProcessingLoop = () => {
@@ -613,11 +716,17 @@ export function Clippy() {
     isSpriteReady,
     manualAnimationKey,
     runAnimation,
+    shouldUseBuddyProcessingAnimation,
     shouldUseProcessingAnimation,
   ]);
 
   useEffect(() => {
-    if (!animationKey || manualAnimationKey || isAgentSwitchAnimating) {
+    if (
+      !animationKey ||
+      manualAnimationKey ||
+      isAgentSwitchAnimating ||
+      isBuddyThinking
+    ) {
       return;
     }
 
@@ -628,6 +737,7 @@ export function Clippy() {
   }, [
     animationKey,
     isAgentSwitchAnimating,
+    isBuddyThinking,
     manualAnimationKey,
     playAnimation,
     setAnimationKey,
@@ -641,6 +751,32 @@ export function Clippy() {
         pointerEvents: isAssistantGalleryOpen ? "none" : "auto",
       }}
     >
+      {buddySpeech && (
+        <div className="buddy-speech app-no-drag" aria-live="polite">
+          <button
+            className="buddy-speech-close"
+            aria-label="Close buddy message"
+            onClick={closeBuddySpeech}
+          >
+            x
+          </button>
+          <div className="buddy-speech-content">{buddySpeech.speech}</div>
+          <div className="buddy-speech-options">
+            <button className="buddy-speech-option" onClick={retryBuddySpeech}>
+              <span className="buddy-speech-option-dot" />
+              Try again
+            </button>
+            <button
+              className="buddy-speech-option"
+              onClick={openBuddySpeechInChat}
+            >
+              <span className="buddy-speech-option-dot" />
+              Open in chat
+            </button>
+          </div>
+          <div className="buddy-speech-tail" />
+        </div>
+      )}
       <div
         className="app-drag"
         style={{

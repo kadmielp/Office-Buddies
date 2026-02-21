@@ -6,6 +6,8 @@ import {
   ChatWithMessages,
   ClippyDebugInfo,
   Versions,
+  BuddySpeechPayload,
+  BuddyAction,
 } from "../types/interfaces";
 import { DebugState } from "../debugState";
 
@@ -26,6 +28,9 @@ export type ClippyApi = {
     callback: (animationKey: string | null) => void,
   ) => void;
   offContextMenuSelectAnimation: () => void;
+  onBuddySpeech: (callback: (payload: BuddySpeechPayload) => void) => void;
+  offBuddySpeech: () => void;
+  runBuddyAction: (action: BuddyAction, selectionText: string) => Promise<void>;
   // Models
   updateModelState: () => Promise<void>;
   downloadModelByName: (name: string) => Promise<void>;

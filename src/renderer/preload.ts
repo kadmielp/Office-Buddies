@@ -6,7 +6,11 @@ import { IpcMessages } from "../ipc-messages";
 import type { SharedState } from "../sharedState";
 
 import type { ClippyApi } from "./clippyApi";
-import { ChatWithMessages } from "../types/interfaces";
+import {
+  BuddyAction,
+  BuddySpeechPayload,
+  ChatWithMessages,
+} from "../types/interfaces";
 import { DebugState } from "../debugState";
 import { BubbleView } from "./contexts/BubbleViewContext";
 
@@ -41,6 +45,17 @@ const clippyApi: ClippyApi = {
   offContextMenuSelectAnimation: () => {
     ipcRenderer.removeAllListeners(IpcMessages.CONTEXT_MENU_SELECT_ANIMATION);
   },
+  onBuddySpeech: (callback: (payload: BuddySpeechPayload) => void) => {
+    ipcRenderer.on(
+      IpcMessages.CONTEXT_MENU_BUDDY_SPEECH,
+      (_event, payload: BuddySpeechPayload) => callback(payload),
+    );
+  },
+  offBuddySpeech: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.CONTEXT_MENU_BUDDY_SPEECH);
+  },
+  runBuddyAction: (action: BuddyAction, selectionText: string) =>
+    ipcRenderer.invoke(IpcMessages.BUDDY_RUN_ACTION, action, selectionText),
 
   // Models
   updateModelState: () =>

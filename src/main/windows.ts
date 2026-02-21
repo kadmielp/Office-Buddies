@@ -1,4 +1,10 @@
-import { BrowserWindow, shell, screen, app } from "electron";
+import {
+  BrowserWindow,
+  shell,
+  screen,
+  app,
+  MenuItemConstructorOptions,
+} from "electron";
 import contextMenu from "electron-context-menu";
 import { getLogger } from "./logger";
 
@@ -6,6 +12,7 @@ import path from "path";
 import { getStateManager } from "./state";
 import { getDebugManager } from "./debug";
 import { popupAppMenu } from "./menu";
+import { runBuddyAction } from "./buddy-actions";
 
 let mainWindow: BrowserWindow | undefined;
 
@@ -118,6 +125,21 @@ export function setupWindowListener() {
       if (!isMainWindow) {
         contextMenu({
           window: browserWindow,
+          prepend: (_defaultActions, parameters) => {
+            const selectionText = parameters.selectionText?.trim();
+
+            if (!selectionText) {
+              return [];
+            }
+
+            return [
+              {
+                label: "Buddy",
+                submenu: getBuddyContextActions(selectionText),
+              },
+              { type: "separator" },
+            ];
+          },
         });
       }
 
@@ -136,6 +158,37 @@ export function setupWindowListener() {
       });
     },
   );
+}
+
+function getBuddyContextActions(
+  selectionText: string,
+): MenuItemConstructorOptions[] {
+  return [
+    {
+      label: "Define",
+      click: () => {
+        void runBuddyAction("define", selectionText);
+      },
+    },
+    {
+      label: "Summarize",
+      click: () => {
+        void runBuddyAction("summarize", selectionText);
+      },
+    },
+    {
+      label: "Explain Like I'm 5",
+      click: () => {
+        void runBuddyAction("explain-simple", selectionText);
+      },
+    },
+    {
+      label: "Rewrite Friendly",
+      click: () => {
+        void runBuddyAction("rewrite-friendly", selectionText);
+      },
+    },
+  ];
 }
 
 /**

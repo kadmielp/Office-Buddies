@@ -16,6 +16,8 @@ import { getVersions } from "./helpers/getVersions";
 import { getClippyDebugInfo } from "./debug-clippy";
 import { getDebugManager } from "./debug";
 import { fetchRemoteProviderModels, promptRemoteProvider } from "./remote-ai";
+import { runBuddyAction } from "./buddy-actions";
+import { BuddyAction } from "../types/interfaces";
 
 export function setupIpcListeners() {
   // Window
@@ -29,6 +31,11 @@ export function setupIpcListeners() {
   ipcMain.handle(
     IpcMessages.SET_CONTEXT_MENU_ANIMATIONS,
     (_, animationKeys: string[]) => setContextMenuAnimations(animationKeys),
+  );
+  ipcMain.handle(
+    IpcMessages.BUDDY_RUN_ACTION,
+    (_, action: BuddyAction, selectionText: string) =>
+      runBuddyAction(action, selectionText),
   );
 
   // App

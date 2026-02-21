@@ -39,3 +39,16 @@ export interface ClippyDebugInfo {
   checks: Record<string, boolean | string>;
   gpu: unknown;
 }
+
+export type BuddyAction =
+  | "define"
+  | "summarize"
+  | "explain-simple"
+  | "rewrite-friendly";
+
+export interface BuddySpeechPayload {
+  action: BuddyAction;
+  selectedText: string;
+  speech: string;
+  isLoading?: boolean;
+}

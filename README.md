@@ -37,7 +37,7 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 
 - Multiple classic assistants, each with their own animation set and sounds.
 - Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
-- Optional remote providers: OpenAI, Google, and Maritaca.
+- Optional remote providers: OpenAI, Google, Maritaca, and OpenClaw 🦞.
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
 - Native-feeling context menu for choosing and previewing assistant animations.

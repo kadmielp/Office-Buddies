@@ -30,10 +30,11 @@ export async function runBuddyAction(
     isLoading: true,
   } as BuddySpeechPayload);
 
+  const settings = getStateManager().getSettings();
   const speech =
     action === "define"
-      ? await getDefinitionSpeech(text)
-      : await getGeneratedSpeech(action, text);
+      ? await getDefinitionSpeech(text, settings)
+      : await getGeneratedSpeech(action, text, settings);
   const formattedSpeech = formatSpeechForBalloon(speech);
 
   getMainWindow()?.webContents.send(IpcMessages.CONTEXT_MENU_BUDDY_SPEECH, {
@@ -70,8 +71,8 @@ function getStaticSpeech(action: BuddyAction, text: string): string {
 async function getGeneratedSpeech(
   action: Exclude<BuddyAction, "define">,
   text: string,
+  settings: SettingsState,
 ): Promise<string> {
-  const settings = getStateManager().getSettings();
   const provider = settings.aiProvider || "local";
 
   if (provider === "local") {
@@ -129,6 +130,10 @@ function isRemoteProviderConfigured(settings: SettingsState): boolean {
     return Boolean(settings.maritacaApiKey?.trim());
   }
 
+  if (provider === "openclaw") {
+    return Boolean(settings.openclawEndpoint?.trim());
+  }
+
   return false;
 }
 
@@ -158,7 +163,19 @@ function getBuddySystemPrompt(action: Exclude<BuddyAction, "define">): string {
   ].join(" ");
 }
 
-async function getDefinitionSpeech(text: string): Promise<string> {
+function getDefineSystemPrompt(): string {
+  return [
+    "You define one selected word in plain language.",
+    "Return: first line with `word (part of speech)`, then 1-2 concise bullet-style definition lines.",
+    "No markdown code fences or extra commentary.",
+    "Reply in the same language as the input when possible.",
+  ].join(" ");
+}
+
+async function getDefinitionSpeech(
+  text: string,
+  settings: SettingsState,
+): Promise<string> {
   const singleWord = getSingleWord(text);
 
   if (!singleWord) {
@@ -166,6 +183,32 @@ async function getDefinitionSpeech(text: string): Promise<string> {
   }
 
   const normalized = singleWord.toLowerCase();
+  const provider = settings.aiProvider || "local";
+
+  if (provider !== "local" && isRemoteProviderConfigured(settings)) {
+    try {
+      const response = await promptRemoteProvider({
+        provider,
+        settings,
+        systemPrompt: getDefineSystemPrompt(),
+        history: [
+          {
+            id: `buddy-define-${Date.now()}`,
+            sender: "user",
+            content: normalized,
+            createdAt: Date.now(),
+          },
+        ],
+      });
+
+      const trimmed = response.trim();
+      if (trimmed) {
+        return truncateText(trimmed, 800);
+      }
+    } catch {
+      // Dictionary fallback below.
+    }
+  }
 
   try {
     const response = await fetch(

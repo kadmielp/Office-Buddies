@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-02-22
+
+### Added
+
+- Added OpenClaw as an optional remote provider in the app model settings and provider flow.
+- Added OpenClaw setup documentation at `docs/openclaw-officebuddies-tailscale.md`.
+- Added project branding assets used by README (`assets/logo.png` and screenshots under `assets/screenshots/`).
+
+### Changed
+
+- Updated README header/badges and feature list to reflect Office Buddies branding and OpenClaw support.
+- Updated repository metadata references to `kadmielp/Office-Buddies`.
+- Updated license attribution to include both the original author and fork maintainer.
+- Rolled Electron runtime back to `35.1.4` to avoid a Windows inactive-window title regression.
+
 ## [0.5.7] - 2026-02-21
 
 ### Added

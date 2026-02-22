@@ -1,7 +1,7 @@
 {
   "name": "office-buddies",
   "productName": "Office Buddies",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Office Buddies",
   "main": ".vite/build/main.js",
   "scripts": {

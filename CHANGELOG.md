@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1] - 2026-02-22
+
+### Added
+
+- Added Windows global shortcut `Win+F4` for Buddy action: "Explain in a simple way" (`explain-simple`).
+- Buddy shortcut executions are now persisted as new chats automatically (user prompt + assistant reply).
+
+### Changed
+
+- Buddy shortcut generation now follows the selected provider configuration more consistently, including OpenClaw when configured.
+- Restored Buddy speech balloon auto-dismiss behavior (requires no manual close for each response).
+
 ## [0.6.0] - 2026-02-22
 
 ### Added

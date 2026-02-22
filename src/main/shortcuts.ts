@@ -13,7 +13,11 @@ const SHORTCUTS: Array<{
 }> = [
   { accelerator: "Super+F2", action: "define", label: "Define" },
   { accelerator: "Super+F3", action: "summarize", label: "Summarize" },
-  { accelerator: "Super+F4", action: "explain-simple", label: "Simplify" },
+  {
+    accelerator: "Super+F4",
+    action: "explain-simple",
+    label: "Explain in a simple way",
+  },
   { accelerator: "Super+F5", action: "rewrite-friendly", label: "Rewrite" },
 ];
 

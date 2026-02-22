@@ -1,9 +1,15 @@
 import { getMainWindow } from "./windows";
 import { IpcMessages } from "../ipc-messages";
-import { BuddyAction, BuddySpeechPayload } from "../types/interfaces";
+import {
+  BuddyAction,
+  BuddySpeechPayload,
+  ChatWithMessages,
+  MessageRecord,
+} from "../types/interfaces";
 import { getStateManager } from "./state";
 import { promptRemoteProvider } from "./remote-ai";
 import { SettingsState } from "../sharedState";
+import { getChatManager } from "./chats";
 
 const MAX_SELECTION_LENGTH = 220;
 
@@ -43,6 +49,8 @@ export async function runBuddyAction(
     speech: formattedSpeech,
     isLoading: false,
   } as BuddySpeechPayload);
+
+  void persistBuddyActionAsNewChat(action, text, formattedSpeech);
 }
 
 function getLoadingSpeech(action: BuddyAction): string {
@@ -508,4 +516,66 @@ function wrapByLineLength(value: string, maxLength: number): string {
   }
 
   return lines.join("\n");
+}
+
+async function persistBuddyActionAsNewChat(
+  action: BuddyAction,
+  selectedText: string,
+  speech: string,
+): Promise<void> {
+  const now = Date.now();
+  const chatId = crypto.randomUUID();
+  const userPrompt = getBuddyChatPrompt(action, selectedText);
+  const messages: MessageRecord[] = [
+    {
+      id: crypto.randomUUID(),
+      sender: "user",
+      content: userPrompt,
+      createdAt: now,
+    },
+    {
+      id: crypto.randomUUID(),
+      sender: "clippy",
+      content: speech,
+      createdAt: now + 1,
+    },
+  ];
+
+  const chatWithMessages: ChatWithMessages = {
+    chat: {
+      id: chatId,
+      createdAt: now,
+      updatedAt: now,
+      preview: truncateText(userPrompt.replace(/\s+/g, " "), 100),
+    },
+    messages,
+  };
+
+  try {
+    await getChatManager().writeChatWithMessages(chatWithMessages);
+  } catch (error) {
+    console.error("Failed to persist buddy action chat:", error);
+  }
+}
+
+function getBuddyChatPrompt(action: BuddyAction, selectedText: string): string {
+  const normalized = selectedText.trim();
+
+  if (!normalized) {
+    return "Help me with this.";
+  }
+
+  if (action === "define") {
+    return `Define this word and include context examples: ${normalized}`;
+  }
+
+  if (action === "summarize") {
+    return `Summarize this text in a concise way:\n\n${normalized}`;
+  }
+
+  if (action === "rewrite-friendly") {
+    return `Rewrite this in a friendlier tone while keeping the meaning:\n\n${normalized}`;
+  }
+
+  return `Explain this in simple terms:\n\n${normalized}`;
 }

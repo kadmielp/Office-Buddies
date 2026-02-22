@@ -45,6 +45,7 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 - Windows global shortcuts for Buddy actions:
   - `Win + F2`: Define
   - `Win + F3`: Summarize
+  - `Win + F4`: Simplify (Explain like I'm 5)
   - `Win + F5`: Rewrite in a friendlier tone
 - Windows-98-inspired UI and interaction patterns.
 

@@ -41,6 +41,9 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
 - Native-feeling context menu for choosing and previewing assistant animations.
+- Proactive integration with OpenClaw 🦞 ([Learn more](openclaw-officebuddies-tailscale.md)).
+- Smart Reminders: Schedule tasks using natural language directly in the chat.
+- OpenClaw Skill included for easy agent integration ([View Skill](skills/office-buddies/SKILL.md)).
 - Buddy actions for selected text (define, summarize, simplify, rewrite).
 - Windows global shortcuts for Buddy actions:
   - `Win + F2`: Define

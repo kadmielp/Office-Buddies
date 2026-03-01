@@ -19,6 +19,7 @@ import {
 import { BUILT_IN_MODELS } from "../models";
 import { getLogger } from "./logger";
 import { setupAppMenu } from "./menu";
+import { startProactiveServer } from "./proactive-server";
 
 const ENCRYPTED_PREFIX = "ob_enc_v1:";
 type SensitiveSettingsKey = "openAiApiKey" | "geminiApiKey" | "maritacaApiKey";
@@ -248,6 +249,14 @@ export class StateManager {
 
     if (previousSettings.defaultFont !== nextSettings.defaultFont) {
       setFont(nextSettings.defaultFont);
+    }
+
+    if (
+      previousSettings.enableProactiveMessages !==
+        nextSettings.enableProactiveMessages ||
+      previousSettings.proactivePort !== nextSettings.proactivePort
+    ) {
+      startProactiveServer();
     }
 
     // Update the menu, which contains state

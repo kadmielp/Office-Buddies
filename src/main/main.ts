@@ -16,6 +16,7 @@ import {
   registerGlobalShortcuts,
   unregisterGlobalShortcuts,
 } from "./shortcuts";
+import { startProactiveServer } from "./proactive-server";
 
 async function onReady() {
   console.info(`Welcome to Office Buddies v${app.getVersion()}`);
@@ -27,6 +28,7 @@ async function onReady() {
   setupWindowListener();
   await createMainWindow();
   registerGlobalShortcuts();
+  startProactiveServer();
 }
 
 async function loadLlm() {

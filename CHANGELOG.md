@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.2] - 2026-02-24
+
+### Added
+
+- **Feat: Proactive Integration**: Implemented an HTTP server listener (default port 5050) to receive remote notifications and commands from OpenClaw agents.
+- **Feat: Interactive Buttons**: Proactive messages now support multiple-choice buttons rendered in the classic speech balloon.
+- **Feat: Feedback Loop**: Integrated a bridge to send button interactions back to the OpenClaw agent for real-time responses.
+- **Feat: Looping Animations**: Added support for persistent looping animations (urgent alerts) via the `loop` parameter in proactive payloads.
+- **Feat: Prioritization Setting**: Added "Prioritize App Notifications" option to allow agents to bypass mobile notifications when the desktop app is active.
+- **Feat: Response Routing**: Proactive replies now include `reply_to` bubble metadata so follow-up actions are routed back to the correct conversation context.
+- **UI: Classic Balloon Style**: Proactive messages now appear in the nostalgic yellow speech balloon with "blue dot" selection markers.
+- **UI: Vertical Button Layout**: Stacked proactive message buttons vertically for better readability and a cleaner list-style interface.
+- **UX: Auto-Chat Handover**: Every proactive message now automatically includes an "Open in chat" button for seamless transition to full conversation mode.
+- **UX: SendMail Animation**: Assistant now plays the classic `SendMail` animation when a proactive response is being sent back to the server.
+- **Docs**: Added a comprehensive `openclaw-officebuddies-tailscale.md` integration guide, a ready-to-use OpenClaw Skill, and the required gateway configuration notes for Office Buddies chat support.
+
+### Changed
+
+- Proactive configuration (Enable/Port/Prioritize) is now dynamically shown in the **Model** tab only when the **OpenClaw** provider is selected.
+- Proactive notifications no longer force the main chat window open, keeping the interaction focused within the classic speech balloon.
+
 ## [0.6.1] - 2026-02-22
 
 ### Added

@@ -50,4 +50,8 @@ export const IpcMessages = {
 
   // Clipboard
   CLIPBOARD_WRITE: "clippy_clipboard_write",
+
+  // Proactive messages
+  PROACTIVE_MESSAGE: "clippy_proactive_message",
+  PROACTIVE_ACTION_CLICK: "clippy_proactive_action_click",
 };

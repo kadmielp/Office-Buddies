@@ -1,8 +1,14 @@
+export interface MessageAction {
+  label: string;
+  action: string;
+}
+
 export interface MessageRecord {
   id: string;
   content?: string;
   sender: "user" | "clippy";
   createdAt: number;
+  actions?: MessageAction[];
 }
 
 export interface ChatRecord {

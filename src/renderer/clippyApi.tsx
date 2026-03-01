@@ -64,6 +64,16 @@ export type ClippyApi = {
   deleteAllChats: () => Promise<void>;
   onNewChat: (callback: () => void) => void;
   offNewChat: () => void;
+  // Proactive
+  onProactiveSpeech: (
+    callback: (payload: {
+      message: string;
+      animation?: string;
+      actions?: Array<{ label: string; action: string }>;
+      loop?: boolean;
+    }) => void,
+  ) => void;
+  offProactiveSpeech: () => void;
   // Remote AI Providers
   fetchRemoteProviderModels: (
     provider: "openai" | "gemini" | "maritaca" | "openclaw",
@@ -79,6 +89,16 @@ export type ClippyApi = {
   }) => Promise<string> | void;
   // Clipboard
   clipboardWrite: (data: Data) => Promise<void>;
+  // Proactive
+  sendProactiveAction: (messageId: string, action: string) => Promise<void>;
+  onProactiveMessage: (
+    callback: (payload: {
+      message: string;
+      animation?: string;
+      actions?: Array<{ label: string; action: string }>;
+    }) => void,
+  ) => void;
+  offProactiveMessage: () => void;
 };
 
 declare global {

@@ -121,6 +121,14 @@ const clippyApi: ClippyApi = {
   offNewChat: () => {
     ipcRenderer.removeAllListeners(IpcMessages.CHAT_NEW_CHAT);
   },
+  onProactiveSpeech: (callback: (payload: any) => void) => {
+    ipcRenderer.on(IpcMessages.PROACTIVE_MESSAGE, (_event, payload: any) =>
+      callback(payload),
+    );
+  },
+  offProactiveSpeech: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.PROACTIVE_MESSAGE);
+  },
   fetchRemoteProviderModels: (provider: "openai" | "gemini" | "maritaca" | "openclaw") =>
     ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
   promptRemoteProvider: (payload: {
@@ -173,6 +181,19 @@ const clippyApi: ClippyApi = {
   // Clipboard
   clipboardWrite: (data: Data) =>
     ipcRenderer.invoke(IpcMessages.CLIPBOARD_WRITE, data),
+
+  // Proactive
+  sendProactiveAction: (messageId: string, action: string) =>
+    ipcRenderer.invoke(IpcMessages.PROACTIVE_ACTION_CLICK, messageId, action),
+  onProactiveMessage: (callback: (payload: any) => void) => {
+    ipcRenderer.on(
+      IpcMessages.PROACTIVE_MESSAGE,
+      (_event, payload: any) => callback(payload),
+    );
+  },
+  offProactiveMessage: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.PROACTIVE_MESSAGE);
+  },
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);

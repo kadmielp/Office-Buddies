@@ -181,34 +181,6 @@ export async function fetchRemoteProviderModels(
       .sort();
   }
 
-  if (provider === "openclaw") {
-    if (!settings.openclawEndpoint) {
-      throw new Error("OpenClaw endpoint is missing.");
-    }
-
-    let baseUrl = ensureProtocol(settings.openclawEndpoint).replace(/\/+$/, "");
-    
-    // OpenClaw OpenAI-compatible routes are actually at the root /v1
-    // The previous /api attempt returned the Control UI HTML.
-    if (!baseUrl.endsWith("/v1")) {
-      baseUrl += "/v1";
-    }
-
-    const modelsUrl = `${baseUrl}/models`;
-
-    const headers: Record<string, string> = {};
-    if (settings.openclawApiKey?.trim()) {
-      headers.Authorization = `Bearer ${settings.openclawApiKey.trim()}`;
-    }
-
-    const payload = await fetchJson(modelsUrl, headers);
-
-    return ((payload?.data as Array<any>) || [])
-      .map((item) => item?.id)
-      .filter((id) => typeof id === "string")
-      .sort();
-  }
-
   if (provider === "gemini") {
     const apiKey = encodeURIComponent(settings.geminiApiKey || "");
     const payload = await fetchJson(

@@ -1,5 +1,6 @@
 import { clipboard, Data, ipcMain } from "electron";
 import {
+  getMainWindow,
   toggleChatWindow,
   maximizeChatWindow,
   minimizeChatWindow,

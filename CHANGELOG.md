@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.3] - 2026-03-01
+
+### Changed
+
+- Updated chat message layout so both user and assistant messages auto-size to their content instead of stretching across the full row.
+- Replaced justified chat text with left-aligned message content for cleaner wrapping and more natural readability.
+
 ## [0.6.2] - 2026-02-24
 
 ### Added

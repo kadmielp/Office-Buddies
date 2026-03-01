@@ -22,12 +22,17 @@ import { setupAppMenu } from "./menu";
 import { startProactiveServer } from "./proactive-server";
 
 const ENCRYPTED_PREFIX = "ob_enc_v1:";
-type SensitiveSettingsKey = "openAiApiKey" | "geminiApiKey" | "maritacaApiKey";
+type SensitiveSettingsKey =
+  | "openAiApiKey"
+  | "geminiApiKey"
+  | "maritacaApiKey"
+  | "openclawApiKey";
 
 const SENSITIVE_SETTINGS_KEYS: SensitiveSettingsKey[] = [
   "openAiApiKey",
   "geminiApiKey",
   "maritacaApiKey",
+  "openclawApiKey",
 ];
 
 function isSensitiveSettingsPath(path: string): boolean {

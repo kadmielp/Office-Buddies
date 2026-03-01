@@ -5,20 +5,28 @@ import { IpcMessages } from "../ipc-messages";
 import { getLogger } from "./logger";
 
 let server: http.Server | null = null;
+let activePort: number | null = null;
+const PROACTIVE_BIND_ADDRESS = "127.0.0.1";
 
 export function startProactiveServer() {
   const settings = getStateManager().getSettings();
+  const port = settings.proactivePort || 5050;
 
   if (!settings.enableProactiveMessages) {
     stopProactiveServer();
     return;
   }
 
-  if (server) {
+  if (server && activePort === port) {
     return;
   }
 
-  const port = settings.proactivePort || 5050;
+  if (server) {
+    getLogger().info(
+      `Restarting proactive server to apply port change (${activePort} -> ${port})`,
+    );
+    stopProactiveServer();
+  }
 
   server = http.createServer((req, res) => {
     if (req.method === "POST" && req.url === "/notify") {
@@ -31,7 +39,6 @@ export function startProactiveServer() {
         try {
           const data = JSON.parse(body);
           const { message, animation, actions, loop } = data;
-          const currentSettings = getStateManager().getSettings();
 
           const mainWindow = getMainWindow();
           if (mainWindow) {
@@ -62,8 +69,12 @@ export function startProactiveServer() {
     }
   });
 
-  server.listen(port, "0.0.0.0", () => {
-    getLogger().info(`Proactive server listening on port ${port}`);
+  activePort = port;
+
+  server.listen(port, PROACTIVE_BIND_ADDRESS, () => {
+    getLogger().info(
+      `Proactive server listening on ${PROACTIVE_BIND_ADDRESS}:${port}`,
+    );
   });
 
   server.on("error", (error) => {
@@ -76,6 +87,7 @@ export function stopProactiveServer() {
   if (server) {
     server.close();
     server = null;
+    activePort = null;
     getLogger().info("Proactive server stopped");
   }
 }

@@ -1,4 +1,5 @@
 import Markdown from "react-markdown";
+import type { CSSProperties } from "react";
 import questionIcon from "../images/icons/question.png";
 import defaultClippy from "../images/icons/msagent.png";
 import { MessageRecord } from "../../types/interfaces";
@@ -14,6 +15,20 @@ export interface Message extends MessageRecord {
 
 export function Message({ message }: { message: Message }) {
   const isUser = message.sender === "user";
+  const userMessageContentStyle: CSSProperties = {
+    minWidth: 0,
+    width: "fit-content",
+    maxWidth: "82%",
+    textAlign: "left",
+    overflowWrap: "anywhere",
+  };
+  const assistantMessageContentStyle: CSSProperties = {
+    minWidth: 0,
+    width: "fit-content",
+    maxWidth: "calc(100% - 40px)",
+    textAlign: "left",
+    overflowWrap: "anywhere",
+  };
 
   return (
     <div
@@ -28,13 +43,7 @@ export function Message({ message }: { message: Message }) {
         <>
           <div
             className="message-content"
-            style={{
-              minWidth: 0,
-              width: "calc(100% - 72px)",
-              maxWidth: "calc(100% - 72px)",
-              textAlign: "justify",
-              textAlignLast: "left",
-            }}
+            style={userMessageContentStyle}
           >
             {message.children ? (
               message.children
@@ -75,13 +84,7 @@ export function Message({ message }: { message: Message }) {
           />
           <div
             className="message-content"
-            style={{
-              minWidth: 0,
-              width: "calc(100% - 72px)",
-              maxWidth: "calc(100% - 72px)",
-              textAlign: "justify",
-              textAlignLast: "left",
-            }}
+            style={assistantMessageContentStyle}
           >
             {message.children ? (
               message.children

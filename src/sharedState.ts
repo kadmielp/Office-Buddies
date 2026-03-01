@@ -29,6 +29,8 @@ export interface SettingsState {
   defaultFontSize: number;
   disableAutoUpdate?: boolean;
   disableSound?: boolean;
+  enableProactiveMessages?: boolean;
+  proactivePort?: number;
 }
 
 export interface SharedState {
@@ -70,6 +72,8 @@ export const DEFAULT_SETTINGS: SettingsState = {
   defaultFontSize: 12,
   disableAutoUpdate: false,
   disableSound: false,
+  enableProactiveMessages: false,
+  proactivePort: 5050,
 };
 
 export const EMPTY_SHARED_STATE: SharedState = {

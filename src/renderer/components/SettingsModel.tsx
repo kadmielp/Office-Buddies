@@ -9,6 +9,7 @@ import { isModelDownloading } from "../../helpers/model-helpers";
 import { AiProvider } from "../../sharedState";
 import { fetchProviderModels } from "../ai-provider-client";
 import { useChat } from "../contexts/ChatContext";
+import { Checkbox } from "./Checkbox";
 import localProviderIcon from "../images/icons/network_drive_off.png";
 import remoteProviderIcon from "../images/icons/network_drive_on.png";
 
@@ -319,6 +320,44 @@ export const SettingsModel: React.FC = () => {
                 }}
               />
             </div>
+            {selectedProvider === "openclaw" && (
+              <div
+                className="field-row"
+                style={{ marginTop: "10px", alignItems: "flex-start" }}
+              >
+                <Checkbox
+                  id="enableProactive"
+                  label="Enable Proactive Messages (Listener)"
+                  checked={!!settings.enableProactiveMessages}
+                  onChange={(checked) => {
+                    clippyApi.setState("settings.enableProactiveMessages", checked);
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginLeft: "24px",
+                    marginTop: "4px",
+                  }}
+                >
+                  <label htmlFor="proactivePort">Port:</label>
+                  <input
+                    id="proactivePort"
+                    type="number"
+                    value={settings.proactivePort || 5050}
+                    style={{ width: "60px" }}
+                    onChange={(e) => {
+                      clippyApi.setState(
+                        "settings.proactivePort",
+                        parseInt(e.target.value),
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            )}
             <div className="field-row">
               <button
                 onClick={handleRefreshRemoteModels}

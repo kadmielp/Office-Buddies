@@ -2,6 +2,7 @@ import Markdown from "react-markdown";
 import questionIcon from "../images/icons/question.png";
 import defaultClippy from "../images/icons/msagent.png";
 import { MessageRecord } from "../../types/interfaces";
+import { clippyApi } from "../clippyApi";
 
 export interface Message extends MessageRecord {
   id: string;
@@ -94,6 +95,47 @@ export function Message({ message }: { message: Message }) {
               >
                 {message.content}
               </Markdown>
+            )}
+            {message.actions && message.actions.length > 0 && (
+              <div
+                className="message-actions"
+                style={{
+                  marginTop: "12px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                }}
+              >
+                {message.actions.map((action, idx) => (
+                  <button
+                    key={idx}
+                    style={{
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "4px 8px",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                    onClick={() => {
+                      clippyApi.sendProactiveAction(message.id, action.action);
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        backgroundColor: "#000080",
+                        display: "inline-block",
+                        boxShadow: "inset -1px -1px 1px rgba(0,0,0,0.5)",
+                      }}
+                    />
+                    {action.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </>

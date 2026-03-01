@@ -155,6 +155,12 @@ export function Clippy() {
   const [manualAnimationKey, setManualAnimationKey] = useState<string | null>(
     null,
   );
+  const [proactiveSpeech, setProactiveSpeech] = useState<{
+    message: string;
+    actions?: Array<{ label: string; action: string }>;
+    animation?: string;
+    loop?: boolean;
+  } | null>(null);
   const [switchTargetAgent, setSwitchTargetAgent] = useState<string | null>(
     null,
   );
@@ -491,14 +497,52 @@ export function Clippy() {
   ]);
 
   useEffect(() => {
-    const speechPaddingWidth = buddySpeech ? 220 : 0;
-    const speechPaddingHeight = buddySpeech ? 340 : 0;
+    clippyApi.offProactiveSpeech();
+    clippyApi.onProactiveSpeech((payload) => {
+      const defaultAnimation = "GetAttention";
+      const animation = payload.animation || defaultAnimation;
+      const loop = payload.loop ?? true;
+
+      setProactiveSpeech({
+        message: payload.message,
+        actions: payload.actions,
+        animation: animation,
+        loop: loop,
+      });
+
+      if (animation && !loop) {
+        setManualAnimationKey(animation);
+      }
+
+      scheduleProactiveSpeechDismiss();
+    });
+
+    return () => {
+      clippyApi.offProactiveSpeech();
+    };
+  }, []);
+
+  const scheduleProactiveSpeechDismiss = useCallback(() => {
+    clearSpeechTimeout();
+    speechTimeoutRef.current = window.setTimeout(() => {
+      setProactiveSpeech(null);
+    }, 30000);
+  }, [clearSpeechTimeout]);
+
+  const closeProactiveSpeech = useCallback(() => {
+    clearSpeechTimeout();
+    setProactiveSpeech(null);
+  }, [clearSpeechTimeout]);
+
+  useEffect(() => {
+    const speechPaddingWidth = buddySpeech || proactiveSpeech ? 220 : 0;
+    const speechPaddingHeight = buddySpeech || proactiveSpeech ? 340 : 0;
 
     clippyApi.setMainWindowSize(
       agentPack.frameWidth + WINDOW_PADDING_WIDTH + speechPaddingWidth,
       agentPack.frameHeight + WINDOW_PADDING_HEIGHT + speechPaddingHeight,
     );
-  }, [agentPack.frameHeight, agentPack.frameWidth, buddySpeech]);
+  }, [agentPack.frameHeight, agentPack.frameWidth, buddySpeech, proactiveSpeech]);
 
   useEffect(() => {
     clippyApi.setContextMenuAnimations(contextMenuAnimations).catch((error) => {
@@ -837,6 +881,50 @@ export function Clippy() {
   ]);
 
   useEffect(() => {
+    if (!isSpriteReady || manualAnimationKey || isAgentSwitchAnimating) {
+      return;
+    }
+
+    if (!proactiveSpeech || !proactiveSpeech.loop || !proactiveSpeech.animation) {
+      return;
+    }
+
+    const loopKey = proactiveSpeech.animation;
+    if (!agentPack.animations[loopKey]) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const playLoop = () => {
+      if (isCancelled) {
+        return;
+      }
+
+      runAnimation(loopKey, () => {
+        if (isCancelled) {
+          return;
+        }
+        playLoop();
+      });
+    };
+
+    playLoop();
+
+    return () => {
+      isCancelled = true;
+      runAnimation("Default");
+    };
+  }, [
+    agentPack.animations,
+    isAgentSwitchAnimating,
+    isSpriteReady,
+    manualAnimationKey,
+    runAnimation,
+    proactiveSpeech,
+  ]);
+
+  useEffect(() => {
     if (
       !animationKey ||
       manualAnimationKey ||
@@ -867,6 +955,95 @@ export function Clippy() {
         pointerEvents: isAssistantGalleryOpen ? "none" : "auto",
       }}
     >
+      {proactiveSpeech && (
+        <div className="buddy-speech app-no-drag" aria-live="polite">
+          <button
+            className="buddy-speech-close"
+            aria-label="Close message"
+            onClick={closeProactiveSpeech}
+          >
+            x
+          </button>
+          <div className="buddy-speech-content">
+            <Markdown
+              components={{
+                a: ({ node, ...props }) => (
+                  <a target="_blank" rel="noopener noreferrer" {...props} />
+                ),
+              }}
+            >
+              {proactiveSpeech.message}
+            </Markdown>
+          </div>
+          <div
+            className="buddy-speech-options"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              gap: "8px",
+            }}
+          >
+            {proactiveSpeech.actions &&
+              proactiveSpeech.actions.map((action, idx) => (
+                <button
+                  key={idx}
+                  className="buddy-speech-option"
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    justifyContent: "flex-start",
+                    padding: "2px 4px",
+                  }}
+                  onClick={() => {
+                    setProactiveSpeech({
+                      message: "Sending to Zero...",
+                      actions: [],
+                      loop: false,
+                    });
+                    setManualAnimationKey("SendMail");
+                    clippyApi.sendProactiveAction("proactive", action.action);
+                  }}
+                >
+                  <span className="buddy-speech-option-dot" />
+                  {action.label}
+                </button>
+              ))}
+            {(proactiveSpeech.actions?.length ?? 0) > 0 && (
+              <div
+                style={{
+                  borderTop: "1px solid rgba(0,0,0,0.1)",
+                  width: "100%",
+                  margin: "4px 0",
+                }}
+              />
+            )}
+            <button
+              className="buddy-speech-option"
+              style={{
+                width: "100%",
+                textAlign: "left",
+                justifyContent: "flex-start",
+                padding: "2px 4px",
+              }}
+                onClick={() => {
+                  clippyApi.sendProactiveAction("proactive", "open_chat");
+                  setProactiveSpeech(null);
+                  setManualAnimationKey("SendMail");
+                  setIsChatWindowOpen(true);
+                  setCurrentView("chat");
+                }}
+            >
+              <span
+                className="buddy-speech-option-dot"
+                style={{ backgroundColor: "#808080" }}
+              />
+              Open in chat
+            </button>
+          </div>
+          <div className="buddy-speech-tail" />
+        </div>
+      )}
       {buddySpeech && (
         <div className="buddy-speech app-no-drag" aria-live="polite">
           <button

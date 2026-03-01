@@ -171,4 +171,54 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.CLIPBOARD_WRITE, (_, data: Data) =>
     clipboard.write(data, "clipboard"),
   );
+
+  // Proactive
+  ipcMain.handle(
+    IpcMessages.PROACTIVE_ACTION_CLICK,
+    async (event, messageId: string, action: string) => {
+      console.log(`Proactive action clicked: ${messageId} -> ${action}`);
+
+      const settings = getStateManager().getSettings();
+      if (settings.aiProvider === "openclaw" && settings.openclawEndpoint) {
+        try {
+          const endpoint = settings.openclawEndpoint.replace(/\/$/, "");
+          const response = await fetch(`${endpoint}/v1/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${settings.openclawApiKey || ""}`,
+            },
+            body: JSON.stringify({
+              model: settings.remoteModel || "default",
+              messages: [
+                {
+                  role: "user",
+                  content: `[Office Buddies Action]: ${action}`,
+                },
+              ],
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const reply = data.choices?.[0]?.message?.content;
+            if (reply) {
+              // Send the agent's response back to the balloon
+              getMainWindow()?.webContents.send(IpcMessages.PROACTIVE_MESSAGE, {
+                message: reply,
+                // We keep the balloon open with the new message
+              });
+            }
+          } else {
+            console.error(`OpenClaw feedback failed: ${response.status}`);
+          }
+        } catch (error) {
+          console.error(
+            "Failed to send proactive action feedback to OpenClaw:",
+            error,
+          );
+        }
+      }
+    },
+  );
 }

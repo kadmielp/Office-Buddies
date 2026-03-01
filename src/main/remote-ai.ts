@@ -120,19 +120,26 @@ async function promptOpenAiCompatible(args: {
     headers.Authorization = `Bearer ${args.apiKey.trim()}`;
   }
 
+  const body: any = {
+    model: args.model,
+    messages: [
+      { role: "system", content: args.systemPrompt },
+      ...toChatHistoryMessages(args.history),
+    ],
+    temperature: args.temperature,
+    max_tokens: args.maxTokens,
+    stream: false,
+  };
+
+  // OpenClaw specific metadata
+  if (args.endpoint.includes(".ts.net") || args.endpoint.includes("openclaw")) {
+    body.metadata = { reply_to: "bubble" };
+  }
+
   const response = await fetch(args.endpoint, {
     method: "POST",
     headers,
-    body: JSON.stringify({
-      model: args.model,
-      messages: [
-        { role: "system", content: args.systemPrompt },
-        ...toChatHistoryMessages(args.history),
-      ],
-      temperature: args.temperature,
-      max_tokens: args.maxTokens,
-      stream: false,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -261,19 +268,26 @@ async function* streamOpenAiCompatible(args: {
     headers.Authorization = `Bearer ${args.apiKey.trim()}`;
   }
 
+  const body: any = {
+    model: args.model,
+    messages: [
+      { role: "system", content: args.systemPrompt },
+      ...toChatHistoryMessages(args.history),
+    ],
+    temperature: args.temperature,
+    max_tokens: args.maxTokens,
+    stream: true,
+  };
+
+  // OpenClaw specific metadata
+  if (args.endpoint.includes(".ts.net") || args.endpoint.includes("openclaw")) {
+    body.metadata = { reply_to: "bubble" };
+  }
+
   const response = await fetch(args.endpoint, {
     method: "POST",
     headers,
-    body: JSON.stringify({
-      model: args.model,
-      messages: [
-        { role: "system", content: args.systemPrompt },
-        ...toChatHistoryMessages(args.history),
-      ],
-      temperature: args.temperature,
-      max_tokens: args.maxTokens,
-      stream: true,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {

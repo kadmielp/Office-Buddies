@@ -476,6 +476,7 @@ function messageRecordFromMessage(message: Message): MessageRecord {
     content: message.content,
     sender: message.sender,
     createdAt: message.createdAt,
+    actions: message.actions,
   };
 }
 

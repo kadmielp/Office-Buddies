@@ -19,11 +19,17 @@ import { clippyApi } from "../clippyApi";
 import { useBubbleView } from "../contexts/BubbleViewContext";
 import { isModelDownloading } from "../../helpers/model-helpers";
 import { BuddySpeechPayload } from "../../types/interfaces";
+import { Message } from "./Message";
+import { streamAssistantReply } from "../helpers/stream-assistant-reply";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
 const WINDOW_PADDING_WIDTH = 1;
 const WINDOW_PADDING_HEIGHT = 7;
+const SPEECH_BUBBLE_PADDING_WIDTH = 220;
+const SPEECH_BUBBLE_PADDING_HEIGHT = 340;
+const MINI_CHAT_PADDING_WIDTH = 400;
+const MINI_CHAT_PADDING_HEIGHT = 360;
 
 function getFrameTimeout(frame: AgentFrame): number {
   return Math.max(frame.duration ?? 100, 10);
@@ -128,6 +134,7 @@ export function Clippy() {
     isStartingNewChat,
     setIsChatWindowOpen,
     isChatWindowOpen,
+    messages,
     addMessage,
     startNewChat,
   } = useChat();
@@ -167,6 +174,10 @@ export function Clippy() {
   const [buddySpeech, setBuddySpeech] = useState<BuddySpeechPayload | null>(
     null,
   );
+  const [miniChatMessages, setMiniChatMessages] = useState<Message[]>([]);
+  const [miniChatInput, setMiniChatInput] = useState("");
+  const [miniChatStreamingContent, setMiniChatStreamingContent] = useState("");
+  const [isMiniChatOpen, setIsMiniChatOpen] = useState(false);
   const [hasCopiedBuddySpeech, setHasCopiedBuddySpeech] = useState(false);
   const [isBuddyThinking, setIsBuddyThinking] = useState(false);
   const [hasShownStartupGreeting, setHasShownStartupGreeting] =
@@ -177,6 +188,7 @@ export function Clippy() {
     "none" | "goodbye" | "welcome"
   >("none");
   const isAgentSwitchAnimating = switchPhase !== "none";
+  const miniChatInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const agentPack = useMemo(
     () => getAgentPack(displayedAgent),
@@ -197,6 +209,20 @@ export function Clippy() {
     hasShownStartupGreeting &&
     !isStartupGreetingPlaying &&
     (shouldUseChatProcessingAnimation || shouldUseBuddyProcessingAnimation);
+  const displayedMiniChatMessages =
+    miniChatStreamingContent.trim().length > 0
+      ? [
+          ...miniChatMessages,
+          {
+            id: "mini-chat-streaming",
+            content: miniChatStreamingContent,
+            sender: "clippy" as const,
+            createdAt: Date.now(),
+          },
+        ]
+      : miniChatMessages;
+  const hasSpeechBubble =
+    isMiniChatOpen || Boolean(buddySpeech) || Boolean(proactiveSpeech);
 
   const clearFrameTimeout = useCallback(() => {
     if (frameTimeoutRef.current) {
@@ -412,6 +438,103 @@ export function Clippy() {
     setIsChatWindowOpen(true);
   }, [isChatWindowOpen, setCurrentView, setIsChatWindowOpen]);
 
+  const closeMiniChat = useCallback(() => {
+    setIsMiniChatOpen(false);
+    setMiniChatInput("");
+    setMiniChatMessages([]);
+    setMiniChatStreamingContent("");
+  }, []);
+
+  const openMiniChat = useCallback(() => {
+    clearSpeechTimeout();
+    clearCopyFeedbackTimeout();
+    setBuddySpeech(null);
+    setProactiveSpeech(null);
+    setHasCopiedBuddySpeech(false);
+    setIsMiniChatOpen(true);
+
+    requestAnimationFrame(() => {
+      miniChatInputRef.current?.focus();
+    });
+  }, [clearCopyFeedbackTimeout, clearSpeechTimeout]);
+
+  const sendMiniChatMessage = useCallback(async () => {
+    const trimmedMessage = miniChatInput.trim();
+
+    if (!trimmedMessage || status !== "idle") {
+      return;
+    }
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      content: trimmedMessage,
+      sender: "user",
+      createdAt: Date.now(),
+    };
+
+    const history = [...messages, ...miniChatMessages, userMessage];
+
+    setMiniChatMessages((prevMessages) => [...prevMessages, userMessage]);
+    setMiniChatInput("");
+    setMiniChatStreamingContent("");
+    setStatus("thinking");
+
+    try {
+      const filteredContent = await streamAssistantReply({
+        settings,
+        selectedAgent,
+        history,
+        input: trimmedMessage,
+        requestUUID: crypto.randomUUID(),
+        onResponding: () => setStatus("responding"),
+        onChunk: (content) => setMiniChatStreamingContent(content),
+        onAnimationKey: (animationKey) => setAnimationKey(animationKey),
+      });
+
+      setMiniChatMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: crypto.randomUUID(),
+          content: filteredContent,
+          sender: "clippy",
+          createdAt: Date.now(),
+        },
+      ]);
+    } catch (error) {
+      console.error(error);
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Unknown error while contacting remote provider.";
+
+      setMiniChatMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: crypto.randomUUID(),
+          content: `Falha ao obter resposta: ${errorMessage}`,
+          sender: "clippy",
+          createdAt: Date.now(),
+        },
+      ]);
+    } finally {
+      setMiniChatStreamingContent("");
+      setStatus("idle");
+      requestAnimationFrame(() => {
+        miniChatInputRef.current?.focus();
+      });
+    }
+  }, [
+    messages,
+    miniChatInput,
+    miniChatMessages,
+    selectedAgent,
+    setAnimationKey,
+    setStatus,
+    settings,
+    status,
+  ]);
+
   useEffect(() => {
     if (selectedAgent === displayedAgent) {
       return;
@@ -436,6 +559,56 @@ export function Clippy() {
     // If the user changes selection during a transition, keep latest target.
     setSwitchTargetAgent(selectedAgent);
   }, [displayedAgent, isSpriteReady, selectedAgent, switchPhase]);
+
+  useEffect(() => {
+    if (!isMiniChatOpen) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      miniChatInputRef.current?.focus();
+    });
+  }, [isMiniChatOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isMiniChatOpen) {
+        event.preventDefault();
+        closeMiniChat();
+        return;
+      }
+
+      if (!(event.ctrlKey && event.key === "Enter")) {
+        return;
+      }
+
+      if (isChatWindowOpen) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (isMiniChatOpen) {
+        void sendMiniChatMessage();
+        return;
+      }
+
+      openMiniChat();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    closeMiniChat,
+    isChatWindowOpen,
+    isMiniChatOpen,
+    openMiniChat,
+    sendMiniChatMessage,
+  ]);
 
   useEffect(() => {
     hasPlayedWelcomeRef.current = false;
@@ -535,14 +708,22 @@ export function Clippy() {
   }, [clearSpeechTimeout]);
 
   useEffect(() => {
-    const speechPaddingWidth = buddySpeech || proactiveSpeech ? 220 : 0;
-    const speechPaddingHeight = buddySpeech || proactiveSpeech ? 340 : 0;
+    const speechPaddingWidth = isMiniChatOpen
+      ? MINI_CHAT_PADDING_WIDTH
+      : hasSpeechBubble
+        ? SPEECH_BUBBLE_PADDING_WIDTH
+        : 0;
+    const speechPaddingHeight = isMiniChatOpen
+      ? MINI_CHAT_PADDING_HEIGHT
+      : hasSpeechBubble
+        ? SPEECH_BUBBLE_PADDING_HEIGHT
+        : 0;
 
     clippyApi.setMainWindowSize(
       agentPack.frameWidth + WINDOW_PADDING_WIDTH + speechPaddingWidth,
       agentPack.frameHeight + WINDOW_PADDING_HEIGHT + speechPaddingHeight,
     );
-  }, [agentPack.frameHeight, agentPack.frameWidth, buddySpeech, proactiveSpeech]);
+  }, [agentPack.frameHeight, agentPack.frameWidth, hasSpeechBubble, isMiniChatOpen]);
 
   useEffect(() => {
     clippyApi.setContextMenuAnimations(contextMenuAnimations).catch((error) => {
@@ -589,7 +770,11 @@ export function Clippy() {
       clearSpeechTimeout();
       clearCopyFeedbackTimeout();
     };
-  }, [clearCopyFeedbackTimeout, clearSpeechTimeout, scheduleBuddySpeechDismiss]);
+  }, [
+    clearCopyFeedbackTimeout,
+    clearSpeechTimeout,
+    scheduleBuddySpeechDismiss,
+  ]);
 
   const closeBuddySpeech = useCallback(() => {
     clearSpeechTimeout();
@@ -885,7 +1070,11 @@ export function Clippy() {
       return;
     }
 
-    if (!proactiveSpeech || !proactiveSpeech.loop || !proactiveSpeech.animation) {
+    if (
+      !proactiveSpeech ||
+      !proactiveSpeech.loop ||
+      !proactiveSpeech.animation
+    ) {
       return;
     }
 
@@ -955,7 +1144,87 @@ export function Clippy() {
         pointerEvents: isAssistantGalleryOpen ? "none" : "auto",
       }}
     >
-      {proactiveSpeech && (
+      {isMiniChatOpen && (
+        <div className="buddy-speech buddy-speech-mini-chat app-no-drag">
+          <button
+            className="buddy-speech-close"
+            aria-label="Close mini chat"
+            onClick={closeMiniChat}
+          >
+            x
+          </button>
+          <div className="buddy-mini-chat-log" aria-live="polite">
+            {displayedMiniChatMessages.length === 0 && (
+              <div className="buddy-mini-chat-empty">
+                Ask something here. Press Enter to send.
+              </div>
+            )}
+            {displayedMiniChatMessages.map((message) => (
+              <div
+                key={message.id}
+                className={`buddy-mini-chat-message ${message.sender === "user" ? "is-user" : "is-assistant"}`}
+              >
+                <div className="buddy-mini-chat-message-label">
+                  {message.sender === "user" ? "You" : selectedAgent}
+                </div>
+                <div className="buddy-mini-chat-message-body">
+                  <Markdown
+                    components={{
+                      a: ({ node, ...props }) => (
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          {...props}
+                        />
+                      ),
+                    }}
+                  >
+                    {message.content || ""}
+                  </Markdown>
+                </div>
+              </div>
+            ))}
+          </div>
+          <textarea
+            ref={miniChatInputRef}
+            className="buddy-mini-chat-input"
+            rows={1}
+            value={miniChatInput}
+            disabled={status === "thinking" || status === "responding"}
+            onChange={(event) => setMiniChatInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                closeMiniChat();
+                return;
+              }
+
+              if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                void sendMiniChatMessage();
+              }
+            }}
+            placeholder="Start typing... (press Enter to send)"
+          />
+          <div className="buddy-mini-chat-shortcuts">
+            <span className="buddy-mini-chat-shortcut">
+              <kbd>Ctrl</kbd>
+              <kbd>Enter</kbd>
+              <span>Send</span>
+            </span>
+            <span className="buddy-mini-chat-shortcut">
+              <kbd>Esc</kbd>
+              <span>Cancel</span>
+            </span>
+          </div>
+          <div className="buddy-speech-tail" />
+        </div>
+      )}
+      {!isMiniChatOpen && proactiveSpeech && (
         <div className="buddy-speech app-no-drag" aria-live="polite">
           <button
             className="buddy-speech-close"
@@ -1026,13 +1295,13 @@ export function Clippy() {
                 justifyContent: "flex-start",
                 padding: "2px 4px",
               }}
-                onClick={() => {
-                  clippyApi.sendProactiveAction("proactive", "open_chat");
-                  setProactiveSpeech(null);
-                  setManualAnimationKey("SendMail");
-                  setIsChatWindowOpen(true);
-                  setCurrentView("chat");
-                }}
+              onClick={() => {
+                clippyApi.sendProactiveAction("proactive", "open_chat");
+                setProactiveSpeech(null);
+                setManualAnimationKey("SendMail");
+                setIsChatWindowOpen(true);
+                setCurrentView("chat");
+              }}
             >
               <span
                 className="buddy-speech-option-dot"
@@ -1044,7 +1313,7 @@ export function Clippy() {
           <div className="buddy-speech-tail" />
         </div>
       )}
-      {buddySpeech && (
+      {!isMiniChatOpen && buddySpeech && (
         <div className="buddy-speech app-no-drag" aria-live="polite">
           <button
             className="buddy-speech-close"

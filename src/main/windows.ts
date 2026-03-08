@@ -15,6 +15,8 @@ import { popupAppMenu } from "./menu";
 import { runBuddyAction } from "./buddy-actions";
 
 let mainWindow: BrowserWindow | undefined;
+const allowedMinimizeWindows = new WeakSet<BrowserWindow>();
+const allowedHideWindows = new WeakSet<BrowserWindow>();
 
 function setWindowAlwaysOnTop(
   window: BrowserWindow | undefined,
@@ -25,7 +27,8 @@ function setWindowAlwaysOnTop(
   }
 
   const shouldStayOnTop = Boolean(enabled);
-  window.setAlwaysOnTop(shouldStayOnTop);
+  const alwaysOnTopLevel = process.platform === "win32" ? "screen-saver" : "normal";
+  window.setAlwaysOnTop(shouldStayOnTop, alwaysOnTopLevel);
 
   if (shouldStayOnTop) {
     window.moveTop();
@@ -36,6 +39,67 @@ function syncAlwaysOnTopWithSettings() {
   const settings = getStateManager().store.get("settings");
   setWindowAlwaysOnTop(getMainWindow(), settings.clippyAlwaysOnTop);
   setWindowAlwaysOnTop(getChatWindow(), settings.chatAlwaysOnTop);
+}
+
+function shouldProtectWindowFromMinimize(window: BrowserWindow) {
+  const settings = getStateManager().store.get("settings");
+
+  if (window === getMainWindow()) {
+    return Boolean(settings.clippyAlwaysOnTop);
+  }
+
+  if (isChatWindow(window)) {
+    return Boolean(settings.chatAlwaysOnTop);
+  }
+
+  return false;
+}
+
+function setupMinimizeProtection(window: BrowserWindow) {
+  const reassertProtectedWindow = () => {
+    setTimeout(() => {
+      if (window.isDestroyed() || !shouldProtectWindowFromMinimize(window)) {
+        return;
+      }
+
+      if (window.isMinimized()) {
+        window.restore();
+      }
+
+      if (!window.isVisible()) {
+        window.showInactive();
+      }
+
+      window.moveTop();
+    }, 0);
+  };
+
+  (window as any).on("minimize", (event: Electron.Event) => {
+    if (allowedMinimizeWindows.has(window)) {
+      allowedMinimizeWindows.delete(window);
+      return;
+    }
+
+    if (!shouldProtectWindowFromMinimize(window)) {
+      return;
+    }
+
+    event.preventDefault();
+    reassertProtectedWindow();
+  });
+
+  (window as any).on("hide", () => {
+    if (allowedHideWindows.has(window)) {
+      allowedHideWindows.delete(window);
+      return;
+    }
+
+    if (!shouldProtectWindowFromMinimize(window)) {
+      return;
+    }
+
+    reassertProtectedWindow();
+  });
 }
 
 /**
@@ -121,6 +185,7 @@ export function setupWindowListener() {
 
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);
+      setupMinimizeProtection(browserWindow);
 
       if (!isMainWindow) {
         contextMenu({
@@ -320,6 +385,7 @@ export function toggleChatWindow() {
   }
 
   if (chatWindow.isVisible()) {
+    allowedHideWindows.add(chatWindow);
     chatWindow.hide();
   } else {
     syncAlwaysOnTopWithSettings();
@@ -337,7 +403,14 @@ export function toggleChatWindow() {
  * Minimize the chat window
  */
 export function minimizeChatWindow() {
-  return getChatWindow()?.minimize();
+  const chatWindow = getChatWindow();
+
+  if (!chatWindow) {
+    return;
+  }
+
+  allowedMinimizeWindows.add(chatWindow);
+  return chatWindow.minimize();
 }
 
 /**

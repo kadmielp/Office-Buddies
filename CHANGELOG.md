@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4] - 2026-03-08
+
+### Fixed
+
+- Keep Office Buddies and the chat window visible during `Win + D` when their always-on-top options are enabled.
+
 ## [0.6.3] - 2026-03-01
 
 ### Changed

@@ -214,7 +214,128 @@ textarea.chat-input-busy::placeholder {
   height: 9px;
   border-radius: 50%;
   display: inline-block;
-  background:
-    radial-gradient(circle at 35% 35%, #8fd1ff 15%, #1276b9 45%, #003a72 100%);
+  background: radial-gradient(
+    circle at 35% 35%,
+    #8fd1ff 15%,
+    #1276b9 45%,
+    #003a72 100%
+  );
   box-shadow: 0 0 0 1px #0f3d66;
+}
+
+.buddy-speech-mini-chat {
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.buddy-mini-chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 210px;
+  overflow-y: auto;
+  padding: 2px 24px 2px 2px;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.buddy-mini-chat-empty {
+  color: rgba(17, 17, 17, 0.75);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.buddy-mini-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.buddy-mini-chat-message.is-user {
+  align-items: flex-end;
+}
+
+.buddy-mini-chat-message.is-assistant {
+  align-items: flex-start;
+}
+
+.buddy-mini-chat-message-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(17, 17, 17, 0.7);
+}
+
+.buddy-mini-chat-message-body {
+  max-width: 100%;
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.55);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.buddy-mini-chat-message.is-user .buddy-mini-chat-message-body {
+  background: #111;
+  color: #f7f3d7;
+}
+
+.buddy-mini-chat-message-body p {
+  margin: 0 0 4px 0;
+}
+
+.buddy-mini-chat-message-body p:last-child {
+  margin-bottom: 0;
+}
+
+.buddy-mini-chat-input {
+  width: 100%;
+  min-height: 36px;
+  max-height: 96px;
+  resize: vertical;
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font: inherit;
+  color: #111;
+  background: rgba(255, 255, 255, 0.7);
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.buddy-mini-chat-input:disabled {
+  color: #666;
+  background: rgba(229, 229, 229, 0.95);
+}
+
+.buddy-mini-chat-shortcuts {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.buddy-mini-chat-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #111;
+}
+
+.buddy-mini-chat-shortcut kbd {
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.75);
+  font: inherit;
+  font-weight: 600;
 }

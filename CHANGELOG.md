@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.6] - 2026-03-08
+
+### Added
+
+- Added support for sending real mini-chat screenshot attachments through the remote multimodal provider pipeline, including OpenAI-compatible `image_url` messages and Gemini `inlineData`.
+- Added a rewritten `KNO-23` delivery summary documenting the mini-chat, screenshot capture flow, multimodal transport, follow-ups, and remaining vision-related gaps.
+
+### Changed
+
+- Continued refining the Buddy mini-chat into an assistant-first reply panel with hidden user prompts, proactive-style follow-up loading, and clearer `Thinking` versus `Writing` animation transitions.
+- Reworked the pending screenshot UI to use compact attachment icons, support multiple screenshots per turn, and allow lightweight removal of the most recent pending capture.
+- Tightened mini-chat spacing, paragraph rendering, top-bar control layout, and attachment presentation so the bubble feels more native to the Buddy UI.
+
+### Fixed
+
+- Fixed mini-chat screenshot prompts so attached images are sent as actual multimodal payloads instead of text-only placeholders.
+- Fixed several mini-chat layout issues including bubble cropping, empty header artifacts, close-button overlap, oversized attachment controls, and excessive paragraph spacing in assistant replies.
+
+## [0.6.5] - 2026-03-08
+
+### Added
+
+- Added a `Ctrl+Enter` mini-chat shortcut that opens a compact speech-bubble reply panel above the assistant.
+- Added inline mini-chat screenshot capture with `Ctrl+E`, including support for stacking multiple screenshots before send.
+- Added remote multimodal screenshot delivery for mini-chat attachments using OpenAI-compatible `image_url` payloads and Gemini `inlineData`.
+- Added mini-chat follow-up loading so users can request suggested next actions and continue the exchange from button clicks.
+
+### Changed
+
+- Reworked the mini-chat from a two-sided chat into an assistant-focused reply panel that keeps user prompts hidden and shows assistant replies as speech text.
+- Updated mini-chat animation behavior so the assistant uses `Thinking` before the first streamed token and `Writing` while streaming the reply.
+- Refined mini-chat layout and spacing, including tighter paragraph/list rendering, cleaner top-bar controls, compact attachment indicators, and improved bubble sizing/positioning.
+
 ## [0.6.4] - 2026-03-08
 
 ### Fixed

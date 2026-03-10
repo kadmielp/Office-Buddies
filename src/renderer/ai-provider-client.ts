@@ -20,7 +20,7 @@ const LOCAL_SYSTEM_PROMPT_FALLBACK = "You are a helpful assistant.";
 
 function queueLocalSessionOperation(operation: () => Promise<void>) {
   const nextOperation = localSessionOperation.then(operation, operation);
-  localSessionOperation = nextOperation.catch(() => { });
+  localSessionOperation = nextOperation.catch(() => {});
   return nextOperation;
 }
 
@@ -70,7 +70,7 @@ export async function createProviderSession(
       }
 
       // Recovery path for transient renderer/main session desync.
-      await electronAi.destroy().catch(() => { });
+      await electronAi.destroy().catch(() => {});
       await electronAi.create(options);
     }
   });
@@ -180,6 +180,7 @@ export async function* promptStreamingWithProvider(args: {
         id: msg.id,
         sender: msg.sender,
         content: msg.content,
+        imageDataUrls: msg.imageDataUrls,
         createdAt: msg.createdAt,
       }));
 
@@ -208,7 +209,7 @@ export async function* promptStreamingWithProvider(args: {
             resolveNext();
             resolveNext = null;
           }
-        }
+        },
       });
 
       while (!isDone || chunks.length > 0) {
@@ -250,11 +251,16 @@ async function promptRemoteProvider(args: {
     throw new Error("Request aborted");
   }
 
-  const provider = args.provider as "openai" | "gemini" | "maritaca" | "openclaw";
+  const provider = args.provider as
+    | "openai"
+    | "gemini"
+    | "maritaca"
+    | "openclaw";
   const history = args.history.map((msg) => ({
     id: msg.id,
     sender: msg.sender,
     content: msg.content,
+    imageDataUrls: msg.imageDataUrls,
     createdAt: msg.createdAt,
   }));
 
@@ -289,6 +295,10 @@ export async function fetchProviderModels(
     return [];
   }
 
-  const remoteProvider = provider as "openai" | "gemini" | "maritaca" | "openclaw";
+  const remoteProvider = provider as
+    | "openai"
+    | "gemini"
+    | "maritaca"
+    | "openclaw";
   return clippyApi.fetchRemoteProviderModels(remoteProvider as any) as any;
 }

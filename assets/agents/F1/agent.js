@@ -42,11 +42,13 @@
           duration: 100,
           images: [[0, 0]],
           sound: "29",
-          branching: { branches: [
-            { frameIndex: 1, weight: 33 },
-            { frameIndex: 23, weight: 33 },
-            { frameIndex: 28, weight: 33 }]
-           },
+          branching: {
+            branches: [
+              { frameIndex: 1, weight: 33 },
+              { frameIndex: 23, weight: 33 },
+              { frameIndex: 28, weight: 33 },
+            ],
+          },
         },
         // #1
         { duration: 100, images: [[124, 0]] },
@@ -6135,4 +6137,3 @@
     },
   },
 });
-

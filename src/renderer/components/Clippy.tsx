@@ -21,6 +21,7 @@ import { isModelDownloading } from "../../helpers/model-helpers";
 import { BuddySpeechPayload } from "../../types/interfaces";
 import { Message } from "./Message";
 import { streamAssistantReply } from "../helpers/stream-assistant-reply";
+import attachmentIcon from "../images/icons/attachment.png";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
@@ -30,6 +31,17 @@ const SPEECH_BUBBLE_PADDING_WIDTH = 220;
 const SPEECH_BUBBLE_PADDING_HEIGHT = 340;
 const MINI_CHAT_PADDING_WIDTH = 400;
 const MINI_CHAT_PADDING_HEIGHT = 360;
+
+type MiniChatScreenshot = {
+  dataUrl: string;
+  width: number;
+  height: number;
+};
+
+type MiniChatMessage = Message & {
+  screenshots?: MiniChatScreenshot[];
+  promptContent?: string;
+};
 
 function getFrameTimeout(frame: AgentFrame): number {
   return Math.max(frame.duration ?? 100, 10);
@@ -125,6 +137,20 @@ function normalizeSelectedTextForChat(value: string): string {
     .trim();
 }
 
+function buildMiniChatPrompt(message: string, screenshotCount: number): string {
+  const trimmedMessage = message.trim();
+
+  if (screenshotCount > 0 && trimmedMessage) {
+    return `${trimmedMessage}\n\n[The user also attached ${screenshotCount} screenshot${screenshotCount === 1 ? "" : "s"} from the current display.]`;
+  }
+
+  if (screenshotCount > 0) {
+    return `I attached ${screenshotCount} screenshot${screenshotCount === 1 ? "" : "s"} from my current display.`;
+  }
+
+  return trimmedMessage;
+}
+
 export function Clippy() {
   const {
     animationKey,
@@ -174,10 +200,17 @@ export function Clippy() {
   const [buddySpeech, setBuddySpeech] = useState<BuddySpeechPayload | null>(
     null,
   );
-  const [miniChatMessages, setMiniChatMessages] = useState<Message[]>([]);
+  const [miniChatMessages, setMiniChatMessages] = useState<MiniChatMessage[]>(
+    [],
+  );
   const [miniChatInput, setMiniChatInput] = useState("");
   const [miniChatStreamingContent, setMiniChatStreamingContent] = useState("");
   const [isMiniChatOpen, setIsMiniChatOpen] = useState(false);
+  const [miniChatScreenshots, setMiniChatScreenshots] = useState<
+    MiniChatScreenshot[]
+  >([]);
+  const [isCapturingMiniChatScreenshot, setIsCapturingMiniChatScreenshot] =
+    useState(false);
   const [hasCopiedBuddySpeech, setHasCopiedBuddySpeech] = useState(false);
   const [isBuddyThinking, setIsBuddyThinking] = useState(false);
   const [hasShownStartupGreeting, setHasShownStartupGreeting] =
@@ -205,10 +238,16 @@ export function Clippy() {
   const shouldUseChatProcessingAnimation =
     isAnyModelDownloading || isStartingNewChat;
   const shouldUseBuddyProcessingAnimation = isBuddyThinking;
+  const miniChatAnimationPhase =
+    isMiniChatOpen && (status === "thinking" || status === "responding")
+      ? status
+      : null;
   const shouldUseProcessingAnimation =
     hasShownStartupGreeting &&
     !isStartupGreetingPlaying &&
-    (shouldUseChatProcessingAnimation || shouldUseBuddyProcessingAnimation);
+    (shouldUseChatProcessingAnimation ||
+      shouldUseBuddyProcessingAnimation ||
+      Boolean(miniChatAnimationPhase));
   const displayedMiniChatMessages =
     miniChatStreamingContent.trim().length > 0
       ? [
@@ -443,6 +482,8 @@ export function Clippy() {
     setMiniChatInput("");
     setMiniChatMessages([]);
     setMiniChatStreamingContent("");
+    setMiniChatScreenshots([]);
+    setIsCapturingMiniChatScreenshot(false);
   }, []);
 
   const openMiniChat = useCallback(() => {
@@ -458,25 +499,79 @@ export function Clippy() {
     });
   }, [clearCopyFeedbackTimeout, clearSpeechTimeout]);
 
-  const sendMiniChatMessage = useCallback(async () => {
-    const trimmedMessage = miniChatInput.trim();
-
-    if (!trimmedMessage || status !== "idle") {
+  const captureMiniChatScreenshot = useCallback(async () => {
+    if (!isMiniChatOpen || isCapturingMiniChatScreenshot) {
       return;
     }
 
-    const userMessage: Message = {
+    setIsCapturingMiniChatScreenshot(true);
+
+    try {
+      const screenshot = await clippyApi.captureAssistantScreenshot();
+      if (screenshot) {
+        setMiniChatScreenshots((prevScreenshots) => [
+          ...prevScreenshots,
+          screenshot,
+        ]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsCapturingMiniChatScreenshot(false);
+      requestAnimationFrame(() => {
+        miniChatInputRef.current?.focus();
+      });
+    }
+  }, [isCapturingMiniChatScreenshot, isMiniChatOpen]);
+
+  const sendMiniChatMessage = useCallback(async () => {
+    const trimmedMessage = miniChatInput.trim();
+    const screenshotCount = miniChatScreenshots.length;
+    const prompt = buildMiniChatPrompt(trimmedMessage, screenshotCount);
+
+    if ((!trimmedMessage && screenshotCount === 0) || status !== "idle") {
+      return;
+    }
+
+    const visibleContent =
+      trimmedMessage ||
+      (screenshotCount > 0
+        ? `Attached ${screenshotCount} screenshot${screenshotCount === 1 ? "" : "s"}.`
+        : "");
+
+    const userMessage: MiniChatMessage = {
       id: crypto.randomUUID(),
-      content: trimmedMessage,
+      content: visibleContent,
+      imageDataUrls: miniChatScreenshots.map(
+        (screenshot) => screenshot.dataUrl,
+      ),
       sender: "user",
       createdAt: Date.now(),
+      screenshots: miniChatScreenshots,
+      promptContent: prompt,
     };
 
-    const history = [...messages, ...miniChatMessages, userMessage];
+    const history = [
+      ...messages,
+      ...miniChatMessages.map((message) => ({
+        id: message.id,
+        content:
+          message.promptContent ||
+          message.content ||
+          ((message.screenshots?.length || 0) > 0
+            ? `The user attached ${message.screenshots?.length} screenshot${message.screenshots?.length === 1 ? "" : "s"} from the current display.`
+            : ""),
+        imageDataUrls: message.imageDataUrls,
+        sender: message.sender,
+        createdAt: message.createdAt,
+      })),
+      userMessage,
+    ];
 
     setMiniChatMessages((prevMessages) => [...prevMessages, userMessage]);
     setMiniChatInput("");
     setMiniChatStreamingContent("");
+    setMiniChatScreenshots([]);
     setStatus("thinking");
 
     try {
@@ -484,7 +579,7 @@ export function Clippy() {
         settings,
         selectedAgent,
         history,
-        input: trimmedMessage,
+        input: prompt,
         requestUUID: crypto.randomUUID(),
         onResponding: () => setStatus("responding"),
         onChunk: (content) => setMiniChatStreamingContent(content),
@@ -528,6 +623,7 @@ export function Clippy() {
     messages,
     miniChatInput,
     miniChatMessages,
+    miniChatScreenshots,
     selectedAgent,
     setAnimationKey,
     setStatus,
@@ -579,6 +675,17 @@ export function Clippy() {
       }
 
       if (!(event.ctrlKey && event.key === "Enter")) {
+        if (!(event.ctrlKey && event.key.toLowerCase() === "e")) {
+          return;
+        }
+
+        if (!isMiniChatOpen) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        void captureMiniChatScreenshot();
         return;
       }
 
@@ -603,6 +710,7 @@ export function Clippy() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [
+    captureMiniChatScreenshot,
     closeMiniChat,
     isChatWindowOpen,
     isMiniChatOpen,
@@ -723,7 +831,12 @@ export function Clippy() {
       agentPack.frameWidth + WINDOW_PADDING_WIDTH + speechPaddingWidth,
       agentPack.frameHeight + WINDOW_PADDING_HEIGHT + speechPaddingHeight,
     );
-  }, [agentPack.frameHeight, agentPack.frameWidth, hasSpeechBubble, isMiniChatOpen]);
+  }, [
+    agentPack.frameHeight,
+    agentPack.frameWidth,
+    hasSpeechBubble,
+    isMiniChatOpen,
+  ]);
 
   useEffect(() => {
     clippyApi.setContextMenuAnimations(contextMenuAnimations).catch((error) => {
@@ -1029,9 +1142,13 @@ export function Clippy() {
     const processingAnimationKey =
       findFirstAnimationKey(
         agentPack.animations,
-        shouldUseBuddyProcessingAnimation
-          ? ["Thinking", "Processing"]
-          : ["Processing", "Thinking", "Searching"],
+        miniChatAnimationPhase === "responding"
+          ? ["Writing", "Processing", "Thinking"]
+          : miniChatAnimationPhase === "thinking"
+            ? ["Thinking", "Processing", "Searching"]
+            : shouldUseBuddyProcessingAnimation
+              ? ["Thinking", "Processing"]
+              : ["Processing", "Thinking", "Searching"],
       ) ?? "Default";
     let isCancelled = false;
 
@@ -1060,6 +1177,7 @@ export function Clippy() {
     isAgentSwitchAnimating,
     isSpriteReady,
     manualAnimationKey,
+    miniChatAnimationPhase,
     runAnimation,
     shouldUseBuddyProcessingAnimation,
     shouldUseProcessingAnimation,
@@ -1146,51 +1264,117 @@ export function Clippy() {
     >
       {isMiniChatOpen && (
         <div className="buddy-speech buddy-speech-mini-chat app-no-drag">
-          <button
-            className="buddy-speech-close"
-            aria-label="Close mini chat"
-            onClick={closeMiniChat}
-          >
-            x
-          </button>
-          <div className="buddy-mini-chat-log" aria-live="polite">
-            {displayedMiniChatMessages.length === 0 && (
-              <div className="buddy-mini-chat-empty">
-                Ask something here. Press Enter to send.
-              </div>
-            )}
-            {displayedMiniChatMessages.map((message) => (
-              <div
-                key={message.id}
-                className={`buddy-mini-chat-message ${message.sender === "user" ? "is-user" : "is-assistant"}`}
+          <div className="buddy-mini-chat-topbar">
+            {(miniChatScreenshots.length > 0 ||
+              isCapturingMiniChatScreenshot) && (
+              <button
+                type="button"
+                className="buddy-mini-chat-attachment-pill"
+                aria-label={
+                  isCapturingMiniChatScreenshot
+                    ? "Capturing screenshot"
+                    : "Remove last pending screenshot"
+                }
+                disabled={
+                  miniChatScreenshots.length === 0 ||
+                  isCapturingMiniChatScreenshot
+                }
+                onClick={() =>
+                  setMiniChatScreenshots((prevScreenshots) =>
+                    prevScreenshots.slice(0, -1),
+                  )
+                }
               >
-                <div className="buddy-mini-chat-message-label">
-                  {message.sender === "user" ? "You" : selectedAgent}
+                <div className="buddy-mini-chat-attachment-pill-icons">
+                  {miniChatScreenshots.map((_, index) => (
+                    <img
+                      key={`mini-chat-screenshot-${index}`}
+                      src={attachmentIcon}
+                      alt=""
+                      aria-hidden="true"
+                      className="buddy-mini-chat-attachment-pill-icon"
+                    />
+                  ))}
+                  {isCapturingMiniChatScreenshot && (
+                    <img
+                      src={attachmentIcon}
+                      alt="Capturing screenshot"
+                      className="buddy-mini-chat-attachment-pill-icon buddy-mini-chat-attachment-pill-icon-pending"
+                    />
+                  )}
                 </div>
-                <div className="buddy-mini-chat-message-body">
-                  <Markdown
-                    components={{
-                      a: ({ node, ...props }) => (
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          {...props}
-                        />
-                      ),
-                    }}
-                  >
-                    {message.content || ""}
-                  </Markdown>
-                </div>
-              </div>
-            ))}
+                {miniChatScreenshots.length > 0 &&
+                  !isCapturingMiniChatScreenshot && (
+                    <span className="buddy-mini-chat-attachment-pill-count">
+                      {miniChatScreenshots.length}
+                    </span>
+                  )}
+              </button>
+            )}
+            <button
+              className="buddy-speech-close"
+              aria-label="Close mini chat"
+              onClick={closeMiniChat}
+            >
+              x
+            </button>
           </div>
+          {displayedMiniChatMessages.length > 0 && (
+            <div className="buddy-mini-chat-log" aria-live="polite">
+              {displayedMiniChatMessages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`buddy-mini-chat-message ${message.sender === "user" ? "is-user" : "is-assistant"}`}
+                >
+                  <div className="buddy-mini-chat-message-label">
+                    {message.sender === "user" ? "You" : selectedAgent}
+                  </div>
+                  <div className="buddy-mini-chat-message-body">
+                    {(message.screenshots?.length || 0) > 0 && (
+                      <div className="buddy-mini-chat-inline-attachment">
+                        <img
+                          src={attachmentIcon}
+                          alt=""
+                          aria-hidden="true"
+                          className="buddy-mini-chat-inline-attachment-icon"
+                        />
+                        <span>
+                          {message.screenshots?.length} screenshot
+                          {message.screenshots?.length === 1 ? "" : "s"}{" "}
+                          attached
+                        </span>
+                      </div>
+                    )}
+                    {message.content && (
+                      <Markdown
+                        components={{
+                          a: ({ node, ...props }) => (
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              {...props}
+                            />
+                          ),
+                        }}
+                      >
+                        {message.content}
+                      </Markdown>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <textarea
             ref={miniChatInputRef}
             className="buddy-mini-chat-input"
             rows={1}
             value={miniChatInput}
-            disabled={status === "thinking" || status === "responding"}
+            disabled={
+              status === "thinking" ||
+              status === "responding" ||
+              isCapturingMiniChatScreenshot
+            }
             onChange={(event) => setMiniChatInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
@@ -1211,6 +1395,11 @@ export function Clippy() {
             placeholder="Start typing... (press Enter to send)"
           />
           <div className="buddy-mini-chat-shortcuts">
+            <span className="buddy-mini-chat-shortcut">
+              <kbd>Ctrl</kbd>
+              <kbd>E</kbd>
+              <span>Screenshot</span>
+            </span>
             <span className="buddy-mini-chat-shortcut">
               <kbd>Ctrl</kbd>
               <kbd>Enter</kbd>

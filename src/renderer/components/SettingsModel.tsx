@@ -121,7 +121,10 @@ export const SettingsModel: React.FC = () => {
       (selectedProvider === "openclaw" && !!settings.openclawEndpoint?.trim());
 
     // In OpenClaw, if we have endpoint, we always show the static models
-    if (selectedProvider === "openclaw" && !!settings.openclawEndpoint?.trim()) {
+    if (
+      selectedProvider === "openclaw" &&
+      !!settings.openclawEndpoint?.trim()
+    ) {
       // In a real app we might want to fetch, but we know the Gateway models
       // and we just updated the main process to return static ones.
     } else if (!hasApiKey) {
@@ -138,7 +141,10 @@ export const SettingsModel: React.FC = () => {
 
       try {
         const list = await fetchProviderModels(selectedProvider, settings);
-        const filteredList = filterRemoteModelsByProvider(selectedProvider, list);
+        const filteredList = filterRemoteModelsByProvider(
+          selectedProvider,
+          list,
+        );
         if (cancelled) {
           return;
         }
@@ -182,21 +188,31 @@ export const SettingsModel: React.FC = () => {
 
   const getProviderApiKey = () => {
     switch (selectedProvider) {
-      case "openai": return settings.openAiApiKey || "";
-      case "gemini": return settings.geminiApiKey || "";
-      case "maritaca": return settings.maritacaApiKey || "";
-      case "openclaw": return settings.openclawApiKey || "";
-      default: return "";
+      case "openai":
+        return settings.openAiApiKey || "";
+      case "gemini":
+        return settings.geminiApiKey || "";
+      case "maritaca":
+        return settings.maritacaApiKey || "";
+      case "openclaw":
+        return settings.openclawApiKey || "";
+      default:
+        return "";
     }
   };
 
   const getProviderApiKeySettingName = () => {
     switch (selectedProvider) {
-      case "openai": return "settings.openAiApiKey";
-      case "gemini": return "settings.geminiApiKey";
-      case "maritaca": return "settings.maritacaApiKey";
-      case "openclaw": return "settings.openclawApiKey";
-      default: return "";
+      case "openai":
+        return "settings.openAiApiKey";
+      case "gemini":
+        return "settings.geminiApiKey";
+      case "maritaca":
+        return "settings.maritacaApiKey";
+      case "openclaw":
+        return "settings.openclawApiKey";
+      default:
+        return "";
     }
   };
 
@@ -250,7 +266,9 @@ export const SettingsModel: React.FC = () => {
           </select>
           <img
             src={
-              selectedProvider === "local" ? localProviderIcon : remoteProviderIcon
+              selectedProvider === "local"
+                ? localProviderIcon
+                : remoteProviderIcon
             }
             alt=""
             aria-hidden="true"
@@ -277,7 +295,7 @@ export const SettingsModel: React.FC = () => {
                   <option value="">
                     {isLoadingRemoteModels
                       ? "Loading models..."
-                      : selectedProvider === "openclaw" 
+                      : selectedProvider === "openclaw"
                         ? "Enter endpoint and refresh."
                         : "Add credentials and refresh."}
                   </option>
@@ -330,7 +348,10 @@ export const SettingsModel: React.FC = () => {
                   label="Enable Proactive Messages (Listener)"
                   checked={!!settings.enableProactiveMessages}
                   onChange={(checked) => {
-                    clippyApi.setState("settings.enableProactiveMessages", checked);
+                    clippyApi.setState(
+                      "settings.enableProactiveMessages",
+                      checked,
+                    );
                   }}
                 />
                 <div

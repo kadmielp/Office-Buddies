@@ -50,7 +50,11 @@ function isEncryptedValue(value: unknown): value is string {
 }
 
 function encryptSecret(value: unknown): unknown {
-  if (typeof value !== "string" || value.length === 0 || isEncryptedValue(value)) {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    isEncryptedValue(value)
+  ) {
     return value;
   }
 
@@ -300,7 +304,9 @@ export class StateManager {
     const storedSettings = { ...settings };
 
     for (const key of SENSITIVE_SETTINGS_KEYS) {
-      storedSettings[key] = encryptSecret(storedSettings[key]) as string | undefined;
+      storedSettings[key] = encryptSecret(storedSettings[key]) as
+        | string
+        | undefined;
     }
 
     return storedSettings;
@@ -310,7 +316,9 @@ export class StateManager {
     const runtimeSettings = { ...settings };
 
     for (const key of SENSITIVE_SETTINGS_KEYS) {
-      runtimeSettings[key] = decryptSecret(runtimeSettings[key]) as string | undefined;
+      runtimeSettings[key] = decryptSecret(runtimeSettings[key]) as
+        | string
+        | undefined;
     }
 
     return runtimeSettings;

@@ -6,6 +6,7 @@ export interface MessageAction {
 export interface MessageRecord {
   id: string;
   content?: string;
+  imageDataUrls?: string[];
   sender: "user" | "clippy";
   createdAt: number;
   actions?: MessageAction[];

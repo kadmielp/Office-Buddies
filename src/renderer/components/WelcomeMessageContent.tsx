@@ -26,8 +26,8 @@ export const WelcomeMessageContent: React.FC = () => {
         art or satire.
       </p>
       <p>
-        This version of Office Buddies can run a Large Language Model (LLM) locally, so
-        that you can chat with it offline.
+        This version of Office Buddies can run a Large Language Model (LLM)
+        locally, so that you can chat with it offline.
       </p>
       <p>
         It supports a variety of models, including Google's Gemma3, Meta's
@@ -69,4 +69,3 @@ export const WelcomeMessageContent: React.FC = () => {
     </div>
   );
 };
-

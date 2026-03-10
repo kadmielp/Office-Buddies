@@ -15,6 +15,8 @@ import { DebugState } from "../debugState";
 import { BubbleView } from "./contexts/BubbleViewContext";
 
 const clippyApi: ClippyApi = {
+  captureAssistantScreenshot: () =>
+    ipcRenderer.invoke(IpcMessages.CAPTURE_ASSISTANT_SCREENSHOT),
   // Window
   toggleChatWindow: () => ipcRenderer.invoke(IpcMessages.TOGGLE_CHAT_WINDOW),
   minimizeChatWindow: () =>
@@ -129,8 +131,9 @@ const clippyApi: ClippyApi = {
   offProactiveSpeech: () => {
     ipcRenderer.removeAllListeners(IpcMessages.PROACTIVE_MESSAGE);
   },
-  fetchRemoteProviderModels: (provider: "openai" | "gemini" | "maritaca" | "openclaw") =>
-    ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
+  fetchRemoteProviderModels: (
+    provider: "openai" | "gemini" | "maritaca" | "openclaw",
+  ) => ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
   promptRemoteProvider: (payload: {
     provider: "openai" | "gemini" | "maritaca" | "openclaw";
     systemPrompt: string;
@@ -143,7 +146,8 @@ const clippyApi: ClippyApi = {
     if (payload.requestUUID && payload.onChunk) {
       // Streaming mode
       const { requestUUID } = payload;
-      const chunkListener = (_event: any, data: { chunk: string }) => payload.onChunk!(data.chunk);
+      const chunkListener = (_event: any, data: { chunk: string }) =>
+        payload.onChunk!(data.chunk);
       const doneListener = () => {
         cleanup();
         payload.onDone?.();
@@ -154,9 +158,18 @@ const clippyApi: ClippyApi = {
       };
 
       const cleanup = () => {
-        ipcRenderer.removeListener(`clippy_ai_prompt_chunk_${requestUUID}`, chunkListener);
-        ipcRenderer.removeListener(`clippy_ai_prompt_done_${requestUUID}`, doneListener);
-        ipcRenderer.removeListener(`clippy_ai_prompt_error_${requestUUID}`, errorListener);
+        ipcRenderer.removeListener(
+          `clippy_ai_prompt_chunk_${requestUUID}`,
+          chunkListener,
+        );
+        ipcRenderer.removeListener(
+          `clippy_ai_prompt_done_${requestUUID}`,
+          doneListener,
+        );
+        ipcRenderer.removeListener(
+          `clippy_ai_prompt_error_${requestUUID}`,
+          errorListener,
+        );
       };
 
       ipcRenderer.on(`clippy_ai_prompt_chunk_${requestUUID}`, chunkListener);
@@ -186,9 +199,8 @@ const clippyApi: ClippyApi = {
   sendProactiveAction: (messageId: string, action: string) =>
     ipcRenderer.invoke(IpcMessages.PROACTIVE_ACTION_CLICK, messageId, action),
   onProactiveMessage: (callback: (payload: any) => void) => {
-    ipcRenderer.on(
-      IpcMessages.PROACTIVE_MESSAGE,
-      (_event, payload: any) => callback(payload),
+    ipcRenderer.on(IpcMessages.PROACTIVE_MESSAGE, (_event, payload: any) =>
+      callback(payload),
     );
   },
   offProactiveMessage: () => {

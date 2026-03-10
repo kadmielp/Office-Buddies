@@ -26,9 +26,9 @@ export const SettingsAbout: React.FC = () => {
       <fieldset>
         <legend>Version</legend>
         <p>
-          Office Buddies <code>{versions.clippy || "Unknown"}</code> (with Electron{" "}
-          <code>{versions.electron || "Unknown"}</code> and Node-llama-cpp:{" "}
-          <code>{versions.nodeLlamaCpp || "Unknown"})</code>
+          Office Buddies <code>{versions.clippy || "Unknown"}</code> (with
+          Electron <code>{versions.electron || "Unknown"}</code> and
+          Node-llama-cpp: <code>{versions.nodeLlamaCpp || "Unknown"})</code>
         </p>
       </fieldset>
       <p>
@@ -48,9 +48,9 @@ export const SettingsAbout: React.FC = () => {
         <a href="https://github.com/felixrieseberg" target="_blank">
           Felix Rieseberg
         </a>
-        , and has since grown into a broader assistant-focused app with
-        multiple characters, richer animations, and multi-provider AI support.
-        Local inference is powered by{" "}
+        , and has since grown into a broader assistant-focused app with multiple
+        characters, richer animations, and multi-provider AI support. Local
+        inference is powered by{" "}
         <a href="https://electronjs.org/" target="_blank">
           Electron
         </a>
@@ -74,12 +74,12 @@ export const SettingsAbout: React.FC = () => {
         <a href="https://github.com/pi0" target="_blank">
           Pooya Parsa
         </a>{" "}
-        and contributors helped keep these characters available. GGUF models
-        are available from creators such as{" "}
+        and contributors helped keep these characters available. GGUF models are
+        available from creators such as{" "}
         <a href="https://www.unsloth.ai" target="_blank">
           Unsloth
-        </a>
-        {" "}and{" "}
+        </a>{" "}
+        and{" "}
         <a href="https://huggingface.co/thebloke" target="_blank">
           TheBloke
         </a>
@@ -94,8 +94,8 @@ export const SettingsAbout: React.FC = () => {
         Assistants.
       </p>
       <p>
-        Clippy and all visual assets related to Office Assistants are owned by Microsoft.
-        This app is not affiliated with Microsoft.
+        Clippy and all visual assets related to Office Assistants are owned by
+        Microsoft. This app is not affiliated with Microsoft.
       </p>
     </div>
   );

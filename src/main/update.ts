@@ -109,7 +109,8 @@ export async function checkForUpdates() {
  * @returns {Promise<string>} The version comparison string
  */
 export async function getVersionComparisonString() {
-  const latestVersionTagName = await getLatestVersionFromGitHub(getUpdateRepo());
+  const latestVersionTagName =
+    await getLatestVersionFromGitHub(getUpdateRepo());
   const latestVersionString = latestVersionTagName
     ? `  The latest published version is ${latestVersionTagName}.`
     : "";
@@ -126,7 +127,9 @@ export async function getLatestVersionFromGitHub(
   repo: string,
 ): Promise<string | null> {
   try {
-    const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+    const response = await fetch(
+      `https://api.github.com/repos/${repo}/releases/latest`,
+    );
     const data = await response.json();
     return data.tag_name;
   } catch (error) {
@@ -152,7 +155,10 @@ function getUpdateRepo(): string {
       return parsedRepo;
     }
   } catch (error) {
-    getLogger().warn("Failed to determine update repository from package.json", error);
+    getLogger().warn(
+      "Failed to determine update repository from package.json",
+      error,
+    );
   }
 
   return DEFAULT_UPDATE_REPO;

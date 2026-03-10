@@ -112,9 +112,9 @@ export const SettingsAdvanced: React.FC = () => {
       <fieldset>
         <legend>Configuration</legend>
         <p>
-          Office Buddies keeps its configuration in JSON files.
-          Click these buttons to open them in your default JSON editor.
-          Restart Office Buddies to apply the changes.
+          Office Buddies keeps its configuration in JSON files. Click these
+          buttons to open them in your default JSON editor. Restart Office
+          Buddies to apply the changes.
         </p>
         <button onClick={clippyApi.openStateInEditor}>
           Open Configuration File
@@ -134,9 +134,7 @@ export const SettingsAdvanced: React.FC = () => {
           }}
         >
           <div style={{ flex: 1 }}>
-            <p>
-              This will delete all models. This action is not reversible.
-            </p>
+            <p>This will delete all models. This action is not reversible.</p>
             <button
               onClick={() => void handleDeleteAllModels()}
               disabled={!hasDownloadedLocalModels}
@@ -146,7 +144,9 @@ export const SettingsAdvanced: React.FC = () => {
           </div>
           <img
             src={
-              hasDownloadedLocalModels ? recycleBinFullIcon : recycleBinEmptyIcon
+              hasDownloadedLocalModels
+                ? recycleBinFullIcon
+                : recycleBinEmptyIcon
             }
             alt=""
             aria-hidden="true"

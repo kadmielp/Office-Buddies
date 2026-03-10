@@ -35,13 +35,13 @@ Sends a message to the assistant's speech balloon on the desktop.
 #### Parameters
 
 - `message` (string, required): The text to display in the balloon.
-- `animation` (string, optional): The animation for the assistant to play (e.g., `Wave`, `Thinking`, `GetAttention`, `CheckingSomething`). 
-    - *Note:* Defaults to `GetAttention` if not provided. Animations loop by default until the user interacts with the balloon.
+- `animation` (string, optional): The animation for the assistant to play (e.g., `Wave`, `Thinking`, `GetAttention`, `CheckingSomething`).
+  - _Note:_ Defaults to `GetAttention` if not provided. Animations loop by default until the user interacts with the balloon.
 - `loop` (boolean, optional): Defaults to `true`. Set to `false` if you want the animation to play only once.
 - `actions` (array, optional): A list of up to 3 interactive buttons.
-    - `label` (string): The text visible on the button.
-    - `action` (string): A unique ID string. When clicked, the agent will receive an inbound message with `[Office Buddies Action]: <action_id>`.
-    - *Note:* An "Open in chat" button is automatically appended to every message.
+  - `label` (string): The text visible on the button.
+  - `action` (string): A unique ID string. When clicked, the agent will receive an inbound message with `[Office Buddies Action]: <action_id>`.
+  - _Note:_ An "Open in chat" button is automatically appended to every message.
 
 #### Usage Example
 
@@ -58,7 +58,7 @@ Sends a message to the assistant's speech balloon on the desktop.
 
 ## Implementation Note
 
-The agent performs a POST request to `http://<USER_IP>:5050/notify`. 
+The agent performs a POST request to `http://<USER_IP>:5050/notify`.
 User responses to buttons are delivered back to the agent as standard user messages with the prefix `[Office Buddies Action]:`.
 
 ## Security

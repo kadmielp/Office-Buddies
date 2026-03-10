@@ -48,7 +48,7 @@ export function startProactiveServer() {
               actions,
               loop,
             });
-            
+
             // Show window if hidden
             if (!mainWindow.isVisible()) {
               mainWindow.show();

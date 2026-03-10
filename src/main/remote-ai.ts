@@ -29,22 +29,78 @@ function resolveRemoteMaxTokens(settings: SettingsState): number {
   );
 }
 
-function toChatHistoryMessages(history: MessageRecord[]) {
+function toChatHistoryMessages(
+  history: MessageRecord[],
+  options?: { includeImages?: boolean },
+) {
   return history
-    .filter((msg) => !!msg.content)
-    .map((msg) => ({
-      role: msg.sender === "clippy" ? "assistant" : "user",
-      content: msg.content || "",
-    }));
+    .filter((msg) => !!msg.content || (msg.imageDataUrls?.length || 0) > 0)
+    .map((msg) => {
+      const role = msg.sender === "clippy" ? "assistant" : "user";
+      const imageDataUrls = msg.imageDataUrls || [];
+
+      if (
+        options?.includeImages &&
+        role === "user" &&
+        imageDataUrls.length > 0
+      ) {
+        return {
+          role,
+          content: [
+            ...(msg.content ? [{ type: "text", text: msg.content || "" }] : []),
+            ...imageDataUrls.map((dataUrl) => ({
+              type: "image_url",
+              image_url: { url: dataUrl },
+            })),
+          ],
+        };
+      }
+
+      return {
+        role,
+        content: msg.content || "",
+      };
+    });
 }
 
 function toGeminiHistory(history: MessageRecord[]) {
   return history
-    .filter((msg) => !!msg.content)
-    .map((msg) => ({
-      role: msg.sender === "clippy" ? "model" : "user",
-      parts: [{ text: msg.content || "" }],
-    }));
+    .filter((msg) => !!msg.content || (msg.imageDataUrls?.length || 0) > 0)
+    .map((msg) => {
+      const imageDataUrls = msg.imageDataUrls || [];
+      const parts: Array<Record<string, unknown>> = [];
+
+      if (msg.content) {
+        parts.push({ text: msg.content || "" });
+      }
+
+      if (msg.sender !== "clippy") {
+        for (const dataUrl of imageDataUrls) {
+          const inlineData = parseDataUrlForGemini(dataUrl);
+          if (inlineData) {
+            parts.push({ inlineData });
+          }
+        }
+      }
+
+      return {
+        role: msg.sender === "clippy" ? "model" : "user",
+        parts,
+      };
+    });
+}
+
+function parseDataUrlForGemini(dataUrl: string) {
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    mimeType: match[1],
+    data: match[2],
+  };
 }
 
 function getGeminiText(payload: any): string {
@@ -99,7 +155,9 @@ async function fetchJson(url: string, headers?: Record<string, string>) {
   try {
     return JSON.parse(rawText);
   } catch (err) {
-    throw new Error(`Failed to parse JSON response from ${url}. Raw response: ${rawText.slice(0, 500)}`);
+    throw new Error(
+      `Failed to parse JSON response from ${url}. Raw response: ${rawText.slice(0, 500)}`,
+    );
   }
 }
 
@@ -111,6 +169,7 @@ async function promptOpenAiCompatible(args: {
   maxTokens: number;
   systemPrompt: string;
   history: MessageRecord[];
+  includeImages?: boolean;
 }) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -124,7 +183,9 @@ async function promptOpenAiCompatible(args: {
     model: args.model,
     messages: [
       { role: "system", content: args.systemPrompt },
-      ...toChatHistoryMessages(args.history),
+      ...toChatHistoryMessages(args.history, {
+        includeImages: args.includeImages,
+      }),
     ],
     temperature: args.temperature,
     max_tokens: args.maxTokens,
@@ -231,6 +292,7 @@ async function* streamOpenAiCompatible(args: {
   maxTokens: number;
   systemPrompt: string;
   history: MessageRecord[];
+  includeImages?: boolean;
 }): AsyncGenerator<string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -244,7 +306,9 @@ async function* streamOpenAiCompatible(args: {
     model: args.model,
     messages: [
       { role: "system", content: args.systemPrompt },
-      ...toChatHistoryMessages(args.history),
+      ...toChatHistoryMessages(args.history, {
+        includeImages: args.includeImages,
+      }),
     ],
     temperature: args.temperature,
     max_tokens: args.maxTokens,
@@ -317,6 +381,7 @@ export async function* promptStreamingRemoteProvider(args: {
       maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
       history: args.history,
+      includeImages: true,
     });
     return;
   }
@@ -343,6 +408,7 @@ export async function* promptStreamingRemoteProvider(args: {
       maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
       history: args.history,
+      includeImages: true,
     });
     return;
   }
@@ -367,6 +433,7 @@ export async function promptRemoteProvider(args: {
       maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
       history: args.history,
+      includeImages: true,
     });
   }
 
@@ -375,7 +442,10 @@ export async function promptRemoteProvider(args: {
       throw new Error("OpenClaw endpoint is missing.");
     }
 
-    let baseUrl = ensureProtocol(args.settings.openclawEndpoint).replace(/\/+$/, "");
+    let baseUrl = ensureProtocol(args.settings.openclawEndpoint).replace(
+      /\/+$/,
+      "",
+    );
     if (!baseUrl.endsWith("/v1")) {
       baseUrl += "/v1";
     }
@@ -389,6 +459,7 @@ export async function promptRemoteProvider(args: {
       maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
       history: args.history,
+      includeImages: true,
     });
   }
 

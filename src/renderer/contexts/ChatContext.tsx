@@ -93,94 +93,97 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     [currentChatRecord, messages],
   );
 
-  const startNewChat = useCallback(async (force = false) => {
-    setStatus("thinking");
-    setIsStartingNewChat(true);
+  const startNewChat = useCallback(
+    async (force = false) => {
+      setStatus("thinking");
+      setIsStartingNewChat(true);
 
-    const resetModelSession = async () => {
-      if (debug?.simulateDownload) {
-        return;
-      }
-      const readiness = getProviderReadiness(settings, models);
+      const resetModelSession = async () => {
+        if (debug?.simulateDownload) {
+          return;
+        }
+        const readiness = getProviderReadiness(settings, models);
 
-      if (!readiness.ready) {
+        if (!readiness.ready) {
+          setIsModelLoaded(false);
+          return;
+        }
+
+        try {
+          await destroyProviderSession(settings);
+        } catch (error) {
+          console.error(error);
+        }
+
         setIsModelLoaded(false);
-        return;
-      }
 
-      try {
-        await destroyProviderSession(settings);
-      } catch (error) {
-        console.error(error);
-      }
+        const options: LanguageModelCreateOptions = {
+          modelAlias: settings.selectedModel,
+          systemPrompt: getSystemPrompt(),
+          topK: settings.topK,
+          temperature: settings.temperature,
+          initialPrompts: [],
+        };
 
-      setIsModelLoaded(false);
-
-      const options: LanguageModelCreateOptions = {
-        modelAlias: settings.selectedModel,
-        systemPrompt: getSystemPrompt(),
-        topK: settings.topK,
-        temperature: settings.temperature,
-        initialPrompts: [],
+        try {
+          await createProviderSession(settings, options);
+          setIsModelLoaded(true);
+        } catch (error) {
+          console.error(error);
+        }
       };
 
+      // No need if there are no messages, we'll just keep the current chat
+      // and update the timestamps
       try {
-        await createProviderSession(settings, options);
-        setIsModelLoaded(true);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+        if (messages.length === 0 && !force) {
+          setCurrentChatRecord({
+            ...currentChatRecord,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          });
 
-    // No need if there are no messages, we'll just keep the current chat
-    // and update the timestamps
-    try {
-      if (messages.length === 0 && !force) {
-        setCurrentChatRecord({
-          ...currentChatRecord,
+          await resetModelSession();
+          return;
+        }
+
+        const newChatRecord = {
+          id: crypto.randomUUID(),
           createdAt: Date.now(),
           updatedAt: Date.now(),
-        });
+          preview: "",
+        };
 
+        setCurrentChatRecord(newChatRecord);
+        setChatRecords((prevChatRecords) => ({
+          ...prevChatRecords,
+          [newChatRecord.id]: newChatRecord,
+        }));
+        setMessages([]);
         await resetModelSession();
-        return;
+      } finally {
+        setIsStartingNewChat(false);
+        setStatus("idle");
       }
-
-      const newChatRecord = {
-        id: crypto.randomUUID(),
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        preview: "",
-      };
-
-      setCurrentChatRecord(newChatRecord);
-      setChatRecords((prevChatRecords) => ({
-        ...prevChatRecords,
-        [newChatRecord.id]: newChatRecord,
-      }));
-      setMessages([]);
-      await resetModelSession();
-    } finally {
-      setIsStartingNewChat(false);
-      setStatus("idle");
-    }
-  }, [
-    currentChatRecord,
-    debug?.simulateDownload,
-    messages,
-    settings.temperature,
-    settings.topK,
-    settings.selectedModel,
-    settings.aiProvider,
-    settings.remoteModel,
-    settings.openAiApiKey,
-    settings.geminiApiKey,
-    settings.maritacaApiKey,
-    models,
-    getSystemPrompt,
-    setIsStartingNewChat,
-    setStatus,
-  ]);
+    },
+    [
+      currentChatRecord,
+      debug?.simulateDownload,
+      messages,
+      settings.temperature,
+      settings.topK,
+      settings.selectedModel,
+      settings.aiProvider,
+      settings.remoteModel,
+      settings.openAiApiKey,
+      settings.geminiApiKey,
+      settings.maritacaApiKey,
+      models,
+      getSystemPrompt,
+      setIsStartingNewChat,
+      setStatus,
+    ],
+  );
 
   const loadModel = useCallback(
     async (initialPrompts: LanguageModelPrompt[] = []) => {
@@ -474,6 +477,7 @@ function messageRecordFromMessage(message: Message): MessageRecord {
   return {
     id: message.id,
     content: message.content,
+    imageDataUrls: message.imageDataUrls,
     sender: message.sender,
     createdAt: message.createdAt,
     actions: message.actions,

@@ -39,11 +39,21 @@
                   <canvas id="animationPreviewCanvas"></canvas>
                 </div>
                 <div class="field-row preview-controls">
-                  <button id="toggleAnimationPlayBtn" type="button">Play</button>
-                  <button id="togglePreviewSoundBtn" type="button" title="Preview sound off">Sound: Off</button>
+                  <button id="toggleAnimationPlayBtn" type="button">
+                    Play
+                  </button>
+                  <button
+                    id="togglePreviewSoundBtn"
+                    type="button"
+                    title="Preview sound off"
+                  >
+                    Sound: Off
+                  </button>
                   <span id="previewFrameText">Frame: -</span>
                 </div>
-                <div class="field-row branch-selector branch-selector-under-preview">
+                <div
+                  class="field-row branch-selector branch-selector-under-preview"
+                >
                   <button id="prevBranchBtn" type="button">&lt;</button>
                   <span id="branchPositionText">Branch 1/1</span>
                   <button id="nextBranchBtn" type="button">&gt;</button>
@@ -65,7 +75,9 @@
               <button id="zoomInBtn" type="button">+</button>
               <span id="zoomLabel">100%</span>
               <span class="map-zoom-spacer"></span>
-              <button id="sequenceCaptureBtn" type="button">Seq Add: Off</button>
+              <button id="sequenceCaptureBtn" type="button">
+                Seq Add: Off
+              </button>
             </div>
             <div class="canvas-wrap sunken-panel">
               <canvas id="mapCanvas"></canvas>
@@ -79,11 +91,28 @@
 
           <section class="right-panel">
             <menu role="tablist" aria-label="Editor Tabs">
-              <button id="framesTabBtn" role="tab" aria-selected="true" aria-controls="framesTabContent">Frames</button>
-              <button id="soundsTabBtn" role="tab" aria-selected="false" aria-controls="soundsTabContent">Sound Library</button>
+              <button
+                id="framesTabBtn"
+                role="tab"
+                aria-selected="true"
+                aria-controls="framesTabContent"
+              >
+                Frames
+              </button>
+              <button
+                id="soundsTabBtn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="soundsTabContent"
+              >
+                Sound Library
+              </button>
             </menu>
 
-            <fieldset id="framesTabContent" class="frames-panel tab-content active-tab">
+            <fieldset
+              id="framesTabContent"
+              class="frames-panel tab-content active-tab"
+            >
               <legend>Frames</legend>
               <div class="frames-grid">
                 <div class="frame-list-column">
@@ -103,12 +132,25 @@
                   <input id="exitBranchInput" type="number" min="0" step="1" />
 
                   <label for="branchFrameIndexInput">Branch Frame Index</label>
-                  <input id="branchFrameIndexInput" type="number" min="0" step="1" />
+                  <input
+                    id="branchFrameIndexInput"
+                    type="number"
+                    min="0"
+                    step="1"
+                  />
 
                   <label for="weightInput">Weight (%)</label>
-                  <input id="weightInput" type="number" min="0" max="100" step="1" />
+                  <input
+                    id="weightInput"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                  />
 
-                  <label for="imagesInput">Images (x,y pairs, one per line)</label>
+                  <label for="imagesInput"
+                    >Images (x,y pairs, one per line)</label
+                  >
                   <textarea id="imagesInput" rows="6"></textarea>
 
                   <div class="field-row wrap">
@@ -127,8 +169,13 @@
 
             <fieldset id="soundsTabContent" class="sound-browser tab-content">
               <legend>Sound Library</legend>
-              <label for="soundButtonGrid">Detected sounds for current assistant</label>
-              <div id="soundButtonGrid" class="sound-button-grid sunken-panel"></div>
+              <label for="soundButtonGrid"
+                >Detected sounds for current assistant</label
+              >
+              <div
+                id="soundButtonGrid"
+                class="sound-button-grid sunken-panel"
+              ></div>
               <div class="field-row wrap">
                 <button id="stopLibrarySoundBtn">Stop</button>
                 <button id="useLibrarySoundBtn">Use In Frame</button>

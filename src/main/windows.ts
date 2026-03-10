@@ -27,7 +27,8 @@ function setWindowAlwaysOnTop(
   }
 
   const shouldStayOnTop = Boolean(enabled);
-  const alwaysOnTopLevel = process.platform === "win32" ? "screen-saver" : "normal";
+  const alwaysOnTopLevel =
+    process.platform === "win32" ? "screen-saver" : "normal";
   window.setAlwaysOnTop(shouldStayOnTop, alwaysOnTopLevel);
 
   if (shouldStayOnTop) {

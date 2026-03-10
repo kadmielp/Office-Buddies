@@ -110,8 +110,8 @@ Example:
 branching: {
   branches: [
     { frameIndex: 19, weight: 40 },
-    { frameIndex: 25, weight: 60 }
-  ]
+    { frameIndex: 25, weight: 60 },
+  ];
 }
 ```
 
@@ -128,7 +128,7 @@ Meaning:
 Example:
 
 ```js
-exitBranch: 34
+exitBranch: 34;
 ```
 
 Meaning:

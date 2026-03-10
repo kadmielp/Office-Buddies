@@ -15,6 +15,11 @@ import type { BubbleView } from "./contexts/BubbleViewContext";
 import { Data } from "electron";
 
 export type ClippyApi = {
+  captureAssistantScreenshot: () => Promise<{
+    dataUrl: string;
+    width: number;
+    height: number;
+  } | null>;
   // Window
   toggleChatWindow: () => Promise<void>;
   minimizeChatWindow: () => Promise<void>;

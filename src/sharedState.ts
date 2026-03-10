@@ -6,7 +6,12 @@ export type DefaultFont =
   | "Tahoma"
   | "System Default";
 export type DefaultFontSize = number;
-export type AiProvider = "local" | "openai" | "gemini" | "maritaca" | "openclaw";
+export type AiProvider =
+  | "local"
+  | "openai"
+  | "gemini"
+  | "maritaca"
+  | "openclaw";
 
 export interface SettingsState {
   aiProvider?: AiProvider;

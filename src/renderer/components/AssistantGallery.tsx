@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AgentAnimation, AgentFrame, AVAILABLE_AGENTS, getAgentPack } from "../agent-packs";
+import {
+  AgentAnimation,
+  AgentFrame,
+  AVAILABLE_AGENTS,
+  getAgentPack,
+} from "../agent-packs";
 import { clippyApi } from "../clippyApi";
 import { useSharedState } from "../contexts/SharedStateContext";
 import { useBubbleView } from "../contexts/BubbleViewContext";
@@ -101,7 +106,10 @@ function getNextFrameIndex(
   const branches = frame.branching?.branches ?? [];
 
   if (branches.length > 0) {
-    const totalWeight = branches.reduce((sum, branch) => sum + branch.weight, 0);
+    const totalWeight = branches.reduce(
+      (sum, branch) => sum + branch.weight,
+      0,
+    );
     const random = Math.random() * totalWeight;
     let cumulative = 0;
 
@@ -121,7 +129,9 @@ function getNextFrameIndex(
   return currentIndex + 1;
 }
 
-function pickPreviewAnimationKey(animations: Record<string, AgentAnimation>): string {
+function pickPreviewAnimationKey(
+  animations: Record<string, AgentAnimation>,
+): string {
   const candidates = ["GetAttention", "Greeting", "Show", "Default"];
   return candidates.find((key) => animations[key]) || "Default";
 }
@@ -139,7 +149,8 @@ function AssistantPreview({
   useEffect(() => {
     const pack = getAgentPack(agentName);
     const previewAnimationKey = pickPreviewAnimationKey(pack.animations);
-    const animation = pack.animations[previewAnimationKey] || pack.animations.Default;
+    const animation =
+      pack.animations[previewAnimationKey] || pack.animations.Default;
     const canvas = canvasRef.current;
 
     if (!canvas || !animation || animation.frames.length === 0) {
@@ -213,7 +224,10 @@ function AssistantPreview({
     };
 
     let stepCount = 0;
-    const maxSteps = Math.max(animation.frames.length * 4, animation.frames.length + 1);
+    const maxSteps = Math.max(
+      animation.frames.length * 4,
+      animation.frames.length + 1,
+    );
 
     const tick = (frameIndex: number) => {
       if (isDisposed) {
@@ -241,7 +255,10 @@ function AssistantPreview({
         return;
       }
 
-      timeoutRef.current = window.setTimeout(() => tick(nextFrameIndex), frameTimeout);
+      timeoutRef.current = window.setTimeout(
+        () => tick(nextFrameIndex),
+        frameTimeout,
+      );
     };
 
     image.onload = () => {
@@ -400,11 +417,20 @@ export function AssistantGallery() {
         </div>
       </fieldset>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "18px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginTop: "18px",
+        }}
+      >
         <button onClick={onOk} style={{ minWidth: "70px" }}>
           OK
         </button>
-        <button onClick={onCancel} style={{ minWidth: "70px", marginLeft: "8px" }}>
+        <button
+          onClick={onCancel}
+          style={{ minWidth: "70px", marginLeft: "8px" }}
+        >
           Cancel
         </button>
       </div>

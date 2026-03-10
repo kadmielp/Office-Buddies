@@ -1,4 +1,4 @@
-import { clipboard, Data, ipcMain } from "electron";
+import { clipboard, Data, desktopCapturer, ipcMain, screen } from "electron";
 import {
   getMainWindow,
   toggleChatWindow,
@@ -16,7 +16,11 @@ import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
 import { getClippyDebugInfo } from "./debug-clippy";
 import { getDebugManager } from "./debug";
-import { fetchRemoteProviderModels, promptRemoteProvider, promptStreamingRemoteProvider } from "./remote-ai";
+import {
+  fetchRemoteProviderModels,
+  promptRemoteProvider,
+  promptStreamingRemoteProvider,
+} from "./remote-ai";
 import { runBuddyAction } from "./buddy-actions";
 import { BuddyAction } from "../types/interfaces";
 
@@ -38,6 +42,37 @@ export function setupIpcListeners() {
     (_, action: BuddyAction, selectionText: string) =>
       runBuddyAction(action, selectionText),
   );
+  ipcMain.handle(IpcMessages.CAPTURE_ASSISTANT_SCREENSHOT, async () => {
+    const mainWindow = getMainWindow();
+
+    if (!mainWindow) {
+      return null;
+    }
+
+    const display = screen.getDisplayMatching(mainWindow.getBounds());
+    const sources = await desktopCapturer.getSources({
+      types: ["screen"],
+      thumbnailSize: {
+        width: Math.max(display.size.width, 1),
+        height: Math.max(display.size.height, 1),
+      },
+    });
+    const matchingSource =
+      sources.find((source) => source.display_id === String(display.id)) ||
+      sources[0];
+
+    if (!matchingSource || matchingSource.thumbnail.isEmpty()) {
+      return null;
+    }
+
+    const { width, height } = matchingSource.thumbnail.getSize();
+
+    return {
+      dataUrl: matchingSource.thumbnail.toDataURL(),
+      width,
+      height,
+    };
+  });
 
   // App
   ipcMain.handle(IpcMessages.APP_CHECK_FOR_UPDATES, () => checkForUpdates());
@@ -64,9 +99,8 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.STATE_UPDATE_MODEL_STATE, () =>
     getStateManager().updateModelState(),
   );
-  ipcMain.handle(
-    IpcMessages.STATE_GET_FULL,
-    () => getStateManager().getSharedStateForRenderer(),
+  ipcMain.handle(IpcMessages.STATE_GET_FULL, () =>
+    getStateManager().getSharedStateForRenderer(),
   );
   ipcMain.handle(IpcMessages.STATE_SET, (_, key: string, value: any) =>
     getStateManager().setStateValue(key, value),

@@ -62,8 +62,7 @@ async function triggerBuddyAction(action: BuddyAction) {
     sendBuddySpeech({
       action,
       selectedText: "",
-      speech:
-        "I couldn't read selected text. Select text and try again.",
+      speech: "I couldn't read selected text. Select text and try again.",
       isLoading: false,
     });
     return;

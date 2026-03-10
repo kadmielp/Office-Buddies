@@ -41,10 +41,7 @@ export function Message({ message }: { message: Message }) {
     >
       {isUser ? (
         <>
-          <div
-            className="message-content"
-            style={userMessageContentStyle}
-          >
+          <div className="message-content" style={userMessageContentStyle}>
             {message.children ? (
               message.children
             ) : (
@@ -82,10 +79,7 @@ export function Message({ message }: { message: Message }) {
               marginTop: "10px",
             }}
           />
-          <div
-            className="message-content"
-            style={assistantMessageContentStyle}
-          >
+          <div className="message-content" style={assistantMessageContentStyle}>
             {message.children ? (
               message.children
             ) : (

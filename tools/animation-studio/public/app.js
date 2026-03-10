@@ -10,10 +10,10 @@
   mapZoom: 1,
   soundCache: new Map(),
   currentAudio: null,
-  activeTab: 'frames',
+  activeTab: "frames",
   previewTimer: null,
   previewFrameIndex: 0,
-  selectedLibrarySoundId: '',
+  selectedLibrarySoundId: "",
   historyStack: [],
   previewSoundEnabled: false,
   previewPathChoice: 0,
@@ -21,62 +21,62 @@
 };
 
 const elements = {
-  agentSelect: document.getElementById('agentSelect'),
-  loadAgentBtn: document.getElementById('loadAgentBtn'),
-  saveBtn: document.getElementById('saveBtn'),
-  undoBtn: document.getElementById('undoBtn'),
-  statusText: document.getElementById('statusText'),
-  animationPreviewCanvas: document.getElementById('animationPreviewCanvas'),
-  toggleAnimationPlayBtn: document.getElementById('toggleAnimationPlayBtn'),
-  togglePreviewSoundBtn: document.getElementById('togglePreviewSoundBtn'),
-  previewFrameText: document.getElementById('previewFrameText'),
-  framesTabBtn: document.getElementById('framesTabBtn'),
-  soundsTabBtn: document.getElementById('soundsTabBtn'),
-  framesTabContent: document.getElementById('framesTabContent'),
-  soundsTabContent: document.getElementById('soundsTabContent'),
-  animationSearch: document.getElementById('animationSearch'),
-  animationList: document.getElementById('animationList'),
-  newAnimationBtn: document.getElementById('newAnimationBtn'),
-  renameAnimationBtn: document.getElementById('renameAnimationBtn'),
-  deleteAnimationBtn: document.getElementById('deleteAnimationBtn'),
-  mapMeta: document.getElementById('mapMeta'),
-  selectedCell: document.getElementById('selectedCell'),
-  zoomOutBtn: document.getElementById('zoomOutBtn'),
-  zoomResetBtn: document.getElementById('zoomResetBtn'),
-  zoomInBtn: document.getElementById('zoomInBtn'),
-  zoomLabel: document.getElementById('zoomLabel'),
-  sequenceCaptureBtn: document.getElementById('sequenceCaptureBtn'),
-  mapCanvas: document.getElementById('mapCanvas'),
-  appendFrameBtn: document.getElementById('appendFrameBtn'),
-  replaceImageBtn: document.getElementById('replaceImageBtn'),
-  previewSoundBtn: document.getElementById('previewSoundBtn'),
-  soundButtonGrid: document.getElementById('soundButtonGrid'),
-  stopLibrarySoundBtn: document.getElementById('stopLibrarySoundBtn'),
-  useLibrarySoundBtn: document.getElementById('useLibrarySoundBtn'),
-  selectedLibrarySoundText: document.getElementById('selectedLibrarySoundText'),
-  frameList: document.getElementById('frameList'),
-  durationInput: document.getElementById('durationInput'),
-  soundSelect: document.getElementById('soundSelect'),
-  playFrameSoundBtn: document.getElementById('playFrameSoundBtn'),
-  exitBranchInput: document.getElementById('exitBranchInput'),
-  prevBranchBtn: document.getElementById('prevBranchBtn'),
-  nextBranchBtn: document.getElementById('nextBranchBtn'),
-  branchPositionText: document.getElementById('branchPositionText'),
-  branchFrameIndexInput: document.getElementById('branchFrameIndexInput'),
-  weightInput: document.getElementById('weightInput'),
-  imagesInput: document.getElementById('imagesInput'),
-  addFrameBtn: document.getElementById('addFrameBtn'),
-  duplicateFrameBtn: document.getElementById('duplicateFrameBtn'),
-  removeFrameBtn: document.getElementById('removeFrameBtn'),
-  moveUpBtn: document.getElementById('moveUpBtn'),
-  moveDownBtn: document.getElementById('moveDownBtn'),
-  selectAllFramesBtn: document.getElementById('selectAllFramesBtn'),
-  invertFramesBtn: document.getElementById('invertFramesBtn'),
-  applyFrameBtn: document.getElementById('applyFrameBtn'),
+  agentSelect: document.getElementById("agentSelect"),
+  loadAgentBtn: document.getElementById("loadAgentBtn"),
+  saveBtn: document.getElementById("saveBtn"),
+  undoBtn: document.getElementById("undoBtn"),
+  statusText: document.getElementById("statusText"),
+  animationPreviewCanvas: document.getElementById("animationPreviewCanvas"),
+  toggleAnimationPlayBtn: document.getElementById("toggleAnimationPlayBtn"),
+  togglePreviewSoundBtn: document.getElementById("togglePreviewSoundBtn"),
+  previewFrameText: document.getElementById("previewFrameText"),
+  framesTabBtn: document.getElementById("framesTabBtn"),
+  soundsTabBtn: document.getElementById("soundsTabBtn"),
+  framesTabContent: document.getElementById("framesTabContent"),
+  soundsTabContent: document.getElementById("soundsTabContent"),
+  animationSearch: document.getElementById("animationSearch"),
+  animationList: document.getElementById("animationList"),
+  newAnimationBtn: document.getElementById("newAnimationBtn"),
+  renameAnimationBtn: document.getElementById("renameAnimationBtn"),
+  deleteAnimationBtn: document.getElementById("deleteAnimationBtn"),
+  mapMeta: document.getElementById("mapMeta"),
+  selectedCell: document.getElementById("selectedCell"),
+  zoomOutBtn: document.getElementById("zoomOutBtn"),
+  zoomResetBtn: document.getElementById("zoomResetBtn"),
+  zoomInBtn: document.getElementById("zoomInBtn"),
+  zoomLabel: document.getElementById("zoomLabel"),
+  sequenceCaptureBtn: document.getElementById("sequenceCaptureBtn"),
+  mapCanvas: document.getElementById("mapCanvas"),
+  appendFrameBtn: document.getElementById("appendFrameBtn"),
+  replaceImageBtn: document.getElementById("replaceImageBtn"),
+  previewSoundBtn: document.getElementById("previewSoundBtn"),
+  soundButtonGrid: document.getElementById("soundButtonGrid"),
+  stopLibrarySoundBtn: document.getElementById("stopLibrarySoundBtn"),
+  useLibrarySoundBtn: document.getElementById("useLibrarySoundBtn"),
+  selectedLibrarySoundText: document.getElementById("selectedLibrarySoundText"),
+  frameList: document.getElementById("frameList"),
+  durationInput: document.getElementById("durationInput"),
+  soundSelect: document.getElementById("soundSelect"),
+  playFrameSoundBtn: document.getElementById("playFrameSoundBtn"),
+  exitBranchInput: document.getElementById("exitBranchInput"),
+  prevBranchBtn: document.getElementById("prevBranchBtn"),
+  nextBranchBtn: document.getElementById("nextBranchBtn"),
+  branchPositionText: document.getElementById("branchPositionText"),
+  branchFrameIndexInput: document.getElementById("branchFrameIndexInput"),
+  weightInput: document.getElementById("weightInput"),
+  imagesInput: document.getElementById("imagesInput"),
+  addFrameBtn: document.getElementById("addFrameBtn"),
+  duplicateFrameBtn: document.getElementById("duplicateFrameBtn"),
+  removeFrameBtn: document.getElementById("removeFrameBtn"),
+  moveUpBtn: document.getElementById("moveUpBtn"),
+  moveDownBtn: document.getElementById("moveDownBtn"),
+  selectAllFramesBtn: document.getElementById("selectAllFramesBtn"),
+  invertFramesBtn: document.getElementById("invertFramesBtn"),
+  applyFrameBtn: document.getElementById("applyFrameBtn"),
 };
 
-const mapCtx = elements.mapCanvas.getContext('2d');
-const previewCtx = elements.animationPreviewCanvas.getContext('2d');
+const mapCtx = elements.mapCanvas.getContext("2d");
+const previewCtx = elements.animationPreviewCanvas.getContext("2d");
 
 function setStatus(text) {
   elements.statusText.textContent = text;
@@ -84,32 +84,46 @@ function setStatus(text) {
 
 function setEditorTab(tab) {
   state.activeTab = tab;
-  const showFrames = tab === 'frames';
+  const showFrames = tab === "frames";
 
-  elements.framesTabBtn.setAttribute('aria-selected', showFrames ? 'true' : 'false');
-  elements.soundsTabBtn.setAttribute('aria-selected', showFrames ? 'false' : 'true');
-  elements.framesTabContent.classList.toggle('active-tab', showFrames);
-  elements.soundsTabContent.classList.toggle('active-tab', !showFrames);
+  elements.framesTabBtn.setAttribute(
+    "aria-selected",
+    showFrames ? "true" : "false",
+  );
+  elements.soundsTabBtn.setAttribute(
+    "aria-selected",
+    showFrames ? "false" : "true",
+  );
+  elements.framesTabContent.classList.toggle("active-tab", showFrames);
+  elements.soundsTabContent.classList.toggle("active-tab", !showFrames);
 }
 
 function updatePreviewSoundToggle() {
   const enabled = state.previewSoundEnabled;
-  elements.togglePreviewSoundBtn.textContent = enabled ? 'Sound: On' : 'Sound: Off';
-  elements.togglePreviewSoundBtn.title = enabled ? 'Preview sound on' : 'Preview sound off';
+  elements.togglePreviewSoundBtn.textContent = enabled
+    ? "Sound: On"
+    : "Sound: Off";
+  elements.togglePreviewSoundBtn.title = enabled
+    ? "Preview sound on"
+    : "Preview sound off";
 }
 
 function updatePreviewPlayToggle() {
   const isPlaying = Boolean(state.previewTimer);
-  elements.toggleAnimationPlayBtn.textContent = isPlaying ? 'Stop' : 'Play';
-  elements.toggleAnimationPlayBtn.title = isPlaying ? 'Stop preview' : 'Play preview';
+  elements.toggleAnimationPlayBtn.textContent = isPlaying ? "Stop" : "Play";
+  elements.toggleAnimationPlayBtn.title = isPlaying
+    ? "Stop preview"
+    : "Play preview";
 }
 
 function updateSequenceCaptureToggle() {
   const enabled = state.sequenceCaptureEnabled;
-  elements.sequenceCaptureBtn.textContent = enabled ? 'Seq Add: On' : 'Seq Add: Off';
+  elements.sequenceCaptureBtn.textContent = enabled
+    ? "Seq Add: On"
+    : "Seq Add: Off";
   elements.sequenceCaptureBtn.title = enabled
-    ? 'Click map cells to append frames in order'
-    : 'Enable to append frames while clicking map cells';
+    ? "Click map cells to append frames in order"
+    : "Enable to append frames while clicking map cells";
 }
 
 async function fetchJson(endpoint, options) {
@@ -154,10 +168,14 @@ function getPreviewPathOptions(frameIndex) {
   const seen = new Set();
 
   const pushOption = (targetIndex, kind, branchIndex = null) => {
-    if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= frames.length) {
+    if (
+      !Number.isInteger(targetIndex) ||
+      targetIndex < 0 ||
+      targetIndex >= frames.length
+    ) {
       return;
     }
-    const key = `${kind}:${targetIndex}:${branchIndex ?? ''}`;
+    const key = `${kind}:${targetIndex}:${branchIndex ?? ""}`;
     if (seen.has(key)) {
       return;
     }
@@ -165,20 +183,22 @@ function getPreviewPathOptions(frameIndex) {
     options.push({ frameIndex: targetIndex, kind, branchIndex });
   };
 
-  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  const branches = Array.isArray(frame?.branching?.branches)
+    ? frame.branching.branches
+    : [];
   for (let i = 0; i < branches.length; i += 1) {
     const branch = branches[i];
     const target = Number(branch?.frameIndex);
     const weight = Number(branch?.weight);
     if (Number.isInteger(target) && Number.isFinite(weight) && weight > 0) {
-      pushOption(target, 'branch', i);
+      pushOption(target, "branch", i);
     }
   }
 
   if (Number.isInteger(frame.exitBranch)) {
-    pushOption(frame.exitBranch, 'exit');
+    pushOption(frame.exitBranch, "exit");
   } else if (frames.length > 0) {
-    pushOption((frameIndex + 1) % frames.length, 'next');
+    pushOption((frameIndex + 1) % frames.length, "next");
   }
 
   return options;
@@ -198,7 +218,9 @@ function getAnimationPathChoiceCount() {
 
 function getActiveEditableBranchIndex() {
   const frame = getCurrentFrames()[state.selectedFrameIndex];
-  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  const branches = Array.isArray(frame?.branching?.branches)
+    ? frame.branching.branches
+    : [];
   if (!branches.length) {
     return 0;
   }
@@ -207,8 +229,14 @@ function getActiveEditableBranchIndex() {
   const choice = Number(state.previewPathChoice);
   if (Number.isInteger(choice) && choice >= 0 && choice < options.length) {
     const selectedOption = options[choice];
-    if (selectedOption?.kind === 'branch' && Number.isInteger(selectedOption.branchIndex)) {
-      return Math.max(0, Math.min(selectedOption.branchIndex, branches.length - 1));
+    if (
+      selectedOption?.kind === "branch" &&
+      Number.isInteger(selectedOption.branchIndex)
+    ) {
+      return Math.max(
+        0,
+        Math.min(selectedOption.branchIndex, branches.length - 1),
+      );
     }
   }
 
@@ -227,8 +255,8 @@ function renderPreviewPathSelector() {
   elements.branchPositionText.textContent = `Branch ${choice + 1}/${count}`;
   elements.prevBranchBtn.disabled = count <= 1;
   elements.nextBranchBtn.disabled = count <= 1;
-  elements.prevBranchBtn.style.visibility = 'visible';
-  elements.nextBranchBtn.style.visibility = 'visible';
+  elements.prevBranchBtn.style.visibility = "visible";
+  elements.nextBranchBtn.style.visibility = "visible";
 }
 
 function getFrameImageCoordsList(frame) {
@@ -273,24 +301,37 @@ function renderAnimationPreview(frameIndex = 0) {
 
   const [fw, fh] = state.payload.frameSize;
   const frames = getCurrentFrames();
-  const bounded = Math.max(0, Math.min(frameIndex, Math.max(0, frames.length - 1)));
+  const bounded = Math.max(
+    0,
+    Math.min(frameIndex, Math.max(0, frames.length - 1)),
+  );
   state.previewFrameIndex = bounded;
 
   elements.animationPreviewCanvas.width = fw;
   elements.animationPreviewCanvas.height = fh;
   previewCtx.clearRect(0, 0, fw, fh);
-  previewCtx.fillStyle = '#1f1f1f';
+  previewCtx.fillStyle = "#1f1f1f";
   previewCtx.fillRect(0, 0, fw, fh);
 
   if (!frames.length || !state.mapImage) {
-    elements.previewFrameText.textContent = 'Frame: -';
+    elements.previewFrameText.textContent = "Frame: -";
     return;
   }
 
   const frame = frames[bounded];
   const coordsList = getFrameImageCoordsList(frame);
   for (const coords of coordsList) {
-    previewCtx.drawImage(state.mapImage, coords.x, coords.y, fw, fh, 0, 0, fw, fh);
+    previewCtx.drawImage(
+      state.mapImage,
+      coords.x,
+      coords.y,
+      fw,
+      fh,
+      0,
+      0,
+      fw,
+      fh,
+    );
   }
 
   elements.previewFrameText.textContent = `Frame: ${bounded}`;
@@ -300,7 +341,7 @@ function playAnimationPreview(options = {}) {
   const frames = getCurrentFrames();
   if (!frames.length) {
     stopAnimationPreview();
-    setStatus('No frames in this animation');
+    setStatus("No frames in this animation");
     return;
   }
 
@@ -323,19 +364,22 @@ function playAnimationPreview(options = {}) {
     }
 
     const frame = frames[currentIndex] || {};
-    const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+    const branches = Array.isArray(frame?.branching?.branches)
+      ? frame.branching.branches
+      : [];
     const weightedBranches = branches
       .map((branch) => ({
         frameIndex: Number(branch?.frameIndex),
         weight: Number(branch?.weight),
       }))
-      .filter((branch) => (
-        Number.isInteger(branch.frameIndex)
-        && branch.frameIndex >= 0
-        && branch.frameIndex < frames.length
-        && Number.isFinite(branch.weight)
-        && branch.weight > 0
-      ));
+      .filter(
+        (branch) =>
+          Number.isInteger(branch.frameIndex) &&
+          branch.frameIndex >= 0 &&
+          branch.frameIndex < frames.length &&
+          Number.isFinite(branch.weight) &&
+          branch.weight > 0,
+      );
 
     if (weightedBranches.length) {
       const roll = Math.random() * 100;
@@ -407,15 +451,27 @@ function restoreSnapshot(snapshot) {
   }
 
   const frames = getCurrentFrames();
-  state.selectedFrameIndex = Math.max(0, Math.min(snapshot.selectedFrameIndex, Math.max(0, frames.length - 1)));
+  state.selectedFrameIndex = Math.max(
+    0,
+    Math.min(snapshot.selectedFrameIndex, Math.max(0, frames.length - 1)),
+  );
   state.selectedFrameIndices = Array.isArray(snapshot.selectedFrameIndices)
-    ? snapshot.selectedFrameIndices.filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length)
+    ? snapshot.selectedFrameIndices.filter(
+        (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+      )
     : [];
-  if (!state.selectedFrameIndices.length && state.selectedFrameIndex >= 0 && frames.length > 0) {
+  if (
+    !state.selectedFrameIndices.length &&
+    state.selectedFrameIndex >= 0 &&
+    frames.length > 0
+  ) {
     state.selectedFrameIndices = [state.selectedFrameIndex];
   }
   state.selectedCell = snapshot.selectedCell;
-  state.previewFrameIndex = Math.max(0, Number(snapshot.previewFrameIndex) || 0);
+  state.previewFrameIndex = Math.max(
+    0,
+    Number(snapshot.previewFrameIndex) || 0,
+  );
   state.previewPathChoice = 0;
 
   renderAnimationList();
@@ -470,7 +526,7 @@ function drawMap() {
   mapCtx.clearRect(0, 0, width, height);
   mapCtx.drawImage(state.mapImage, 0, 0);
 
-  mapCtx.strokeStyle = 'rgba(255,255,255,0.23)';
+  mapCtx.strokeStyle = "rgba(255,255,255,0.23)";
   mapCtx.lineWidth = 1;
   for (let c = 0; c <= cols; c += 1) {
     const x = c * fw + 0.5;
@@ -490,14 +546,19 @@ function drawMap() {
   const selectedFrame = getCurrentFrames()[state.selectedFrameIndex];
   const selectedFrameCell = frameToCell(selectedFrame);
   if (selectedFrameCell) {
-    mapCtx.strokeStyle = '#00ff55';
+    mapCtx.strokeStyle = "#00ff55";
     mapCtx.lineWidth = 2;
-    mapCtx.strokeRect(selectedFrameCell.x + 1, selectedFrameCell.y + 1, fw - 2, fh - 2);
+    mapCtx.strokeRect(
+      selectedFrameCell.x + 1,
+      selectedFrameCell.y + 1,
+      fw - 2,
+      fh - 2,
+    );
   }
 
   if (state.selectedCell) {
     const cell = cellIndexToCoords(state.selectedCell);
-    mapCtx.strokeStyle = '#ffea00';
+    mapCtx.strokeStyle = "#ffea00";
     mapCtx.lineWidth = 2;
     mapCtx.strokeRect(cell.x + 1, cell.y + 1, fw - 2, fh - 2);
   }
@@ -512,8 +573,8 @@ function setMapZoom(value) {
 
 function renderMapMeta() {
   if (!state.payload) {
-    elements.mapMeta.textContent = '';
-    elements.selectedCell.textContent = '';
+    elements.mapMeta.textContent = "";
+    elements.selectedCell.textContent = "";
     return;
   }
 
@@ -522,7 +583,7 @@ function renderMapMeta() {
   elements.mapMeta.textContent = `Map ${map.width}x${map.height}, Grid ${map.cols}x${map.rows}, Frame ${fw}x${fh}`;
 
   if (state.selectedCell === null) {
-    elements.selectedCell.textContent = 'Selected: none';
+    elements.selectedCell.textContent = "Selected: none";
   } else {
     const c = cellIndexToCoords(state.selectedCell);
     elements.selectedCell.textContent = `Selected: #${c.index} (${c.x},${c.y})`;
@@ -535,14 +596,14 @@ function animationNames() {
 
 function renderAnimationList() {
   const list = elements.animationList;
-  list.innerHTML = '';
+  list.innerHTML = "";
   const query = elements.animationSearch.value.trim().toLowerCase();
 
   for (const name of animationNames()) {
     if (query && !name.toLowerCase().includes(query)) {
       continue;
     }
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = name;
     option.textContent = name;
     if (name === state.selectedAnimation) {
@@ -553,11 +614,11 @@ function renderAnimationList() {
 }
 
 function renderSoundOptions() {
-  elements.soundSelect.innerHTML = '';
+  elements.soundSelect.innerHTML = "";
 
-  const none = document.createElement('option');
-  none.value = '';
-  none.textContent = '(none)';
+  const none = document.createElement("option");
+  none.value = "";
+  none.textContent = "(none)";
   elements.soundSelect.appendChild(none);
 
   if (!state.payload) {
@@ -565,7 +626,7 @@ function renderSoundOptions() {
   }
 
   for (const sound of state.payload.sounds) {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = sound.id;
     option.textContent = sound.id;
     elements.soundSelect.appendChild(option);
@@ -573,23 +634,23 @@ function renderSoundOptions() {
 }
 
 function renderSoundLibrary() {
-  elements.soundButtonGrid.innerHTML = '';
-  state.selectedLibrarySoundId = '';
-  elements.selectedLibrarySoundText.textContent = 'Selected: (none)';
+  elements.soundButtonGrid.innerHTML = "";
+  state.selectedLibrarySoundId = "";
+  elements.selectedLibrarySoundText.textContent = "Selected: (none)";
   if (!state.payload) {
     return;
   }
 
   for (const sound of state.payload.sounds) {
-    const button = document.createElement('button');
-    button.type = 'button';
+    const button = document.createElement("button");
+    button.type = "button";
     button.dataset.soundId = sound.id;
     button.textContent = `${sound.id} >`;
-    button.addEventListener('click', async () => {
+    button.addEventListener("click", async () => {
       state.selectedLibrarySoundId = sound.id;
       elements.selectedLibrarySoundText.textContent = `Selected: ${sound.id}`;
-      for (const el of elements.soundButtonGrid.querySelectorAll('button')) {
-        el.classList.toggle('active', el === button);
+      for (const el of elements.soundButtonGrid.querySelectorAll("button")) {
+        el.classList.toggle("active", el === button);
       }
       try {
         await playSoundById(sound.id);
@@ -604,37 +665,52 @@ function renderSoundLibrary() {
 function describeFrame(frame, index) {
   const duration = Number(frame?.duration ?? 0);
   const imageCell = frameToCell(frame);
-  const sound = frame?.sound ? ` sound:${frame.sound}` : '';
-  const branch = Number.isInteger(frame?.exitBranch) ? ` ->${frame.exitBranch}` : '';
-  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  const sound = frame?.sound ? ` sound:${frame.sound}` : "";
+  const branch = Number.isInteger(frame?.exitBranch)
+    ? ` ->${frame.exitBranch}`
+    : "";
+  const branches = Array.isArray(frame?.branching?.branches)
+    ? frame.branching.branches
+    : [];
   const branchLabels = branches
     .map((item) => ({
       frameIndex: Number(item?.frameIndex),
       weight: Number(item?.weight),
     }))
-    .filter((item) => Number.isInteger(item.frameIndex) && item.frameIndex >= 0 && Number.isFinite(item.weight) && item.weight > 0)
+    .filter(
+      (item) =>
+        Number.isInteger(item.frameIndex) &&
+        item.frameIndex >= 0 &&
+        Number.isFinite(item.weight) &&
+        item.weight > 0,
+    )
     .map((item) => `${item.weight}@${item.frameIndex}`);
-  const weighted = branchLabels.length ? ` w:${branchLabels.join('|')}` : '';
-  const img = imageCell ? ` #${imageCell.index}` : ' n/a';
-  return `${index.toString().padStart(3, '0')} | ${duration}ms | ${img}${branch}${weighted}${sound}`;
+  const weighted = branchLabels.length ? ` w:${branchLabels.join("|")}` : "";
+  const img = imageCell ? ` #${imageCell.index}` : " n/a";
+  return `${index.toString().padStart(3, "0")} | ${duration}ms | ${img}${branch}${weighted}${sound}`;
 }
 
 function renderFrameList() {
   const list = elements.frameList;
-  list.innerHTML = '';
+  list.innerHTML = "";
 
   const frames = getCurrentFrames();
   if (state.selectedFrameIndex >= frames.length) {
     state.selectedFrameIndex = frames.length - 1;
   }
-  state.selectedFrameIndices = (state.selectedFrameIndices || [])
-    .filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length);
-  if (!state.selectedFrameIndices.length && state.selectedFrameIndex >= 0 && frames.length > 0) {
+  state.selectedFrameIndices = (state.selectedFrameIndices || []).filter(
+    (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+  );
+  if (
+    !state.selectedFrameIndices.length &&
+    state.selectedFrameIndex >= 0 &&
+    frames.length > 0
+  ) {
     state.selectedFrameIndices = [state.selectedFrameIndex];
   }
 
   frames.forEach((frame, index) => {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = String(index);
     option.textContent = describeFrame(frame, index);
     if (state.selectedFrameIndices.includes(index)) {
@@ -651,50 +727,60 @@ function renderFrameList() {
 
 function formatImages(images) {
   if (!Array.isArray(images)) {
-    return '';
+    return "";
   }
   return images
     .filter((image) => Array.isArray(image) && image.length >= 2)
     .map((image) => `${image[0]},${image[1]}`)
-    .join('\n');
+    .join("\n");
 }
 
 function renderFrameEditor() {
   const frame = getCurrentFrames()[state.selectedFrameIndex];
 
   if (!frame) {
-    elements.durationInput.value = '';
-    elements.soundSelect.value = '';
-    elements.exitBranchInput.value = '';
-    elements.branchFrameIndexInput.value = '';
-    elements.weightInput.value = '';
-    elements.imagesInput.value = '';
+    elements.durationInput.value = "";
+    elements.soundSelect.value = "";
+    elements.exitBranchInput.value = "";
+    elements.branchFrameIndexInput.value = "";
+    elements.weightInput.value = "";
+    elements.imagesInput.value = "";
     renderPreviewPathSelector();
     return;
   }
 
   elements.durationInput.value = Number(frame.duration ?? 0);
-  elements.soundSelect.value = frame.sound ? String(frame.sound) : '';
-  elements.exitBranchInput.value = Number.isInteger(frame.exitBranch) ? String(frame.exitBranch) : '';
-  const branches = Array.isArray(frame?.branching?.branches) ? frame.branching.branches : [];
+  elements.soundSelect.value = frame.sound ? String(frame.sound) : "";
+  elements.exitBranchInput.value = Number.isInteger(frame.exitBranch)
+    ? String(frame.exitBranch)
+    : "";
+  const branches = Array.isArray(frame?.branching?.branches)
+    ? frame.branching.branches
+    : [];
   const editableBranchIndex = getActiveEditableBranchIndex();
   const activeBranch = branches[editableBranchIndex] || null;
-  elements.branchFrameIndexInput.value = Number.isInteger(activeBranch?.frameIndex) ? String(activeBranch.frameIndex) : '';
-  elements.weightInput.value = Number.isFinite(Number(activeBranch?.weight)) ? String(Number(activeBranch.weight)) : '';
+  elements.branchFrameIndexInput.value = Number.isInteger(
+    activeBranch?.frameIndex,
+  )
+    ? String(activeBranch.frameIndex)
+    : "";
+  elements.weightInput.value = Number.isFinite(Number(activeBranch?.weight))
+    ? String(Number(activeBranch.weight))
+    : "";
   elements.imagesInput.value = formatImages(frame.images);
   renderPreviewPathSelector();
 }
 
 function parseImages(text) {
   const lines = text
-    .split('\n')
+    .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
 
   const images = [];
   for (const line of lines) {
-    const normalized = line.replace(/\s+/g, '');
-    const [xRaw, yRaw] = normalized.split(',');
+    const normalized = line.replace(/\s+/g, "");
+    const [xRaw, yRaw] = normalized.split(",");
     const x = Number(xRaw);
     const y = Number(yRaw);
     if (!Number.isFinite(x) || !Number.isFinite(y)) {
@@ -712,9 +798,9 @@ function applyFrameEditor() {
     return;
   }
 
-  const duration = Number(elements.durationInput.value || '0');
+  const duration = Number(elements.durationInput.value || "0");
   if (!Number.isFinite(duration) || duration < 0) {
-    throw new Error('Duration must be 0 or higher');
+    throw new Error("Duration must be 0 or higher");
   }
 
   frame.duration = duration;
@@ -730,7 +816,7 @@ function applyFrameEditor() {
   if (exitBranchRaw) {
     const exitBranch = Number(exitBranchRaw);
     if (!Number.isInteger(exitBranch) || exitBranch < 0) {
-      throw new Error('Exit Branch must be a whole number >= 0');
+      throw new Error("Exit Branch must be a whole number >= 0");
     }
     frame.exitBranch = exitBranch;
   } else {
@@ -744,7 +830,11 @@ function applyFrameEditor() {
   const editableBranchIndex = getActiveEditableBranchIndex();
 
   if (!hasBranchFrameIndex && !hasWeight) {
-    if (frame.branching && Array.isArray(frame.branching.branches) && frame.branching.branches.length > editableBranchIndex) {
+    if (
+      frame.branching &&
+      Array.isArray(frame.branching.branches) &&
+      frame.branching.branches.length > editableBranchIndex
+    ) {
       frame.branching.branches.splice(editableBranchIndex, 1);
       if (frame.branching.branches.length === 0) {
         delete frame.branching;
@@ -752,20 +842,22 @@ function applyFrameEditor() {
     }
   } else {
     if (!hasBranchFrameIndex || !hasWeight) {
-      throw new Error('Set both Branch Frame Index and Weight, or clear both to remove branch');
+      throw new Error(
+        "Set both Branch Frame Index and Weight, or clear both to remove branch",
+      );
     }
 
     const branchFrameIndex = Number(branchFrameIndexRaw);
     if (!Number.isInteger(branchFrameIndex) || branchFrameIndex < 0) {
-      throw new Error('Branch Frame Index must be a whole number >= 0');
+      throw new Error("Branch Frame Index must be a whole number >= 0");
     }
 
     const weight = Number(weightRaw);
     if (!Number.isInteger(weight) || weight < 0 || weight > 100) {
-      throw new Error('Weight must be a whole number between 0 and 100');
+      throw new Error("Weight must be a whole number between 0 and 100");
     }
 
-    if (!frame.branching || typeof frame.branching !== 'object') {
+    if (!frame.branching || typeof frame.branching !== "object") {
       frame.branching = {};
     }
     if (!Array.isArray(frame.branching.branches)) {
@@ -774,7 +866,10 @@ function applyFrameEditor() {
     while (frame.branching.branches.length <= editableBranchIndex) {
       frame.branching.branches.push({});
     }
-    if (!frame.branching.branches[editableBranchIndex] || typeof frame.branching.branches[editableBranchIndex] !== 'object') {
+    if (
+      !frame.branching.branches[editableBranchIndex] ||
+      typeof frame.branching.branches[editableBranchIndex] !== "object"
+    ) {
       frame.branching.branches[editableBranchIndex] = {};
     }
 
@@ -827,7 +922,7 @@ async function loadAgent(name) {
   state.mapImage = await new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('Failed to load map image'));
+    img.onerror = () => reject(new Error("Failed to load map image"));
     img.src = payload.map.src;
   });
 
@@ -875,17 +970,24 @@ async function saveAgent(options = {}) {
     return;
   }
 
-  setStatus('Saving...');
-  const result = await fetchJson(`/api/agent/${encodeURIComponent(state.currentAgent)}/save`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ definition: state.payload.definition }),
-  });
+  setStatus("Saving...");
+  const result = await fetchJson(
+    `/api/agent/${encodeURIComponent(state.currentAgent)}/save`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ definition: state.payload.definition }),
+    },
+  );
 
   // Read back from disk after save so UI state always matches the actual file content.
-  const reloaded = await fetchJson(`/api/agent/${encodeURIComponent(state.currentAgent)}`);
-  if (!reloaded?.definition || typeof reloaded.definition !== 'object') {
-    throw new Error('Save verification failed: could not reload agent definition');
+  const reloaded = await fetchJson(
+    `/api/agent/${encodeURIComponent(state.currentAgent)}`,
+  );
+  if (!reloaded?.definition || typeof reloaded.definition !== "object") {
+    throw new Error(
+      "Save verification failed: could not reload agent definition",
+    );
   }
   state.payload.definition = reloaded.definition;
   if (!getAnimationsObject()[state.selectedAnimation]) {
@@ -896,13 +998,17 @@ async function saveAgent(options = {}) {
     state.selectedFrameIndex = -1;
     state.selectedFrameIndices = [];
   } else {
-    state.selectedFrameIndex = Math.max(0, Math.min(state.selectedFrameIndex, frames.length - 1));
+    state.selectedFrameIndex = Math.max(
+      0,
+      Math.min(state.selectedFrameIndex, frames.length - 1),
+    );
     state.selectedFrameIndices = [state.selectedFrameIndex];
   }
   renderAnimationList();
   renderFrameList();
 
-  const savedPath = result?.savedPath || `assets/agents/${state.currentAgent}/agent.js`;
+  const savedPath =
+    result?.savedPath || `assets/agents/${state.currentAgent}/agent.js`;
   setStatus(`Saved: ${savedPath}`);
 }
 
@@ -919,7 +1025,7 @@ async function applyAndPersistFrame() {
 
 async function undoLastChange() {
   if (!state.historyStack.length) {
-    setStatus('Nothing to undo');
+    setStatus("Nothing to undo");
     return;
   }
 
@@ -928,21 +1034,23 @@ async function undoLastChange() {
   restoreSnapshot(snapshot);
   await saveAgent({ applyCurrentFrame: false });
   playAnimationPreview();
-  setStatus('Undid last change');
+  setStatus("Undid last change");
 }
 
 async function playSoundById(soundId, options = {}) {
   const { silent = false } = options;
   if (!soundId || !state.currentAgent) {
     if (!silent) {
-      setStatus('Pick a sound first');
+      setStatus("Pick a sound first");
     }
     return;
   }
 
   let uri = state.soundCache.get(soundId);
   if (!uri) {
-    const data = await fetchJson(`/api/agent/${encodeURIComponent(state.currentAgent)}/sound/${encodeURIComponent(soundId)}`);
+    const data = await fetchJson(
+      `/api/agent/${encodeURIComponent(state.currentAgent)}/sound/${encodeURIComponent(soundId)}`,
+    );
     uri = data.uri;
     state.soundCache.set(soundId, uri);
   }
@@ -950,7 +1058,7 @@ async function playSoundById(soundId, options = {}) {
   stopCurrentAudio();
   const audio = new Audio(uri);
   state.currentAudio = audio;
-  audio.addEventListener('ended', () => {
+  audio.addEventListener("ended", () => {
     if (state.currentAudio === audio) {
       state.currentAudio = null;
     }
@@ -975,15 +1083,15 @@ async function previewSelectedSound() {
 }
 
 function bindEvents() {
-  elements.framesTabBtn.addEventListener('click', () => {
-    setEditorTab('frames');
+  elements.framesTabBtn.addEventListener("click", () => {
+    setEditorTab("frames");
   });
 
-  elements.soundsTabBtn.addEventListener('click', () => {
-    setEditorTab('sounds');
+  elements.soundsTabBtn.addEventListener("click", () => {
+    setEditorTab("sounds");
   });
 
-  elements.togglePreviewSoundBtn.addEventListener('click', () => {
+  elements.togglePreviewSoundBtn.addEventListener("click", () => {
     state.previewSoundEnabled = !state.previewSoundEnabled;
     updatePreviewSoundToggle();
     if (!state.previewSoundEnabled) {
@@ -991,25 +1099,29 @@ function bindEvents() {
     }
   });
 
-  elements.zoomOutBtn.addEventListener('click', () => {
+  elements.zoomOutBtn.addEventListener("click", () => {
     setMapZoom(state.mapZoom - 0.25);
   });
 
-  elements.zoomInBtn.addEventListener('click', () => {
+  elements.zoomInBtn.addEventListener("click", () => {
     setMapZoom(state.mapZoom + 0.25);
   });
 
-  elements.zoomResetBtn.addEventListener('click', () => {
+  elements.zoomResetBtn.addEventListener("click", () => {
     setMapZoom(1);
   });
 
-  elements.sequenceCaptureBtn.addEventListener('click', () => {
+  elements.sequenceCaptureBtn.addEventListener("click", () => {
     state.sequenceCaptureEnabled = !state.sequenceCaptureEnabled;
     updateSequenceCaptureToggle();
-    setStatus(state.sequenceCaptureEnabled ? 'Sequence add enabled' : 'Sequence add disabled');
+    setStatus(
+      state.sequenceCaptureEnabled
+        ? "Sequence add enabled"
+        : "Sequence add disabled",
+    );
   });
 
-  elements.loadAgentBtn.addEventListener('click', async () => {
+  elements.loadAgentBtn.addEventListener("click", async () => {
     const name = elements.agentSelect.value;
     if (!name) {
       return;
@@ -1021,7 +1133,7 @@ function bindEvents() {
     }
   });
 
-  elements.saveBtn.addEventListener('click', async () => {
+  elements.saveBtn.addEventListener("click", async () => {
     try {
       await saveAgent();
     } catch (error) {
@@ -1029,7 +1141,7 @@ function bindEvents() {
     }
   });
 
-  elements.undoBtn.addEventListener('click', async () => {
+  elements.undoBtn.addEventListener("click", async () => {
     try {
       await undoLastChange();
     } catch (error) {
@@ -1037,9 +1149,9 @@ function bindEvents() {
     }
   });
 
-  elements.animationSearch.addEventListener('input', renderAnimationList);
+  elements.animationSearch.addEventListener("input", renderAnimationList);
 
-  elements.animationList.addEventListener('change', () => {
+  elements.animationList.addEventListener("change", () => {
     const name = elements.animationList.value;
     if (!name) {
       return;
@@ -1047,7 +1159,7 @@ function bindEvents() {
     selectAnimation(name);
   });
 
-  elements.toggleAnimationPlayBtn.addEventListener('click', () => {
+  elements.toggleAnimationPlayBtn.addEventListener("click", () => {
     if (state.previewTimer) {
       stopAnimationPreview();
       renderAnimationPreview(state.previewFrameIndex);
@@ -1056,23 +1168,25 @@ function bindEvents() {
     playAnimationPreview();
   });
 
-  elements.newAnimationBtn.addEventListener('click', () => {
+  elements.newAnimationBtn.addEventListener("click", () => {
     if (!state.payload) {
       return;
     }
 
-    const name = window.prompt('Animation name');
+    const name = window.prompt("Animation name");
     if (!name) {
       return;
     }
     if (!/^[A-Za-z0-9_]+$/.test(name)) {
-      setStatus('Use only letters, numbers, and underscore for animation names');
+      setStatus(
+        "Use only letters, numbers, and underscore for animation names",
+      );
       return;
     }
 
     const animations = getAnimationsObject();
     if (animations[name]) {
-      setStatus('Animation already exists');
+      setStatus("Animation already exists");
       return;
     }
 
@@ -1082,28 +1196,30 @@ function bindEvents() {
     setStatus(`Created ${name}`);
   });
 
-  elements.renameAnimationBtn.addEventListener('click', () => {
+  elements.renameAnimationBtn.addEventListener("click", () => {
     if (!state.payload || !state.selectedAnimation) {
       return;
     }
 
     const currentName = state.selectedAnimation;
-    const nextName = window.prompt('New animation name', currentName);
+    const nextName = window.prompt("New animation name", currentName);
     if (!nextName) {
       return;
     }
     if (!/^[A-Za-z0-9_]+$/.test(nextName)) {
-      setStatus('Use only letters, numbers, and underscore for animation names');
+      setStatus(
+        "Use only letters, numbers, and underscore for animation names",
+      );
       return;
     }
     if (nextName === currentName) {
-      setStatus('Name unchanged');
+      setStatus("Name unchanged");
       return;
     }
 
     const animations = getAnimationsObject();
     if (animations[nextName]) {
-      setStatus('Animation name already exists');
+      setStatus("Animation name already exists");
       return;
     }
 
@@ -1121,7 +1237,7 @@ function bindEvents() {
     setStatus(`Renamed ${currentName} -> ${nextName}`);
   });
 
-  elements.deleteAnimationBtn.addEventListener('click', () => {
+  elements.deleteAnimationBtn.addEventListener("click", () => {
     const name = state.selectedAnimation;
     if (!name || !state.payload) {
       return;
@@ -1138,20 +1254,22 @@ function bindEvents() {
     setStatus(`Deleted ${name}`);
   });
 
-  elements.frameList.addEventListener('change', () => {
+  elements.frameList.addEventListener("change", () => {
     const selected = Array.from(elements.frameList.selectedOptions)
       .map((o) => Number(o.value))
       .filter((v) => Number.isInteger(v))
       .sort((a, b) => a - b);
 
     state.selectedFrameIndices = selected;
-    state.selectedFrameIndex = selected.length ? selected[0] : Number(elements.frameList.value);
+    state.selectedFrameIndex = selected.length
+      ? selected[0]
+      : Number(elements.frameList.value);
     renderFrameEditor();
     drawMap();
     renderAnimationPreview(state.selectedFrameIndex);
   });
 
-  elements.applyFrameBtn.addEventListener('click', () => {
+  elements.applyFrameBtn.addEventListener("click", () => {
     (async () => {
       try {
         await applyAndPersistFrame();
@@ -1172,7 +1290,7 @@ function bindEvents() {
   };
 
   const applyOnEnter = (event) => {
-    if (event.key !== 'Enter') {
+    if (event.key !== "Enter") {
       return;
     }
     event.preventDefault();
@@ -1180,7 +1298,7 @@ function bindEvents() {
   };
 
   const applyOnTextareaEnter = (event) => {
-    if (event.key !== 'Enter') {
+    if (event.key !== "Enter") {
       return;
     }
     if (!event.ctrlKey && !event.metaKey) {
@@ -1190,13 +1308,13 @@ function bindEvents() {
     runApplyAndPersist();
   };
 
-  elements.durationInput.addEventListener('keydown', applyOnEnter);
-  elements.exitBranchInput.addEventListener('keydown', applyOnEnter);
-  elements.branchFrameIndexInput.addEventListener('keydown', applyOnEnter);
-  elements.weightInput.addEventListener('keydown', applyOnEnter);
-  elements.imagesInput.addEventListener('keydown', applyOnTextareaEnter);
+  elements.durationInput.addEventListener("keydown", applyOnEnter);
+  elements.exitBranchInput.addEventListener("keydown", applyOnEnter);
+  elements.branchFrameIndexInput.addEventListener("keydown", applyOnEnter);
+  elements.weightInput.addEventListener("keydown", applyOnEnter);
+  elements.imagesInput.addEventListener("keydown", applyOnTextareaEnter);
 
-  elements.prevBranchBtn.addEventListener('click', () => {
+  elements.prevBranchBtn.addEventListener("click", () => {
     const count = getAnimationPathChoiceCount();
     if (count <= 1) {
       return;
@@ -1212,7 +1330,7 @@ function bindEvents() {
     }
   });
 
-  elements.nextBranchBtn.addEventListener('click', () => {
+  elements.nextBranchBtn.addEventListener("click", () => {
     const count = getAnimationPathChoiceCount();
     if (count <= 1) {
       return;
@@ -1228,10 +1346,13 @@ function bindEvents() {
     }
   });
 
-  elements.addFrameBtn.addEventListener('click', () => {
+  elements.addFrameBtn.addEventListener("click", () => {
     pushHistorySnapshot();
     const frames = getCurrentFrames();
-    const insertAt = state.selectedFrameIndex >= 0 ? state.selectedFrameIndex + 1 : frames.length;
+    const insertAt =
+      state.selectedFrameIndex >= 0
+        ? state.selectedFrameIndex + 1
+        : frames.length;
     frames.splice(insertAt, 0, createFrameFromSelectedCell());
     state.selectedFrameIndex = insertAt;
     state.selectedFrameIndices = [insertAt];
@@ -1239,7 +1360,7 @@ function bindEvents() {
     setStatus(`Inserted frame ${insertAt}`);
   });
 
-  elements.appendFrameBtn.addEventListener('click', () => {
+  elements.appendFrameBtn.addEventListener("click", () => {
     pushHistorySnapshot();
     const frames = getCurrentFrames();
     frames.push(createFrameFromSelectedCell());
@@ -1249,7 +1370,7 @@ function bindEvents() {
     setStatus(`Appended frame ${state.selectedFrameIndex}`);
   });
 
-  elements.duplicateFrameBtn.addEventListener('click', () => {
+  elements.duplicateFrameBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
     const selected = (state.selectedFrameIndices || [])
       .filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length)
@@ -1271,9 +1392,12 @@ function bindEvents() {
     setStatus(`Duplicated ${clones.length} frame(s)`);
   });
 
-  elements.removeFrameBtn.addEventListener('click', () => {
+  elements.removeFrameBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
-    if (state.selectedFrameIndex < 0 || state.selectedFrameIndex >= frames.length) {
+    if (
+      state.selectedFrameIndex < 0 ||
+      state.selectedFrameIndex >= frames.length
+    ) {
       return;
     }
 
@@ -1282,19 +1406,23 @@ function bindEvents() {
     state.selectedFrameIndex = Math.max(0, state.selectedFrameIndex - 1);
     state.selectedFrameIndices = [state.selectedFrameIndex];
     renderFrameList();
-    setStatus('Frame removed');
+    setStatus("Frame removed");
   });
 
-  elements.frameList.addEventListener('keydown', (event) => {
-    if (event.key !== 'Delete') {
+  elements.frameList.addEventListener("keydown", (event) => {
+    if (event.key !== "Delete") {
       return;
     }
     event.preventDefault();
 
     const frames = getCurrentFrames();
-    const selected = Array.from(new Set((state.selectedFrameIndices || [])
-      .filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length)))
-      .sort((a, b) => b - a);
+    const selected = Array.from(
+      new Set(
+        (state.selectedFrameIndices || []).filter(
+          (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+        ),
+      ),
+    ).sort((a, b) => b - a);
 
     if (!selected.length) {
       return;
@@ -1309,7 +1437,10 @@ function bindEvents() {
       state.selectedFrameIndex = -1;
       state.selectedFrameIndices = [];
     } else {
-      const nextIndex = Math.max(0, Math.min(selected[selected.length - 1], frames.length - 1));
+      const nextIndex = Math.max(
+        0,
+        Math.min(selected[selected.length - 1], frames.length - 1),
+      );
       state.selectedFrameIndex = nextIndex;
       state.selectedFrameIndices = [nextIndex];
     }
@@ -1318,7 +1449,7 @@ function bindEvents() {
     setStatus(`Removed ${selected.length} frame(s)`);
   });
 
-  elements.moveUpBtn.addEventListener('click', () => {
+  elements.moveUpBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
     const i = state.selectedFrameIndex;
     if (i <= 0 || i >= frames.length) {
@@ -1332,7 +1463,7 @@ function bindEvents() {
     renderFrameList();
   });
 
-  elements.moveDownBtn.addEventListener('click', () => {
+  elements.moveDownBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
     const i = state.selectedFrameIndex;
     if (i < 0 || i >= frames.length - 1) {
@@ -1346,7 +1477,7 @@ function bindEvents() {
     renderFrameList();
   });
 
-  elements.selectAllFramesBtn.addEventListener('click', () => {
+  elements.selectAllFramesBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
     if (!frames.length) {
       return;
@@ -1357,14 +1488,14 @@ function bindEvents() {
     setStatus(`Selected ${frames.length} frame(s)`);
   });
 
-  elements.invertFramesBtn.addEventListener('click', () => {
+  elements.invertFramesBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
     const selected = (state.selectedFrameIndices || [])
       .filter((i) => Number.isInteger(i) && i >= 0 && i < frames.length)
       .sort((a, b) => a - b);
 
     if (selected.length < 2) {
-      setStatus('Select at least 2 frames to invert');
+      setStatus("Select at least 2 frames to invert");
       return;
     }
 
@@ -1380,11 +1511,11 @@ function bindEvents() {
     setStatus(`Inverted ${selected.length} selected frame(s)`);
   });
 
-  elements.replaceImageBtn.addEventListener('click', () => {
+  elements.replaceImageBtn.addEventListener("click", () => {
     const frame = getCurrentFrames()[state.selectedFrameIndex];
     const coords = selectedCellCoords();
     if (!frame || !coords) {
-      setStatus('Select a frame and a map cell first');
+      setStatus("Select a frame and a map cell first");
       return;
     }
 
@@ -1400,10 +1531,10 @@ function bindEvents() {
     }
 
     renderFrameList();
-    setStatus('Updated first image reference');
+    setStatus("Updated first image reference");
   });
 
-  elements.previewSoundBtn.addEventListener('click', async () => {
+  elements.previewSoundBtn.addEventListener("click", async () => {
     try {
       await previewSelectedSound();
     } catch (error) {
@@ -1411,7 +1542,7 @@ function bindEvents() {
     }
   });
 
-  elements.playFrameSoundBtn.addEventListener('click', async () => {
+  elements.playFrameSoundBtn.addEventListener("click", async () => {
     try {
       await previewSelectedSound();
     } catch (error) {
@@ -1419,23 +1550,23 @@ function bindEvents() {
     }
   });
 
-  elements.stopLibrarySoundBtn.addEventListener('click', () => {
+  elements.stopLibrarySoundBtn.addEventListener("click", () => {
     stopCurrentAudio();
-    setStatus('Stopped sound');
+    setStatus("Stopped sound");
   });
 
-  elements.useLibrarySoundBtn.addEventListener('click', () => {
+  elements.useLibrarySoundBtn.addEventListener("click", () => {
     const soundId = state.selectedLibrarySoundId;
     if (!soundId) {
-      setStatus('Select a sound first');
+      setStatus("Select a sound first");
       return;
     }
     elements.soundSelect.value = soundId;
-    setEditorTab('frames');
+    setEditorTab("frames");
     setStatus(`Selected sound ${soundId} for frame editor`);
   });
 
-  elements.mapCanvas.addEventListener('click', (event) => {
+  elements.mapCanvas.addEventListener("click", (event) => {
     if (!state.payload) {
       return;
     }
@@ -1450,7 +1581,12 @@ function bindEvents() {
 
     const col = Math.floor(x / fw);
     const row = Math.floor(y / fh);
-    if (col < 0 || row < 0 || col >= state.payload.map.cols || row >= state.payload.map.rows) {
+    if (
+      col < 0 ||
+      row < 0 ||
+      col >= state.payload.map.cols ||
+      row >= state.payload.map.rows
+    ) {
       return;
     }
 
@@ -1459,12 +1595,12 @@ function bindEvents() {
     if (state.sequenceCaptureEnabled) {
       const frames = getCurrentFrames();
       if (!frames) {
-        setStatus('Select an animation first');
+        setStatus("Select an animation first");
         drawMap();
         return;
       }
 
-      let duration = Number(elements.durationInput.value || '100');
+      let duration = Number(elements.durationInput.value || "100");
       if (!Number.isFinite(duration) || duration < 0) {
         duration = 100;
       }
@@ -1488,18 +1624,18 @@ function bindEvents() {
 
 async function bootstrap() {
   bindEvents();
-  setEditorTab('frames');
+  setEditorTab("frames");
   updatePreviewSoundToggle();
   updatePreviewPlayToggle();
   updateSequenceCaptureToggle();
 
   try {
-    const data = await fetchJson('/api/agents');
+    const data = await fetchJson("/api/agents");
     state.agents = data.agents;
 
-    elements.agentSelect.innerHTML = '';
+    elements.agentSelect.innerHTML = "";
     for (const agent of state.agents) {
-      const option = document.createElement('option');
+      const option = document.createElement("option");
       option.value = agent;
       option.textContent = agent;
       elements.agentSelect.appendChild(option);
@@ -1508,7 +1644,7 @@ async function bootstrap() {
     if (state.agents.length > 0) {
       await loadAgent(state.agents[0]);
     } else {
-      setStatus('No agents found');
+      setStatus("No agents found");
     }
   } catch (error) {
     setStatus(error.message);

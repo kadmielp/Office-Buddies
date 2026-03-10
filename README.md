@@ -108,11 +108,11 @@ That output goes to `out/Office Buddies-win32-<arch>/`.
 Animation files live at `assets/agents/<Agent>/agent.js`.
 
 ### Animation Studio (Recommended)
+
 <p align="center">
   <img src="assets/screenshots/animation_studio.png" alt="Logo" width="512" />
 </p>
 <p align="center">
-
 
 Animation Studio is a standalone Win98-style visual editor for assistant animations (`agent.js`), sprite-map frame picking (`map.png`), and sound assignment (`sounds-mp3.js` / `sounds-ogg.js`).
 

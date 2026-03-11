@@ -10,6 +10,8 @@ export type BubbleView =
   | "settings-general"
   | "settings-model"
   | "settings-parameters"
+  | "settings-session"
+  | "settings-knowledge"
   | "settings-advanced"
   | "settings-about";
 

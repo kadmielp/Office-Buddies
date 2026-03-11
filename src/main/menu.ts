@@ -253,10 +253,6 @@ function getSettingsMenuItem(): MenuItem {
         click: () => openView("settings-model"),
       },
       {
-        label: "Parameters",
-        click: () => openView("settings-parameters"),
-      },
-      {
         label: "Advanced",
         click: () => openView("settings-advanced"),
       },

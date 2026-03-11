@@ -442,3 +442,35 @@ textarea.chat-input-busy::placeholder {
   font: inherit;
   font-weight: 600;
 }
+
+.settings-knowledge-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.settings-knowledge-item + .settings-knowledge-item {
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.settings-knowledge-item-title {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.settings-knowledge-item-meta {
+  margin-top: 2px;
+  color: rgba(0, 0, 0, 0.72);
+  line-height: 1.25;
+}
+
+.settings-knowledge-badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1px solid #7f7f7f;
+  background: #efefef;
+  font-size: 11px;
+  line-height: 1.2;
+}

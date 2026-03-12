@@ -6,8 +6,8 @@ import {
   minimizeChatWindow,
   setMainWindowSize,
 } from "./windows";
-import { IpcMessages } from "../ipc-messages";
-import { getModelManager } from "./models";
+import { IpcMessages } from "../shared/ipc-messages";
+import { getModelManager } from "./model-manager";
 import { getStateManager } from "./state";
 import { getChatManager } from "./chats";
 import { ChatWithMessages } from "../types/interfaces";
@@ -23,6 +23,13 @@ import {
 } from "./remote-ai";
 import { runBuddyAction } from "./buddy-actions";
 import { BuddyAction } from "../types/interfaces";
+import {
+  getAvailableMcpSources,
+  pickKnowledgeFiles,
+  refreshKnowledgeFiles,
+} from "./knowledge";
+import { KnowledgeFileSource } from "../shared/shared-state";
+import { getMcpServerManager } from "./mcp-servers";
 
 export function setupIpcListeners() {
   // Window
@@ -93,6 +100,25 @@ export function setupIpcListeners() {
   );
   ipcMain.handle(IpcMessages.ADD_MODEL_FROM_FILE, () =>
     getModelManager().addModelFromFile(),
+  );
+  ipcMain.handle(
+    IpcMessages.KNOWLEDGE_PICK_FILES,
+    (_, existingFiles: KnowledgeFileSource[] = []) =>
+      pickKnowledgeFiles(existingFiles),
+  );
+  ipcMain.handle(
+    IpcMessages.KNOWLEDGE_REFRESH_FILES,
+    (_, existingFiles: KnowledgeFileSource[] = []) =>
+      refreshKnowledgeFiles(existingFiles),
+  );
+  ipcMain.handle(IpcMessages.KNOWLEDGE_GET_AVAILABLE_MCP_SOURCES, () =>
+    getAvailableMcpSources(),
+  );
+  ipcMain.handle(IpcMessages.KNOWLEDGE_SAVE_MCP_SERVER, (_, server) =>
+    getMcpServerManager().saveServer(server),
+  );
+  ipcMain.handle(IpcMessages.KNOWLEDGE_DELETE_MCP_SERVER, (_, serverId: string) =>
+    getMcpServerManager().deleteServer(serverId),
   );
 
   // State
@@ -257,3 +283,4 @@ export function setupIpcListeners() {
     },
   );
 }
+

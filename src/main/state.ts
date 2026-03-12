@@ -8,15 +8,15 @@ import {
   setFont,
   setFontSize,
 } from "./windows";
-import { IpcMessages } from "../ipc-messages";
-import { getModelManager, getModelPath, isModelOnDisk } from "./models";
+import { IpcMessages } from "../shared/ipc-messages";
+import { getModelManager, getModelPath, isModelOnDisk } from "./model-manager";
 import {
   DEFAULT_SYSTEM_PROMPT,
   EMPTY_SHARED_STATE,
   SettingsState,
   SharedState,
-} from "../sharedState";
-import { BUILT_IN_MODELS } from "../models";
+} from "../shared/shared-state";
+import { BUILT_IN_MODELS } from "../shared/models";
 import { getLogger } from "./logger";
 import { setupAppMenu } from "./menu";
 import { startProactiveServer } from "./proactive-server";
@@ -334,3 +334,4 @@ export function getStateManager() {
 
   return _stateManager;
 }
+

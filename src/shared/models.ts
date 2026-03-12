@@ -1,4 +1,4 @@
-import type { DownloadState } from "./sharedState";
+import type { DownloadState } from "./shared-state";
 
 export interface Model {
   name: string;

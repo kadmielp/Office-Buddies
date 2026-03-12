@@ -1,9 +1,9 @@
 import React from "react";
-import { useBubbleView } from "../contexts/BubbleViewContext";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { Progress } from "./Progress";
-import { isModelDownloading, isModelReady } from "../../helpers/model-helpers";
-import { prettyDownloadSpeed } from "../helpers/convert-download-speed";
+import { useBubbleView } from "../../contexts/BubbleViewContext";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { Progress } from "../../ui/Progress";
+import { isModelDownloading, isModelReady } from "../../../shared/model-helpers";
+import { prettyDownloadSpeed } from "../../helpers/convert-download-speed";
 
 export const WelcomeMessageContent: React.FC = () => {
   const { setCurrentView } = useBubbleView();
@@ -69,3 +69,4 @@ export const WelcomeMessageContent: React.FC = () => {
     </div>
   );
 };
+

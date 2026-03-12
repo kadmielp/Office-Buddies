@@ -1,9 +1,9 @@
-import { useChat } from "../contexts/ChatContext";
-import { TableView } from "./TableView";
+import { useChat } from "../../contexts/ChatContext";
+import { TableView } from "../../ui/TableView";
 import { formatDistance } from "date-fns";
-import { clippyApi } from "../clippyApi";
+import { clippyApi } from "../../clippyApi";
 import { useState } from "react";
-import chatsIcon from "../images/icons/file_question.png";
+import chatsIcon from "../../images/icons/file_question.png";
 
 export type SettingsTab = "general" | "model" | "advanced" | "about";
 
@@ -184,3 +184,4 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
     </div>
   );
 };
+

@@ -1,7 +1,7 @@
 import * as http from "http";
 import { getStateManager } from "./state";
 import { getMainWindow } from "./windows";
-import { IpcMessages } from "../ipc-messages";
+import { IpcMessages } from "../shared/ipc-messages";
 import { getLogger } from "./logger";
 
 let server: http.Server | null = null;
@@ -91,3 +91,4 @@ export function stopProactiveServer() {
     getLogger().info("Proactive server stopped");
   }
 }
+

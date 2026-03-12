@@ -6,15 +6,15 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { Message } from "../components/Message";
+import { Message } from "../features/chat/Message";
 import { clippyApi } from "../clippyApi";
 import { SharedStateContext } from "./SharedStateContext";
-import { areAnyModelsReadyOrDownloading } from "../../helpers/model-helpers";
-import { WelcomeMessageContent } from "../components/WelcomeMessageContent";
+import { areAnyModelsReadyOrDownloading } from "../../shared/model-helpers";
+import { WelcomeMessageContent } from "../features/chat/WelcomeMessageContent";
 import { ChatRecord, MessageRecord } from "../../types/interfaces";
 import { useDebugState } from "./DebugContext";
-import { ErrorLoadModelMessageContent } from "../components/ErrorLoadModelMessageContent";
-import { buildSystemPrompt } from "../prompt-helpers";
+import { ErrorLoadModelMessageContent } from "../features/chat/ErrorLoadModelMessageContent";
+import { buildSessionSystemPrompt } from "../prompt-helpers";
 import {
   createProviderSession,
   destroyProviderSession,
@@ -80,11 +80,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     useState(false);
 
   const getSystemPrompt = useCallback(() => {
-    return buildSystemPrompt(
-      settings.systemPrompt,
-      settings.selectedAgent || "Clippy",
-    );
-  }, [settings.selectedAgent, settings.systemPrompt]);
+    return buildSessionSystemPrompt(settings, settings.selectedAgent || "Clippy");
+  }, [settings]);
 
   const addMessage = useCallback(
     async (message: Message) => {
@@ -178,6 +175,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       settings.openAiApiKey,
       settings.geminiApiKey,
       settings.maritacaApiKey,
+      settings.useKnowledgeAtStart,
+      settings.knowledgeFiles,
+      settings.knowledgeMcpSources,
       models,
       getSystemPrompt,
       setIsStartingNewChat,
@@ -237,6 +237,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       settings.maritacaApiKey,
       settings.topK,
       settings.temperature,
+      settings.useKnowledgeAtStart,
+      settings.knowledgeFiles,
+      settings.knowledgeMcpSources,
       status,
       models,
       getSystemPrompt,
@@ -353,6 +356,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     settings.systemPrompt,
     settings.topK,
     settings.temperature,
+    settings.useKnowledgeAtStart,
+    settings.knowledgeFiles,
+    settings.knowledgeMcpSources,
     models,
   ]);
 
@@ -496,3 +502,4 @@ function getPreviewFromMessages(messages: Message[]): string {
   // Remove newlines and limit to 100 characters
   return messages[0].content.replace(/\n/g, " ").substring(0, 100);
 }
+

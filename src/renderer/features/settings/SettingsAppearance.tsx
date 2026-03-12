@@ -1,7 +1,7 @@
-import { DEFAULT_SETTINGS, SettingsState } from "../../sharedState";
-import { clippyApi } from "../clippyApi";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { Checkbox } from "./Checkbox";
+import { DEFAULT_SETTINGS, SettingsState } from "../../../shared/shared-state";
+import { clippyApi } from "../../clippyApi";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { Checkbox } from "../../ui/Checkbox";
 
 export const SettingsAppearance: React.FC = () => {
   const { settings } = useSharedState();
@@ -101,3 +101,4 @@ export const SettingsAppearance: React.FC = () => {
     </div>
   );
 };
+

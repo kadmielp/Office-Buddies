@@ -1,4 +1,4 @@
-import { ManagedModel, ModelState } from "../models";
+import { ManagedModel, ModelState } from "./models";
 
 export function isModelDownloading(model?: ManagedModel) {
   return (
@@ -19,3 +19,4 @@ export function areAnyModelsReadyOrDownloading(models: ModelState) {
     return model.downloaded || isModelDownloading(model);
   });
 }
+

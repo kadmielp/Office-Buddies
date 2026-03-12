@@ -13,6 +13,38 @@ export type AiProvider =
   | "maritaca"
   | "openclaw";
 
+export type KnowledgeFileStatus = "Ready" | "Indexed" | "Error";
+export type KnowledgeMcpStatus = "Connected" | "Available" | "Error";
+export type MpcServerType = "http" | "stdio";
+
+export interface KnowledgeFileSource {
+  id: string;
+  name: string;
+  meta: string;
+  status: KnowledgeFileStatus;
+  filePath: string;
+  previewText?: string;
+}
+
+export interface KnowledgeMcpSource {
+  id: string;
+  name: string;
+  meta: string;
+  status: KnowledgeMcpStatus;
+  serverId: string;
+  resourceId?: string;
+}
+
+export interface MpcServerConfig {
+  id: string;
+  name: string;
+  type: MpcServerType;
+  endpoint?: string;
+  command?: string;
+  status: KnowledgeMcpStatus;
+  hasCredential: boolean;
+}
+
 export interface SettingsState {
   aiProvider?: AiProvider;
   selectedModel?: string;
@@ -36,6 +68,10 @@ export interface SettingsState {
   disableSound?: boolean;
   enableProactiveMessages?: boolean;
   proactivePort?: number;
+  useKnowledgeAtStart?: boolean;
+  knowledgeFiles?: KnowledgeFileSource[];
+  knowledgeMcpSources?: KnowledgeMcpSource[];
+  mcpServers?: MpcServerConfig[];
 }
 
 export interface SharedState {
@@ -79,6 +115,10 @@ export const DEFAULT_SETTINGS: SettingsState = {
   disableSound: false,
   enableProactiveMessages: false,
   proactivePort: 5050,
+  useKnowledgeAtStart: true,
+  knowledgeFiles: [],
+  knowledgeMcpSources: [],
+  mcpServers: [],
 };
 
 export const EMPTY_SHARED_STATE: SharedState = {

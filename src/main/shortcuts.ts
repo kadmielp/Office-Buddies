@@ -1,6 +1,6 @@
 import { app, clipboard, globalShortcut } from "electron";
 import { execFile } from "child_process";
-import { IpcMessages } from "../ipc-messages";
+import { IpcMessages } from "../shared/ipc-messages";
 import { BuddyAction, BuddySpeechPayload } from "../types/interfaces";
 import { getLogger } from "./logger";
 import { getMainWindow } from "./windows";

@@ -4,10 +4,10 @@ import {
   AgentFrame,
   AVAILABLE_AGENTS,
   getAgentPack,
-} from "../agent-packs";
-import { clippyApi } from "../clippyApi";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { useBubbleView } from "../contexts/BubbleViewContext";
+} from "../../agent-packs";
+import { clippyApi } from "../../clippyApi";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { useBubbleView } from "../../contexts/BubbleViewContext";
 
 type AssistantDetails = {
   displayName: string;
@@ -437,3 +437,4 @@ export function AssistantGallery() {
     </div>
   );
 }
+

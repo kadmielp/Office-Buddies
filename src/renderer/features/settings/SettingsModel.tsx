@@ -1,17 +1,17 @@
-import { Column, TableView } from "./TableView";
-import { Progress } from "./Progress";
+import { Column, TableView } from "../../ui/TableView";
+import { Progress } from "../../ui/Progress";
 import React, { useEffect, useState } from "react";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { clippyApi } from "../clippyApi";
-import { prettyDownloadSpeed } from "../helpers/convert-download-speed";
-import { ManagedModel } from "../../models";
-import { isModelDownloading } from "../../helpers/model-helpers";
-import { AiProvider } from "../../sharedState";
-import { fetchProviderModels } from "../ai-provider-client";
-import { useChat } from "../contexts/ChatContext";
-import { Checkbox } from "./Checkbox";
-import localProviderIcon from "../images/icons/network_drive_off.png";
-import remoteProviderIcon from "../images/icons/network_drive_on.png";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { clippyApi } from "../../clippyApi";
+import { prettyDownloadSpeed } from "../../helpers/convert-download-speed";
+import { ManagedModel } from "../../../shared/models";
+import { isModelDownloading } from "../../../shared/model-helpers";
+import { AiProvider } from "../../../shared/shared-state";
+import { fetchProviderModels } from "../../ai-provider-client";
+import { useChat } from "../../contexts/ChatContext";
+import { Checkbox } from "../../ui/Checkbox";
+import localProviderIcon from "../../images/icons/network_drive_off.png";
+import remoteProviderIcon from "../../images/icons/network_drive_on.png";
 
 function filterRemoteModelsByProvider(
   provider: AiProvider,
@@ -509,3 +509,4 @@ const SettingsModelDownload: React.FC<{
     </div>
   );
 };
+

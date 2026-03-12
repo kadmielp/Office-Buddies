@@ -12,7 +12,7 @@ import { getStateManager } from "./state";
 
 import type { BubbleView } from "../renderer/contexts/BubbleViewContext";
 import { getMainWindow, toggleChatWindow } from "./windows";
-import { IpcMessages } from "../ipc-messages";
+import { IpcMessages } from "../shared/ipc-messages";
 import { checkForUpdates } from "./update";
 import {
   closeInspector,
@@ -328,3 +328,4 @@ function getHelpMenu(): MenuItemConstructorOptions[] {
 function openView(view: BubbleView) {
   getMainWindow()?.webContents.send(IpcMessages.SET_BUBBLE_VIEW, view);
 }
+

@@ -1,13 +1,13 @@
-import { clippyApi } from "../clippyApi";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { useChat } from "../contexts/ChatContext";
-import { Checkbox } from "./Checkbox";
-import recycleBinEmptyIcon from "../images/icons/recycle_bin_empty.png";
-import recycleBinFullIcon from "../images/icons/recycle_bin_full.png";
-import automaticUpdatesOffIcon from "../images/icons/satellite_updates_off.png";
-import automaticUpdatesOnIcon from "../images/icons/satellite_updates_on.png";
-import speakerOffIcon from "../images/icons/speaker_off.png";
-import speakerOnIcon from "../images/icons/speaker_on.png";
+import { clippyApi } from "../../clippyApi";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { useChat } from "../../contexts/ChatContext";
+import { Checkbox } from "../../ui/Checkbox";
+import recycleBinEmptyIcon from "../../images/icons/recycle_bin_empty.png";
+import recycleBinFullIcon from "../../images/icons/recycle_bin_full.png";
+import automaticUpdatesOffIcon from "../../images/icons/satellite_updates_off.png";
+import automaticUpdatesOnIcon from "../../images/icons/satellite_updates_on.png";
+import speakerOffIcon from "../../images/icons/speaker_off.png";
+import speakerOnIcon from "../../images/icons/speaker_on.png";
 
 export const SettingsAdvanced: React.FC = () => {
   const { settings, models } = useSharedState();
@@ -157,3 +157,4 @@ export const SettingsAdvanced: React.FC = () => {
     </div>
   );
 };
+

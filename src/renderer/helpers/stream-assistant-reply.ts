@@ -1,8 +1,8 @@
 import { getAnimationKeysBrackets } from "../agent-packs";
-import { buildSystemPrompt } from "../prompt-helpers";
+import { buildSessionSystemPrompt } from "../prompt-helpers";
 import { promptStreamingWithProvider } from "../ai-provider-client";
-import { Message } from "../components/Message";
-import { SettingsState } from "../../sharedState";
+import { Message } from "../features/chat/Message";
+import { SettingsState } from "../../shared/shared-state";
 
 type StreamAssistantReplyArgs = {
   settings: SettingsState;
@@ -25,8 +25,8 @@ export async function streamAssistantReply({
   onChunk,
   onAnimationKey,
 }: StreamAssistantReplyArgs): Promise<string> {
-  const systemPrompt = buildSystemPrompt(
-    settings.systemPrompt,
+  const systemPrompt = buildSessionSystemPrompt(
+    settings,
     selectedAgent || "Clippy",
   );
   const response = promptStreamingWithProvider({
@@ -97,3 +97,4 @@ export function filterMessageContent(
 
   return { text, animationKey };
 }
+

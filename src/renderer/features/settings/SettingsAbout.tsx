@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Versions } from "../../types/interfaces";
-import { clippyApi } from "../clippyApi";
-import infoIcon from "../images/icons/info.png";
+import { Versions } from "../../../types/interfaces";
+import { clippyApi } from "../../clippyApi";
+import infoIcon from "../../images/icons/info.png";
 
 export const SettingsAbout: React.FC = () => {
   const [versions, setVersions] = useState<Partial<Versions>>({});
@@ -100,3 +100,4 @@ export const SettingsAbout: React.FC = () => {
     </div>
   );
 };
+

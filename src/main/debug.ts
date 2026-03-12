@@ -1,7 +1,7 @@
-import { DebugState } from "../debugState";
+import { DebugState } from "../shared/debug-state";
 import Store from "electron-store";
 import { getMainWindow } from "./windows";
-import { IpcMessages } from "../ipc-messages";
+import { IpcMessages } from "../shared/ipc-messages";
 
 class DebugManager {
   public store: Store<DebugState>;
@@ -46,3 +46,4 @@ export function getDebugManager(): DebugManager {
 
   return _debugManager;
 }
+

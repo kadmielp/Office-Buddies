@@ -3,8 +3,8 @@ import path from "path";
 import fs from "fs";
 import { getLogger } from "./logger";
 
-import { ManagedModel, ModelState, Model, BUILT_IN_MODELS } from "../models";
-import { DownloadState } from "../sharedState";
+import { ManagedModel, ModelState, Model, BUILT_IN_MODELS } from "../shared/models";
+import { DownloadState } from "../shared/shared-state";
 import { getStateManager } from "./state";
 import { MockDownloadItem } from "./MockDownloadItem";
 import { getDebugManager } from "./debug";
@@ -448,3 +448,4 @@ export function getModelPath(model: Model): string {
 export function getModelFileName(model: Model): string {
   return path.basename(new URL(model.url).pathname);
 }
+

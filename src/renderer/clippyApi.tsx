@@ -1,5 +1,11 @@
 import { ElectronLlmRenderer } from "@electron/llm";
-import { SharedState } from "../sharedState";
+import {
+  KnowledgeFileSource,
+  KnowledgeMcpSource,
+  MpcServerConfig,
+  MpcServerType,
+  SharedState,
+} from "../shared/shared-state";
 import {
   ChatRecord,
   MessageRecord,
@@ -9,7 +15,7 @@ import {
   BuddySpeechPayload,
   BuddyAction,
 } from "../types/interfaces";
-import { DebugState } from "../debugState";
+import { DebugState } from "../shared/debug-state";
 
 import type { BubbleView } from "./contexts/BubbleViewContext";
 import { Data } from "electron";
@@ -43,6 +49,22 @@ export type ClippyApi = {
   deleteModelByName: (name: string) => Promise<boolean>;
   deleteAllModels: () => Promise<boolean>;
   addModelFromFile: () => Promise<void>;
+  pickKnowledgeFiles: (
+    existingFiles: KnowledgeFileSource[],
+  ) => Promise<KnowledgeFileSource[]>;
+  refreshKnowledgeFiles: (
+    existingFiles: KnowledgeFileSource[],
+  ) => Promise<KnowledgeFileSource[]>;
+  getAvailableMcpSources: () => Promise<KnowledgeMcpSource[]>;
+  saveMcpServer: (server: {
+    id?: string;
+    name: string;
+    type: MpcServerType;
+    endpoint?: string;
+    command?: string;
+    credential?: string;
+  }) => Promise<MpcServerConfig>;
+  deleteMcpServer: (serverId: string) => Promise<void>;
   // State
   offStateChanged: () => void;
   onStateChanged: (callback: (state: SharedState) => void) => void;
@@ -115,3 +137,4 @@ declare global {
 
 export const clippyApi = window["clippy"];
 export const electronAi = window["electronAi"];
+

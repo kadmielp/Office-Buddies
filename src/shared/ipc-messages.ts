@@ -19,6 +19,14 @@ export const IpcMessages = {
   DELETE_ALL_MODELS: "clippy_delete_all_models",
   ADD_MODEL_FROM_FILE: "clippy_add_model_from_file",
 
+  // Knowledge messages
+  KNOWLEDGE_PICK_FILES: "clippy_knowledge_pick_files",
+  KNOWLEDGE_REFRESH_FILES: "clippy_knowledge_refresh_files",
+  KNOWLEDGE_GET_AVAILABLE_MCP_SOURCES:
+    "clippy_knowledge_get_available_mcp_sources",
+  KNOWLEDGE_SAVE_MCP_SERVER: "clippy_knowledge_save_mcp_server",
+  KNOWLEDGE_DELETE_MCP_SERVER: "clippy_knowledge_delete_mcp_server",
+
   // State messages
   STATE_UPDATE_MODEL_STATE: "clippy_state_update_model_state",
   STATE_CHANGED: "clippy_state_changed",

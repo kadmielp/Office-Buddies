@@ -1,4 +1,4 @@
-import { SettingsState } from "../sharedState";
+import { SettingsState } from "../shared/shared-state";
 import { MessageRecord } from "../types/interfaces";
 
 export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
@@ -518,3 +518,4 @@ export async function promptRemoteProvider(args: {
   const payload = await response.json();
   return getGeminiText(payload);
 }
+

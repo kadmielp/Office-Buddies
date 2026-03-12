@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Checkbox } from "./Checkbox";
+import { Checkbox } from "../../ui/Checkbox";
 
 const sessionPersonas = ["Meeting Assistant", "Interview Coach"] as const;
 const whisperModels = [
@@ -214,3 +214,4 @@ export const SettingsSession: React.FC = () => {
     </div>
   );
 };
+

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useChat } from "../contexts/ChatContext";
+import { useChat } from "../../contexts/ChatContext";
 export type ChatInputProps = {
   onSend: (message: string) => void;
   onAbort: () => void;
@@ -106,3 +106,4 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     </div>
   );
 }
+

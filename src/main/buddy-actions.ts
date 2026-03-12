@@ -1,5 +1,5 @@
 import { getMainWindow } from "./windows";
-import { IpcMessages } from "../ipc-messages";
+import { IpcMessages } from "../shared/ipc-messages";
 import {
   BuddyAction,
   BuddySpeechPayload,
@@ -8,7 +8,7 @@ import {
 } from "../types/interfaces";
 import { getStateManager } from "./state";
 import { promptRemoteProvider } from "./remote-ai";
-import { SettingsState } from "../sharedState";
+import { SettingsState } from "../shared/shared-state";
 import { getChatManager } from "./chats";
 
 const MAX_SELECTION_LENGTH = 220;
@@ -579,3 +579,4 @@ function getBuddyChatPrompt(action: BuddyAction, selectedText: string): string {
 
   return `Explain this in simple terms:\n\n${normalized}`;
 }
+

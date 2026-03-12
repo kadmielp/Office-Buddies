@@ -1,4 +1,5 @@
-import { getAgentProfile } from "../agent-profiles";
+import { SettingsState } from "../shared/shared-state";
+import { getAgentProfile } from "../shared/agent-profiles";
 import { getAnimationKeysBrackets } from "./agent-packs";
 
 const STRUCTURE_RULE =
@@ -63,6 +64,22 @@ Agent context:
 ${fallbackLines.join("\n")}`);
 }
 
+export function buildSessionSystemPrompt(
+  settings: SettingsState,
+  selectedAgent: string,
+): string {
+  const basePrompt = buildSystemPrompt(settings.systemPrompt, selectedAgent);
+  const knowledgeContext = buildKnowledgeContext(settings);
+
+  if (!knowledgeContext) {
+    return basePrompt;
+  }
+
+  return `${basePrompt}
+
+${knowledgeContext}`;
+}
+
 function ensureStructureRule(prompt: string): string {
   if (prompt.includes(STRUCTURE_RULE)) {
     return prompt;
@@ -70,3 +87,41 @@ function ensureStructureRule(prompt: string): string {
 
   return `${prompt}\n${STRUCTURE_RULE}`;
 }
+
+function buildKnowledgeContext(settings: SettingsState): string {
+  if (!settings.useKnowledgeAtStart) {
+    return "";
+  }
+
+  const fileLines = (settings.knowledgeFiles || []).map((file) => {
+    const previewSuffix = file.previewText
+      ? ` Extracted content: ${file.previewText.slice(0, 2000)}`
+      : " Preview unavailable; use the file name and metadata as reference only.";
+
+    return `- ${file.name} (${file.meta}, ${file.status}).${previewSuffix}`;
+  });
+
+  const mcpLines = (settings.knowledgeMcpSources || []).map(
+    (source) =>
+      `- ${source.name} (${source.meta}, ${source.status}). Treat this as a read-only live knowledge source.`,
+  );
+
+  if (fileLines.length === 0 && mcpLines.length === 0) {
+    return "";
+  }
+
+  const sections = ["Knowledge sources available for this session:"];
+
+  if (fileLines.length > 0) {
+    sections.push("Files:");
+    sections.push(...fileLines);
+  }
+
+  if (mcpLines.length > 0) {
+    sections.push("MCP sources:");
+    sections.push(...mcpLines);
+  }
+
+  return sections.join("\n");
+}
+

@@ -57,6 +57,14 @@ ul.tree-view {
   top: 100px;
 }
 
+.tutorials-container {
+  width: 360px;
+  position: fixed;
+  z-index: 2;
+  left: calc(50% - 120px);
+  top: calc((1.4 / 7 * 100vh));
+}
+
 .logo {
   width: 150px;
   height: auto;

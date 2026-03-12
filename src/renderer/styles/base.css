@@ -53,9 +53,10 @@ body {
 }
 
 .bubble-title-shortcuts > button {
-  min-width: auto;
-  padding-left: 8px;
-  padding-right: 8px;
+  min-width: 58px;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
 }
 
 .bubble-window-content {

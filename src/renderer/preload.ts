@@ -2,8 +2,11 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, Data, ipcRenderer } from "electron";
-import { IpcMessages } from "../ipc-messages";
-import type { SharedState } from "../sharedState";
+import { IpcMessages } from "../shared/ipc-messages";
+import type {
+  KnowledgeFileSource,
+  SharedState,
+} from "../shared/shared-state";
 
 import type { ClippyApi } from "./clippyApi";
 import {
@@ -11,7 +14,7 @@ import {
   BuddySpeechPayload,
   ChatWithMessages,
 } from "../types/interfaces";
-import { DebugState } from "../debugState";
+import { DebugState } from "../shared/debug-state";
 import { BubbleView } from "./contexts/BubbleViewContext";
 
 const clippyApi: ClippyApi = {
@@ -70,6 +73,16 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.REMOVE_MODEL_BY_NAME, name),
   deleteAllModels: () => ipcRenderer.invoke(IpcMessages.DELETE_ALL_MODELS),
   addModelFromFile: () => ipcRenderer.invoke(IpcMessages.ADD_MODEL_FROM_FILE),
+  pickKnowledgeFiles: (existingFiles: KnowledgeFileSource[]) =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_PICK_FILES, existingFiles),
+  refreshKnowledgeFiles: (existingFiles: KnowledgeFileSource[]) =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_REFRESH_FILES, existingFiles),
+  getAvailableMcpSources: () =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_GET_AVAILABLE_MCP_SOURCES),
+  saveMcpServer: (server) =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_SAVE_MCP_SERVER, server),
+  deleteMcpServer: (serverId: string) =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_DELETE_MCP_SERVER, serverId),
 
   // State
   getFullState: () => ipcRenderer.invoke(IpcMessages.STATE_GET_FULL),
@@ -209,3 +222,4 @@ const clippyApi: ClippyApi = {
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);
+

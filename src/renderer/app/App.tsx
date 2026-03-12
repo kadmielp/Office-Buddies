@@ -1,12 +1,12 @@
-import "./css/App.css";
+import "../styles/App.css";
 import "../../../node_modules/98.css/dist/98.css";
-import "./css/98.extended.css";
-import "./css/Theme.css";
+import "../styles/98.extended.css";
+import "../styles/Theme.css";
 
-import { Clippy } from "./Clippy";
+import { Clippy } from "../features/assistant/Clippy";
 import { ChatProvider } from "../contexts/ChatContext";
-import { WindowPortal } from "./WindowPortal";
-import { Bubble } from "./BubbleWindow";
+import { WindowPortal } from "../ui/WindowPortal";
+import { Bubble } from "../features/assistant/BubbleWindow";
 import { SharedStateProvider } from "../contexts/SharedStateContext";
 import { BubbleViewProvider } from "../contexts/BubbleViewContext";
 import { DebugProvider } from "../contexts/DebugContext";
@@ -42,3 +42,4 @@ export function App() {
     </DebugProvider>
   );
 }
+

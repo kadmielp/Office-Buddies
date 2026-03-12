@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
-import { useChat } from "../contexts/ChatContext";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { abortProviderRequest } from "../ai-provider-client";
-import { streamAssistantReply } from "../helpers/stream-assistant-reply";
+import { useChat } from "../../contexts/ChatContext";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { abortProviderRequest } from "../../ai-provider-client";
+import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
 
 export type ChatProps = {
   style?: React.CSSProperties;
@@ -105,3 +105,4 @@ export function Chat({ style }: ChatProps) {
     </div>
   );
 }
+

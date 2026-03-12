@@ -9,7 +9,7 @@ import { app, BrowserWindow } from "electron";
 import { loadElectronLlm } from "@electron/llm";
 import { setupIpcListeners } from "./ipc";
 import { createMainWindow, setupWindowListener } from "./windows";
-import { getModelManager } from "./models";
+import { getModelManager } from "./model-manager";
 import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
 import {
@@ -64,3 +64,4 @@ app.on("activate", () => {
     createMainWindow();
   }
 });
+

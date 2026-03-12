@@ -1,5 +1,5 @@
-import { clippyApi } from "../clippyApi";
-import { useSharedState } from "../contexts/SharedStateContext";
+import { clippyApi } from "../../clippyApi";
+import { useSharedState } from "../../contexts/SharedStateContext";
 
 interface ErrorLoadModelMessageContentProps {
   error: string;
@@ -44,3 +44,4 @@ export const ErrorLoadModelMessageContent: React.FC<
     </div>
   );
 };
+

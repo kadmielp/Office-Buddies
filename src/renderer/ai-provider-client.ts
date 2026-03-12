@@ -3,9 +3,9 @@ import type {
   LanguageModelPrompt,
 } from "@electron/llm";
 import { clippyApi, electronAi } from "./clippyApi";
-import { Message } from "./components/Message";
-import { ModelState } from "../models";
-import { SettingsState } from "../sharedState";
+import { Message } from "./features/chat/Message";
+import { ModelState } from "../shared/models";
+import { SettingsState } from "../shared/shared-state";
 
 type ProviderName = NonNullable<SettingsState["aiProvider"]>;
 
@@ -302,3 +302,4 @@ export async function fetchProviderModels(
     | "openclaw";
   return clippyApi.fetchRemoteProviderModels(remoteProvider as any) as any;
 }
+

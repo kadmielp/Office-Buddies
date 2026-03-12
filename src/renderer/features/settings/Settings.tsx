@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { TabList } from "./TabList";
-import { BubbleView, useBubbleView } from "../contexts/BubbleViewContext";
+import { TabList } from "../../ui/TabList";
+import { BubbleView, useBubbleView } from "../../contexts/BubbleViewContext";
 import { SettingsModel } from "./SettingsModel";
 import { SettingsAdvanced } from "./SettingsAdvanced";
 import { SettingsAppearance } from "./SettingsAppearance";
@@ -80,3 +80,4 @@ function bubbleViewToSettingsTab(view: BubbleView): SettingsTab {
 
   return "appearance";
 }
+

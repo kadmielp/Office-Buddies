@@ -1,5 +1,5 @@
 import { DownloadItem } from "electron";
-import { ManagedModel } from "../models";
+import { ManagedModel } from "../shared/models";
 import { getLogger } from "./logger";
 
 /**
@@ -89,3 +89,4 @@ export class MockDownloadItem implements Partial<DownloadItem> {
     // No-op for mock
   }
 }
+

@@ -10,18 +10,18 @@ import {
   isDisallowedChatAnimationKey,
   AgentAnimation,
   AgentFrame,
-} from "../agent-packs";
-import { useChat } from "../contexts/ChatContext";
-import { log } from "../logging";
-import { useDebugState } from "../contexts/DebugContext";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { clippyApi } from "../clippyApi";
-import { useBubbleView } from "../contexts/BubbleViewContext";
-import { isModelDownloading } from "../../helpers/model-helpers";
-import { BuddySpeechPayload } from "../../types/interfaces";
-import { Message } from "./Message";
-import { streamAssistantReply } from "../helpers/stream-assistant-reply";
-import attachmentIcon from "../images/icons/attachment.png";
+} from "../../agent-packs";
+import { useChat } from "../../contexts/ChatContext";
+import { log } from "../../logging";
+import { useDebugState } from "../../contexts/DebugContext";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { clippyApi } from "../../clippyApi";
+import { useBubbleView } from "../../contexts/BubbleViewContext";
+import { isModelDownloading } from "../../../shared/model-helpers";
+import { BuddySpeechPayload } from "../../../types/interfaces";
+import { Message } from "../chat/Message";
+import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
+import attachmentIcon from "../../images/icons/attachment.png";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
@@ -1578,3 +1578,4 @@ export function Clippy() {
     </div>
   );
 }
+

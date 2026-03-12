@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
-import { DEFAULT_SETTINGS, SharedState } from "../../sharedState";
+import { DEFAULT_SETTINGS, SharedState } from "../../shared/shared-state";
 import { clippyApi } from "../clippyApi";
-import { isModelDownloading } from "../../helpers/model-helpers";
+import { isModelDownloading } from "../../shared/model-helpers";
 
 const EMPTY_SHARED_STATE: SharedState = {
   models: {},
@@ -86,3 +86,4 @@ export const useSharedState = () => {
 
   return sharedState;
 };
+

@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
 
-import { clippyApi } from "../clippyApi";
-import { Chat } from "./Chat";
-import { Settings } from "./Settings";
-import { useBubbleView } from "../contexts/BubbleViewContext";
-import { Chats } from "./Chats";
+import { clippyApi } from "../../clippyApi";
+import { Chat } from "../chat/Chat";
+import { Settings } from "../settings/Settings";
+import { useBubbleView } from "../../contexts/BubbleViewContext";
+import { Chats } from "../chat/Chats";
 import { AssistantGallery } from "./AssistantGallery";
-import { useChat } from "../contexts/ChatContext";
-import loadingGif from "../../../assets/loading.gif";
+import { useChat } from "../../contexts/ChatContext";
+import loadingGif from "../../../../assets/loading.gif";
 
 export function Bubble() {
   const { currentView, setCurrentView } = useBubbleView();
@@ -175,3 +175,4 @@ export function Bubble() {
     </div>
   );
 }
+

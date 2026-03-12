@@ -1,9 +1,9 @@
 import Markdown from "react-markdown";
 import type { CSSProperties } from "react";
-import questionIcon from "../images/icons/question.png";
-import defaultClippy from "../images/icons/msagent.png";
-import { MessageRecord } from "../../types/interfaces";
-import { clippyApi } from "../clippyApi";
+import questionIcon from "../../images/icons/question.png";
+import defaultClippy from "../../images/icons/msagent.png";
+import { MessageRecord } from "../../../types/interfaces";
+import { clippyApi } from "../../clippyApi";
 
 export interface Message extends MessageRecord {
   id: string;
@@ -140,3 +140,4 @@ export function Message({ message }: { message: Message }) {
     </div>
   );
 }
+

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { clippyApi } from "../clippyApi";
-import { DebugState, EMPTY_DEBUG_STATE } from "../../debugState";
+import { DebugState, EMPTY_DEBUG_STATE } from "../../shared/debug-state";
 
 export const DebugContext = createContext<DebugState>(EMPTY_DEBUG_STATE);
 
@@ -39,3 +39,4 @@ export const useDebugState = () => {
 
   return context;
 };
+

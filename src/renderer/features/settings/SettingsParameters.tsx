@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { clippyApi } from "../clippyApi";
-import { useSharedState } from "../contexts/SharedStateContext";
-import { buildSystemPrompt } from "../prompt-helpers";
+import { clippyApi } from "../../clippyApi";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { buildSystemPrompt } from "../../prompt-helpers";
 
 export const SettingsParameters: React.FC = () => {
   const { settings } = useSharedState();
@@ -96,3 +96,4 @@ export const SettingsParameters: React.FC = () => {
     </>
   );
 };
+

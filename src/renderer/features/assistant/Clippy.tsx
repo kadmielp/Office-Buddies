@@ -1263,106 +1263,116 @@ export function Clippy() {
       }}
     >
       {isMiniChatOpen && (
-        <div className="buddy-speech buddy-speech-mini-chat app-no-drag">
-          <div className="buddy-mini-chat-topbar">
-            {(miniChatScreenshots.length > 0 ||
-              isCapturingMiniChatScreenshot) && (
-              <button
-                type="button"
-                className="buddy-mini-chat-attachment-pill"
-                aria-label={
-                  isCapturingMiniChatScreenshot
-                    ? "Capturing screenshot"
-                    : "Remove last pending screenshot"
-                }
-                disabled={
-                  miniChatScreenshots.length === 0 ||
-                  isCapturingMiniChatScreenshot
-                }
-                onClick={() =>
-                  setMiniChatScreenshots((prevScreenshots) =>
-                    prevScreenshots.slice(0, -1),
-                  )
-                }
-              >
-                <div className="buddy-mini-chat-attachment-pill-icons">
-                  {miniChatScreenshots.map((_, index) => (
-                    <img
-                      key={`mini-chat-screenshot-${index}`}
-                      src={attachmentIcon}
-                      alt=""
-                      aria-hidden="true"
-                      className="buddy-mini-chat-attachment-pill-icon"
-                    />
-                  ))}
-                  {isCapturingMiniChatScreenshot && (
-                    <img
-                      src={attachmentIcon}
-                      alt="Capturing screenshot"
-                      className="buddy-mini-chat-attachment-pill-icon buddy-mini-chat-attachment-pill-icon-pending"
-                    />
-                  )}
-                </div>
-                {miniChatScreenshots.length > 0 &&
-                  !isCapturingMiniChatScreenshot && (
-                    <span className="buddy-mini-chat-attachment-pill-count">
-                      {miniChatScreenshots.length}
-                    </span>
-                  )}
-              </button>
-            )}
-            <button
-              className="buddy-speech-close"
-              aria-label="Close mini chat"
-              onClick={closeMiniChat}
-            >
-              x
-            </button>
-          </div>
+        <div
+          className={`buddy-speech buddy-speech-mini-chat app-no-drag ${
+            miniChatScreenshots.length > 0 || isCapturingMiniChatScreenshot
+              ? "has-toolbar"
+              : ""
+          }`}
+        >
+          {(miniChatScreenshots.length > 0 ||
+            isCapturingMiniChatScreenshot) && (
+            <div className="buddy-mini-chat-toolbar">
+              <div className="buddy-mini-chat-toolbar-left">
+                <button
+                  type="button"
+                  className="buddy-mini-chat-attachment-pill"
+                  aria-label={
+                    isCapturingMiniChatScreenshot
+                      ? "Capturing screenshot"
+                      : "Remove last pending screenshot"
+                  }
+                  disabled={
+                    miniChatScreenshots.length === 0 ||
+                    isCapturingMiniChatScreenshot
+                  }
+                  onClick={() =>
+                    setMiniChatScreenshots((prevScreenshots) =>
+                      prevScreenshots.slice(0, -1),
+                    )
+                  }
+                >
+                  <div className="buddy-mini-chat-attachment-pill-icons">
+                    {miniChatScreenshots.map((_, index) => (
+                      <img
+                        key={`mini-chat-screenshot-${index}`}
+                        src={attachmentIcon}
+                        alt=""
+                        aria-hidden="true"
+                        className="buddy-mini-chat-attachment-pill-icon"
+                      />
+                    ))}
+                    {isCapturingMiniChatScreenshot && (
+                      <img
+                        src={attachmentIcon}
+                        alt="Capturing screenshot"
+                        className="buddy-mini-chat-attachment-pill-icon buddy-mini-chat-attachment-pill-icon-pending"
+                      />
+                    )}
+                  </div>
+                  {miniChatScreenshots.length > 0 &&
+                    !isCapturingMiniChatScreenshot && (
+                      <span className="buddy-mini-chat-attachment-pill-count">
+                        {miniChatScreenshots.length}
+                      </span>
+                    )}
+                </button>
+              </div>
+            </div>
+          )}
+          <button
+            className="buddy-speech-close"
+            aria-label="Close mini chat"
+            onClick={closeMiniChat}
+          >
+            x
+          </button>
           {displayedMiniChatMessages.length > 0 && (
             <div className="buddy-mini-chat-log" aria-live="polite">
-              {displayedMiniChatMessages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`buddy-mini-chat-message ${message.sender === "user" ? "is-user" : "is-assistant"}`}
-                >
-                  <div className="buddy-mini-chat-message-label">
-                    {message.sender === "user" ? "You" : selectedAgent}
+              <>
+                {displayedMiniChatMessages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`buddy-mini-chat-message ${message.sender === "user" ? "is-user" : "is-assistant"}`}
+                  >
+                    <div className="buddy-mini-chat-message-label">
+                      {message.sender === "user" ? "You" : selectedAgent}
+                    </div>
+                    <div className="buddy-mini-chat-message-body">
+                      {(message.screenshots?.length || 0) > 0 && (
+                        <div className="buddy-mini-chat-inline-attachment">
+                          <img
+                            src={attachmentIcon}
+                            alt=""
+                            aria-hidden="true"
+                            className="buddy-mini-chat-inline-attachment-icon"
+                          />
+                          <span>
+                            {message.screenshots?.length} screenshot
+                            {message.screenshots?.length === 1 ? "" : "s"}{" "}
+                            attached
+                          </span>
+                        </div>
+                      )}
+                      {message.content && (
+                        <Markdown
+                          components={{
+                            a: ({ node, ...props }) => (
+                              <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                {...props}
+                              />
+                            ),
+                          }}
+                        >
+                          {message.content}
+                        </Markdown>
+                      )}
+                    </div>
                   </div>
-                  <div className="buddy-mini-chat-message-body">
-                    {(message.screenshots?.length || 0) > 0 && (
-                      <div className="buddy-mini-chat-inline-attachment">
-                        <img
-                          src={attachmentIcon}
-                          alt=""
-                          aria-hidden="true"
-                          className="buddy-mini-chat-inline-attachment-icon"
-                        />
-                        <span>
-                          {message.screenshots?.length} screenshot
-                          {message.screenshots?.length === 1 ? "" : "s"}{" "}
-                          attached
-                        </span>
-                      </div>
-                    )}
-                    {message.content && (
-                      <Markdown
-                        components={{
-                          a: ({ node, ...props }) => (
-                            <a
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              {...props}
-                            />
-                          ),
-                        }}
-                      >
-                        {message.content}
-                      </Markdown>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </>
             </div>
           )}
           <textarea
@@ -1578,4 +1588,3 @@ export function Clippy() {
     </div>
   );
 }
-

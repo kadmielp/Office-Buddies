@@ -6,6 +6,7 @@ export type DefaultFont =
   | "Tahoma"
   | "System Default";
 export type DefaultFontSize = number;
+export type UiDesign = "Win98" | "WinXP";
 export type AiProvider =
   | "local"
   | "openai"
@@ -62,6 +63,7 @@ export interface SettingsState {
   alwaysOpenChat?: boolean;
   topK?: number;
   temperature?: number;
+  uiDesign: UiDesign;
   defaultFont: DefaultFont;
   defaultFontSize: number;
   disableAutoUpdate?: boolean;
@@ -109,6 +111,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   remoteMaxTokens: 512,
   topK: 10,
   temperature: 0.7,
+  uiDesign: "Win98",
   defaultFont: "Tahoma",
   defaultFontSize: 12,
   disableAutoUpdate: false,

@@ -16,6 +16,7 @@ export const SettingsAppearance: React.FC = () => {
 
   const onReset = () => {
     const defaultAppareanceSettings: SettingsState = {
+      uiDesign: DEFAULT_SETTINGS.uiDesign,
       defaultFont: DEFAULT_SETTINGS.defaultFont,
       defaultFontSize: DEFAULT_SETTINGS.defaultFontSize,
       clippyAlwaysOnTop: DEFAULT_SETTINGS.clippyAlwaysOnTop,
@@ -33,6 +34,24 @@ export const SettingsAppearance: React.FC = () => {
 
   return (
     <div>
+      <fieldset>
+        <legend>UI Design</legend>
+        <div className="field-row" style={{ width: 300 }}>
+          <label htmlFor="uiDesign" style={{ width: 58 }}>
+            Style:
+          </label>
+          <select
+            id="uiDesign"
+            value={settings.uiDesign}
+            onChange={(event) => {
+              clippyApi.setState("settings.uiDesign", event.target.value);
+            }}
+          >
+            <option value="Win98">Win98</option>
+            <option value="WinXP">WinXP</option>
+          </select>
+        </div>
+      </fieldset>
       <fieldset>
         <legend>Window Options</legend>
         <Checkbox

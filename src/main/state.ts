@@ -171,6 +171,10 @@ export class StateManager {
       settings.temperature = 0.7;
     }
 
+    if (!settings.uiDesign) {
+      settings.uiDesign = "Win98";
+    }
+
     if (settings.remoteMaxTokens === undefined) {
       settings.remoteMaxTokens = 512;
     }

@@ -83,6 +83,7 @@ export type ClippyApi = {
   // App
   getVersions: () => Promise<Versions>;
   checkForUpdates: () => Promise<void>;
+  restartApp: () => Promise<void>;
   // Chats
   getChatRecords: () => Promise<Record<string, ChatRecord>>;
   getChatWithMessages: (chatId: string) => Promise<ChatWithMessages | null>;

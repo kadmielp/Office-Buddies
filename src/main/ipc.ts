@@ -1,4 +1,11 @@
-import { clipboard, Data, desktopCapturer, ipcMain, screen } from "electron";
+import {
+  app,
+  clipboard,
+  Data,
+  desktopCapturer,
+  ipcMain,
+  screen,
+} from "electron";
 import {
   getMainWindow,
   toggleChatWindow,
@@ -84,6 +91,10 @@ export function setupIpcListeners() {
   // App
   ipcMain.handle(IpcMessages.APP_CHECK_FOR_UPDATES, () => checkForUpdates());
   ipcMain.handle(IpcMessages.APP_GET_VERSIONS, () => getVersions());
+  ipcMain.handle(IpcMessages.APP_RESTART, () => {
+    app.relaunch();
+    app.exit(0);
+  });
 
   // Model
   ipcMain.handle(IpcMessages.DOWNLOAD_MODEL_BY_NAME, (_, name: string) =>

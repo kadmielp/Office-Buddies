@@ -8,12 +8,12 @@ import {
 } from "../../../shared/shared-state";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
-import attachmentIcon from "../../images/icons/kb_files.png";
-import networkDriveOnIcon from "../../images/icons/kb_mcp.png";
 import { Checkbox } from "../../ui/Checkbox";
+import { getThemeIcons } from "../../theme/theme";
 
 export const SettingsKnowledge: React.FC = () => {
   const { settings } = useSharedState();
+  const themeIcons = getThemeIcons(settings.uiDesign);
   const [availableMcpSources, setAvailableMcpSources] = useState<
     KnowledgeMcpSource[]
   >([]);
@@ -240,7 +240,7 @@ export const SettingsKnowledge: React.FC = () => {
               }}
             >
               <img
-                src={attachmentIcon}
+                  src={themeIcons.kbFiles}
                 alt=""
                 aria-hidden="true"
                 style={{ width: "18px", height: "18px" }}
@@ -298,7 +298,7 @@ export const SettingsKnowledge: React.FC = () => {
               }}
             >
               <img
-                src={networkDriveOnIcon}
+                  src={themeIcons.kbMcp}
                 alt=""
                 aria-hidden="true"
                 style={{ width: "18px", height: "18px" }}

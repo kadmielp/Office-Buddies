@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Versions } from "../../../types/interfaces";
 import { clippyApi } from "../../clippyApi";
-import infoIcon from "../../images/icons/info.png";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { getThemeIcons } from "../../theme/theme";
 
 export const SettingsAbout: React.FC = () => {
+  const { settings } = useSharedState();
+  const themeIcons = getThemeIcons(settings.uiDesign);
   const [versions, setVersions] = useState<Partial<Versions>>({});
 
   useEffect(() => {
@@ -16,7 +19,7 @@ export const SettingsAbout: React.FC = () => {
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <img
-          src={infoIcon}
+          src={themeIcons.info}
           alt=""
           aria-hidden="true"
           style={{ width: "24px", height: "24px" }}

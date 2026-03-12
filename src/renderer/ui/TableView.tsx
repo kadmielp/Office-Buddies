@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
+
 import { useWindow } from "../contexts/WindowContext";
 
 export interface Column {
@@ -60,8 +61,15 @@ export const TableView: React.FC<TableViewProps> = ({
       dataCopy.sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+
         return 0;
       });
     }
@@ -75,13 +83,15 @@ export const TableView: React.FC<TableViewProps> = ({
 
   const handleRowSelect = useCallback(
     (sortedDataIndex: number) => {
-      if (onRowSelect) {
-        onRowSelect(indexMap.get(sortedData[sortedDataIndex]));
+      const originalIndex = indexMap.get(sortedData[sortedDataIndex]);
+
+      if (onRowSelect && typeof originalIndex === "number") {
+        onRowSelect(originalIndex);
       }
 
       setSelectedRowIndex(sortedDataIndex);
     },
-    [onRowSelect, indexMap],
+    [indexMap, onRowSelect, sortedData],
   );
 
   const handleSort = (columnKey: string) => {
@@ -94,51 +104,64 @@ export const TableView: React.FC<TableViewProps> = ({
     }));
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (!sortedData.length) return;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!sortedData.length) {
+        return;
+      }
 
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        if (selectedRowIndex === null) {
-          // Select first row if nothing is selected
-          handleRowSelect(0);
-        } else if (selectedRowIndex < sortedData.length - 1) {
-          // Move to next row
-          handleRowSelect(selectedRowIndex + 1);
-        }
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        if (selectedRowIndex === null) {
-          // Select last row if nothing is selected
-          handleRowSelect(sortedData.length - 1);
-        } else if (selectedRowIndex > 0) {
-          // Move to previous row
-          handleRowSelect(selectedRowIndex - 1);
-        }
-        break;
-      case "Escape":
-        // Clear selection
-        setSelectedRowIndex(null);
-        break;
-    }
-  };
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          if (selectedRowIndex === null) {
+            handleRowSelect(0);
+          } else if (selectedRowIndex < sortedData.length - 1) {
+            handleRowSelect(selectedRowIndex + 1);
+          }
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          if (selectedRowIndex === null) {
+            handleRowSelect(sortedData.length - 1);
+          } else if (selectedRowIndex > 0) {
+            handleRowSelect(selectedRowIndex - 1);
+          }
+          break;
+        case "Escape":
+          setSelectedRowIndex(null);
+          break;
+      }
+    },
+    [handleRowSelect, selectedRowIndex, sortedData],
+  );
 
   useEffect(() => {
-    // Focus the table container to enable keyboard navigation
     if (tableRef.current) {
       tableRef.current.focus();
     }
 
-    // Add event listener for keyboard navigation
     currentWindow.addEventListener("keydown", handleKeyDown);
 
-    // Cleanup
     return () => {
       currentWindow.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedRowIndex, sortedData]);
+  }, [currentWindow, handleKeyDown]);
+
+  useEffect(() => {
+    if (typeof initialSelectedIndex !== "number") {
+      return;
+    }
+
+    const initialRow = data[initialSelectedIndex];
+
+    if (!initialRow) {
+      setSelectedRowIndex(null);
+      return;
+    }
+
+    const sortedIndex = sortedData.findIndex((row) => row === initialRow);
+    setSelectedRowIndex(sortedIndex >= 0 ? sortedIndex : null);
+  }, [data, initialSelectedIndex, sortedData]);
 
   const handleResizeStart = (e: React.MouseEvent, columnKey: string) => {
     e.preventDefault();
@@ -154,87 +177,94 @@ export const TableView: React.FC<TableViewProps> = ({
     });
   };
 
-  const handleResizeMove = (e: MouseEvent) => {
-    if (!resizing) return;
+  const handleResizeMove = useCallback(
+    (e: MouseEvent) => {
+      if (!resizing) {
+        return;
+      }
 
-    const deltaX =
-      e.clientX -
-      resizing.cursorOffset -
-      (resizing.startX - resizing.cursorOffset);
-    const newWidth = Math.max(50, resizing.initialWidth + deltaX);
+      const deltaX =
+        e.clientX -
+        resizing.cursorOffset -
+        (resizing.startX - resizing.cursorOffset);
+      const newWidth = Math.max(50, resizing.initialWidth + deltaX);
 
-    setColumnWidths((prev) => ({
-      ...prev,
-      [resizing.key]: newWidth,
-    }));
-  };
+      setColumnWidths((prev) => ({
+        ...prev,
+        [resizing.key]: newWidth,
+      }));
+    },
+    [resizing],
+  );
 
-  const handleResizeEnd = () => {
+  const handleResizeEnd = useCallback(() => {
     setResizing(null);
-  };
+  }, []);
 
   useEffect(() => {
-    if (resizing) {
-      currentWindow.document.addEventListener("mousemove", handleResizeMove);
-      currentWindow.document.addEventListener("mouseup", handleResizeEnd);
-      return () => {
-        currentWindow.document.removeEventListener(
-          "mousemove",
-          handleResizeMove,
-        );
-        currentWindow.document.removeEventListener("mouseup", handleResizeEnd);
-      };
+    if (!resizing) {
+      return;
     }
-  }, [resizing]);
+
+    currentWindow.document.addEventListener("mousemove", handleResizeMove);
+    currentWindow.document.addEventListener("mouseup", handleResizeEnd);
+
+    return () => {
+      currentWindow.document.removeEventListener("mousemove", handleResizeMove);
+      currentWindow.document.removeEventListener("mouseup", handleResizeEnd);
+    };
+  }, [currentWindow, handleResizeEnd, handleResizeMove, resizing]);
 
   const getColumnWidth = (column: Column) => {
     if (columnWidths[column.key]) {
       return { width: `${columnWidths[column.key]}px` };
     }
+
     if (column.width !== undefined) {
       return { width: `${column.width}px` };
     }
+
     return { width: "auto" };
   };
 
   return (
     <div
-      className="sunken-panel"
+      className="sunken-panel app-table-frame"
       style={{ ...style, outline: "none" }}
       ref={tableRef}
       tabIndex={0}
     >
-      <table
-        className="interactive"
-        style={{ width: "100%", tableLayout: "fixed" }}
-      >
+      <table className="interactive app-table" role="grid">
         <thead>
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
+                className="app-table-header-cell"
+                aria-sort={
+                  sortConfig?.key === column.key
+                    ? sortConfig.direction === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
                 style={{
                   ...getColumnWidth(column),
                   position: "relative",
-                  userSelect: "none",
-                  cursor: "pointer",
                 }}
                 onClick={() => handleSort(column.key)}
               >
-                {column.header}
-                {sortConfig?.key === column.key && (
-                  <span style={{ marginLeft: "4px" }}>
-                    {sortConfig.direction === "asc" ? "↑" : "↓"}
-                  </span>
-                )}
+                <span className="app-table-header-content">
+                  <span>{column.header}</span>
+                  {sortConfig?.key === column.key && (
+                    <span className="app-table-sort-indicator" aria-hidden="true">
+                      {sortConfig.direction === "asc" ? "^" : "v"}
+                    </span>
+                  )}
+                </span>
                 <div
+                  className="app-table-resize-handle"
                   style={{
-                    position: "absolute",
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: "4px",
-                    cursor: "col-resize",
                     backgroundColor:
                       resizing?.key === column.key ? "#666" : "transparent",
                   }}
@@ -249,10 +279,12 @@ export const TableView: React.FC<TableViewProps> = ({
             <tr
               key={rowIndex}
               className={selectedRowIndex === rowIndex ? "highlighted" : ""}
+              aria-selected={selectedRowIndex === rowIndex}
               onClick={() => handleRowSelect(rowIndex)}
             >
               {columns.map((column) => (
                 <td
+                  className="app-table-cell"
                   key={`${rowIndex}-${column.key}`}
                   style={getColumnWidth(column)}
                 >

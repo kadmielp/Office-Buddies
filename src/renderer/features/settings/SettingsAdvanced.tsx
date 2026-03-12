@@ -2,16 +2,12 @@ import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { useChat } from "../../contexts/ChatContext";
 import { Checkbox } from "../../ui/Checkbox";
-import recycleBinEmptyIcon from "../../images/icons/recycle_bin_empty.png";
-import recycleBinFullIcon from "../../images/icons/recycle_bin_full.png";
-import automaticUpdatesOffIcon from "../../images/icons/satellite_updates_off.png";
-import automaticUpdatesOnIcon from "../../images/icons/satellite_updates_on.png";
-import speakerOffIcon from "../../images/icons/speaker_off.png";
-import speakerOnIcon from "../../images/icons/speaker_on.png";
+import { getThemeIcons } from "../../theme/theme";
 
 export const SettingsAdvanced: React.FC = () => {
   const { settings, models } = useSharedState();
   const { setAnimationKey } = useChat();
+  const themeIcons = getThemeIcons(settings.uiDesign);
   const soundEnabled = !settings.disableSound;
   const downloadedLocalModelCount = Object.values(models).filter(
     (model) => model.downloaded,
@@ -70,8 +66,8 @@ export const SettingsAdvanced: React.FC = () => {
           <img
             src={
               settings.disableAutoUpdate
-                ? automaticUpdatesOffIcon
-                : automaticUpdatesOnIcon
+                ? themeIcons.satelliteUpdatesOff
+                : themeIcons.satelliteUpdatesOn
             }
             alt=""
             aria-hidden="true"
@@ -102,7 +98,7 @@ export const SettingsAdvanced: React.FC = () => {
             </button>
           </div>
           <img
-            src={soundEnabled ? speakerOnIcon : speakerOffIcon}
+            src={soundEnabled ? themeIcons.speakerOn : themeIcons.speakerOff}
             alt=""
             aria-hidden="true"
             style={{ width: "32px", height: "32px", flexShrink: 0 }}
@@ -145,8 +141,8 @@ export const SettingsAdvanced: React.FC = () => {
           <img
             src={
               hasDownloadedLocalModels
-                ? recycleBinFullIcon
-                : recycleBinEmptyIcon
+                ? themeIcons.recycleBinFull
+                : themeIcons.recycleBinEmpty
             }
             alt=""
             aria-hidden="true"

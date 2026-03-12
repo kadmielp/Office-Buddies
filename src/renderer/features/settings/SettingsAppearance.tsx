@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { DEFAULT_SETTINGS, SettingsState } from "../../../shared/shared-state";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
@@ -5,6 +7,11 @@ import { Checkbox } from "../../ui/Checkbox";
 
 export const SettingsAppearance: React.FC = () => {
   const { settings } = useSharedState();
+  const [pendingUiDesign, setPendingUiDesign] = useState(settings.uiDesign);
+
+  useEffect(() => {
+    setPendingUiDesign(settings.uiDesign);
+  }, [settings.uiDesign]);
 
   const onChangeFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSize = parseInt(event.target.value, 10);
@@ -14,9 +21,17 @@ export const SettingsAppearance: React.FC = () => {
     }
   };
 
+  const onApplyUiDesign = async () => {
+    if (pendingUiDesign === settings.uiDesign) {
+      return;
+    }
+
+    await clippyApi.setState("settings.uiDesign", pendingUiDesign);
+    await clippyApi.restartApp();
+  };
+
   const onReset = () => {
-    const defaultAppareanceSettings: SettingsState = {
-      uiDesign: DEFAULT_SETTINGS.uiDesign,
+    const defaultAppareanceSettings: Partial<SettingsState> = {
       defaultFont: DEFAULT_SETTINGS.defaultFont,
       defaultFontSize: DEFAULT_SETTINGS.defaultFontSize,
       clippyAlwaysOnTop: DEFAULT_SETTINGS.clippyAlwaysOnTop,
@@ -27,10 +42,14 @@ export const SettingsAppearance: React.FC = () => {
     for (const key in defaultAppareanceSettings) {
       clippyApi.setState(
         `settings.${key}`,
-        defaultAppareanceSettings[key as keyof SettingsState],
+        defaultAppareanceSettings[key as keyof typeof defaultAppareanceSettings],
       );
     }
+
+    setPendingUiDesign(DEFAULT_SETTINGS.uiDesign);
   };
+
+  const hasPendingUiDesignChange = pendingUiDesign !== settings.uiDesign;
 
   return (
     <div>
@@ -42,14 +61,20 @@ export const SettingsAppearance: React.FC = () => {
           </label>
           <select
             id="uiDesign"
-            value={settings.uiDesign}
+            value={pendingUiDesign}
             onChange={(event) => {
-              clippyApi.setState("settings.uiDesign", event.target.value);
+              setPendingUiDesign(event.target.value as typeof settings.uiDesign);
             }}
           >
             <option value="Win98">Win98</option>
             <option value="WinXP">WinXP</option>
           </select>
+        </div>
+        <div className="field-row" style={{ marginTop: 8 }}>
+          <button onClick={() => void onApplyUiDesign()} disabled={!hasPendingUiDesignChange}>
+            Apply and Restart
+          </button>
+          <span style={{ color: "#555" }}>Theme changes require a restart.</span>
         </div>
       </fieldset>
       <fieldset>

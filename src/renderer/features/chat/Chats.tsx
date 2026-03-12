@@ -3,7 +3,8 @@ import { TableView } from "../../ui/TableView";
 import { formatDistance } from "date-fns";
 import { clippyApi } from "../../clippyApi";
 import { useState } from "react";
-import chatsIcon from "../../images/icons/file_question.png";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { getThemeIcons } from "../../theme/theme";
 
 export type SettingsTab = "general" | "model" | "advanced" | "about";
 
@@ -12,6 +13,8 @@ export type SettingsProps = {
 };
 
 export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
+  const { settings } = useSharedState();
+  const themeIcons = getThemeIcons(settings.uiDesign);
   const {
     chatRecords,
     currentChatRecord,
@@ -118,50 +121,30 @@ export const Chats: React.FC<SettingsProps> = ({ onClose }) => {
   ];
 
   return (
-    <div
-      className="chats-container"
-      style={{
-        padding: "16px",
-        maxHeight: "80vh",
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        }}
-      >
+    <div className="app-page app-page--compact chats-page">
+      <div className="app-page-header">
         <img
-          src={chatsIcon}
+          className="app-page-icon"
+          src={themeIcons.fileQuestion}
           alt=""
           aria-hidden="true"
-          style={{ width: "24px", height: "24px" }}
         />
-        <h1>Chats</h1>
+        <h1 className="app-page-title">Chats</h1>
       </div>
 
-      <TableView
-        columns={columns}
-        data={chatsWithPreview}
-        onRowSelect={handleSelectChat}
-        style={{ height: "calc(80vh - 180px)", overflow: "auto" }}
-        initialSelectedIndex={Object.values(chatRecords).findIndex(
-          (chat) => chat.id === currentChatRecord.id,
-        )}
-      />
+      <div className="app-fill">
+        <TableView
+          columns={columns}
+          data={chatsWithPreview}
+          onRowSelect={handleSelectChat}
+          style={{ height: "100%", overflow: "auto" }}
+          initialSelectedIndex={Object.values(chatRecords).findIndex(
+            (chat) => chat.id === currentChatRecord.id,
+          )}
+        />
+      </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "8px",
-          justifyContent: "flex-end",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="app-actions">
         <button onClick={handleNewChat} disabled={isDeleting}>
           New Chat
         </button>

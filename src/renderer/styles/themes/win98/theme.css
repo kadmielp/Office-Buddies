@@ -1,0 +1,138 @@
+/* Default Theme */
+.clippy {
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: var(--font-size);
+  -webkit-font-smoothing: antialiased;
+  --app-overlay-bg: rgba(192, 192, 192, 0.86);
+}
+
+/* Font Family */
+.clippy[data-font="Tahoma"] {
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+.clippy[data-font="Comic Sans MS"] {
+  font-family: "Comic Sans MS", Tahoma, Arial, sans-serif;
+}
+
+.clippy[data-font="Pixelated MS Sans Serif"] {
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  -webkit-font-smoothing: none;
+}
+
+.clippy[data-font="System Default"] {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+}
+
+/* Apply it all */
+
+.clippy > .title-bar,
+.window,
+button[role="tab"],
+button,
+input,
+label,
+legend,
+option,
+select,
+table,
+textarea,
+ul.tree-view {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  -webkit-font-smoothing: inherit !important;
+}
+
+.clippy h1 {
+  font-size: 1.5rem;
+}
+
+.clippy h2 {
+  font-size: 1.25rem;
+}
+
+.clippy h3 {
+  font-size: 1rem;
+}
+
+.bubble-window-content {
+  background: #c0c0c0;
+}
+
+.bubble-loading-overlay {
+  background: var(--app-overlay-bg);
+}
+
+.bubble-loading-card,
+.app-gallery-preview,
+.app-gallery-speech,
+.chat-message-body {
+  border: 2px solid #808080;
+  background: #fff;
+  box-shadow:
+    inset -1px -1px #fff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+}
+
+.bubble-loading-card {
+  min-width: 180px;
+}
+
+.app-gallery-description {
+  color: #222;
+}
+
+.chat-composer-input {
+  background: #fff;
+}
+
+.chat-composer-input.is-busy {
+  background: #e5e5e5;
+  color: #666;
+}
+
+.chat-message-body {
+  padding: 8px 10px;
+}
+
+.chat-message.is-assistant .chat-message-body {
+  background: #fff7c7;
+}
+
+.chat-message-action {
+  padding: 4px 8px;
+}
+
+.chat-message-action-dot {
+  background: #000080;
+  box-shadow: inset -1px -1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.app-table th {
+  padding: 0 4px 4px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.app-table td {
+  padding: 1px 4px;
+}
+
+.app-table tbody tr.highlighted > td,
+.app-table tbody tr[aria-selected="true"] > td {
+  background: #000080;
+  color: #fff;
+}

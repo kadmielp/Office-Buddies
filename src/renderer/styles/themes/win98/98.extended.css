@@ -1,0 +1,22 @@
+.window-content {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+table > tbody > tr > * {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+fieldset button {
+  margin: 0 5px;
+}
+
+fieldset button:first-of-type {
+  margin-left: 0;
+}
+
+fieldset button:last-of-type {
+  margin-right: 0;
+}

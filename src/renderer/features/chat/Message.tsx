@@ -1,9 +1,8 @@
 import Markdown from "react-markdown";
-import type { CSSProperties } from "react";
-import questionIcon from "../../images/icons/question.png";
-import defaultClippy from "../../images/icons/msagent.png";
 import { MessageRecord } from "../../../types/interfaces";
 import { clippyApi } from "../../clippyApi";
+import { useSharedState } from "../../contexts/SharedStateContext";
+import { getThemeIcons } from "../../theme/theme";
 
 export interface Message extends MessageRecord {
   id: string;
@@ -14,34 +13,17 @@ export interface Message extends MessageRecord {
 }
 
 export function Message({ message }: { message: Message }) {
+  const { settings } = useSharedState();
+  const themeIcons = getThemeIcons(settings.uiDesign);
   const isUser = message.sender === "user";
-  const userMessageContentStyle: CSSProperties = {
-    minWidth: 0,
-    width: "fit-content",
-    maxWidth: "82%",
-    textAlign: "left",
-    overflowWrap: "anywhere",
-  };
-  const assistantMessageContentStyle: CSSProperties = {
-    minWidth: 0,
-    width: "fit-content",
-    maxWidth: "calc(100% - 40px)",
-    textAlign: "left",
-    overflowWrap: "anywhere",
-  };
 
   return (
     <div
-      className="message"
-      style={{
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: isUser ? "flex-end" : "flex-start",
-      }}
+      className={`message chat-message ${isUser ? "is-user" : "is-assistant"}`}
     >
       {isUser ? (
         <>
-          <div className="message-content" style={userMessageContentStyle}>
+          <div className="message-content chat-message-body">
             {message.children ? (
               message.children
             ) : (
@@ -57,29 +39,19 @@ export function Message({ message }: { message: Message }) {
             )}
           </div>
           <img
-            src={questionIcon}
+            className="chat-message-icon"
+            src={themeIcons.question}
             alt="You"
-            style={{
-              width: "24px",
-              height: "24px",
-              marginLeft: "8px",
-              marginTop: "10px",
-            }}
           />
         </>
       ) : (
         <>
           <img
-            src={defaultClippy}
+            className="chat-message-icon"
+            src={themeIcons.msagent}
             alt="Clippy"
-            style={{
-              width: "24px",
-              height: "24px",
-              marginRight: "8px",
-              marginTop: "10px",
-            }}
           />
-          <div className="message-content" style={assistantMessageContentStyle}>
+          <div className="message-content chat-message-body">
             {message.children ? (
               message.children
             ) : (
@@ -94,41 +66,16 @@ export function Message({ message }: { message: Message }) {
               </Markdown>
             )}
             {message.actions && message.actions.length > 0 && (
-              <div
-                className="message-actions"
-                style={{
-                  marginTop: "12px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "6px",
-                }}
-              >
+              <div className="message-actions chat-message-actions">
                 {message.actions.map((action, idx) => (
                   <button
                     key={idx}
-                    style={{
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      width: "100%",
-                    }}
+                    className="chat-message-action"
                     onClick={() => {
                       clippyApi.sendProactiveAction(message.id, action.action);
                     }}
                   >
-                    <span
-                      style={{
-                        width: "10px",
-                        height: "10px",
-                        borderRadius: "50%",
-                        backgroundColor: "#000080",
-                        display: "inline-block",
-                        boxShadow: "inset -1px -1px 1px rgba(0,0,0,0.5)",
-                      }}
-                    />
+                    <span className="chat-message-action-dot" />
                     {action.label}
                   </button>
                 ))}

@@ -14,32 +14,10 @@ export function Bubble() {
   const { setIsChatWindowOpen, isStartingNewChat } = useChat();
   const [isMaximized, setIsMaximized] = useState(false);
 
-  const containerStyle = {
-    width: "calc(100% - 6px)",
-    height: "calc(100% - 6px)",
-    margin: 0,
-    overflow: "hidden",
-    position: "relative" as const,
-  };
-
-  const chatStyle = {
-    padding: "15px",
-    display: "flex",
-    flexDirection: "column" as const,
-    justifyContent: "flex-end",
-    minHeight: "calc(100% - 35px)",
-    overflowAnchor: "none" as const,
-  };
-
-  const scrollAnchoredAtBottomStyle = {
-    display: "flex",
-    flexDirection: "column-reverse" as const,
-  };
-
   let content = null;
 
   if (currentView === "chat") {
-    content = <Chat style={chatStyle} />;
+    content = <Chat />;
   } else if (currentView.startsWith("settings")) {
     content = <Settings onClose={() => setCurrentView("chat")} />;
   } else if (currentView === "chats") {
@@ -65,8 +43,7 @@ export function Bubble() {
 
   return (
     <div
-      className="bubble-container window"
-      style={containerStyle}
+      className="bubble-container window bubble-window"
       aria-busy={isStartingNewChat}
     >
       <div className="app-drag title-bar">
@@ -76,49 +53,40 @@ export function Bubble() {
             : "Chat with Office Buddies"}
         </div>
         <div className="title-bar-controls app-no-drag">
-          {isAssistantHeaderMode ? (
-            <>
-              <button
-                className={isGallerySelected ? "header-tab-active" : undefined}
-                style={{
-                  marginRight: "8px",
-                  paddingLeft: "8px",
-                  paddingRight: "8px",
-                }}
-                aria-pressed={isGallerySelected}
-                onClick={() => setCurrentView("assistant-gallery")}
-              >
-                Gallery
-              </button>
-              <button
-                className={isOptionsSelected ? "header-tab-active" : undefined}
-                style={{
-                  marginRight: "8px",
-                  paddingLeft: "8px",
-                  paddingRight: "8px",
-                }}
-                aria-pressed={isOptionsSelected}
-                onClick={() => setCurrentView("settings-general")}
-              >
-                Options
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                className={isChatsSelected ? "header-tab-active" : undefined}
-                style={{
-                  marginRight: "8px",
-                  paddingLeft: "8px",
-                  paddingRight: "8px",
-                }}
-                aria-pressed={isChatsSelected}
-                onClick={handleChatsClick}
-              >
-                Chats
-              </button>
-            </>
-          )}
+          <div className="bubble-title-shortcuts">
+            {isAssistantHeaderMode ? (
+              <>
+                <button
+                  className={
+                    isGallerySelected ? "header-tab-active" : undefined
+                  }
+                  aria-pressed={isGallerySelected}
+                  onClick={() => setCurrentView("assistant-gallery")}
+                >
+                  Gallery
+                </button>
+                <button
+                  className={
+                    isOptionsSelected ? "header-tab-active" : undefined
+                  }
+                  aria-pressed={isOptionsSelected}
+                  onClick={() => setCurrentView("settings-general")}
+                >
+                  Options
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className={isChatsSelected ? "header-tab-active" : undefined}
+                  aria-pressed={isChatsSelected}
+                  onClick={handleChatsClick}
+                >
+                  Chats
+                </button>
+              </>
+            )}
+          </div>
           <button
             aria-label="Minimize"
             onClick={() => clippyApi.minimizeChatWindow()}
@@ -137,36 +105,19 @@ export function Bubble() {
         </div>
       </div>
       <div
-        className="window-content"
-        style={currentView === "chat" ? scrollAnchoredAtBottomStyle : {}}
+        className={`window-content bubble-window-content${
+          currentView === "chat" ? " is-chat" : ""
+        }`}
       >
         {content}
       </div>
       {isStartingNewChat && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 1000,
-            backgroundColor: "rgba(192, 192, 192, 0.8)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "auto",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
+        <div className="bubble-loading-overlay">
+          <div className="bubble-loading-card">
             <img
+              className="bubble-loading-image"
               src={loadingGif}
               alt="Loading model"
-              style={{ width: "32px", height: "32px" }}
             />
             <span>Preparing new chat...</span>
           </div>

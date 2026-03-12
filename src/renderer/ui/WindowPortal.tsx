@@ -5,6 +5,7 @@ import { clippyApi } from "../clippyApi";
 import { WindowContext } from "../contexts/WindowContext";
 import { useChat } from "../contexts/ChatContext";
 import { useSharedState } from "../contexts/SharedStateContext";
+import { applyThemeDocument } from "../theme/theme";
 
 interface WindowPortalProps {
   children: React.ReactNode;
@@ -19,6 +20,10 @@ interface WindowPortalProps {
 let _externalWindow: Window | null = null;
 let containerDiv: HTMLDivElement | null = null;
 let isInitialized = false;
+
+function getThemeWindowBackground(uiDesign: string) {
+  return uiDesign === "WinXP" ? "#ece9d8" : "#c0c0c0";
+}
 
 export function WindowPortal({
   children,
@@ -40,6 +45,22 @@ export function WindowPortal({
       setIsChatWindowOpen(true);
     }
   }, [settings.alwaysOpenChat, isChatWindowOpen, setIsChatWindowOpen]);
+
+  useEffect(() => {
+    if (!containerDiv) {
+      return;
+    }
+
+    containerDiv.setAttribute("data-font", settings.defaultFont);
+    containerDiv.setAttribute("data-ui-design", settings.uiDesign);
+
+    if (_externalWindow && !_externalWindow.closed) {
+      applyThemeDocument(_externalWindow.document, settings.uiDesign);
+      const background = getThemeWindowBackground(settings.uiDesign);
+      _externalWindow.document.documentElement.style.background = background;
+      _externalWindow.document.body.style.background = background;
+    }
+  }, [settings.defaultFont, settings.uiDesign]);
 
   // Initialize the singleton container only once
   useEffect(() => {
@@ -93,6 +114,10 @@ export function WindowPortal({
         }
 
         externalDoc.head.appendChild(style);
+        applyThemeDocument(externalDoc, settings.uiDesign);
+        const background = getThemeWindowBackground(settings.uiDesign);
+        externalDoc.documentElement.style.background = background;
+        externalDoc.body.style.background = background;
 
         // Setup close event
         _externalWindow.addEventListener("beforeunload", () => {
@@ -139,7 +164,7 @@ export function WindowPortal({
       // We don't close the window here anymore to maintain singleton
       // The window will be closed when the app is closed
     };
-  }, [isChatWindowOpen, width, height, title]);
+  }, [isChatWindowOpen, settings.uiDesign, width, height, title]);
 
   // Always render to the portal if it exists, regardless of visibility
   if (!containerDiv) {

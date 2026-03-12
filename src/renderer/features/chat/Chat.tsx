@@ -7,11 +7,7 @@ import { useSharedState } from "../../contexts/SharedStateContext";
 import { abortProviderRequest } from "../../ai-provider-client";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
 
-export type ChatProps = {
-  style?: React.CSSProperties;
-};
-
-export function Chat({ style }: ChatProps) {
+export function Chat() {
   const { settings } = useSharedState();
   const { setAnimationKey, setStatus, status, messages, addMessage } =
     useChat();
@@ -57,7 +53,7 @@ export function Chat({ style }: ChatProps) {
       });
 
       // Once streaming is complete, add the full message to the messages array
-      // and clear the streaming message
+      // and clear the streaming message.
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         content: filteredContent,
@@ -76,7 +72,7 @@ export function Chat({ style }: ChatProps) {
 
       await addMessage({
         id: crypto.randomUUID(),
-        content: `⚠️ Falha ao obter resposta: ${errorMessage}`,
+        content: `[Error] Falha ao obter resposta: ${errorMessage}`,
         sender: "clippy",
         createdAt: Date.now(),
       });
@@ -87,7 +83,7 @@ export function Chat({ style }: ChatProps) {
   };
 
   return (
-    <div style={style} className="chat-container">
+    <div className="chat-container">
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
@@ -105,4 +101,3 @@ export function Chat({ style }: ChatProps) {
     </div>
   );
 }
-

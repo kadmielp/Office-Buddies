@@ -1,6 +1,15 @@
+.bubble-container.window {
+  padding: 1px;
+  background: #ece9d8;
+  box-shadow:
+    inset 0 0 0 1px #7aa2e4,
+    inset 0 0 0 2px #0c57d8;
+}
+
 .window-content {
   overflow-y: auto;
-  height: calc(100% - 20px);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 table > tbody > tr > * {

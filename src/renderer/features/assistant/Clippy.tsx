@@ -21,7 +21,7 @@ import { isModelDownloading } from "../../../shared/model-helpers";
 import { BuddySpeechPayload } from "../../../types/interfaces";
 import { Message } from "../chat/Message";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
-import attachmentIcon from "../../images/icons/attachment.png";
+import { getThemeIcons } from "../../theme/theme";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
@@ -168,6 +168,10 @@ export function Clippy() {
   const { currentView, setCurrentView } = useBubbleView();
   const { enableDragDebug } = useDebugState();
   const selectedAgent = settings.selectedAgent || "Clippy";
+  const themeIcons = useMemo(
+    () => getThemeIcons(settings.uiDesign),
+    [settings.uiDesign],
+  );
   const isAssistantGalleryOpen =
     currentView === "assistant-gallery" && isChatWindowOpen;
 
@@ -1296,7 +1300,7 @@ export function Clippy() {
                     {miniChatScreenshots.map((_, index) => (
                       <img
                         key={`mini-chat-screenshot-${index}`}
-                        src={attachmentIcon}
+                        src={themeIcons.attachment}
                         alt=""
                         aria-hidden="true"
                         className="buddy-mini-chat-attachment-pill-icon"
@@ -1304,7 +1308,7 @@ export function Clippy() {
                     ))}
                     {isCapturingMiniChatScreenshot && (
                       <img
-                        src={attachmentIcon}
+                        src={themeIcons.attachment}
                         alt="Capturing screenshot"
                         className="buddy-mini-chat-attachment-pill-icon buddy-mini-chat-attachment-pill-icon-pending"
                       />
@@ -1342,7 +1346,7 @@ export function Clippy() {
                       {(message.screenshots?.length || 0) > 0 && (
                         <div className="buddy-mini-chat-inline-attachment">
                           <img
-                            src={attachmentIcon}
+                            src={themeIcons.attachment}
                             alt=""
                             aria-hidden="true"
                             className="buddy-mini-chat-inline-attachment-icon"

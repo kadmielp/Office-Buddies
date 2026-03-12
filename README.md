@@ -16,7 +16,7 @@
 
 Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
-Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic.
+Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic with selectable Windows 98 and Windows XP themes.
 It is also a tribute to the nostalgic assistants that marked generations.
 
 ## What This Fork Is
@@ -50,7 +50,14 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
   - `Win + F3`: Summarize
   - `Win + F4`: Explain in a simple way (like I'm 5)
   - `Win + F5`: Rewrite in a friendlier tone
-- Windows-98-inspired UI and interaction patterns.
+- Selectable Windows 98 and Windows XP-inspired UI themes and interaction patterns.
+
+## UI Themes
+
+You can switch the app chrome in `Settings > Appearance > UI Design`.
+
+- `Win98`: classic Office Buddies look.
+- `WinXP`: Windows XP-inspired theme for the main app windows and controls.
 
 ## Buddy Actions and Speech Balloon
 
@@ -141,6 +148,7 @@ Special thanks to:
 - Microsoft, for the Office Assistant legacy and for Electron.
 - [Kevan Atteberry](https://www.kevanatteberry.com/) for designing Clippy.
 - [Jordan Scales (@jdan)](https://github.com/jdan) for the Windows 98 visual language.
+- [botoxparty/XP.css](https://botoxparty.github.io/XP.css/) for the Windows XP visual language used by the XP theme.
 - [Alex Meub's Windows 98 Icons](https://win98icons.alexmeub.com/) as the source for some icons used in this project.
 - [Pooya Parsa (@pi0)](https://github.com/pi0) and contributors who helped preserve/extract assistant animation data.
 - [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for making local inference practical in Node/Electron.

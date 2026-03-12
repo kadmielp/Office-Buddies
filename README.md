@@ -41,7 +41,7 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
 - Native-feeling context menu for choosing and previewing assistant animations.
-- Proactive integration with OpenClaw 🦞 ([Learn more](openclaw-officebuddies-tailscale.md)).
+- Proactive integration with OpenClaw 🦞 ([Learn more](docs/tutorials/openclaw-officebuddies-tailscale.md)).
 - Smart Reminders: Schedule tasks using natural language directly in the chat.
 - OpenClaw Skill included for easy agent integration ([View Skill](skills/office-buddies/SKILL.md)).
 - Buddy actions for selected text (define, summarize, simplify, rewrite).
@@ -125,7 +125,7 @@ Quick start on Windows:
 Detailed docs:
 
 - [`tools/animation-studio/README.md`](tools/animation-studio/README.md)
-- [`tools/animation-studio/TUTORIAL.md`](tools/animation-studio/TUTORIAL.md)
+- [`docs/tutorials/animation-studio.md`](docs/tutorials/animation-studio.md)
 
 ## Scope and Intent
 
@@ -144,3 +144,4 @@ Special thanks to:
 - [Alex Meub's Windows 98 Icons](https://win98icons.alexmeub.com/) as the source for some icons used in this project.
 - [Pooya Parsa (@pi0)](https://github.com/pi0) and contributors who helped preserve/extract assistant animation data.
 - [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for making local inference practical in Node/Electron.
+

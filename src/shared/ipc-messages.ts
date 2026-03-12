@@ -46,6 +46,7 @@ export const IpcMessages = {
   // App messages
   APP_CHECK_FOR_UPDATES: "clippy_app_check_for_updates",
   APP_GET_VERSIONS: "clippy_app__get_versions",
+  APP_RESTART: "clippy_app_restart",
 
   // Chat messages
   CHAT_GET_CHAT_RECORDS: "clippy_chat_get_chat_records",

@@ -1,0 +1,315 @@
+:root {
+  background: transparent;
+}
+
+html,
+body {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background: transparent;
+}
+
+.clippy {
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.clippy * {
+  box-sizing: border-box;
+}
+
+.app-drag {
+  app-region: drag;
+}
+
+.app-no-drag {
+  app-region: no-drag;
+}
+
+.app-no-select {
+  user-select: none;
+}
+
+.bubble-window {
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble-title-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+}
+
+.bubble-title-shortcuts > button {
+  min-width: auto;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.bubble-window-content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.bubble-window-content.is-chat {
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.bubble-loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.bubble-loading-image {
+  width: 32px;
+  height: 32px;
+}
+
+.app-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 12px;
+  gap: 12px;
+}
+
+.app-page--compact {
+  gap: 10px;
+}
+
+.app-fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.app-page-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.app-page-icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.app-page-title {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.app-inline-note {
+  margin: 0;
+}
+
+.app-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.app-gallery {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  gap: 12px;
+}
+
+.app-gallery-hero {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.app-gallery-preview {
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex: none;
+}
+
+.app-gallery-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.app-gallery-speech {
+  min-height: 82px;
+  padding: 10px;
+}
+
+.app-gallery-description {
+  min-height: 72px;
+}
+
+.app-gallery-nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.app-gallery-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100%;
+  padding: 15px;
+  gap: 10px;
+  overflow-anchor: none;
+}
+
+.chat-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.chat-composer-input {
+  flex: 1 1 auto;
+  width: 80px;
+  min-height: 23px;
+  resize: vertical;
+}
+
+.chat-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.chat-message.is-user {
+  justify-content: flex-end;
+}
+
+.chat-message.is-assistant {
+  justify-content: flex-start;
+}
+
+.chat-message-body {
+  min-width: 0;
+  width: fit-content;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.chat-message.is-user .chat-message-body {
+  max-width: 82%;
+}
+
+.chat-message.is-assistant .chat-message-body {
+  max-width: calc(100% - 40px);
+}
+
+.chat-message-icon {
+  width: 24px;
+  height: 24px;
+  margin-top: 10px;
+  flex: none;
+}
+
+.chat-message-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-message-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chat-message-action-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: none;
+}
+
+.app-table-frame {
+  min-height: 0;
+}
+
+.app-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.app-table th {
+  user-select: none;
+  cursor: pointer;
+}
+
+.app-table-header-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-table-sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 8px;
+  line-height: 1;
+}
+
+.app-table-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+}

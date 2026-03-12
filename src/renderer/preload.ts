@@ -203,6 +203,7 @@ const clippyApi: ClippyApi = {
   // App
   getVersions: () => ipcRenderer.invoke(IpcMessages.APP_GET_VERSIONS),
   checkForUpdates: () => ipcRenderer.invoke(IpcMessages.APP_CHECK_FOR_UPDATES),
+  restartApp: () => ipcRenderer.invoke(IpcMessages.APP_RESTART),
 
   // Clipboard
   clipboardWrite: (data: Data) =>

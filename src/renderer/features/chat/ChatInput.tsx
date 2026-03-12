@@ -34,11 +34,6 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     }
   }, [status, handleSend, handleAbort]);
 
-  const buttonStyle: React.CSSProperties = {
-    alignSelf: "flex-end",
-    height: "23px",
-  };
-
   useEffect(() => {
     if (isModelLoaded && textareaRef.current) {
       textareaRef.current.focus();
@@ -75,9 +70,11 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     : "This is your chat input, we're just waiting for a model to load...";
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-end" }}>
+    <div className="chat-composer">
       <textarea
-        className={isModelReplying ? "chat-input-busy" : undefined}
+        className={`chat-composer-input${
+          isModelReplying ? " chat-input-busy is-busy" : ""
+        }`}
         rows={1}
         ref={textareaRef}
         value={message}
@@ -85,19 +82,9 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
         disabled={!isModelLoaded || isModelReplying}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        style={{
-          flex: 1,
-          marginRight: "8px",
-          resize: "vertical",
-          minHeight: "23px",
-          width: 80,
-          backgroundColor: isModelReplying ? "#e5e5e5" : undefined,
-          color: isModelReplying ? "#666666" : undefined,
-        }}
       />
       <button
         disabled={!isModelLoaded}
-        style={buttonStyle}
         onMouseDown={(e) => e.preventDefault()}
         onClick={handleSendOrAbort}
       >

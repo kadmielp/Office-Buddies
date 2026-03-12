@@ -343,73 +343,37 @@ export function AssistantGallery() {
   };
 
   return (
-    <div style={{ padding: "12px", height: "100%", boxSizing: "border-box" }}>
-      <p style={{ marginTop: "0", marginBottom: "10px" }}>
+    <div className="app-page assistant-gallery-page">
+      <p className="app-inline-note">
         You can scroll through the different assistants by using the &lt;Back
         and Next&gt; buttons. When you are finished selecting your assistant,
         click the OK button.
       </p>
 
-      <fieldset style={{ margin: 0 }}>
+      <fieldset className="app-fill" style={{ margin: 0 }}>
         <legend>{details.displayName}</legend>
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            alignItems: "flex-start",
-            minHeight: "260px",
-            height: "150px",
-            flexDirection: "column",
-          }}
-        >
-          <div style={{ display: "flex", gap: "12px", width: "100%" }}>
-            <div
-              style={{
-                width: "92px",
-                height: "92px",
-                border: "1px solid #808080",
-                background: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-              }}
-            >
+        <div className="app-gallery">
+          <div className="app-gallery-hero">
+            <div className="app-gallery-preview">
               <AssistantPreview
                 agentName={currentAgent}
                 isSoundEnabled={isSoundEnabled}
               />
             </div>
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  border: "1px solid #808080",
-                  background: "#fff",
-                  minHeight: "82px",
-                  padding: "10px",
-                  marginBottom: "12px",
-                }}
-              >
-                {details.speech}
+            <div className="app-gallery-copy">
+              <div className="app-gallery-speech">{details.speech}</div>
+              <div className="app-gallery-description">
+                {details.description}
               </div>
-              <div style={{ minHeight: "72px" }}>{details.description}</div>
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              width: "100%",
-              marginTop: "auto",
-            }}
-          >
+          <div className="app-gallery-nav">
             <button onClick={onBack} disabled={agentIndex <= 0}>
               &lt; Back
             </button>
             <button
               onClick={onNext}
               disabled={agentIndex >= galleryAgents.length - 1}
-              style={{ marginLeft: "8px" }}
             >
               Next &gt;
             </button>
@@ -417,20 +381,11 @@ export function AssistantGallery() {
         </div>
       </fieldset>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginTop: "18px",
-        }}
-      >
-        <button onClick={onOk} style={{ minWidth: "70px" }}>
+      <div className="app-gallery-footer">
+        <button onClick={onOk}>
           OK
         </button>
-        <button
-          onClick={onCancel}
-          style={{ minWidth: "70px", marginLeft: "8px" }}
-        >
+        <button onClick={onCancel}>
           Cancel
         </button>
       </div>

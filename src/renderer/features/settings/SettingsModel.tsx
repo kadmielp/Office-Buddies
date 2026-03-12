@@ -10,8 +10,7 @@ import { AiProvider } from "../../../shared/shared-state";
 import { fetchProviderModels } from "../../ai-provider-client";
 import { useChat } from "../../contexts/ChatContext";
 import { Checkbox } from "../../ui/Checkbox";
-import localProviderIcon from "../../images/icons/network_drive_off.png";
-import remoteProviderIcon from "../../images/icons/network_drive_on.png";
+import { getThemeIcons } from "../../theme/theme";
 
 function filterRemoteModelsByProvider(
   provider: AiProvider,
@@ -30,6 +29,7 @@ function filterRemoteModelsByProvider(
 export const SettingsModel: React.FC = () => {
   const { models, settings } = useSharedState();
   const { setAnimationKey } = useChat();
+  const themeIcons = getThemeIcons(settings.uiDesign);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const selectedProvider = settings.aiProvider || "local";
   const [remoteModelOptions, setRemoteModelOptions] = useState<string[]>([]);
@@ -265,11 +265,11 @@ export const SettingsModel: React.FC = () => {
             <option value={"openclaw" as AiProvider}>OpenClaw</option>
           </select>
           <img
-            src={
-              selectedProvider === "local"
-                ? localProviderIcon
-                : remoteProviderIcon
-            }
+              src={
+                selectedProvider === "local"
+                  ? themeIcons.networkDriveOff
+                  : themeIcons.networkDriveOn
+              }
             alt=""
             aria-hidden="true"
             style={{

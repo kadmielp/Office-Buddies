@@ -28,26 +28,35 @@ export function TabList({ tabs, activeTab, onTabChange }: TabListProps) {
     }
   };
 
+  const activeTabKey = tabs[activeTabIndex]?.key || "tab";
+  const activePanelId = `tabpanel-${activeTabKey}`;
+  const activeTabId = `tab-${activeTabKey}`;
+
   return (
     <div className="window-body">
       <menu role="tablist">
         {tabs.map((tab, index) => (
-          <li
+          <button
             key={index}
+            id={`tab-${tab.key}`}
+            type="button"
             role="tab"
             aria-selected={activeTabIndex === index}
+            aria-controls={`tabpanel-${tab.key}`}
             onClick={() => handleTabClick(index)}
-            style={{
-              cursor: "pointer",
-            }}
           >
-            <a>{tab.label}</a>
-          </li>
+            {tab.label}
+          </button>
         ))}
       </menu>
-      <div className="window" role="tabpanel">
-        <div className="window-body">{tabs[activeTabIndex]?.content}</div>
-      </div>
+      <article
+        className="tab-panel"
+        role="tabpanel"
+        id={activePanelId}
+        aria-labelledby={activeTabId}
+      >
+        {tabs[activeTabIndex]?.content}
+      </article>
     </div>
   );
 }

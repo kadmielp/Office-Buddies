@@ -8,6 +8,7 @@ This is a standalone Win98-style GUI tool for editing assistant animations.
 - `tools/animation-studio/public/index.html`
 - `tools/animation-studio/public/app.js`
 - `tools/animation-studio/public/app.css`
+- Tutorial: `docs/tutorials/animation-studio.md`
 
 ## Run
 

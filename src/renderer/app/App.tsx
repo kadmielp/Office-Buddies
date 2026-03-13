@@ -36,7 +36,7 @@ function AppShell() {
       }}
     >
       <Clippy />
-      <WindowPortal width={450} height={650}>
+      <WindowPortal width={500} height={650}>
         <Bubble />
       </WindowPortal>
     </div>

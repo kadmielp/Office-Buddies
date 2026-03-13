@@ -8,6 +8,8 @@ export const SettingsAdvanced: React.FC = () => {
   const { settings, models } = useSharedState();
   const { setAnimationKey } = useChat();
   const themeIcons = getThemeIcons(settings.uiDesign);
+  const isWindows = navigator.userAgent.toLowerCase().includes("windows");
+  const isStartupSupported = isWindows && window.location.protocol === "file:";
   const soundEnabled = !settings.disableSound;
   const downloadedLocalModelCount = Object.values(models).filter(
     (model) => model.downloaded,
@@ -36,6 +38,23 @@ export const SettingsAdvanced: React.FC = () => {
 
   return (
     <div>
+      <fieldset>
+        <legend>Startup</legend>
+        <Checkbox
+          id="startWithWindows"
+          label="Start Office Buddies automatically when Windows starts"
+          checked={!!settings.startWithWindows}
+          disabled={!isStartupSupported}
+          onChange={(checked) => {
+            clippyApi.setState("settings.startWithWindows", checked);
+          }}
+        />
+        <p style={{ marginBottom: 0 }}>
+          {isStartupSupported
+            ? "Office Buddies will launch at sign-in using the Windows startup entry."
+            : "This option is available in installed Windows builds."}
+        </p>
+      </fieldset>
       <fieldset>
         <legend>Automatic Updates</legend>
         <div
@@ -153,4 +172,3 @@ export const SettingsAdvanced: React.FC = () => {
     </div>
   );
 };
-

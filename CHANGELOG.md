@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.7] - 2026-03-13
+
+### Added
+
+- Added `KNO-57`: a "Start Office Buddies automatically when Windows starts" option in Advanced settings.
+- Added Windows startup registration handling that persists the preference and applies it through Electron's login-item integration for installed Windows builds.
+
+### Changed
+
+- Startup settings now reconcile the stored preference with the actual Windows login-item state so the UI reflects the real system registration result.
+- The startup toggle is shown as available only in installed Windows builds, avoiding accidental registration during development runs.
+
 ## [0.6.6] - 2026-03-08
 
 ### Added

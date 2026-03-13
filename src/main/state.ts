@@ -20,6 +20,7 @@ import { BUILT_IN_MODELS } from "../shared/models";
 import { getLogger } from "./logger";
 import { setupAppMenu } from "./menu";
 import { startProactiveServer } from "./proactive-server";
+import { syncWindowsStartupSetting } from "./startup";
 
 const ENCRYPTED_PREFIX = "ob_enc_v1:";
 type SensitiveSettingsKey =
@@ -100,6 +101,7 @@ export class StateManager {
   constructor() {
     this.ensureCorrectModelState();
     this.ensureCorrectSettingsState();
+    this.syncWindowsStartupSettingFromState();
 
     this.store.onDidAnyChange((newValue) => this.onDidAnyChange(newValue));
 
@@ -191,6 +193,10 @@ export class StateManager {
       settings.systemPrompt = DEFAULT_SYSTEM_PROMPT;
     }
 
+    if (settings.startWithWindows === undefined) {
+      settings.startWithWindows = false;
+    }
+
     this.store.set("settings", this.toStoredSettings(settings));
   }
 
@@ -272,6 +278,16 @@ export class StateManager {
       startProactiveServer();
     }
 
+    if (previousSettings.startWithWindows !== nextSettings.startWithWindows) {
+      const actualValue = syncWindowsStartupSetting(
+        nextSettings.startWithWindows,
+      );
+
+      if (actualValue !== Boolean(nextSettings.startWithWindows)) {
+        this.store.set("settings.startWithWindows", actualValue);
+      }
+    }
+
     // Update the menu, which contains state
     setupAppMenu();
 
@@ -327,6 +343,16 @@ export class StateManager {
 
     return runtimeSettings;
   }
+
+  private syncWindowsStartupSettingFromState() {
+    const actualValue = syncWindowsStartupSetting(
+      this.getSettings().startWithWindows,
+    );
+
+    if (actualValue !== Boolean(this.getSettings().startWithWindows)) {
+      this.store.set("settings.startWithWindows", actualValue);
+    }
+  }
 }
 
 let _stateManager: StateManager | null = null;
@@ -338,4 +364,3 @@ export function getStateManager() {
 
   return _stateManager;
 }
-

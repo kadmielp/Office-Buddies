@@ -68,6 +68,7 @@ export interface SettingsState {
   defaultFontSize: number;
   disableAutoUpdate?: boolean;
   disableSound?: boolean;
+  startWithWindows?: boolean;
   enableProactiveMessages?: boolean;
   proactivePort?: number;
   useKnowledgeAtStart?: boolean;
@@ -116,6 +117,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   defaultFontSize: 12,
   disableAutoUpdate: false,
   disableSound: false,
+  startWithWindows: false,
   enableProactiveMessages: false,
   proactivePort: 5050,
   useKnowledgeAtStart: true,

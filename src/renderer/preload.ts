@@ -3,10 +3,7 @@
 
 import { contextBridge, Data, ipcRenderer } from "electron";
 import { IpcMessages } from "../shared/ipc-messages";
-import type {
-  KnowledgeFileSource,
-  SharedState,
-} from "../shared/shared-state";
+import type { KnowledgeFileSource, SharedState } from "../shared/shared-state";
 
 import type { ClippyApi } from "./clippyApi";
 import {
@@ -77,12 +74,14 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.KNOWLEDGE_PICK_FILES, existingFiles),
   refreshKnowledgeFiles: (existingFiles: KnowledgeFileSource[]) =>
     ipcRenderer.invoke(IpcMessages.KNOWLEDGE_REFRESH_FILES, existingFiles),
-  getAvailableMcpSources: () =>
-    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_GET_AVAILABLE_MCP_SOURCES),
-  saveMcpServer: (server) =>
-    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_SAVE_MCP_SERVER, server),
-  deleteMcpServer: (serverId: string) =>
-    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_DELETE_MCP_SERVER, serverId),
+  getAvailableKnowledgeSources: () =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_GET_AVAILABLE_SOURCES),
+  getDynamicKnowledgeContext: (query: string) =>
+    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_GET_DYNAMIC_CONTEXT, query),
+  saveIntegration: (integration) =>
+    ipcRenderer.invoke(IpcMessages.INTEGRATIONS_SAVE, integration),
+  deleteIntegration: (integrationId: string) =>
+    ipcRenderer.invoke(IpcMessages.INTEGRATIONS_DELETE, integrationId),
 
   // State
   getFullState: () => ipcRenderer.invoke(IpcMessages.STATE_GET_FULL),
@@ -223,4 +222,3 @@ const clippyApi: ClippyApi = {
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);
-

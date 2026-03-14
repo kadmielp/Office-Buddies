@@ -1,9 +1,17 @@
-# Knowledge Tutorial: Files and MCP
+# Knowledge Tutorial: Files, Knowledge Sources, and Integrations
 
-This guide shows how to add knowledge to Office Buddies in two ways:
+This guide shows how knowledge is organized in Office Buddies:
 
-- local files (notes, docs, PDFs)
-- MCP resources (live workspace context from connected servers)
+- `Files`: local notes, docs, PDFs, and source files
+- `Knowledge Sources`: read-only connected sources attached to the current session
+- `Integrations`: the connection layer that discovers those knowledge sources
+
+Today, `MCP` and `Confluence` are available integration types. The UI is still
+structured so additional native connectors can plug into the same knowledge
+source flow later.
+
+For attached Confluence sources, Office Buddies now tries to search and fetch
+matching page content at question time.
 
 ## Where to find it
 
@@ -11,10 +19,11 @@ This guide shows how to add knowledge to Office Buddies in two ways:
 2. Open the chat window settings.
 3. Go to `Settings > Knowledge`.
 
-You should see two panels:
+You should see three panels:
 
 - `Files`
-- `MCP`
+- `Knowledge Sources`
+- `Integrations`
 
 ## Activate knowledge usage first
 
@@ -22,13 +31,14 @@ Before adding references, enable knowledge for the session:
 
 1. In `Settings > Knowledge`, find `Have the model use the knowledge base.`.
 2. Turn it on.
-3. Keep it enabled while testing Files and MCP sources.
+3. Keep it enabled while testing Files and connected sources.
 
-If this toggle is off, attached files and MCP resources may be present but not used by the model at chat start.
+If this toggle is off, attached files and knowledge sources may be present but
+not used by the model at chat start.
 
 ## Part 1: Add knowledge via files
 
-Use this when you want the model to reference local documents.
+Use this when you want the model to reference local documents directly.
 
 1. In `Settings > Knowledge`, keep `Have the model use the knowledge base.` enabled.
 2. In the `Files` panel, click `Add Files`.
@@ -41,48 +51,53 @@ Notes:
 - Use `Remove` on an item to delete one reference.
 - Use `Clear Files` to remove all local references.
 
-## Part 2: Add knowledge via MCP
+## Part 2: Configure an integration
 
-Use this for live resources like issue trackers, docs systems, or database-backed sources.
+Use this when the knowledge lives in a connected system instead of a local file.
 
-### A. Add an MCP server (optional, if you do not already have one)
-
-1. In the `MCP` panel, click `+ Add MCP Server`.
+1. In the `Integrations` panel, click `+ Add Integration`.
 2. Fill:
    - `Name`
-   - `Type` (`HTTP` or `stdio`)
-   - `Endpoint` (for `HTTP`) or `Command` (for `stdio`)
-   - `Credential` (optional)
-3. Click `Save Server`.
+   - `Connector`
+   - For `MCP`:
+     - `Transport` (`HTTP` or `stdio`)
+     - `Endpoint` (for `HTTP`) or `Command` (for `stdio`)
+     - `Credential` (optional)
+   - For `Confluence`:
+     - `Base URL`
+     - `Email`
+     - `API token`
+3. Click `Save Integration`.
 
-You should then see the server in `Configured MCP Servers`.
+You should then see the integration in `Configured Integrations`.
 
-### B. Attach MCP resources to knowledge
+## Part 3: Attach knowledge sources from an integration
 
-1. Click `Browse MCP`.
-2. Wait for `Available MCP Sources` to load.
+1. Click `Browse Sources`.
+2. Wait for `Available Knowledge Sources` to load.
 3. Select a source from the `Source` dropdown.
-4. Click `Add Resource`.
-5. Confirm it appears in the MCP knowledge list with a status badge.
+4. Click `Add Source`.
+5. Confirm it appears in the `Knowledge Sources` list with a status badge.
 
 Notes:
 
-- `Delete Server` removes the configured server.
-- `Remove` on a knowledge source detaches only that source from the session knowledge list.
+- Saving an integration does not automatically attach it to the session.
+- `Delete Integration` removes the connection and detaches any knowledge sources that came from it.
+- `Remove` on a knowledge source detaches only that source from the session.
 
 ## Recommended usage pattern
 
-- Put static context in `Files` (briefs, reference docs, exported notes).
-- Put changing context in `MCP` (live systems you update frequently).
-- Keep only relevant sources attached to reduce noise in responses.
+- Put static context in `Files` (briefs, exported notes, reference docs).
+- Put changing context in `Knowledge Sources` (workspace docs, trackers, live systems).
+- Use `Integrations` as the reusable connection layer behind those sources.
 
 ## Quick troubleshooting
 
-- `Browse MCP` shows no sources:
-  - verify server endpoint/command and credentials
-  - save server again and retry `Browse MCP`
-- Resource cannot be added:
-  - ensure the source is selected in dropdown
+- `Browse Sources` shows no sources:
+  - verify the integration endpoint or command and credentials
+  - save the integration again and retry
+- A source cannot be added:
+  - ensure a source is selected in the dropdown
   - ensure it is not already attached
 - File context seems ignored:
   - verify `Have the model use the knowledge base.` is enabled

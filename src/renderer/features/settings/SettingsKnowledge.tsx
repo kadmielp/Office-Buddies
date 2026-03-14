@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
 import {
+  IntegrationConfig,
+  IntegrationType,
   KnowledgeFileSource,
-  KnowledgeMcpSource,
-  MpcServerConfig,
-  MpcServerType,
+  KnowledgeSource,
+  McpTransportType,
 } from "../../../shared/shared-state";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
@@ -14,59 +15,66 @@ import { getThemeIcons } from "../../theme/theme";
 export const SettingsKnowledge: React.FC = () => {
   const { settings } = useSharedState();
   const themeIcons = getThemeIcons(settings.uiDesign);
-  const [availableMcpSources, setAvailableMcpSources] = useState<
-    KnowledgeMcpSource[]
+  const [availableKnowledgeSources, setAvailableKnowledgeSources] = useState<
+    KnowledgeSource[]
   >([]);
-  const [selectedMcpSourceId, setSelectedMcpSourceId] = useState("");
-  const [isLoadingMcpSources, setIsLoadingMcpSources] = useState(false);
+  const [selectedKnowledgeSourceId, setSelectedKnowledgeSourceId] =
+    useState("");
+  const [isLoadingKnowledgeSources, setIsLoadingKnowledgeSources] =
+    useState(false);
   const [isPickingFiles, setIsPickingFiles] = useState(false);
-  const [showMcpBrowser, setShowMcpBrowser] = useState(false);
-  const [showAddServerForm, setShowAddServerForm] = useState(false);
-  const [isSavingServer, setIsSavingServer] = useState(false);
-  const [serverName, setServerName] = useState("");
-  const [serverType, setServerType] = useState<MpcServerType>("http");
-  const [serverEndpoint, setServerEndpoint] = useState("");
-  const [serverCommand, setServerCommand] = useState("");
-  const [serverError, setServerError] = useState("");
+  const [showSourceBrowser, setShowSourceBrowser] = useState(false);
+  const [showAddIntegrationForm, setShowAddIntegrationForm] = useState(false);
+  const [isSavingIntegration, setIsSavingIntegration] = useState(false);
+  const [integrationName, setIntegrationName] = useState("");
+  const [integrationType, setIntegrationType] =
+    useState<IntegrationType>("mcp");
+  const [integrationTransport, setIntegrationTransport] =
+    useState<McpTransportType>("http");
+  const [integrationEndpoint, setIntegrationEndpoint] = useState("");
+  const [integrationCommand, setIntegrationCommand] = useState("");
+  const [integrationBaseUrl, setIntegrationBaseUrl] = useState("");
+  const [integrationAccountEmail, setIntegrationAccountEmail] = useState("");
+  const [integrationError, setIntegrationError] = useState("");
   const credentialInputRef = useRef<HTMLInputElement>(null);
 
   const knowledgeFiles = settings.knowledgeFiles || [];
-  const knowledgeMcpSources = settings.knowledgeMcpSources || [];
-  const mcpServers = settings.mcpServers || [];
-  const unselectedMcpSources = availableMcpSources.filter(
+  const knowledgeSources = settings.knowledgeSources || [];
+  const integrations = settings.integrations || [];
+  const unselectedKnowledgeSources = availableKnowledgeSources.filter(
     (source) =>
-      !knowledgeMcpSources.some(
+      !knowledgeSources.some(
         (selectedSource) => selectedSource.id === source.id,
       ),
   );
 
   useEffect(() => {
-    const firstAvailableSource = unselectedMcpSources[0]?.id || "";
+    const firstAvailableSource = unselectedKnowledgeSources[0]?.id || "";
 
     if (
       firstAvailableSource &&
-      !unselectedMcpSources.some((source) => source.id === selectedMcpSourceId)
+      !unselectedKnowledgeSources.some(
+        (source) => source.id === selectedKnowledgeSourceId,
+      )
     ) {
-      setSelectedMcpSourceId(firstAvailableSource);
+      setSelectedKnowledgeSourceId(firstAvailableSource);
     }
 
     if (!firstAvailableSource) {
-      setSelectedMcpSourceId("");
+      setSelectedKnowledgeSourceId("");
     }
-  }, [selectedMcpSourceId, unselectedMcpSources]);
+  }, [selectedKnowledgeSourceId, unselectedKnowledgeSources]);
 
   useEffect(() => {
-    const filesNeedingRefresh = knowledgeFiles.filter(
-      (file) => {
-        const normalizedName = file.name.toLowerCase();
+    const filesNeedingRefresh = knowledgeFiles.filter((file) => {
+      const normalizedName = file.name.toLowerCase();
 
-        return (
-          !file.previewText &&
-          file.status !== "Error" &&
-          (normalizedName.endsWith(".docx") || normalizedName.endsWith(".pdf"))
-        );
-      },
-    );
+      return (
+        !file.previewText &&
+        file.status !== "Error" &&
+        (normalizedName.endsWith(".docx") || normalizedName.endsWith(".pdf"))
+      );
+    });
 
     if (filesNeedingRefresh.length === 0) {
       return;
@@ -89,14 +97,14 @@ export const SettingsKnowledge: React.FC = () => {
     };
   }, [knowledgeFiles]);
 
-  async function loadAvailableMcpSources() {
-    setIsLoadingMcpSources(true);
+  async function loadAvailableKnowledgeSources() {
+    setIsLoadingKnowledgeSources(true);
 
     try {
-      const sources = await clippyApi.getAvailableMcpSources();
-      setAvailableMcpSources(sources);
+      const sources = await clippyApi.getAvailableKnowledgeSources();
+      setAvailableKnowledgeSources(sources);
     } finally {
-      setIsLoadingMcpSources(false);
+      setIsLoadingKnowledgeSources(false);
     }
   }
 
@@ -126,69 +134,86 @@ export const SettingsKnowledge: React.FC = () => {
     await clippyApi.setState("settings.useKnowledgeAtStart", enabled);
   }
 
-  async function handleBrowseMcp() {
-    const nextShowMcpBrowser = !showMcpBrowser;
-    setShowMcpBrowser(nextShowMcpBrowser);
+  async function handleBrowseSources() {
+    const nextShowSourceBrowser = !showSourceBrowser;
+    setShowSourceBrowser(nextShowSourceBrowser);
 
-    if (nextShowMcpBrowser) {
-      await loadAvailableMcpSources();
+    if (nextShowSourceBrowser) {
+      await loadAvailableKnowledgeSources();
     }
   }
 
-  async function handleAddMcpSource() {
-    const sourceToAdd = unselectedMcpSources.find(
-      (source) => source.id === selectedMcpSourceId,
+  async function handleAddKnowledgeSource() {
+    const sourceToAdd = unselectedKnowledgeSources.find(
+      (source) => source.id === selectedKnowledgeSourceId,
     );
 
     if (!sourceToAdd) {
       return;
     }
 
-    await clippyApi.setState("settings.knowledgeMcpSources", [
-      ...knowledgeMcpSources,
+    await clippyApi.setState("settings.knowledgeSources", [
+      ...knowledgeSources,
       sourceToAdd,
     ]);
   }
 
-  async function handleRemoveMcpSource(sourceId: string) {
+  async function handleRemoveKnowledgeSource(sourceId: string) {
     await clippyApi.setState(
-      "settings.knowledgeMcpSources",
-      knowledgeMcpSources.filter((source) => source.id !== sourceId),
+      "settings.knowledgeSources",
+      knowledgeSources.filter((source) => source.id !== sourceId),
     );
   }
 
-  async function handleDeleteMcpServer(serverId: string) {
-    await clippyApi.deleteMcpServer(serverId);
-    await loadAvailableMcpSources();
+  async function handleDeleteIntegration(integrationId: string) {
+    await clippyApi.deleteIntegration(integrationId);
+    await loadAvailableKnowledgeSources();
   }
 
-  async function handleSaveMcpServer() {
-    setIsSavingServer(true);
-    setServerError("");
+  async function handleSaveIntegration() {
+    setIsSavingIntegration(true);
+    setIntegrationError("");
 
     try {
-      await clippyApi.saveMcpServer({
-        name: serverName,
-        type: serverType,
-        endpoint: serverType === "http" ? serverEndpoint : undefined,
-        command: serverType === "stdio" ? serverCommand : undefined,
+      await clippyApi.saveIntegration({
+        name: integrationName,
+        type: integrationType,
+        transport: integrationType === "mcp" ? integrationTransport : undefined,
+        endpoint:
+          integrationType === "mcp" && integrationTransport === "http"
+            ? integrationEndpoint
+            : undefined,
+        command:
+          integrationType === "mcp" && integrationTransport === "stdio"
+            ? integrationCommand
+            : undefined,
+        baseUrl:
+          integrationType === "confluence" ? integrationBaseUrl : undefined,
+        accountEmail:
+          integrationType === "confluence"
+            ? integrationAccountEmail
+            : undefined,
         credential: credentialInputRef.current?.value,
       });
 
-      setServerName("");
-      setServerEndpoint("");
-      setServerCommand("");
-      setShowAddServerForm(false);
+      setIntegrationName("");
+      setIntegrationEndpoint("");
+      setIntegrationCommand("");
+      setIntegrationBaseUrl("");
+      setIntegrationAccountEmail("");
+      setShowAddIntegrationForm(false);
 
       if (credentialInputRef.current) {
         credentialInputRef.current.value = "";
       }
 
-      await loadAvailableMcpSources();
+      await loadAvailableKnowledgeSources();
     } catch (error) {
-      setServerError(error instanceof Error ? error.message : String(error));
+      setIntegrationError(
+        error instanceof Error ? error.message : String(error),
+      );
     } finally {
-      setIsSavingServer(false);
+      setIsSavingIntegration(false);
     }
   }
 
@@ -215,8 +240,8 @@ export const SettingsKnowledge: React.FC = () => {
               />
             </div>
             <p style={{ margin: "8px 0 0 0" }}>
-              Selected files are included as session references, and MCP
-              sources stay read-only by default as live workspace knowledge.
+              Files are pinned directly into the session. Connected knowledge
+              sources come from integrations and stay read-only by default.
             </p>
           </div>
         </div>
@@ -240,7 +265,7 @@ export const SettingsKnowledge: React.FC = () => {
               }}
             >
               <img
-                  src={themeIcons.kbFiles}
+                src={themeIcons.kbFiles}
                 alt=""
                 aria-hidden="true"
                 style={{ width: "18px", height: "18px" }}
@@ -288,7 +313,7 @@ export const SettingsKnowledge: React.FC = () => {
         </fieldset>
 
         <fieldset style={{ marginTop: 0 }}>
-          <legend>MCP</legend>
+          <legend>Knowledge Sources</legend>
           <div style={{ display: "grid", gap: "10px" }}>
             <div
               style={{
@@ -298,189 +323,69 @@ export const SettingsKnowledge: React.FC = () => {
               }}
             >
               <img
-                  src={themeIcons.kbMcp}
+                src={themeIcons.kbMcp}
                 alt=""
                 aria-hidden="true"
                 style={{ width: "18px", height: "18px" }}
               />
-              <strong>Connect live workspace sources</strong>
+              <strong>Attach connected read-only sources</strong>
             </div>
             <p style={{ margin: 0 }}>
-              Use MCP for richer, structured context like issue trackers, docs,
-              databases, or design systems.
+              Use connected sources for systems that change over time, like docs
+              workspaces, trackers, or future native knowledge connectors.
             </p>
             <div className="sunken-panel" style={{ padding: "8px" }}>
-              {knowledgeMcpSources.length === 0 ? (
+              {knowledgeSources.length === 0 ? (
                 <div className="settings-knowledge-item">
                   <div className="settings-knowledge-item-meta">
-                    No MCP knowledge sources connected yet.
+                    No connected knowledge sources attached yet.
                   </div>
                 </div>
               ) : (
-                knowledgeMcpSources.map((source) => (
+                knowledgeSources.map((source) => (
                   <KnowledgeListItem
                     key={source.id}
                     source={source}
-                    onRemove={() => handleRemoveMcpSource(source.id)}
+                    onRemove={() => handleRemoveKnowledgeSource(source.id)}
                   />
                 ))
               )}
             </div>
 
-            <div
-              className="sunken-panel"
-              style={{ padding: "10px", display: "grid", gap: "8px" }}
-            >
-              <strong>Configured MCP Servers</strong>
-              {mcpServers.length === 0 ? (
-                <span>No custom MCP servers configured yet.</span>
-              ) : (
-                mcpServers.map((server) => (
-                  <ConfiguredMcpServerRow
-                    key={server.id}
-                    server={server}
-                    onDelete={() => handleDeleteMcpServer(server.id)}
-                  />
-                ))
-              )}
-            </div>
-
-            {showAddServerForm && (
+            {showSourceBrowser && (
               <div
                 className="sunken-panel"
                 style={{ padding: "10px", display: "grid", gap: "8px" }}
               >
-                <strong>Add MCP Server</strong>
-                <div className="field-row" style={{ marginBottom: 0 }}>
-                  <label htmlFor="mcpServerName" style={{ minWidth: "68px" }}>
-                    Name:
-                  </label>
-                  <input
-                    id="mcpServerName"
-                    type="text"
-                    value={serverName}
-                    onChange={(event) => setServerName(event.target.value)}
-                  />
-                </div>
-                <div className="field-row" style={{ marginBottom: 0 }}>
-                  <label htmlFor="mcpServerType" style={{ minWidth: "68px" }}>
-                    Type:
-                  </label>
-                  <select
-                    id="mcpServerType"
-                    value={serverType}
-                    onChange={(event) =>
-                      setServerType(event.target.value as MpcServerType)
-                    }
-                  >
-                    <option value="http">HTTP</option>
-                    <option value="stdio">stdio</option>
-                  </select>
-                </div>
-                {serverType === "http" ? (
-                  <div className="field-row" style={{ marginBottom: 0 }}>
-                    <label
-                      htmlFor="mcpServerEndpoint"
-                      style={{ minWidth: "68px" }}
-                    >
-                      Endpoint:
-                    </label>
-                    <input
-                      id="mcpServerEndpoint"
-                      type="text"
-                      value={serverEndpoint}
-                      placeholder="https://mcp.example.com"
-                      onChange={(event) =>
-                        setServerEndpoint(event.target.value)
-                      }
-                    />
-                  </div>
-                ) : (
-                  <div className="field-row" style={{ marginBottom: 0 }}>
-                    <label
-                      htmlFor="mcpServerCommand"
-                      style={{ minWidth: "68px" }}
-                    >
-                      Command:
-                    </label>
-                    <input
-                      id="mcpServerCommand"
-                      type="text"
-                      value={serverCommand}
-                      placeholder="npx @modelcontextprotocol/server-memory"
-                      onChange={(event) => setServerCommand(event.target.value)}
-                    />
-                  </div>
-                )}
-                <div className="field-row" style={{ marginBottom: 0 }}>
-                  <label
-                    htmlFor="mcpServerCredential"
-                    style={{ minWidth: "68px" }}
-                  >
-                    Credential:
-                  </label>
-                  <input
-                    id="mcpServerCredential"
-                    ref={credentialInputRef}
-                    type="password"
-                    placeholder="Optional token or secret"
-                    autoComplete="off"
-                  />
-                </div>
-                <p style={{ margin: 0 }}>
-                  Credentials are sent straight to the main process and stored
-                  separately from renderer settings state.
-                </p>
-                {serverError && <p style={{ margin: 0 }}>{serverError}</p>}
-                <div className="field-row" style={{ marginBottom: 0 }}>
-                  <button
-                    type="button"
-                    onClick={handleSaveMcpServer}
-                    disabled={isSavingServer}
-                  >
-                    {isSavingServer ? "Saving..." : "Save Server"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAddServerForm(false);
-                      setServerError("");
-                    }}
-                    disabled={isSavingServer}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {showMcpBrowser && (
-              <div
-                className="sunken-panel"
-                style={{ padding: "10px", display: "grid", gap: "8px" }}
-              >
-                <strong>Available MCP Sources</strong>
-                {isLoadingMcpSources ? (
-                  <span>Loading available MCP sources...</span>
-                ) : unselectedMcpSources.length === 0 ? (
-                  <span>All available MCP sources are already attached.</span>
+                <strong>Available Knowledge Sources</strong>
+                {isLoadingKnowledgeSources ? (
+                  <span>Loading available knowledge sources...</span>
+                ) : integrations.length === 0 ? (
+                  <span>
+                    No integrations configured yet. Add an integration first,
+                    then browse its available sources here.
+                  </span>
+                ) : unselectedKnowledgeSources.length === 0 ? (
+                  <span>
+                    All available knowledge sources are already attached.
+                  </span>
                 ) : (
                   <>
                     <div className="field-row" style={{ marginBottom: 0 }}>
                       <label
-                        htmlFor="knowledgeMcpSelect"
+                        htmlFor="knowledgeSourceSelect"
                         style={{ minWidth: "68px" }}
                       >
                         Source:
                       </label>
                       <select
-                        id="knowledgeMcpSelect"
-                        value={selectedMcpSourceId}
+                        id="knowledgeSourceSelect"
+                        value={selectedKnowledgeSourceId}
                         onChange={(event) =>
-                          setSelectedMcpSourceId(event.target.value)
+                          setSelectedKnowledgeSourceId(event.target.value)
                         }
                       >
-                        {unselectedMcpSources.map((source) => (
+                        {unselectedKnowledgeSources.map((source) => (
                           <option key={source.id} value={source.id}>
                             {source.name}
                           </option>
@@ -488,8 +393,9 @@ export const SettingsKnowledge: React.FC = () => {
                       </select>
                     </div>
                     <p style={{ margin: 0 }}>
-                      MCP knowledge stays read-oriented by default so the model
-                      can reference live workspace context without mutating it.
+                      Connected knowledge sources stay read-oriented by default
+                      so the model can reference live context without mutating
+                      it.
                     </p>
                   </>
                 )}
@@ -497,29 +403,257 @@ export const SettingsKnowledge: React.FC = () => {
             )}
 
             <div className="field-row" style={{ marginBottom: 0 }}>
-              <button type="button" onClick={handleBrowseMcp}>
-                {showMcpBrowser ? "Hide MCP Browser" : "Browse MCP"}
+              <button type="button" onClick={handleBrowseSources}>
+                {showSourceBrowser ? "Hide Sources" : "Browse Sources"}
               </button>
+              <button
+                type="button"
+                onClick={handleAddKnowledgeSource}
+                disabled={
+                  !showSourceBrowser ||
+                  isLoadingKnowledgeSources ||
+                  unselectedKnowledgeSources.length === 0 ||
+                  !selectedKnowledgeSourceId
+                }
+              >
+                Add Source
+              </button>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset style={{ marginTop: 0 }}>
+          <legend>Integrations</legend>
+          <div style={{ display: "grid", gap: "10px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <img
+                src={themeIcons.kbMcp}
+                alt=""
+                aria-hidden="true"
+                style={{ width: "18px", height: "18px" }}
+              />
+              <strong>Configure how Office Buddies connects</strong>
+            </div>
+            <p style={{ margin: 0 }}>
+              MCP and Confluence are currently supported integration types. This
+              keeps knowledge sources separate from the connection method they
+              come from.
+            </p>
+            <div
+              className="sunken-panel"
+              style={{ padding: "10px", display: "grid", gap: "8px" }}
+            >
+              <strong>Configured Integrations</strong>
+              {integrations.length === 0 ? (
+                <span>No integrations configured yet.</span>
+              ) : (
+                integrations.map((integration) => (
+                  <ConfiguredIntegrationRow
+                    key={integration.id}
+                    integration={integration}
+                    onDelete={() => handleDeleteIntegration(integration.id)}
+                  />
+                ))
+              )}
+            </div>
+
+            {showAddIntegrationForm && (
+              <div
+                className="sunken-panel"
+                style={{ padding: "10px", display: "grid", gap: "8px" }}
+              >
+                <strong>Add Integration</strong>
+                <div className="field-row" style={{ marginBottom: 0 }}>
+                  <label htmlFor="integrationName" style={{ minWidth: "72px" }}>
+                    Name:
+                  </label>
+                  <input
+                    id="integrationName"
+                    type="text"
+                    value={integrationName}
+                    onChange={(event) => setIntegrationName(event.target.value)}
+                  />
+                </div>
+                <div className="field-row" style={{ marginBottom: 0 }}>
+                  <label htmlFor="integrationType" style={{ minWidth: "72px" }}>
+                    Connector:
+                  </label>
+                  <select
+                    id="integrationType"
+                    value={integrationType}
+                    onChange={(event) =>
+                      setIntegrationType(event.target.value as IntegrationType)
+                    }
+                  >
+                    <option value="mcp">MCP</option>
+                    <option value="confluence">Confluence</option>
+                  </select>
+                </div>
+                {integrationType === "mcp" && (
+                  <div className="field-row" style={{ marginBottom: 0 }}>
+                    <label
+                      htmlFor="integrationTransport"
+                      style={{ minWidth: "72px" }}
+                    >
+                      Transport:
+                    </label>
+                    <select
+                      id="integrationTransport"
+                      value={integrationTransport}
+                      onChange={(event) =>
+                        setIntegrationTransport(
+                          event.target.value as McpTransportType,
+                        )
+                      }
+                    >
+                      <option value="http">HTTP</option>
+                      <option value="stdio">stdio</option>
+                    </select>
+                  </div>
+                )}
+                {integrationType === "mcp" &&
+                integrationTransport === "http" ? (
+                  <div className="field-row" style={{ marginBottom: 0 }}>
+                    <label
+                      htmlFor="integrationEndpoint"
+                      style={{ minWidth: "72px" }}
+                    >
+                      Endpoint:
+                    </label>
+                    <input
+                      id="integrationEndpoint"
+                      type="text"
+                      value={integrationEndpoint}
+                      placeholder="https://mcp.example.com"
+                      onChange={(event) =>
+                        setIntegrationEndpoint(event.target.value)
+                      }
+                    />
+                  </div>
+                ) : integrationType === "mcp" ? (
+                  <div className="field-row" style={{ marginBottom: 0 }}>
+                    <label
+                      htmlFor="integrationCommand"
+                      style={{ minWidth: "72px" }}
+                    >
+                      Command:
+                    </label>
+                    <input
+                      id="integrationCommand"
+                      type="text"
+                      value={integrationCommand}
+                      placeholder="npx @modelcontextprotocol/server-memory"
+                      onChange={(event) =>
+                        setIntegrationCommand(event.target.value)
+                      }
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="field-row" style={{ marginBottom: 0 }}>
+                      <label
+                        htmlFor="integrationBaseUrl"
+                        style={{ minWidth: "72px" }}
+                      >
+                        Base URL:
+                      </label>
+                      <input
+                        id="integrationBaseUrl"
+                        type="text"
+                        value={integrationBaseUrl}
+                        placeholder="https://your-site.atlassian.net/wiki"
+                        onChange={(event) =>
+                          setIntegrationBaseUrl(event.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="field-row" style={{ marginBottom: 0 }}>
+                      <label
+                        htmlFor="integrationAccountEmail"
+                        style={{ minWidth: "72px" }}
+                      >
+                        Email:
+                      </label>
+                      <input
+                        id="integrationAccountEmail"
+                        type="text"
+                        value={integrationAccountEmail}
+                        placeholder="you@company.com"
+                        onChange={(event) =>
+                          setIntegrationAccountEmail(event.target.value)
+                        }
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="field-row" style={{ marginBottom: 0 }}>
+                  <label
+                    htmlFor="integrationCredential"
+                    style={{ minWidth: "72px" }}
+                  >
+                    {integrationType === "confluence"
+                      ? "API token:"
+                      : "Credential:"}
+                  </label>
+                  <input
+                    id="integrationCredential"
+                    ref={credentialInputRef}
+                    type="password"
+                    placeholder={
+                      integrationType === "confluence"
+                        ? "Atlassian API token"
+                        : "Optional token or secret"
+                    }
+                    autoComplete="off"
+                  />
+                </div>
+                <p style={{ margin: 0 }}>
+                  {integrationType === "confluence"
+                    ? "The API token is stored separately from renderer settings state. Office Buddies will try to search and fetch matching Confluence pages when you ask a question."
+                    : "Credentials are sent straight to the main process and stored separately from renderer settings state."}
+                </p>
+                {integrationError && (
+                  <p style={{ margin: 0 }}>{integrationError}</p>
+                )}
+                <div className="field-row" style={{ marginBottom: 0 }}>
+                  <button
+                    type="button"
+                    onClick={handleSaveIntegration}
+                    disabled={isSavingIntegration}
+                  >
+                    {isSavingIntegration ? "Saving..." : "Save Integration"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddIntegrationForm(false);
+                      setIntegrationError("");
+                    }}
+                    disabled={isSavingIntegration}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="field-row" style={{ marginBottom: 0 }}>
               <button
                 type="button"
                 onClick={() => {
-                  setShowAddServerForm((current) => !current);
-                  setServerError("");
+                  setShowAddIntegrationForm((current) => !current);
+                  setIntegrationError("");
                 }}
               >
-                {showAddServerForm ? "Hide Add Server" : "+ Add MCP Server"}
-              </button>
-              <button
-                type="button"
-                onClick={handleAddMcpSource}
-                disabled={
-                  !showMcpBrowser ||
-                  isLoadingMcpSources ||
-                  unselectedMcpSources.length === 0 ||
-                  !selectedMcpSourceId
-                }
-              >
-                Add Resource
+                {showAddIntegrationForm
+                  ? "Hide Add Integration"
+                  : "+ Add Integration"}
               </button>
             </div>
           </div>
@@ -530,7 +664,7 @@ export const SettingsKnowledge: React.FC = () => {
 };
 
 const KnowledgeListItem: React.FC<{
-  source: KnowledgeFileSource | KnowledgeMcpSource;
+  source: KnowledgeFileSource | KnowledgeSource;
   onRemove: () => void;
 }> = ({ source, onRemove }) => {
   return (
@@ -549,29 +683,42 @@ const KnowledgeListItem: React.FC<{
   );
 };
 
-const ConfiguredMcpServerRow: React.FC<{
-  server: MpcServerConfig;
+const ConfiguredIntegrationRow: React.FC<{
+  integration: IntegrationConfig;
   onDelete: () => void;
-}> = ({ server, onDelete }) => {
-  const target = server.type === "http" ? server.endpoint : server.command;
-  const credentialState = server.hasCredential ? "Credential saved" : "No credential";
+}> = ({ integration, onDelete }) => {
+  const target =
+    integration.type === "confluence"
+      ? integration.baseUrl
+      : integration.transport === "stdio"
+        ? integration.command
+        : integration.endpoint;
+  const credentialState = integration.hasCredential
+    ? "Credential saved"
+    : "No credential";
+  const title =
+    integration.type === "confluence"
+      ? `${integration.name} (confluence)`
+      : `${integration.name} (${integration.type} via ${integration.transport || "http"})`;
 
   return (
     <div className="settings-knowledge-item">
       <div>
-        <div className="settings-knowledge-item-title">
-          {server.name} ({server.type})
-        </div>
+        <div className="settings-knowledge-item-title">{title}</div>
         <div className="settings-knowledge-item-meta">{target}</div>
+        {integration.type === "confluence" && integration.accountEmail && (
+          <div className="settings-knowledge-item-meta">
+            {integration.accountEmail}
+          </div>
+        )}
         <div className="settings-knowledge-item-meta">{credentialState}</div>
         <div style={{ marginTop: "6px" }}>
           <button type="button" onClick={onDelete}>
-            Delete Server
+            Delete Integration
           </button>
         </div>
       </div>
-      <span className="settings-knowledge-badge">{server.status}</span>
+      <span className="settings-knowledge-badge">{integration.status}</span>
     </div>
   );
 };
-

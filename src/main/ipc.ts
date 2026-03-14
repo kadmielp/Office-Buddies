@@ -31,12 +31,13 @@ import {
 import { runBuddyAction } from "./buddy-actions";
 import { BuddyAction } from "../types/interfaces";
 import {
-  getAvailableMcpSources,
+  getAvailableKnowledgeSources,
   pickKnowledgeFiles,
   refreshKnowledgeFiles,
 } from "./knowledge";
+import { buildDynamicKnowledgeContext } from "./knowledge-runtime";
 import { KnowledgeFileSource } from "../shared/shared-state";
-import { getMcpServerManager } from "./mcp-servers";
+import { getIntegrationManager } from "./integrations";
 
 export function setupIpcListeners() {
   // Window
@@ -122,14 +123,18 @@ export function setupIpcListeners() {
     (_, existingFiles: KnowledgeFileSource[] = []) =>
       refreshKnowledgeFiles(existingFiles),
   );
-  ipcMain.handle(IpcMessages.KNOWLEDGE_GET_AVAILABLE_MCP_SOURCES, () =>
-    getAvailableMcpSources(),
+  ipcMain.handle(IpcMessages.KNOWLEDGE_GET_AVAILABLE_SOURCES, () =>
+    getAvailableKnowledgeSources(),
   );
-  ipcMain.handle(IpcMessages.KNOWLEDGE_SAVE_MCP_SERVER, (_, server) =>
-    getMcpServerManager().saveServer(server),
+  ipcMain.handle(
+    IpcMessages.KNOWLEDGE_GET_DYNAMIC_CONTEXT,
+    (_, query: string) => buildDynamicKnowledgeContext(query),
   );
-  ipcMain.handle(IpcMessages.KNOWLEDGE_DELETE_MCP_SERVER, (_, serverId: string) =>
-    getMcpServerManager().deleteServer(serverId),
+  ipcMain.handle(IpcMessages.INTEGRATIONS_SAVE, (_, integration) =>
+    getIntegrationManager().saveIntegration(integration),
+  );
+  ipcMain.handle(IpcMessages.INTEGRATIONS_DELETE, (_, integrationId: string) =>
+    getIntegrationManager().deleteIntegration(integrationId),
   );
 
   // State
@@ -294,4 +299,3 @@ export function setupIpcListeners() {
     },
   );
 }
-

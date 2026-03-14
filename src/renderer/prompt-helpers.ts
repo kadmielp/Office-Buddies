@@ -67,17 +67,19 @@ ${fallbackLines.join("\n")}`);
 export function buildSessionSystemPrompt(
   settings: SettingsState,
   selectedAgent: string,
+  dynamicKnowledgeContext = "",
 ): string {
   const basePrompt = buildSystemPrompt(settings.systemPrompt, selectedAgent);
   const knowledgeContext = buildKnowledgeContext(settings);
+  const extraKnowledgeContext = dynamicKnowledgeContext.trim();
 
-  if (!knowledgeContext) {
+  if (!knowledgeContext && !extraKnowledgeContext) {
     return basePrompt;
   }
 
-  return `${basePrompt}
-
-${knowledgeContext}`;
+  return [basePrompt, knowledgeContext, extraKnowledgeContext]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function ensureStructureRule(prompt: string): string {
@@ -101,12 +103,12 @@ function buildKnowledgeContext(settings: SettingsState): string {
     return `- ${file.name} (${file.meta}, ${file.status}).${previewSuffix}`;
   });
 
-  const mcpLines = (settings.knowledgeMcpSources || []).map(
+  const knowledgeSourceLines = (settings.knowledgeSources || []).map(
     (source) =>
-      `- ${source.name} (${source.meta}, ${source.status}). Treat this as a read-only live knowledge source.`,
+      `- ${source.name} (${source.meta}, ${source.status}). Treat this as a read-only connected knowledge source.`,
   );
 
-  if (fileLines.length === 0 && mcpLines.length === 0) {
+  if (fileLines.length === 0 && knowledgeSourceLines.length === 0) {
     return "";
   }
 
@@ -117,11 +119,10 @@ function buildKnowledgeContext(settings: SettingsState): string {
     sections.push(...fileLines);
   }
 
-  if (mcpLines.length > 0) {
-    sections.push("MCP sources:");
-    sections.push(...mcpLines);
+  if (knowledgeSourceLines.length > 0) {
+    sections.push("Connected knowledge sources:");
+    sections.push(...knowledgeSourceLines);
   }
 
   return sections.join("\n");
 }
-

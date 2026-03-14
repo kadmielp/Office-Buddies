@@ -15,8 +15,9 @@ export type AiProvider =
   | "openclaw";
 
 export type KnowledgeFileStatus = "Ready" | "Indexed" | "Error";
-export type KnowledgeMcpStatus = "Connected" | "Available" | "Error";
-export type MpcServerType = "http" | "stdio";
+export type KnowledgeSourceStatus = "Connected" | "Available" | "Error";
+export type IntegrationType = "mcp" | "confluence";
+export type McpTransportType = "http" | "stdio";
 
 export interface KnowledgeFileSource {
   id: string;
@@ -27,22 +28,26 @@ export interface KnowledgeFileSource {
   previewText?: string;
 }
 
-export interface KnowledgeMcpSource {
+export interface KnowledgeSource {
   id: string;
   name: string;
   meta: string;
-  status: KnowledgeMcpStatus;
-  serverId: string;
+  status: KnowledgeSourceStatus;
+  integrationId: string;
+  integrationType: IntegrationType;
   resourceId?: string;
 }
 
-export interface MpcServerConfig {
+export interface IntegrationConfig {
   id: string;
   name: string;
-  type: MpcServerType;
+  type: IntegrationType;
+  transport?: McpTransportType;
   endpoint?: string;
   command?: string;
-  status: KnowledgeMcpStatus;
+  baseUrl?: string;
+  accountEmail?: string;
+  status: KnowledgeSourceStatus;
   hasCredential: boolean;
 }
 
@@ -73,8 +78,25 @@ export interface SettingsState {
   proactivePort?: number;
   useKnowledgeAtStart?: boolean;
   knowledgeFiles?: KnowledgeFileSource[];
-  knowledgeMcpSources?: KnowledgeMcpSource[];
-  mcpServers?: MpcServerConfig[];
+  knowledgeSources?: KnowledgeSource[];
+  integrations?: IntegrationConfig[];
+  knowledgeMcpSources?: {
+    id: string;
+    name: string;
+    meta: string;
+    status: KnowledgeSourceStatus;
+    serverId: string;
+    resourceId?: string;
+  }[];
+  mcpServers?: {
+    id: string;
+    name: string;
+    type: McpTransportType;
+    endpoint?: string;
+    command?: string;
+    status: KnowledgeSourceStatus;
+    hasCredential: boolean;
+  }[];
 }
 
 export interface SharedState {
@@ -122,8 +144,8 @@ export const DEFAULT_SETTINGS: SettingsState = {
   proactivePort: 5050,
   useKnowledgeAtStart: true,
   knowledgeFiles: [],
-  knowledgeMcpSources: [],
-  mcpServers: [],
+  knowledgeSources: [],
+  integrations: [],
 };
 
 export const EMPTY_SHARED_STATE: SharedState = {

@@ -22,10 +22,10 @@ export const IpcMessages = {
   // Knowledge messages
   KNOWLEDGE_PICK_FILES: "clippy_knowledge_pick_files",
   KNOWLEDGE_REFRESH_FILES: "clippy_knowledge_refresh_files",
-  KNOWLEDGE_GET_AVAILABLE_MCP_SOURCES:
-    "clippy_knowledge_get_available_mcp_sources",
-  KNOWLEDGE_SAVE_MCP_SERVER: "clippy_knowledge_save_mcp_server",
-  KNOWLEDGE_DELETE_MCP_SERVER: "clippy_knowledge_delete_mcp_server",
+  KNOWLEDGE_GET_AVAILABLE_SOURCES: "clippy_knowledge_get_available_sources",
+  KNOWLEDGE_GET_DYNAMIC_CONTEXT: "clippy_knowledge_get_dynamic_context",
+  INTEGRATIONS_SAVE: "clippy_integrations_save",
+  INTEGRATIONS_DELETE: "clippy_integrations_delete",
 
   // State messages
   STATE_UPDATE_MODEL_STATE: "clippy_state_update_model_state",

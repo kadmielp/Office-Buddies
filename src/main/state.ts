@@ -13,6 +13,8 @@ import { getModelManager, getModelPath, isModelOnDisk } from "./model-manager";
 import {
   DEFAULT_SYSTEM_PROMPT,
   EMPTY_SHARED_STATE,
+  IntegrationConfig,
+  KnowledgeSource,
   SettingsState,
   SharedState,
 } from "../shared/shared-state";
@@ -116,14 +118,16 @@ export class StateManager {
   }
 
   public getSettings(): SettingsState {
-    return this.fromStoredSettings(this.store.get("settings"));
+    return this.normalizeSettings(
+      this.fromStoredSettings(this.store.get("settings")),
+    );
   }
 
   public getSharedStateForRenderer(): SharedState {
     const state = this.store.store;
     return {
       ...state,
-      settings: this.fromStoredSettings(state.settings),
+      settings: this.normalizeSettings(this.fromStoredSettings(state.settings)),
     };
   }
 
@@ -141,7 +145,10 @@ export class StateManager {
 
   public setStateValue(key: string, value: any) {
     if (key === "settings") {
-      this.store.set("settings", this.toStoredSettings(value || {}));
+      this.store.set(
+        "settings",
+        this.toStoredSettings(this.normalizeSettings(value || {})),
+      );
       return;
     }
 
@@ -197,7 +204,10 @@ export class StateManager {
       settings.startWithWindows = false;
     }
 
-    this.store.set("settings", this.toStoredSettings(settings));
+    this.store.set(
+      "settings",
+      this.toStoredSettings(this.normalizeSettings(settings)),
+    );
   }
 
   private ensureCorrectModelState() {
@@ -321,7 +331,7 @@ export class StateManager {
   }
 
   private toStoredSettings(settings: SettingsState): SettingsState {
-    const storedSettings = { ...settings };
+    const storedSettings = { ...this.normalizeSettings(settings) };
 
     for (const key of SENSITIVE_SETTINGS_KEYS) {
       storedSettings[key] = encryptSecret(storedSettings[key]) as
@@ -344,6 +354,52 @@ export class StateManager {
     return runtimeSettings;
   }
 
+  private normalizeSettings(settings: SettingsState): SettingsState {
+    const {
+      knowledgeMcpSources: _legacyKnowledgeSources,
+      mcpServers: _legacyMcpServers,
+      ...nextSettings
+    } = settings;
+    const legacyIntegrations = (settings.mcpServers || []).map((server) => ({
+      id: server.id,
+      name: server.name,
+      type: "mcp" as const,
+      transport: server.type,
+      endpoint: server.endpoint,
+      command: server.command,
+      status: server.status,
+      hasCredential: server.hasCredential,
+    }));
+    const integrations = (settings.integrations ?? legacyIntegrations).sort(
+      compareNamedItems,
+    );
+    const integrationIds = new Set(
+      integrations.map((integration) => integration.id),
+    );
+    const legacyKnowledgeSources = (settings.knowledgeMcpSources || []).map(
+      (source) => ({
+        id: source.id,
+        name: source.name,
+        meta: source.meta,
+        status: source.status,
+        integrationId: source.serverId,
+        integrationType: "mcp" as const,
+        resourceId: source.resourceId,
+      }),
+    );
+    const knowledgeSources = (
+      settings.knowledgeSources ?? legacyKnowledgeSources
+    )
+      .filter((source) => integrationIds.has(source.integrationId))
+      .sort(compareNamedItems);
+
+    return {
+      ...nextSettings,
+      integrations,
+      knowledgeSources,
+    };
+  }
+
   private syncWindowsStartupSettingFromState() {
     const actualValue = syncWindowsStartupSetting(
       this.getSettings().startWithWindows,
@@ -353,6 +409,13 @@ export class StateManager {
       this.store.set("settings.startWithWindows", actualValue);
     }
   }
+}
+
+function compareNamedItems(
+  left: Pick<IntegrationConfig | KnowledgeSource, "name">,
+  right: Pick<IntegrationConfig | KnowledgeSource, "name">,
+) {
+  return left.name.localeCompare(right.name);
 }
 
 let _stateManager: StateManager | null = null;

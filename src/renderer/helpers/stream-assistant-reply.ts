@@ -1,6 +1,7 @@
 import { getAnimationKeysBrackets } from "../agent-packs";
 import { buildSessionSystemPrompt } from "../prompt-helpers";
 import { promptStreamingWithProvider } from "../ai-provider-client";
+import { clippyApi } from "../clippyApi";
 import { Message } from "../features/chat/Message";
 import { SettingsState } from "../../shared/shared-state";
 
@@ -25,9 +26,17 @@ export async function streamAssistantReply({
   onChunk,
   onAnimationKey,
 }: StreamAssistantReplyArgs): Promise<string> {
+  let dynamicKnowledgeContext = "";
+
+  try {
+    dynamicKnowledgeContext = await clippyApi.getDynamicKnowledgeContext(input);
+  } catch (error) {
+    console.error("Unable to load dynamic knowledge context", error);
+  }
   const systemPrompt = buildSessionSystemPrompt(
     settings,
     selectedAgent || "Clippy",
+    dynamicKnowledgeContext,
   );
   const response = promptStreamingWithProvider({
     settings,
@@ -97,4 +106,3 @@ export function filterMessageContent(
 
   return { text, animationKey };
 }
-

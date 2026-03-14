@@ -1,9 +1,10 @@
 import { ElectronLlmRenderer } from "@electron/llm";
 import {
+  IntegrationConfig,
+  IntegrationType,
   KnowledgeFileSource,
-  KnowledgeMcpSource,
-  MpcServerConfig,
-  MpcServerType,
+  KnowledgeSource,
+  McpTransportType,
   SharedState,
 } from "../shared/shared-state";
 import {
@@ -55,16 +56,20 @@ export type ClippyApi = {
   refreshKnowledgeFiles: (
     existingFiles: KnowledgeFileSource[],
   ) => Promise<KnowledgeFileSource[]>;
-  getAvailableMcpSources: () => Promise<KnowledgeMcpSource[]>;
-  saveMcpServer: (server: {
+  getAvailableKnowledgeSources: () => Promise<KnowledgeSource[]>;
+  getDynamicKnowledgeContext: (query: string) => Promise<string>;
+  saveIntegration: (integration: {
     id?: string;
     name: string;
-    type: MpcServerType;
+    type: IntegrationType;
+    transport?: McpTransportType;
     endpoint?: string;
     command?: string;
+    baseUrl?: string;
+    accountEmail?: string;
     credential?: string;
-  }) => Promise<MpcServerConfig>;
-  deleteMcpServer: (serverId: string) => Promise<void>;
+  }) => Promise<IntegrationConfig>;
+  deleteIntegration: (integrationId: string) => Promise<void>;
   // State
   offStateChanged: () => void;
   onStateChanged: (callback: (state: SharedState) => void) => void;
@@ -138,4 +143,3 @@ declare global {
 
 export const clippyApi = window["clippy"];
 export const electronAi = window["electronAi"];
-

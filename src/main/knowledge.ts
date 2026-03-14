@@ -5,9 +5,9 @@ import mammoth from "mammoth";
 import path from "path";
 import { PDFParse } from "pdf-parse";
 
-import { KnowledgeFileSource, KnowledgeMcpSource } from "../shared/shared-state";
+import { KnowledgeFileSource, KnowledgeSource } from "../shared/shared-state";
+import { getIntegrationManager } from "./integrations";
 import { getLogger } from "./logger";
-import { getMcpServerManager } from "./mcp-servers";
 
 const KNOWLEDGE_FILE_FILTERS = [
   {
@@ -48,33 +48,6 @@ const TEXT_PREVIEW_EXTENSIONS = new Set([
 
 const DOCUMENT_PREVIEW_EXTENSIONS = new Set([".docx", ".pdf"]);
 const MAX_PREVIEW_CHARS = 4000;
-
-const AVAILABLE_MCP_SOURCES: KnowledgeMcpSource[] = [
-  {
-    id: "mcp-linear-workspace",
-    name: "Linear workspace",
-    meta: "Issues, projects, and docs",
-    status: "Connected",
-    serverId: "linear",
-    resourceId: "workspace",
-  },
-  {
-    id: "mcp-design-system",
-    name: "Design system server",
-    meta: "Components and usage notes",
-    status: "Available",
-    serverId: "design-system",
-    resourceId: "components",
-  },
-  {
-    id: "mcp-product-docs",
-    name: "Product docs server",
-    meta: "Specs, decisions, and release notes",
-    status: "Available",
-    serverId: "product-docs",
-    resourceId: "docs",
-  },
-];
 
 export async function pickKnowledgeFiles(
   existingFiles: KnowledgeFileSource[] = [],
@@ -118,10 +91,16 @@ export async function refreshKnowledgeFiles(
 
   for (const file of existingFiles) {
     try {
-      const refreshedFile = await buildKnowledgeFileSource(file.filePath, file.id);
+      const refreshedFile = await buildKnowledgeFileSource(
+        file.filePath,
+        file.id,
+      );
       refreshedFiles.push(refreshedFile);
     } catch (error) {
-      getLogger().warn(`Unable to refresh knowledge file ${file.filePath}`, error);
+      getLogger().warn(
+        `Unable to refresh knowledge file ${file.filePath}`,
+        error,
+      );
       refreshedFiles.push(file);
     }
   }
@@ -129,10 +108,13 @@ export async function refreshKnowledgeFiles(
   return refreshedFiles;
 }
 
-export async function getAvailableMcpSources(): Promise<KnowledgeMcpSource[]> {
-  const configuredSources = getMcpServerManager().getKnowledgeSources();
+export async function getAvailableKnowledgeSources(): Promise<
+  KnowledgeSource[]
+> {
+  const configuredSources =
+    getIntegrationManager().getAvailableKnowledgeSources();
 
-  return [...AVAILABLE_MCP_SOURCES, ...configuredSources].map((source) => ({
+  return configuredSources.map((source) => ({
     ...source,
   }));
 }
@@ -175,7 +157,10 @@ async function readPreviewText(
 
     return undefined;
   } catch (error) {
-    getLogger().warn(`Unable to read knowledge preview from ${filePath}`, error);
+    getLogger().warn(
+      `Unable to read knowledge preview from ${filePath}`,
+      error,
+    );
     return undefined;
   }
 }
@@ -241,4 +226,3 @@ function formatFileSize(sizeBytes: number): string {
 
   return `${(sizeBytes / (1024 * 1024)).toFixed(1)} MB`;
 }
-

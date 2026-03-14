@@ -226,6 +226,7 @@ export function Clippy() {
   >("none");
   const isAgentSwitchAnimating = switchPhase !== "none";
   const miniChatInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const isMiniChatKnowledgeEnabled = settings.useKnowledgeInMiniChat !== false;
 
   const agentPack = useMemo(
     () => getAgentPack(displayedAgent),
@@ -580,7 +581,10 @@ export function Clippy() {
 
     try {
       const filteredContent = await streamAssistantReply({
-        settings,
+        settings: {
+          ...settings,
+          useKnowledgeAtStart: isMiniChatKnowledgeEnabled,
+        },
         selectedAgent,
         history,
         input: prompt,
@@ -628,6 +632,7 @@ export function Clippy() {
     miniChatInput,
     miniChatMessages,
     miniChatScreenshots,
+    isMiniChatKnowledgeEnabled,
     selectedAgent,
     setAnimationKey,
     setStatus,
@@ -1408,21 +1413,51 @@ export function Clippy() {
             }}
             placeholder="Start typing... (press Enter to send)"
           />
-          <div className="buddy-mini-chat-shortcuts">
-            <span className="buddy-mini-chat-shortcut">
-              <kbd>Ctrl</kbd>
-              <kbd>E</kbd>
-              <span>Screenshot</span>
-            </span>
-            <span className="buddy-mini-chat-shortcut">
-              <kbd>Ctrl</kbd>
-              <kbd>Enter</kbd>
-              <span>Send</span>
-            </span>
-            <span className="buddy-mini-chat-shortcut">
-              <kbd>Esc</kbd>
-              <span>Cancel</span>
-            </span>
+          <div className="buddy-mini-chat-footer">
+            <div className="buddy-mini-chat-options">
+              <button
+                type="button"
+                className={`buddy-mini-chat-option-pill${
+                  isMiniChatKnowledgeEnabled ? " is-active" : ""
+                }`}
+                aria-pressed={isMiniChatKnowledgeEnabled}
+                title={
+                  isMiniChatKnowledgeEnabled
+                    ? "Knowledge mode is on for mini chat"
+                    : "Knowledge mode is off for mini chat"
+                }
+                onClick={() => {
+                  void clippyApi.setState(
+                    "settings.useKnowledgeInMiniChat",
+                    !isMiniChatKnowledgeEnabled,
+                  );
+                }}
+              >
+                <span
+                  className={`buddy-mini-chat-option-indicator${
+                    isMiniChatKnowledgeEnabled ? " is-active" : ""
+                  }`}
+                  aria-hidden="true"
+                />
+                <span>Knowledge</span>
+              </button>
+            </div>
+            <div className="buddy-mini-chat-shortcuts">
+              <span className="buddy-mini-chat-shortcut">
+                <kbd>Ctrl</kbd>
+                <kbd>E</kbd>
+                <span>Screenshot</span>
+              </span>
+              <span className="buddy-mini-chat-shortcut">
+                <kbd>Ctrl</kbd>
+                <kbd>Enter</kbd>
+                <span>Send</span>
+              </span>
+              <span className="buddy-mini-chat-shortcut">
+                <kbd>Esc</kbd>
+                <span>Cancel</span>
+              </span>
+            </div>
           </div>
           <div className="buddy-speech-tail" />
         </div>

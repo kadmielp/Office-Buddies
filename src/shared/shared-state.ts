@@ -77,6 +77,7 @@ export interface SettingsState {
   enableProactiveMessages?: boolean;
   proactivePort?: number;
   useKnowledgeAtStart?: boolean;
+  useKnowledgeInMiniChat?: boolean;
   knowledgeFiles?: KnowledgeFileSource[];
   knowledgeSources?: KnowledgeSource[];
   integrations?: IntegrationConfig[];
@@ -142,7 +143,8 @@ export const DEFAULT_SETTINGS: SettingsState = {
   startWithWindows: false,
   enableProactiveMessages: false,
   proactivePort: 5050,
-  useKnowledgeAtStart: true,
+  useKnowledgeAtStart: false,
+  useKnowledgeInMiniChat: true,
   knowledgeFiles: [],
   knowledgeSources: [],
   integrations: [],

@@ -485,14 +485,63 @@ menu[role="tablist"] > button[role="tab"]:focus {
   background: rgba(229, 229, 229, 0.95);
 }
 
+.buddy-mini-chat-footer {
+  display: grid;
+  gap: 6px;
+  margin-top: 1px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.buddy-mini-chat-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buddy-mini-chat-option-pill {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--buddy-frame-dark);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--buddy-ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.buddy-mini-chat-option-pill:hover {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.buddy-mini-chat-option-pill.is-active {
+  background: rgba(223, 234, 255, 0.88);
+}
+
+.buddy-mini-chat-option-indicator {
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.buddy-mini-chat-option-indicator.is-active {
+  background: #0b57d0;
+}
+
 .buddy-mini-chat-shortcuts {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 1px;
-  padding-top: 5px;
-  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  min-height: 22px;
 }
 
 .buddy-mini-chat-shortcut {

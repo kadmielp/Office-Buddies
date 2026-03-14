@@ -57,7 +57,10 @@ export type ClippyApi = {
     existingFiles: KnowledgeFileSource[],
   ) => Promise<KnowledgeFileSource[]>;
   getAvailableKnowledgeSources: () => Promise<KnowledgeSource[]>;
-  getDynamicKnowledgeContext: (query: string) => Promise<string>;
+  getDynamicKnowledgeContext: (
+    query: string,
+    options?: { enabled?: boolean },
+  ) => Promise<string>;
   saveIntegration: (integration: {
     id?: string;
     name: string;

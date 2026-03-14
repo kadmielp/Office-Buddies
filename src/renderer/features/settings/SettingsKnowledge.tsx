@@ -9,7 +9,6 @@ import {
 } from "../../../shared/shared-state";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
-import { Checkbox } from "../../ui/Checkbox";
 import { getThemeIcons } from "../../theme/theme";
 
 export const SettingsKnowledge: React.FC = () => {
@@ -130,10 +129,6 @@ export const SettingsKnowledge: React.FC = () => {
     await clippyApi.setState("settings.knowledgeFiles", []);
   }
 
-  async function handleToggleKnowledge(enabled: boolean) {
-    await clippyApi.setState("settings.useKnowledgeAtStart", enabled);
-  }
-
   async function handleBrowseSources() {
     const nextShowSourceBrowser = !showSourceBrowser;
     setShowSourceBrowser(nextShowSourceBrowser);
@@ -231,17 +226,10 @@ export const SettingsKnowledge: React.FC = () => {
           }}
         >
           <div style={{ flex: "1 1 280px" }}>
-            <div style={{ marginTop: "12px" }}>
-              <Checkbox
-                id="useKnowledgeAtStart"
-                label="Have the model use the knowledge base."
-                checked={settings.useKnowledgeAtStart}
-                onChange={handleToggleKnowledge}
-              />
-            </div>
             <p style={{ margin: "8px 0 0 0" }}>
-              Files are pinned directly into the session. Connected knowledge
-              sources come from integrations and stay read-only by default.
+              Files and connected sources are configured here. Mini chat has
+              its own knowledge toggle when you want to use them for a quick
+              lookup.
             </p>
           </div>
         </div>

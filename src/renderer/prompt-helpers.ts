@@ -72,12 +72,17 @@ export function buildSessionSystemPrompt(
   const basePrompt = buildSystemPrompt(settings.systemPrompt, selectedAgent);
   const knowledgeContext = buildKnowledgeContext(settings);
   const extraKnowledgeContext = dynamicKnowledgeContext.trim();
+  const knowledgeRule = buildKnowledgeUsageRule(
+    settings,
+    knowledgeContext,
+    extraKnowledgeContext,
+  );
 
-  if (!knowledgeContext && !extraKnowledgeContext) {
+  if (!knowledgeContext && !extraKnowledgeContext && !knowledgeRule) {
     return basePrompt;
   }
 
-  return [basePrompt, knowledgeContext, extraKnowledgeContext]
+  return [basePrompt, knowledgeRule, knowledgeContext, extraKnowledgeContext]
     .filter(Boolean)
     .join("\n\n");
 }
@@ -125,4 +130,24 @@ function buildKnowledgeContext(settings: SettingsState): string {
   }
 
   return sections.join("\n");
+}
+
+function buildKnowledgeUsageRule(
+  settings: SettingsState,
+  knowledgeContext: string,
+  dynamicKnowledgeContext: string,
+): string {
+  if (!settings.useKnowledgeAtStart) {
+    return "";
+  }
+
+  if (!knowledgeContext && !dynamicKnowledgeContext) {
+    return "";
+  }
+
+  return [
+    "Knowledge-base mode is enabled for this conversation.",
+    "Answer using the provided knowledge-base content first.",
+    "If the answer is not supported by the provided knowledge-base content, say that the knowledge base does not contain enough information instead of guessing.",
+  ].join("\n");
 }

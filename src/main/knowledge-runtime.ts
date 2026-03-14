@@ -59,6 +59,7 @@ const QUERY_STOP_WORDS = new Set([
 
 export async function buildDynamicKnowledgeContext(
   query: string,
+  options: { enabled?: boolean } = {},
 ): Promise<string> {
   const trimmedQuery = query.trim();
 
@@ -68,7 +69,7 @@ export async function buildDynamicKnowledgeContext(
 
   const settings = getStateManager().getSettings();
 
-  if (!settings.useKnowledgeAtStart) {
+  if (!(options.enabled ?? settings.useKnowledgeAtStart)) {
     return "";
   }
 
@@ -102,7 +103,9 @@ export async function buildDynamicKnowledgeContext(
 
   return [
     "Connected-source retrieval results for the current user message:",
-    "Use retrieved excerpts below when answering. If a source reports an error or no matches, say that plainly instead of guessing.",
+    "Use retrieved excerpts below when answering.",
+    "If a source reports an error or no matches, say that plainly instead of guessing.",
+    "If the retrieved content is insufficient, say the knowledge base does not contain enough information.",
     ...lines,
   ].join("\n");
 }

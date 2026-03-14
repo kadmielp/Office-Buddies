@@ -392,9 +392,13 @@ export class StateManager {
     )
       .filter((source) => integrationIds.has(source.integrationId))
       .sort(compareNamedItems);
+    const useKnowledgeInMiniChat =
+      settings.useKnowledgeInMiniChat ?? settings.useKnowledgeAtStart ?? true;
 
     return {
       ...nextSettings,
+      useKnowledgeAtStart: false,
+      useKnowledgeInMiniChat,
       integrations,
       knowledgeSources,
     };

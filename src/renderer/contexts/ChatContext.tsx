@@ -5,6 +5,7 @@ import {
   ReactNode,
   useEffect,
   useCallback,
+  useMemo,
 } from "react";
 import { Message } from "../features/chat/Message";
 import { clippyApi } from "../clippyApi";
@@ -26,6 +27,7 @@ import type {
   LanguageModelPrompt,
   LanguageModelCreateOptions,
 } from "@electron/llm";
+import { SettingsState } from "../../shared/shared-state";
 
 type ClippyNamedStatus =
   | "welcome"
@@ -58,6 +60,13 @@ export const ChatContext = createContext<ChatContextType | undefined>(
   undefined,
 );
 
+function getMainChatSettings(settings: SettingsState): SettingsState {
+  return {
+    ...settings,
+    useKnowledgeAtStart: false,
+  };
+}
+
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentChatRecord, setCurrentChatRecord] = useState<ChatRecord>({
@@ -78,13 +87,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
   const [hasPerformedStartupCheck, setHasPerformedStartupCheck] =
     useState(false);
+  const mainChatSettings = useMemo(
+    () => getMainChatSettings(settings),
+    [settings],
+  );
 
   const getSystemPrompt = useCallback(() => {
     return buildSessionSystemPrompt(
-      settings,
-      settings.selectedAgent || "Clippy",
+      mainChatSettings,
+      mainChatSettings.selectedAgent || "Clippy",
     );
-  }, [settings]);
+  }, [mainChatSettings]);
 
   const addMessage = useCallback(
     async (message: Message) => {
@@ -118,15 +131,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setIsModelLoaded(false);
 
         const options: LanguageModelCreateOptions = {
-          modelAlias: settings.selectedModel,
+          modelAlias: mainChatSettings.selectedModel,
           systemPrompt: getSystemPrompt(),
-          topK: settings.topK,
-          temperature: settings.temperature,
+          topK: mainChatSettings.topK,
+          temperature: mainChatSettings.temperature,
           initialPrompts: [],
         };
 
         try {
-          await createProviderSession(settings, options);
+          await createProviderSession(mainChatSettings, options);
           setIsModelLoaded(true);
         } catch (error) {
           console.error(error);
@@ -170,17 +183,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       currentChatRecord,
       debug?.simulateDownload,
       messages,
-      settings.temperature,
-      settings.topK,
-      settings.selectedModel,
-      settings.aiProvider,
-      settings.remoteModel,
-      settings.openAiApiKey,
-      settings.geminiApiKey,
-      settings.maritacaApiKey,
-      settings.useKnowledgeAtStart,
-      settings.knowledgeFiles,
-      settings.knowledgeSources,
+      mainChatSettings,
       models,
       getSystemPrompt,
       setIsStartingNewChat,
@@ -198,23 +201,23 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setIsModelLoaded(false);
 
       const options: LanguageModelCreateOptions = {
-        modelAlias: settings.selectedModel,
+        modelAlias: mainChatSettings.selectedModel,
         systemPrompt: getSystemPrompt(),
-        topK: settings.topK,
-        temperature: settings.temperature,
+        topK: mainChatSettings.topK,
+        temperature: mainChatSettings.temperature,
         initialPrompts,
       };
 
       console.log("Loading model with options:", options);
 
       try {
-        const readiness = getProviderReadiness(settings, models);
+        const readiness = getProviderReadiness(mainChatSettings, models);
         if (!readiness.ready) {
           setIsModelLoaded(false);
           return;
         }
 
-        await createProviderSession(settings, options);
+        await createProviderSession(mainChatSettings, options);
         setIsModelLoaded(true);
       } catch (error) {
         console.error(error);
@@ -232,17 +235,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
     },
     [
-      settings.selectedModel,
-      settings.aiProvider,
-      settings.remoteModel,
-      settings.openAiApiKey,
-      settings.geminiApiKey,
-      settings.maritacaApiKey,
-      settings.topK,
-      settings.temperature,
-      settings.useKnowledgeAtStart,
-      settings.knowledgeFiles,
-      settings.knowledgeSources,
+      mainChatSettings,
       status,
       models,
       getSystemPrompt,
@@ -335,12 +328,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const readiness = getProviderReadiness(settings, models);
+    const readiness = getProviderReadiness(mainChatSettings, models);
 
     if (readiness.ready) {
       loadModel();
     } else if (isModelLoaded) {
-      destroyProviderSession(settings)
+      destroyProviderSession(mainChatSettings)
         .then(() => {
           setIsModelLoaded(false);
         })
@@ -349,19 +342,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         });
     }
   }, [
-    settings.aiProvider,
-    settings.selectedModel,
-    settings.remoteModel,
-    settings.openAiApiKey,
-    settings.geminiApiKey,
-    settings.maritacaApiKey,
-    settings.selectedAgent,
-    settings.systemPrompt,
-    settings.topK,
-    settings.temperature,
-    settings.useKnowledgeAtStart,
-    settings.knowledgeFiles,
-    settings.knowledgeSources,
+    mainChatSettings,
     models,
   ]);
 

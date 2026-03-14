@@ -27,11 +27,17 @@ export async function streamAssistantReply({
   onAnimationKey,
 }: StreamAssistantReplyArgs): Promise<string> {
   let dynamicKnowledgeContext = "";
+  const knowledgeEnabled = Boolean(settings.useKnowledgeAtStart);
 
-  try {
-    dynamicKnowledgeContext = await clippyApi.getDynamicKnowledgeContext(input);
-  } catch (error) {
-    console.error("Unable to load dynamic knowledge context", error);
+  if (knowledgeEnabled) {
+    try {
+      dynamicKnowledgeContext = await clippyApi.getDynamicKnowledgeContext(
+        input,
+        { enabled: true },
+      );
+    } catch (error) {
+      console.error("Unable to load dynamic knowledge context", error);
+    }
   }
   const systemPrompt = buildSessionSystemPrompt(
     settings,

@@ -128,7 +128,8 @@ export function setupIpcListeners() {
   );
   ipcMain.handle(
     IpcMessages.KNOWLEDGE_GET_DYNAMIC_CONTEXT,
-    (_, query: string) => buildDynamicKnowledgeContext(query),
+    (_, query: string, options?: { enabled?: boolean }) =>
+      buildDynamicKnowledgeContext(query, options),
   );
   ipcMain.handle(IpcMessages.INTEGRATIONS_SAVE, (_, integration) =>
     getIntegrationManager().saveIntegration(integration),

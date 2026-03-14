@@ -76,8 +76,15 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.KNOWLEDGE_REFRESH_FILES, existingFiles),
   getAvailableKnowledgeSources: () =>
     ipcRenderer.invoke(IpcMessages.KNOWLEDGE_GET_AVAILABLE_SOURCES),
-  getDynamicKnowledgeContext: (query: string) =>
-    ipcRenderer.invoke(IpcMessages.KNOWLEDGE_GET_DYNAMIC_CONTEXT, query),
+  getDynamicKnowledgeContext: (
+    query: string,
+    options?: { enabled?: boolean },
+  ) =>
+    ipcRenderer.invoke(
+      IpcMessages.KNOWLEDGE_GET_DYNAMIC_CONTEXT,
+      query,
+      options,
+    ),
   saveIntegration: (integration) =>
     ipcRenderer.invoke(IpcMessages.INTEGRATIONS_SAVE, integration),
   deleteIntegration: (integrationId: string) =>

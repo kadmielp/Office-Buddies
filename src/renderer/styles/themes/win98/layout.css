@@ -13,6 +13,14 @@ hr {
   margin: 10px 0;
 }
 
+/* Keep retro scrollbars to a single arrow at each end. */
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement,
+::-webkit-scrollbar-button:horizontal:start:increment,
+::-webkit-scrollbar-button:horizontal:end:decrement {
+  display: none;
+}
+
 .message {
   flex-shrink: 0;
   user-select: text;

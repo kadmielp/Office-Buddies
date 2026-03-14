@@ -471,6 +471,7 @@ function messageRecordFromMessage(message: Message): MessageRecord {
     sender: message.sender,
     createdAt: message.createdAt,
     actions: message.actions,
+    references: message.references,
   };
 }
 

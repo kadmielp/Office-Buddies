@@ -1,4 +1,8 @@
 import { IntegrationConfig, KnowledgeSource } from "../shared/shared-state";
+import {
+  DynamicKnowledgeContextResult,
+  MessageReference,
+} from "../types/interfaces";
 import { getIntegrationManager } from "./integrations";
 import { getLogger } from "./logger";
 import { getStateManager } from "./state";
@@ -19,12 +23,19 @@ type ConfluencePageContent = {
 type ConfluenceEvidenceChunk = {
   text: string;
   score: number;
+  location?: string;
+  snippet?: string;
 };
 
 type HeadingMatch = {
   level: number;
   title: string;
   index: number;
+};
+
+type KnowledgeContextSection = {
+  context: string;
+  references: MessageReference[];
 };
 
 const MAX_MATCHES_PER_SOURCE = 2;
@@ -85,20 +96,21 @@ const QUERY_STOP_WORDS = new Set([
 export async function buildDynamicKnowledgeContext(
   query: string,
   options: { enabled?: boolean } = {},
-): Promise<string> {
+): Promise<DynamicKnowledgeContextResult> {
   const trimmedQuery = query.trim();
 
   if (!trimmedQuery) {
-    return "";
+    return { promptContext: "", references: [] };
   }
 
   const settings = getStateManager().getSettings();
 
   if (!(options.enabled ?? settings.useKnowledgeAtStart)) {
-    return "";
+    return { promptContext: "", references: [] };
   }
 
   const lines: string[] = [];
+  const references: MessageReference[] = [];
 
   for (const source of settings.knowledgeSources || []) {
     const integration = (settings.integrations || []).find(
@@ -117,29 +129,33 @@ export async function buildDynamicKnowledgeContext(
       );
 
       if (section) {
-        lines.push(section);
+        lines.push(section.context);
+        references.push(...section.references);
       }
     }
   }
 
   if (lines.length === 0) {
-    return "";
+    return { promptContext: "", references: [] };
   }
 
-  return [
-    "Connected-source retrieval results for the current user message:",
-    "Use retrieved evidence below when answering.",
-    "If a source reports an error or no matches, say that plainly instead of guessing.",
-    "If the retrieved content is insufficient, say the knowledge base does not contain enough information.",
-    ...lines,
-  ].join("\n");
+  return {
+    promptContext: [
+      "Connected-source retrieval results for the current user message:",
+      "Use retrieved evidence below when answering.",
+      "If a source reports an error or no matches, say that plainly instead of guessing.",
+      "If the retrieved content is insufficient, say the knowledge base does not contain enough information.",
+      ...lines,
+    ].join("\n"),
+    references: dedupeBy(references, (reference) => reference.id),
+  };
 }
 
 async function buildConfluenceKnowledgeSection(
   query: string,
   source: KnowledgeSource,
   integration: IntegrationConfig,
-): Promise<string> {
+): Promise<KnowledgeContextSection> {
   const integrationManager = getIntegrationManager();
   const credential = integrationManager.getCredential(integration.id)?.trim();
   const baseUrl = normalizeConfluenceBaseUrl(integration.baseUrl || "");
@@ -147,7 +163,10 @@ async function buildConfluenceKnowledgeSection(
 
   if (!baseUrl || !accountEmail || !credential) {
     integrationManager.setIntegrationStatus(integration.id, "Error");
-    return `- Source ${source.name}: Confluence is missing a base URL, account email, or API token.`;
+    return {
+      context: `- Source ${source.name}: Confluence is missing a base URL, account email, or API token.`,
+      references: [],
+    };
   }
 
   try {
@@ -182,12 +201,16 @@ async function buildConfluenceKnowledgeSection(
     });
 
     if (matches.length === 0) {
-      return `- Source ${source.name}: no matching Confluence pages were found for the current query.`;
+      return {
+        context: `- Source ${source.name}: no matching Confluence pages were found for the current query.`,
+        references: [],
+      };
     }
 
     const lines = [
       `- Source ${source.name}: matched ${matches.length} page(s).`,
     ];
+    const references: MessageReference[] = [];
 
     matches.slice(0, MAX_MATCHES_PER_SOURCE).forEach((match, index) => {
       lines.push(`  Match ${index + 1} title: ${match.title}`);
@@ -201,6 +224,12 @@ async function buildConfluenceKnowledgeSection(
         MAX_EVIDENCE_PER_MATCH,
       );
 
+      if (evidenceChunks.length > 0) {
+        references.push(
+          buildConfluenceReference(source, match, evidenceChunks[0]),
+        );
+      }
+
       evidenceChunks.forEach((chunk, chunkIndex) => {
         lines.push(
           `  Match ${index + 1} evidence ${chunkIndex + 1}: ${chunk.text}`,
@@ -208,7 +237,10 @@ async function buildConfluenceKnowledgeSection(
       });
     });
 
-    return lines.join("\n");
+    return {
+      context: lines.join("\n"),
+      references,
+    };
   } catch (error) {
     integrationManager.setIntegrationStatus(integration.id, "Error");
     const message = error instanceof Error ? error.message : String(error);
@@ -217,7 +249,10 @@ async function buildConfluenceKnowledgeSection(
       sourceId: source.id,
       message,
     });
-    return `- Source ${source.name}: Confluence retrieval failed. ${message}`;
+    return {
+      context: `- Source ${source.name}: Confluence retrieval failed. ${message}`,
+      references: [],
+    };
   }
 }
 
@@ -782,7 +817,8 @@ function selectRelevantEvidenceChunks(
   const keywordTokens = extractKeywordTokens(query);
   const phraseCandidates = buildPhraseCandidates(keywordTokens);
   const evidenceChunks: ConfluenceEvidenceChunk[] = [];
-  const excerptText = `Excerpt: ${selectRelevantExcerpt(result.text, query)}`;
+  const excerpt = selectRelevantExcerpt(result.text, query);
+  const excerptText = `Excerpt: ${excerpt}`;
 
   if (result.storageValue) {
     evidenceChunks.push(
@@ -803,6 +839,7 @@ function selectRelevantEvidenceChunks(
 
   evidenceChunks.push({
     text: excerptText,
+    snippet: excerpt,
     score: Math.max(
       1,
       scoreEvidenceText(excerptText, keywordTokens, phraseCandidates),
@@ -873,6 +910,8 @@ function extractTableRowEvidenceChunks(
       evidenceChunks.push({
         text: evidenceText,
         score,
+        location: headingPath || undefined,
+        snippet: rowText,
       });
     }
   }
@@ -911,11 +950,29 @@ function extractBodyBlockEvidenceChunks(
       evidenceChunks.push({
         text: evidenceText,
         score,
+        location: headingPath || undefined,
+        snippet: text,
       });
     }
   }
 
   return evidenceChunks;
+}
+
+function buildConfluenceReference(
+  source: KnowledgeSource,
+  match: ConfluenceSearchResult,
+  evidenceChunk: ConfluenceEvidenceChunk,
+): MessageReference {
+  return {
+    id: `confluence:${source.id}:${match.id}`,
+    kind: "confluence",
+    title: match.title,
+    sourceName: source.name,
+    location: evidenceChunk.location,
+    url: match.url,
+    snippet: trimReferenceSnippet(evidenceChunk.snippet || evidenceChunk.text),
+  };
 }
 
 function findBestExcerptWindow(text: string, query: string) {
@@ -1095,6 +1152,11 @@ function scorePrimaryCell(
 function trimExcerpt(value: string) {
   const excerpt = normalizeWhitespace(value).slice(0, MAX_EXCERPT_CHARS);
   return excerpt.length < value.length ? `${excerpt}...` : excerpt;
+}
+
+function trimReferenceSnippet(value: string) {
+  const snippet = normalizeWhitespace(value).slice(0, 280);
+  return snippet.length < value.length ? `${snippet}...` : snippet;
 }
 
 function storageToPlainText(storageValue: string): string {

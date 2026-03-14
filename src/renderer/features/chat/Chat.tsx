@@ -41,7 +41,7 @@ export function Chat() {
       const requestUUID = crypto.randomUUID();
       setLastRequestUUID(requestUUID);
       const history = [...messages, userMessage];
-      const filteredContent = await streamAssistantReply({
+      const reply = await streamAssistantReply({
         settings,
         selectedAgent: settings.selectedAgent || "Clippy",
         history,
@@ -56,9 +56,10 @@ export function Chat() {
       // and clear the streaming message.
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
-        content: filteredContent,
+        content: reply.content,
         sender: "clippy",
         createdAt: Date.now(),
+        references: reply.references,
       };
 
       addMessage(assistantMessage);

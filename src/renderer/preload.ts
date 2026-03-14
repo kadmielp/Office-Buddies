@@ -10,6 +10,8 @@ import {
   BuddyAction,
   BuddySpeechPayload,
   ChatWithMessages,
+  DynamicKnowledgeContextResult,
+  MessageReference,
 } from "../types/interfaces";
 import { DebugState } from "../shared/debug-state";
 import { BubbleView } from "./contexts/BubbleViewContext";
@@ -79,12 +81,14 @@ const clippyApi: ClippyApi = {
   getDynamicKnowledgeContext: (
     query: string,
     options?: { enabled?: boolean },
-  ) =>
+  ): Promise<DynamicKnowledgeContextResult> =>
     ipcRenderer.invoke(
       IpcMessages.KNOWLEDGE_GET_DYNAMIC_CONTEXT,
       query,
       options,
     ),
+  openReference: (reference: MessageReference) =>
+    ipcRenderer.invoke(IpcMessages.APP_OPEN_REFERENCE, reference),
   saveIntegration: (integration) =>
     ipcRenderer.invoke(IpcMessages.INTEGRATIONS_SAVE, integration),
   deleteIntegration: (integrationId: string) =>

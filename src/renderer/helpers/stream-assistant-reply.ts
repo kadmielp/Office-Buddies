@@ -4,6 +4,10 @@ import { promptStreamingWithProvider } from "../ai-provider-client";
 import { clippyApi } from "../clippyApi";
 import { Message } from "../features/chat/Message";
 import { SettingsState } from "../../shared/shared-state";
+import {
+  DynamicKnowledgeContextResult,
+  MessageReference,
+} from "../../types/interfaces";
 
 type StreamAssistantReplyArgs = {
   settings: SettingsState;
@@ -25,13 +29,19 @@ export async function streamAssistantReply({
   onResponding,
   onChunk,
   onAnimationKey,
-}: StreamAssistantReplyArgs): Promise<string> {
-  let dynamicKnowledgeContext = "";
+}: StreamAssistantReplyArgs): Promise<{
+  content: string;
+  references: MessageReference[];
+}> {
+  let knowledgeContextResult: DynamicKnowledgeContextResult = {
+    promptContext: "",
+    references: [],
+  };
   const knowledgeEnabled = Boolean(settings.useKnowledgeAtStart);
 
   if (knowledgeEnabled) {
     try {
-      dynamicKnowledgeContext = await clippyApi.getDynamicKnowledgeContext(
+      knowledgeContextResult = await clippyApi.getDynamicKnowledgeContext(
         input,
         { enabled: true },
       );
@@ -42,7 +52,7 @@ export async function streamAssistantReply({
   const systemPrompt = buildSessionSystemPrompt(
     settings,
     selectedAgent || "Clippy",
-    dynamicKnowledgeContext,
+    knowledgeContextResult.promptContext,
   );
   const response = promptStreamingWithProvider({
     settings,
@@ -82,7 +92,10 @@ export async function streamAssistantReply({
     onChunk(filteredContent);
   }
 
-  return filteredContent;
+  return {
+    content: filteredContent,
+    references: knowledgeContextResult.references,
+  };
 }
 
 export function filterMessageContent(

@@ -80,7 +80,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     useState(false);
 
   const getSystemPrompt = useCallback(() => {
-    return buildSessionSystemPrompt(settings, settings.selectedAgent || "Clippy");
+    return buildSessionSystemPrompt(
+      settings,
+      settings.selectedAgent || "Clippy",
+    );
   }, [settings]);
 
   const addMessage = useCallback(
@@ -177,7 +180,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       settings.maritacaApiKey,
       settings.useKnowledgeAtStart,
       settings.knowledgeFiles,
-      settings.knowledgeMcpSources,
+      settings.knowledgeSources,
       models,
       getSystemPrompt,
       setIsStartingNewChat,
@@ -239,7 +242,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       settings.temperature,
       settings.useKnowledgeAtStart,
       settings.knowledgeFiles,
-      settings.knowledgeMcpSources,
+      settings.knowledgeSources,
       status,
       models,
       getSystemPrompt,
@@ -358,7 +361,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     settings.temperature,
     settings.useKnowledgeAtStart,
     settings.knowledgeFiles,
-    settings.knowledgeMcpSources,
+    settings.knowledgeSources,
     models,
   ]);
 
@@ -502,4 +505,3 @@ function getPreviewFromMessages(messages: Message[]): string {
   // Remove newlines and limit to 100 characters
   return messages[0].content.replace(/\n/g, " ").substring(0, 100);
 }
-

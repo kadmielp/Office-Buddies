@@ -39,8 +39,10 @@ const FLAGS = {
   AZURE_TENANT_ID: process.env.AZURE_TENANT_ID,
   AZURE_CLIENT_ID: process.env.AZURE_CLIENT_ID,
   AZURE_CLIENT_SECRET: process.env.AZURE_CLIENT_SECRET,
-  APPLE_ID: process.env.APPLE_ID || "felix@felixrieseberg.com",
+  APPLE_ID: process.env.APPLE_ID,
   APPLE_ID_PASSWORD: process.env.APPLE_ID_PASSWORD,
+  APPLE_TEAM_ID: process.env.APPLE_TEAM_ID,
+  APPLE_SIGNING_IDENTITY: process.env.APPLE_SIGNING_IDENTITY,
 };
 
 const EXTERNAL_DEPENDENCIES = [
@@ -57,6 +59,8 @@ const windowsSign: any = {
   timestampServer: "http://timestamp.acs.microsoft.com",
   hashes: ["sha256"],
 };
+
+const APP_BUNDLE_ID = getAppBundleId(packageJson.name, packageJson.author?.name);
 
 setup();
 
@@ -198,23 +202,27 @@ const config: ForgeConfig = {
 
       return true;
     },
-    appBundleId: "com.felixrieseberg.clippy",
+    appBundleId: APP_BUNDLE_ID,
     appCategoryType: "public.app-category.productivity",
     win32metadata: {
-      CompanyName: "Felix Rieseberg",
+      CompanyName: packageJson.author?.name || packageJson.productName,
       OriginalFilename: "OfficeBuddies",
     },
     osxSign: FLAGS.IS_CODESIGNING_ENABLED
-      ? {
-          identity: "Developer ID Application: Felix Rieseberg (LT94ZKYDCJ)",
-        }
+      ? FLAGS.APPLE_SIGNING_IDENTITY
+        ? {
+            identity: FLAGS.APPLE_SIGNING_IDENTITY,
+          }
+        : {}
       : undefined,
     osxNotarize: FLAGS.IS_CODESIGNING_ENABLED
-      ? {
+      ? FLAGS.APPLE_ID && FLAGS.APPLE_ID_PASSWORD && FLAGS.APPLE_TEAM_ID
+        ? {
           appleId: FLAGS.APPLE_ID,
           appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
-          teamId: "LT94ZKYDCJ",
+          teamId: FLAGS.APPLE_TEAM_ID,
         }
+        : undefined
       : undefined,
     windowsSign: FLAGS.IS_CODESIGNING_ENABLED ? windowsSign : undefined,
     icon: path.resolve(__dirname, "assets/icon"),
@@ -230,12 +238,10 @@ const config: ForgeConfig = {
     new MakerSquirrel(
       (arch) => ({
         name: "OfficeBuddies",
-        authors: "Felix Rieseberg",
+        authors: packageJson.author?.name || packageJson.productName,
         exe: "OfficeBuddies.exe",
         noMsi: true,
         remoteReleases: "",
-        iconUrl:
-          "https://raw.githubusercontent.com/felixrieseberg/windows95/master/assets/icon.ico",
         loadingGif: "./assets/boot.gif",
         setupExe: `OfficeBuddies-${packageJson.version}-setup-${arch}.exe`,
         setupIcon: path.resolve(__dirname, "assets", "icon.ico"),
@@ -496,6 +502,19 @@ function getArch() {
   }
 
   return process.arch;
+}
+
+function getAppBundleId(
+  packageName: string | undefined,
+  authorName: string | undefined,
+): string {
+  const author = sanitizeIdentifierPart(authorName || "officebuddies");
+  const app = sanitizeIdentifierPart(packageName || "officebuddies");
+  return `com.${author}.${app}`;
+}
+
+function sanitizeIdentifierPart(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
 /**

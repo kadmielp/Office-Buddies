@@ -1,4 +1,5 @@
 import {
+  app,
   BrowserWindow,
   dialog,
   Menu,
@@ -19,8 +20,11 @@ import {
   getIsInspectorEnabled,
   openInspector,
 } from "./debugger";
+import { readFileSync } from "fs";
+import path from "path";
 
 let contextMenuAnimationKeys: string[] = [];
+const DEFAULT_REPOSITORY_SLUG = "kadmielp/Office-Buddies";
 
 /**
  * Setup the application menu
@@ -265,17 +269,19 @@ function getSettingsMenuItem(): MenuItem {
 }
 
 function getHelpMenu(): MenuItemConstructorOptions[] {
+  const repositorySlug = getRepositorySlug();
+
   return [
     {
       label: "Open Office Buddies Website",
       click: () => {
-        shell.openExternal("https://felixrieseberg.github.io/clippy/");
+        shell.openExternal(`https://github.com/${repositorySlug}`);
       },
     },
     {
       label: "Report an Issue",
       click: () => {
-        shell.openExternal("https://github.com/felixrieseberg/clippy/issues");
+        shell.openExternal(`https://github.com/${repositorySlug}/issues`);
       },
     },
     {
@@ -327,5 +333,48 @@ function getHelpMenu(): MenuItemConstructorOptions[] {
 
 function openView(view: BubbleView) {
   getMainWindow()?.webContents.send(IpcMessages.SET_BUBBLE_VIEW, view);
+}
+
+function getRepositorySlug(): string {
+  try {
+    const packageJsonPath = path.join(app.getAppPath(), "package.json");
+    const packageJsonString = readFileSync(packageJsonPath, "utf-8");
+    const packageJson = JSON.parse(packageJsonString) as {
+      repository?: string | { url?: string };
+    };
+    const repository = packageJson.repository;
+    const repositoryUrl =
+      typeof repository === "string" ? repository : repository?.url;
+    const parsedRepositorySlug = parseGithubRepo(repositoryUrl);
+
+    if (parsedRepositorySlug) {
+      return parsedRepositorySlug;
+    }
+  } catch (error) {
+    getLogger().warn("Failed to resolve repository slug from package.json", error);
+  }
+
+  return DEFAULT_REPOSITORY_SLUG;
+}
+
+function parseGithubRepo(repositoryUrl?: string): string | null {
+  if (!repositoryUrl) {
+    return null;
+  }
+
+  const normalizedRepositoryUrl = repositoryUrl
+    .trim()
+    .replace(/^git\+/, "")
+    .replace(/\.git$/i, "");
+  const httpsMatch = normalizedRepositoryUrl.match(
+    /github\.com[/:]([^/]+\/[^/]+)$/i,
+  );
+
+  if (httpsMatch?.[1]) {
+    return httpsMatch[1];
+  }
+
+  const shortMatch = normalizedRepositoryUrl.match(/^([^/]+\/[^/]+)$/);
+  return shortMatch?.[1] || null;
 }
 

@@ -55,6 +55,13 @@ const QUERY_STOP_WORDS = new Set([
   "that",
   "this",
   "of",
+  "our",
+  "we",
+  "us",
+  "from",
+  "at",
+  "or",
+  "be",
 ]);
 
 export async function buildDynamicKnowledgeContext(
@@ -244,14 +251,18 @@ async function searchConfluenceMatches(
       completedSearches += 1;
 
       for (const result of results) {
+        const relevanceScore = scoreConfluenceResult(result, query);
         const existing = matchesById.get(result.id);
 
         if (!existing) {
-          matchesById.set(result.id, { ...result, score: boost });
+          matchesById.set(result.id, {
+            ...result,
+            score: boost + relevanceScore,
+          });
           continue;
         }
 
-        existing.score += boost;
+        existing.score += boost + relevanceScore;
         existing.text =
           result.text.length > existing.text.length
             ? result.text
@@ -454,8 +465,11 @@ async function fetchConfluenceJson(
 }
 
 function buildConfluenceSearchQueries(query: string) {
-  const titleCandidates = extractTitleCandidates(query);
-  const textCandidates = extractTextCandidates(query);
+  const normalized = normalizeQuery(query);
+  const titleCandidates = extractTitleCandidates(normalized);
+  const textCandidates = extractTextCandidates(normalized);
+  const keywordTokens = extractKeywordTokens(normalized);
+  const phraseCandidates = buildPhraseCandidates(keywordTokens);
   const queries: Array<{ cql: string; boost: number }> = [];
 
   for (const candidate of titleCandidates) {
@@ -469,6 +483,20 @@ function buildConfluenceSearchQueries(query: string) {
     queries.push({
       cql: `type = page AND text ~ "${escapeCql(candidate)}"`,
       boost: titleCandidates.includes(candidate) ? 2 : 1,
+    });
+  }
+
+  for (const candidate of phraseCandidates) {
+    queries.push({
+      cql: `type = page AND text ~ "${escapeCql(candidate)}"`,
+      boost: candidate.split(" ").length >= 3 ? 2 : 1,
+    });
+  }
+
+  for (const candidate of phraseCandidates.slice(0, 2)) {
+    queries.push({
+      cql: `type = page AND title ~ "${escapeCql(candidate)}"`,
+      boost: 2,
     });
   }
 
@@ -489,27 +517,47 @@ function extractTitleCandidates(query: string): string[] {
 function extractTextCandidates(query: string): string[] {
   const normalized = normalizeQuery(query);
   const titleCandidates = extractTitleCandidates(normalized);
-  const stripped = normalizeWhitespace(
-    normalized
-      .replace(/[\u201C\u201D]/g, '"')
-      .replace(/"([^"]+)"/g, "$1")
-      .split(/\s+/)
-      .filter((token) => {
-        const cleaned = stripToken(token).toLowerCase();
-        return cleaned && !QUERY_STOP_WORDS.has(cleaned);
-      })
-      .join(" "),
-  );
+  const stripped = extractKeywordTokens(normalized).join(" ");
   const candidates = [...titleCandidates];
 
   if (stripped.length >= 6) {
     candidates.push(stripped);
   }
 
+  candidates.push(...buildPhraseCandidates(extractKeywordTokens(normalized)));
+
   return dedupeBy(
     candidates.filter((candidate) => candidate.length >= 3),
     (candidate) => candidate.toLowerCase(),
   );
+}
+
+function extractKeywordTokens(query: string): string[] {
+  return query
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/"([^"]+)"/g, "$1")
+    .split(/\s+/)
+    .map(stripToken)
+    .filter(Boolean)
+    .map((token) => token.toLowerCase())
+    .filter((token) => token && !QUERY_STOP_WORDS.has(token));
+}
+
+function buildPhraseCandidates(tokens: string[]): string[] {
+  const phrases: string[] = [];
+  const maxPhraseLength = Math.min(4, tokens.length);
+
+  for (let size = maxPhraseLength; size >= 2; size -= 1) {
+    for (let start = 0; start + size <= tokens.length; start += 1) {
+      const candidate = tokens.slice(start, start + size).join(" ");
+
+      if (candidate.length >= 6) {
+        phrases.push(candidate);
+      }
+    }
+  }
+
+  return dedupeBy(phrases, (candidate) => candidate);
 }
 
 function extractQuotedPhrases(query: string): string[] {
@@ -643,27 +691,61 @@ function selectRelevantExcerpt(text: string, query: string): string {
     return "Page text could not be extracted.";
   }
 
-  const terms = extractTextCandidates(query)
-    .flatMap((candidate) => candidate.split(/\s+/))
-    .map((term) => term.toLowerCase())
-    .filter((term) => term.length >= 4);
-  const index = terms.reduce((bestIndex, term) => {
-    const nextIndex = normalizedText.toLowerCase().indexOf(term);
+  const excerptWindow = findBestExcerptWindow(normalizedText, query);
 
-    if (nextIndex === -1) {
-      return bestIndex;
-    }
-
-    return bestIndex === -1 ? nextIndex : Math.min(bestIndex, nextIndex);
-  }, -1);
-
-  if (index === -1) {
+  if (!excerptWindow) {
     return trimExcerpt(normalizedText);
   }
 
-  const start = Math.max(0, index - 220);
-  const end = Math.min(normalizedText.length, index + MAX_EXCERPT_CHARS);
+  const start = Math.max(0, excerptWindow.start - 220);
+  const end = Math.min(
+    normalizedText.length,
+    excerptWindow.start + MAX_EXCERPT_CHARS,
+  );
   return trimExcerpt(normalizedText.slice(start, end));
+}
+
+function findBestExcerptWindow(text: string, query: string) {
+  const haystack = text.toLowerCase();
+  const terms = dedupeBy(
+    [
+      ...extractKeywordTokens(query),
+      ...buildPhraseCandidates(extractKeywordTokens(query)),
+    ].filter((term) => term.length >= 4),
+    (term) => term,
+  );
+  let bestWindow: { start: number; score: number } | null = null;
+
+  for (const term of terms) {
+    let fromIndex = 0;
+
+    while (fromIndex < haystack.length) {
+      const matchIndex = haystack.indexOf(term, fromIndex);
+
+      if (matchIndex === -1) {
+        break;
+      }
+
+      const windowStart = Math.max(0, matchIndex - 180);
+      const windowEnd = Math.min(
+        haystack.length,
+        windowStart + MAX_EXCERPT_CHARS,
+      );
+      const windowText = haystack.slice(windowStart, windowEnd);
+      const score = terms.reduce(
+        (total, candidate) => total + (windowText.includes(candidate) ? 1 : 0),
+        0,
+      );
+
+      if (!bestWindow || score > bestWindow.score) {
+        bestWindow = { start: windowStart, score };
+      }
+
+      fromIndex = matchIndex + term.length;
+    }
+  }
+
+  return bestWindow;
 }
 
 function trimExcerpt(value: string) {
@@ -728,6 +810,30 @@ function startsWithUppercase(value: string) {
 
 function escapeCql(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+function scoreConfluenceResult(result: ConfluenceSearchResult, query: string) {
+  const title = normalizeWhitespace(result.title).toLowerCase();
+  const text = normalizeWhitespace(result.text).toLowerCase();
+  const phrases = buildPhraseCandidates(extractKeywordTokens(query));
+  const terms = dedupeBy(
+    [...extractKeywordTokens(query), ...phrases].filter(
+      (term) => term.length >= 4,
+    ),
+    (term) => term,
+  );
+
+  return terms.reduce((score, term) => {
+    if (title.includes(term)) {
+      return score + (term.includes(" ") ? 4 : 2);
+    }
+
+    if (text.includes(term)) {
+      return score + (term.includes(" ") ? 2 : 1);
+    }
+
+    return score;
+  }, 0);
 }
 
 function dedupeBy<T>(values: T[], getKey: (value: T) => string) {

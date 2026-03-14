@@ -7,11 +7,29 @@ type ConfluenceSearchResult = {
   id: string;
   title: string;
   text: string;
+  storageValue?: string;
   url?: string;
+};
+
+type ConfluencePageContent = {
+  storageValue: string;
+  text: string;
+};
+
+type ConfluenceEvidenceChunk = {
+  text: string;
+  score: number;
+};
+
+type HeadingMatch = {
+  level: number;
+  title: string;
+  index: number;
 };
 
 const MAX_MATCHES_PER_SOURCE = 2;
 const MAX_SEARCH_CANDIDATES = 6;
+const MAX_EVIDENCE_PER_MATCH = 3;
 const MAX_EXCERPT_CHARS = 1200;
 const TITLE_JOINERS = new Set([
   "the",
@@ -110,7 +128,7 @@ export async function buildDynamicKnowledgeContext(
 
   return [
     "Connected-source retrieval results for the current user message:",
-    "Use retrieved excerpts below when answering.",
+    "Use retrieved evidence below when answering.",
     "If a source reports an error or no matches, say that plainly instead of guessing.",
     "If the retrieved content is insufficient, say the knowledge base does not contain enough information.",
     ...lines,
@@ -178,9 +196,16 @@ async function buildConfluenceKnowledgeSection(
         lines.push(`  Match ${index + 1} url: ${match.url}`);
       }
 
-      lines.push(
-        `  Match ${index + 1} excerpt: ${selectRelevantExcerpt(match.text, query)}`,
+      const evidenceChunks = selectRelevantEvidenceChunks(match, query).slice(
+        0,
+        MAX_EVIDENCE_PER_MATCH,
       );
+
+      evidenceChunks.forEach((chunk, chunkIndex) => {
+        lines.push(
+          `  Match ${index + 1} evidence ${chunkIndex + 1}: ${chunk.text}`,
+        );
+      });
     });
 
     return lines.join("\n");
@@ -326,22 +351,33 @@ async function mapConfluenceResult(
     return null;
   }
 
-  const textFromSearch = storageToPlainText(result?.body?.storage?.value || "");
+  const storageValueFromSearch =
+    typeof result?.body?.storage?.value === "string"
+      ? result.body.storage.value
+      : "";
+  const textFromSearch = storageToPlainText(storageValueFromSearch);
   let text = textFromSearch;
+  let storageValue = storageValueFromSearch;
 
   try {
     // Search results often contain only a short fragment of the page body.
     // Fetch the full page so excerpt selection can reach values that appear
     // lower in tables or later sections.
-    const fullPageText = await fetchConfluencePageText(
+    const fullPageContent = await fetchConfluencePageContent(
       id,
       integration,
       accountEmail,
       apiToken,
     );
 
+    storageValue =
+      fullPageContent.storageValue.length >= storageValueFromSearch.length
+        ? fullPageContent.storageValue
+        : storageValueFromSearch;
     text =
-      fullPageText.length >= textFromSearch.length ? fullPageText : textFromSearch;
+      fullPageContent.text.length >= textFromSearch.length
+        ? fullPageContent.text
+        : textFromSearch;
   } catch (error) {
     getLogger().warn("Unable to fetch Confluence page body", {
       integrationId: integration.id,
@@ -354,6 +390,7 @@ async function mapConfluenceResult(
     id,
     title,
     text,
+    storageValue,
     url: buildConfluencePageUrl(result, integration),
   };
 }
@@ -413,12 +450,27 @@ async function fetchConfluencePageText(
   accountEmail: string,
   apiToken: string,
 ): Promise<string> {
+  const pageContent = await fetchConfluencePageContent(
+    pageId,
+    integration,
+    accountEmail,
+    apiToken,
+  );
+  return pageContent.text;
+}
+
+async function fetchConfluencePageContent(
+  pageId: string,
+  integration: IntegrationConfig,
+  accountEmail: string,
+  apiToken: string,
+): Promise<ConfluencePageContent> {
   const baseUrl = normalizeConfluenceBaseUrl(integration.baseUrl || "");
   const url = `${baseUrl}/rest/api/content/${encodeURIComponent(
     pageId,
   )}?expand=body.storage`;
   const payload = await fetchConfluenceJson(url, accountEmail, apiToken);
-  return storageToPlainText(payload?.body?.storage?.value || "");
+  return toConfluencePageContent(payload);
 }
 
 async function fetchConfluencePageById(
@@ -433,6 +485,7 @@ async function fetchConfluencePageById(
     pageId,
   )}?expand=body.storage`;
   const payload = await fetchConfluenceJson(url, accountEmail, apiToken);
+  const pageContent = toConfluencePageContent(payload);
 
   return {
     id: pageId,
@@ -440,7 +493,8 @@ async function fetchConfluencePageById(
       typeof payload?.title === "string" && payload.title
         ? payload.title
         : `Confluence page ${pageId}`,
-    text: storageToPlainText(payload?.body?.storage?.value || ""),
+    text: pageContent.text,
+    storageValue: pageContent.storageValue,
     url: resolvedUrl,
   };
 }
@@ -466,6 +520,18 @@ async function fetchConfluenceJson(
   }
 
   return response.json();
+}
+
+function toConfluencePageContent(payload: any): ConfluencePageContent {
+  const storageValue =
+    typeof payload?.body?.storage?.value === "string"
+      ? payload.body.storage.value
+      : "";
+
+  return {
+    storageValue,
+    text: storageToPlainText(storageValue),
+  };
 }
 
 function buildConfluenceSearchQueries(query: string) {
@@ -709,6 +775,149 @@ function selectRelevantExcerpt(text: string, query: string): string {
   return trimExcerpt(normalizedText.slice(start, end));
 }
 
+function selectRelevantEvidenceChunks(
+  result: ConfluenceSearchResult,
+  query: string,
+): ConfluenceEvidenceChunk[] {
+  const keywordTokens = extractKeywordTokens(query);
+  const phraseCandidates = buildPhraseCandidates(keywordTokens);
+  const evidenceChunks: ConfluenceEvidenceChunk[] = [];
+  const excerptText = `Excerpt: ${selectRelevantExcerpt(result.text, query)}`;
+
+  if (result.storageValue) {
+    evidenceChunks.push(
+      ...extractTableRowEvidenceChunks(
+        result.storageValue,
+        keywordTokens,
+        phraseCandidates,
+      ),
+    );
+    evidenceChunks.push(
+      ...extractBodyBlockEvidenceChunks(
+        result.storageValue,
+        keywordTokens,
+        phraseCandidates,
+      ),
+    );
+  }
+
+  evidenceChunks.push({
+    text: excerptText,
+    score: Math.max(
+      1,
+      scoreEvidenceText(excerptText, keywordTokens, phraseCandidates),
+    ),
+  });
+
+  return dedupeBy(
+    evidenceChunks
+      .filter((chunk) => chunk.score > 0 && chunk.text.length >= 12)
+      .sort((left, right) => right.score - left.score),
+    (chunk) => chunk.text.toLowerCase(),
+  );
+}
+
+function extractTableRowEvidenceChunks(
+  storageValue: string,
+  keywordTokens: string[],
+  phraseCandidates: string[],
+): ConfluenceEvidenceChunk[] {
+  const headings = extractHeadingMatches(storageValue);
+  const evidenceChunks: ConfluenceEvidenceChunk[] = [];
+
+  for (const tableMatch of storageValue.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/gi)) {
+    const tableHtml = tableMatch[0];
+    const headingPath = getHeadingPathAtIndex(headings, tableMatch.index || 0);
+    let headerCells: string[] = [];
+
+    for (const rowMatch of tableHtml.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)) {
+      const rowHtml = rowMatch[0];
+      const cells = Array.from(
+        rowHtml.matchAll(/<(td|th)\b[^>]*>([\s\S]*?)<\/\1>/gi),
+      ).map((match) => ({
+        tag: match[1].toLowerCase(),
+        value: htmlFragmentToText(match[2]),
+      }));
+
+      if (cells.length === 0) {
+        continue;
+      }
+
+      const hasOnlyHeaders = cells.every((cell) => cell.tag === "th");
+
+      if (hasOnlyHeaders) {
+        headerCells = cells.map((cell) => cell.value);
+        continue;
+      }
+
+      const rowValues = cells.map((cell) => cell.value).filter(Boolean);
+
+      if (rowValues.length === 0) {
+        continue;
+      }
+
+      const rowText =
+        headerCells.length === rowValues.length && headerCells.length > 0
+          ? headerCells
+              .map((header, index) => `${header}: ${rowValues[index]}`)
+              .join(" | ")
+          : rowValues.join(" | ");
+      const evidenceText = headingPath
+        ? `Section: ${headingPath} | Table row: ${rowText}`
+        : `Table row: ${rowText}`;
+      const score =
+        scoreEvidenceText(evidenceText, keywordTokens, phraseCandidates) +
+        6 +
+        scorePrimaryCell(rowValues[0], keywordTokens, phraseCandidates);
+
+      evidenceChunks.push({
+        text: evidenceText,
+        score,
+      });
+    }
+  }
+
+  return evidenceChunks;
+}
+
+function extractBodyBlockEvidenceChunks(
+  storageValue: string,
+  keywordTokens: string[],
+  phraseCandidates: string[],
+): ConfluenceEvidenceChunk[] {
+  const headings = extractHeadingMatches(storageValue);
+  const evidenceChunks: ConfluenceEvidenceChunk[] = [];
+
+  for (const blockMatch of storageValue.matchAll(
+    /<(p|li|blockquote)\b[^>]*>([\s\S]*?)<\/\1>/gi,
+  )) {
+    const text = htmlFragmentToText(blockMatch[2]);
+
+    if (text.length < 24) {
+      continue;
+    }
+
+    const headingPath = getHeadingPathAtIndex(headings, blockMatch.index || 0);
+    const evidenceText = headingPath
+      ? `Section: ${headingPath} | Content: ${text}`
+      : `Content: ${text}`;
+    const score = scoreEvidenceText(
+      evidenceText,
+      keywordTokens,
+      phraseCandidates,
+    );
+
+    if (score > 0) {
+      evidenceChunks.push({
+        text: evidenceText,
+        score,
+      });
+    }
+  }
+
+  return evidenceChunks;
+}
+
 function findBestExcerptWindow(text: string, query: string) {
   const haystack = text.toLowerCase();
   const keywordTokens = extractKeywordTokens(query);
@@ -785,6 +994,102 @@ function scoreStructuredWindow(windowText: string, keywordTokens: string[]) {
 
     return Math.max(bestScore, lineScore);
   }, 0);
+}
+
+function extractHeadingMatches(storageValue: string): HeadingMatch[] {
+  return Array.from(storageValue.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi))
+    .map((match) => ({
+      level: Number(match[1]),
+      title: htmlFragmentToText(match[2]),
+      index: match.index || 0,
+    }))
+    .filter((heading) => Boolean(heading.title));
+}
+
+function getHeadingPathAtIndex(headings: HeadingMatch[], index: number): string {
+  const activeHeadings: HeadingMatch[] = [];
+
+  for (const heading of headings) {
+    if (heading.index > index) {
+      break;
+    }
+
+    while (
+      activeHeadings.length > 0 &&
+      activeHeadings[activeHeadings.length - 1].level >= heading.level
+    ) {
+      activeHeadings.pop();
+    }
+
+    activeHeadings.push(heading);
+  }
+
+  return activeHeadings.map((heading) => heading.title).join(" > ");
+}
+
+function htmlFragmentToText(fragment: string): string {
+  return normalizeWhitespace(
+    decodeHtmlEntities(
+      fragment
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/(p|div|li)>/gi, "\n")
+        .replace(/<[^>]+>/g, " "),
+    ),
+  );
+}
+
+function scoreEvidenceText(
+  text: string,
+  keywordTokens: string[],
+  phraseCandidates: string[],
+): number {
+  const normalizedText = normalizeWhitespace(text).toLowerCase();
+  let score = 0;
+
+  for (const phrase of dedupeBy(phraseCandidates, (value) => value)) {
+    if (normalizedText.includes(phrase)) {
+      score += phrase.split(" ").length >= 3 ? 7 : 5;
+    }
+  }
+
+  for (const token of dedupeBy(keywordTokens, (value) => value)) {
+    if (normalizedText.includes(token)) {
+      score += 2;
+    }
+  }
+
+  if (/\b\d+(?:[.,]\d+)?%?\b/.test(normalizedText)) {
+    score += 1;
+  }
+
+  return score;
+}
+
+function scorePrimaryCell(
+  primaryValue: string | undefined,
+  keywordTokens: string[],
+  phraseCandidates: string[],
+) {
+  if (!primaryValue) {
+    return 0;
+  }
+
+  const normalizedPrimaryValue = normalizeWhitespace(primaryValue).toLowerCase();
+  let score = 0;
+
+  for (const phrase of dedupeBy(phraseCandidates, (value) => value)) {
+    if (normalizedPrimaryValue.includes(phrase)) {
+      score += 6;
+    }
+  }
+
+  for (const token of dedupeBy(keywordTokens, (value) => value)) {
+    if (normalizedPrimaryValue.includes(token)) {
+      score += 3;
+    }
+  }
+
+  return score;
 }
 
 function trimExcerpt(value: string) {

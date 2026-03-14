@@ -5,6 +5,7 @@ import {
   desktopCapturer,
   ipcMain,
   screen,
+  shell,
 } from "electron";
 import {
   getMainWindow,
@@ -17,7 +18,7 @@ import { IpcMessages } from "../shared/ipc-messages";
 import { getModelManager } from "./model-manager";
 import { getStateManager } from "./state";
 import { getChatManager } from "./chats";
-import { ChatWithMessages } from "../types/interfaces";
+import { ChatWithMessages, MessageReference } from "../types/interfaces";
 import { popupAppMenu, setContextMenuAnimations } from "./menu";
 import { checkForUpdates } from "./update";
 import { getVersions } from "./helpers/getVersions";
@@ -96,6 +97,20 @@ export function setupIpcListeners() {
     app.relaunch();
     app.exit(0);
   });
+  ipcMain.handle(
+    IpcMessages.APP_OPEN_REFERENCE,
+    async (_, reference: MessageReference) => {
+      if ("url" in reference && reference.url) {
+        await shell.openExternal(reference.url);
+        return;
+      }
+
+      if ("path" in reference && reference.path) {
+        await shell.openPath(reference.path);
+        return;
+      }
+    },
+  );
 
   // Model
   ipcMain.handle(IpcMessages.DOWNLOAD_MODEL_BY_NAME, (_, name: string) =>

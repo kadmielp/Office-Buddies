@@ -1,5 +1,5 @@
 import Markdown from "react-markdown";
-import { MessageRecord } from "../../../types/interfaces";
+import { MessageRecord, MessageReference } from "../../../types/interfaces";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { getThemeIcons } from "../../theme/theme";
@@ -81,10 +81,77 @@ export function Message({ message }: { message: Message }) {
                 ))}
               </div>
             )}
+            {message.references && message.references.length > 0 && (
+              <div className="chat-message-references">
+                <div className="chat-message-references-label">
+                  Knowledge references
+                </div>
+                {message.references.map((reference) => {
+                  const isOpenable = canOpenReference(reference);
+
+                  return (
+                    <div
+                      key={reference.id}
+                      className="chat-message-reference"
+                    >
+                      <div className="chat-message-reference-header">
+                        <div className="chat-message-reference-title">
+                          {reference.title}
+                        </div>
+                        {isOpenable && (
+                          <button
+                            type="button"
+                            className="chat-message-reference-open"
+                            onClick={() => void clippyApi.openReference(reference)}
+                          >
+                            Open
+                          </button>
+                        )}
+                      </div>
+                      <div className="chat-message-reference-meta">
+                        {getReferenceMeta(reference)}
+                      </div>
+                      {reference.snippet && (
+                        <div className="chat-message-reference-snippet">
+                          {reference.snippet}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </>
       )}
     </div>
   );
+}
+
+function canOpenReference(reference: MessageReference) {
+  return ("url" in reference && Boolean(reference.url)) ||
+    ("path" in reference && Boolean(reference.path));
+}
+
+function getReferenceMeta(reference: MessageReference) {
+  const metaParts = [reference.kind.toUpperCase()];
+
+  if (reference.sourceName) {
+    metaParts.push(reference.sourceName);
+  }
+
+  if (reference.location) {
+    metaParts.push(reference.location);
+  }
+
+  if ("path" in reference && reference.path) {
+    metaParts.push(reference.path);
+  }
+
+  if ("server" in reference && reference.server) {
+    metaParts.push(reference.server);
+  }
+
+  return metaParts.join(" | ");
 }
 

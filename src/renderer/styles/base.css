@@ -278,6 +278,54 @@ body {
   flex: none;
 }
 
+.chat-message-references {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-message-references-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chat-message-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.chat-message-reference-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-message-reference-title {
+  font-weight: 700;
+}
+
+.chat-message-reference-open {
+  flex: none;
+  cursor: pointer;
+}
+
+.chat-message-reference-meta {
+  font-size: 11px;
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+}
+
+.chat-message-reference-snippet {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
 .app-table-frame {
   min-height: 0;
 }

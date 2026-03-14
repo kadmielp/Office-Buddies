@@ -3,6 +3,42 @@ export interface MessageAction {
   action: string;
 }
 
+export type MessageReference =
+  | {
+      id: string;
+      kind: "confluence";
+      title: string;
+      sourceName?: string;
+      location?: string;
+      url?: string;
+      snippet?: string;
+    }
+  | {
+      id: string;
+      kind: "file";
+      title: string;
+      sourceName?: string;
+      location?: string;
+      path: string;
+      snippet?: string;
+    }
+  | {
+      id: string;
+      kind: "mcp";
+      title: string;
+      sourceName?: string;
+      location?: string;
+      resourceUri: string;
+      server: string;
+      url?: string;
+      snippet?: string;
+    };
+
+export interface DynamicKnowledgeContextResult {
+  promptContext: string;
+  references: MessageReference[];
+}
+
 export interface MessageRecord {
   id: string;
   content?: string;
@@ -10,6 +46,7 @@ export interface MessageRecord {
   sender: "user" | "clippy";
   createdAt: number;
   actions?: MessageAction[];
+  references?: MessageReference[];
 }
 
 export interface ChatRecord {

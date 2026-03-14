@@ -9,7 +9,9 @@ import {
 } from "../shared/shared-state";
 import {
   ChatRecord,
+  DynamicKnowledgeContextResult,
   MessageRecord,
+  MessageReference,
   ChatWithMessages,
   ClippyDebugInfo,
   Versions,
@@ -60,7 +62,8 @@ export type ClippyApi = {
   getDynamicKnowledgeContext: (
     query: string,
     options?: { enabled?: boolean },
-  ) => Promise<string>;
+  ) => Promise<DynamicKnowledgeContextResult>;
+  openReference: (reference: MessageReference) => Promise<void>;
   saveIntegration: (integration: {
     id?: string;
     name: string;

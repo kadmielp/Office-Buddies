@@ -18,7 +18,10 @@ import { useSharedState } from "../../contexts/SharedStateContext";
 import { clippyApi } from "../../clippyApi";
 import { useBubbleView } from "../../contexts/BubbleViewContext";
 import { isModelDownloading } from "../../../shared/model-helpers";
-import { BuddySpeechPayload } from "../../../types/interfaces";
+import {
+  BuddySpeechPayload,
+  MessageReference,
+} from "../../../types/interfaces";
 import { Message } from "../chat/Message";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
 import { getThemeIcons } from "../../theme/theme";
@@ -210,6 +213,8 @@ export function Clippy() {
   const [miniChatInput, setMiniChatInput] = useState("");
   const [miniChatStreamingContent, setMiniChatStreamingContent] = useState("");
   const [isMiniChatOpen, setIsMiniChatOpen] = useState(false);
+  const [expandedMiniChatReferenceIds, setExpandedMiniChatReferenceIds] =
+    useState<Record<string, boolean>>({});
   const [miniChatScreenshots, setMiniChatScreenshots] = useState<
     MiniChatScreenshot[]
   >([]);
@@ -490,8 +495,16 @@ export function Clippy() {
     setMiniChatInput("");
     setMiniChatMessages([]);
     setMiniChatStreamingContent("");
+    setExpandedMiniChatReferenceIds({});
     setMiniChatScreenshots([]);
     setIsCapturingMiniChatScreenshot(false);
+  }, []);
+
+  const toggleMiniChatReferences = useCallback((messageId: string) => {
+    setExpandedMiniChatReferenceIds((prevState) => ({
+      ...prevState,
+      [messageId]: !prevState[messageId],
+    }));
   }, []);
 
   const openMiniChat = useCallback(() => {
@@ -583,7 +596,7 @@ export function Clippy() {
     setStatus("thinking");
 
     try {
-      const filteredContent = await streamAssistantReply({
+      const reply = await streamAssistantReply({
         settings: {
           ...settings,
           useKnowledgeAtStart: isMiniChatKnowledgeEnabled,
@@ -601,9 +614,10 @@ export function Clippy() {
         ...prevMessages,
         {
           id: crypto.randomUUID(),
-          content: filteredContent,
+          content: reply.content,
           sender: "clippy",
           createdAt: Date.now(),
+          references: reply.references,
         },
       ]);
     } catch (error) {
@@ -1381,6 +1395,76 @@ export function Clippy() {
                           {message.content}
                         </Markdown>
                       )}
+                      {message.references && message.references.length > 0 && (
+                        <div className="buddy-mini-chat-references">
+                          {message.references.length > 1 && (
+                            <div
+                              className="buddy-mini-chat-reference-summary"
+                              title={buildMiniChatReferencesTooltip(
+                                message.references,
+                              )}
+                            >
+                              <div className="buddy-mini-chat-reference-summary-title">
+                                Sources ({message.references.length})
+                              </div>
+                              <button
+                                type="button"
+                                className="buddy-mini-chat-reference-toggle"
+                                onClick={() =>
+                                  toggleMiniChatReferences(message.id)
+                                }
+                              >
+                                {expandedMiniChatReferenceIds[message.id]
+                                  ? "Hide"
+                                  : "Show"}
+                              </button>
+                            </div>
+                          )}
+                          {(message.references.length > 1 &&
+                          !expandedMiniChatReferenceIds[message.id]
+                            ? []
+                            : message.references
+                          ).map((reference) => {
+                            const isOpenable = canOpenReference(reference);
+                            const referenceLabel = buildMiniChatReferenceLabel(
+                              reference,
+                            );
+
+                            return (
+                              <div
+                                key={reference.id}
+                                className="buddy-mini-chat-reference"
+                                title={buildMiniChatReferenceTooltip(
+                                  reference,
+                                  referenceLabel,
+                                )}
+                              >
+                                <div className="buddy-mini-chat-reference-header">
+                                  <div className="buddy-mini-chat-reference-main">
+                                    <div className="buddy-mini-chat-reference-prefix">
+                                      Source
+                                    </div>
+                                    <div className="buddy-mini-chat-reference-title">
+                                      {reference.title}
+                                    </div>
+                                  </div>
+                                  {isOpenable && (
+                                    <button
+                                      type="button"
+                                      className="buddy-mini-chat-reference-open"
+                                      onClick={() =>
+                                        void clippyApi.openReference(reference)
+                                      }
+                                    >
+                                      View
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1631,4 +1715,46 @@ export function Clippy() {
       />
     </div>
   );
+}
+
+function canOpenReference(reference: MessageReference) {
+  return ("url" in reference && Boolean(reference.url)) ||
+    ("path" in reference && Boolean(reference.path));
+}
+
+function buildMiniChatReferenceLabel(reference: MessageReference) {
+  const metaParts = [reference.kind.toUpperCase()];
+
+  if (reference.sourceName) {
+    metaParts.push(reference.sourceName);
+  }
+
+  if (reference.location) {
+    metaParts.push(reference.location);
+  }
+
+  if ("path" in reference && reference.path) {
+    metaParts.push(reference.path);
+  }
+
+  if ("server" in reference && reference.server) {
+    metaParts.push(reference.server);
+  }
+
+  return metaParts.join(" | ");
+}
+
+function buildMiniChatReferenceTooltip(
+  reference: MessageReference,
+  referenceLabel: string,
+) {
+  if (reference.snippet) {
+    return `${referenceLabel}\n${reference.snippet}`;
+  }
+
+  return referenceLabel;
+}
+
+function buildMiniChatReferencesTooltip(references: MessageReference[]) {
+  return references.map((reference) => reference.title).join("\n");
 }

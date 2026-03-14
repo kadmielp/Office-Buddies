@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Logo" width="128" />
+  <img src="assets/icon.png" alt="Logo" width="128" />
 </p>
 <p align="center">
   <img src="https://img.shields.io/github/languages/top/kadmielp/Office-Buddies" alt="GitHub top language" />

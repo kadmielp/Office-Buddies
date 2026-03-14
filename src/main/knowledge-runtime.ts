@@ -329,21 +329,25 @@ async function mapConfluenceResult(
   const textFromSearch = storageToPlainText(result?.body?.storage?.value || "");
   let text = textFromSearch;
 
-  if (!text) {
-    try {
-      text = await fetchConfluencePageText(
-        id,
-        integration,
-        accountEmail,
-        apiToken,
-      );
-    } catch (error) {
-      getLogger().warn("Unable to fetch Confluence page body", {
-        integrationId: integration.id,
-        pageId: id,
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
+  try {
+    // Search results often contain only a short fragment of the page body.
+    // Fetch the full page so excerpt selection can reach values that appear
+    // lower in tables or later sections.
+    const fullPageText = await fetchConfluencePageText(
+      id,
+      integration,
+      accountEmail,
+      apiToken,
+    );
+
+    text =
+      fullPageText.length >= textFromSearch.length ? fullPageText : textFromSearch;
+  } catch (error) {
+    getLogger().warn("Unable to fetch Confluence page body", {
+      integrationId: integration.id,
+      pageId: id,
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 
   return {
@@ -707,11 +711,10 @@ function selectRelevantExcerpt(text: string, query: string): string {
 
 function findBestExcerptWindow(text: string, query: string) {
   const haystack = text.toLowerCase();
+  const keywordTokens = extractKeywordTokens(query);
+  const phraseCandidates = buildPhraseCandidates(keywordTokens);
   const terms = dedupeBy(
-    [
-      ...extractKeywordTokens(query),
-      ...buildPhraseCandidates(extractKeywordTokens(query)),
-    ].filter((term) => term.length >= 4),
+    [...keywordTokens, ...phraseCandidates].filter((term) => term.length >= 4),
     (term) => term,
   );
   let bestWindow: { start: number; score: number } | null = null;
@@ -732,10 +735,9 @@ function findBestExcerptWindow(text: string, query: string) {
         windowStart + MAX_EXCERPT_CHARS,
       );
       const windowText = haystack.slice(windowStart, windowEnd);
-      const score = terms.reduce(
-        (total, candidate) => total + (windowText.includes(candidate) ? 1 : 0),
-        0,
-      );
+      const score =
+        scoreWindowByTerms(windowText, keywordTokens, phraseCandidates) +
+        scoreStructuredWindow(windowText, keywordTokens);
 
       if (!bestWindow || score > bestWindow.score) {
         bestWindow = { start: windowStart, score };
@@ -746,6 +748,43 @@ function findBestExcerptWindow(text: string, query: string) {
   }
 
   return bestWindow;
+}
+
+function scoreWindowByTerms(
+  windowText: string,
+  keywordTokens: string[],
+  phraseCandidates: string[],
+) {
+  let score = 0;
+
+  for (const token of dedupeBy(keywordTokens, (value) => value)) {
+    if (windowText.includes(token)) {
+      score += 2;
+    }
+  }
+
+  for (const phrase of dedupeBy(phraseCandidates, (value) => value)) {
+    if (windowText.includes(phrase)) {
+      score += phrase.split(" ").length >= 3 ? 4 : 3;
+    }
+  }
+
+  return score;
+}
+
+function scoreStructuredWindow(windowText: string, keywordTokens: string[]) {
+  const lines = windowText
+    .split(/(?<=[.!?])\s+|\s{2,}/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return lines.reduce((bestScore, line) => {
+    const tokenMatches = keywordTokens.filter((token) => line.includes(token));
+    const numericBoost = /\b\d+(?:[.,]\d+)?%?\b/.test(line) ? 2 : 0;
+    const lineScore = tokenMatches.length * 3 + numericBoost;
+
+    return Math.max(bestScore, lineScore);
+  }, 0);
 }
 
 function trimExcerpt(value: string) {

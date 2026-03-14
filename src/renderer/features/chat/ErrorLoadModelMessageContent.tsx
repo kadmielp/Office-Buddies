@@ -31,10 +31,10 @@ export const ErrorLoadModelMessageContent: React.FC<
         be an issue with Office Buddies itself, the selected model, or your
         system. You can report this error at{" "}
         <a
-          href="https://github.com/felixrieseberg/clippy/issues"
+          href="https://github.com/kadmielp/Office-Buddies/issues"
           target="_blank"
         >
-          github.com/felixrieseberg/clippy/issues
+          github.com/kadmielp/Office-Buddies/issues
         </a>
         . Please include both the error message and the debug information.
       </p>

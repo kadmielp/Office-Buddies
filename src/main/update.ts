@@ -5,7 +5,7 @@ import { getStateManager } from "./state";
 import fs from "fs";
 import path from "path";
 
-const DEFAULT_UPDATE_REPO = "felixrieseberg/clippy";
+const DEFAULT_UPDATE_REPO = "kadmielp/Office-Buddies";
 
 /**
  * Setup the auto updater
@@ -98,7 +98,7 @@ export async function checkForUpdates() {
     });
 
     if (result.response === 0) {
-      shell.openExternal("https://felixrieseberg.github.io/clippy/");
+      shell.openExternal(getProjectHomepageUrl());
     }
   }
 }
@@ -162,6 +162,10 @@ function getUpdateRepo(): string {
   }
 
   return DEFAULT_UPDATE_REPO;
+}
+
+function getProjectHomepageUrl(): string {
+  return `https://github.com/${getUpdateRepo()}`;
 }
 
 function parseGithubRepo(repositoryUrl?: string): string | null {

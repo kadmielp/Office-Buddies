@@ -402,7 +402,7 @@ export const SettingsModel: React.FC = () => {
           the more powerful the chat, but the slower it will be - and the more
           memory it will use. Office Buddies uses models in the GGUF format.{" "}
           <a
-            href="https://github.com/felixrieseberg/clippy?tab=readme-ov-file#downloading-more-models"
+            href="https://github.com/kadmielp/Office-Buddies?tab=readme-ov-file#downloading-local-models"
             target="_blank"
           >
             More information.

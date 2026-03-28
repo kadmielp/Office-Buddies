@@ -13,6 +13,12 @@ All notable changes to this project will be documented in this file.
 - Connected-source retrieval can now search shared Notion pages and fetch page markdown at question time, alongside the existing Confluence flow.
 - Updated Knowledge settings and tutorial copy so the integration picker, saved integration list, and setup guidance all reflect Notion support.
 
+### Fixed
+
+- Fixed connected-source integration editing so saved integrations can be updated in place without detaching their attached knowledge sources.
+- Improved Confluence connection diagnostics to surface clearer connection-test and retrieval feedback when credentials or permissions are wrong.
+- Fixed Windows release packaging so the Squirrel installer uses the actual packaged executable name, and cleaned up the Forge config to satisfy TypeScript.
+
 ## [0.6.8] - 2026-03-28
 
 ### Changed

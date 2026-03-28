@@ -71,16 +71,36 @@ When text is selected, Office Buddies can respond in a classic speech balloon fl
   - improved multiline formatting for long definitions and rewrites
 - During shortcut-driven actions, the assistant uses `Thinking` / `Processing` animation behavior.
 
-## Providers
+## AI Providers
 
 Configure providers in `Settings > Model`.
 
-- `Local (GGUF)`: runs on your machine via `@electron/llm`.
-- `OpenAI`: API key + model selection.
-- `Google`: API key + model selection.
-- `Maritaca`: API key + model selection.
+- `Local (GGUF)`: runs on your machine via `@electron/llm` and `node-llama-cpp`.
+- `OpenAI`: API key + hosted model selection.
+- `Google`: API key + hosted model selection.
+- `Maritaca`: API key + hosted model selection.
+- `OpenClaw`: optional remote provider for proactive assistant integrations.
 
 Remote provider requests are executed in the Electron main process via IPC.
+
+## Connections and Knowledge
+
+Configure this area in `Settings > Knowledge`.
+
+- `Files`: pin local notes, docs, PDFs, and source files for static reference.
+- `Knowledge Sources`: attach read-only connected sources to the current session.
+- `Integrations`: configure the reusable connection method behind those sources.
+
+Currently supported integrations:
+
+- `MCP`: connect HTTP or stdio Model Context Protocol servers.
+- `Confluence`: connect Atlassian Confluence with base URL, account email, and API token.
+- `Notion`: connect shared Notion pages with an integration token and fetch page markdown at question time.
+
+Helpful docs:
+
+- [Knowledge tutorial](docs/tutorials/knowledge-files-and-mcp.md)
+- [OpenClaw proactive setup](docs/tutorials/openclaw-officebuddies-tailscale.md)
 
 ## Downloading Local Models
 

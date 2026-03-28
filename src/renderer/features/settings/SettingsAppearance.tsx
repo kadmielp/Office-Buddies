@@ -4,6 +4,7 @@ import { DEFAULT_SETTINGS, SettingsState } from "../../../shared/shared-state";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { Checkbox } from "../../ui/Checkbox";
+import { AssistantGallery } from "../assistant/AssistantGallery";
 
 export const SettingsAppearance: React.FC = () => {
   const { settings } = useSharedState();
@@ -37,6 +38,7 @@ export const SettingsAppearance: React.FC = () => {
       clippyAlwaysOnTop: DEFAULT_SETTINGS.clippyAlwaysOnTop,
       chatAlwaysOnTop: DEFAULT_SETTINGS.chatAlwaysOnTop,
       alwaysOpenChat: DEFAULT_SETTINGS.alwaysOpenChat,
+      selectedAgent: DEFAULT_SETTINGS.selectedAgent,
     };
 
     for (const key in defaultAppareanceSettings) {
@@ -142,6 +144,9 @@ export const SettingsAppearance: React.FC = () => {
       <button style={{ marginTop: 10 }} onClick={onReset}>
         Reset
       </button>
+      <div className="settings-appearance-gallery-section">
+        <AssistantGallery embedded />
+      </div>
     </div>
   );
 };

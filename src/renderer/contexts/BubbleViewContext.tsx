@@ -35,7 +35,7 @@ export const BubbleViewProvider: React.FC<{ children: React.ReactNode }> = ({
     clippyApi.onSetBubbleView((view: BubbleView) => {
       // Menu-driven view changes should also surface the chat/settings window.
       setIsChatWindowOpen(true);
-      setCurrentView(view);
+      setCurrentView(view === "assistant-gallery" ? "settings-general" : view);
     });
 
     return () => {

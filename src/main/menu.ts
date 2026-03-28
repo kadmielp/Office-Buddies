@@ -180,7 +180,7 @@ function getAssistantContextMenu(): Menu {
     },
     {
       label: "Choose Assistant...",
-      click: () => openView("assistant-gallery"),
+      click: () => openView("settings-general"),
     },
     { type: "separator" },
     {

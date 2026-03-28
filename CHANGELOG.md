@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.8] - 2026-03-28
+
+### Changed
+
+- Moved the assistant gallery into `Options > Appearance`, placing it after the existing appearance controls instead of exposing it as a separate top-level gallery view.
+- Refined the embedded assistant gallery layout with clearer separation from the rest of Appearance settings and tighter preview/navigation spacing.
+- Updated the Office Assistant title-bar navigation so `Chats` and `Options` stay visible together more consistently and no longer bounce users back to the main chat when re-clicking `Chats`.
+
 ## [0.6.7] - 2026-03-13
 
 ### Added

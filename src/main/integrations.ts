@@ -5,6 +5,7 @@ import Store from "electron-store";
 
 import {
   IntegrationConfig,
+  IntegrationTestResult,
   IntegrationType,
   KnowledgeSource,
   KnowledgeSourceStatus,
@@ -64,6 +65,11 @@ class IntegrationManager {
       ),
       nextIntegration,
     ].sort((left, right) => left.name.localeCompare(right.name));
+    const nextKnowledgeSource = toKnowledgeSource(nextIntegration);
+    const nextKnowledgeSources = (settings.knowledgeSources || []).map(
+      (source) =>
+        source.integrationId === integrationId ? nextKnowledgeSource : source,
+    );
 
     this.setCredential(
       integrationId,
@@ -73,6 +79,7 @@ class IntegrationManager {
     this.saveSettings({
       ...settings,
       integrations: nextIntegrations,
+      knowledgeSources: nextKnowledgeSources,
     });
 
     return nextIntegration;
@@ -118,6 +125,66 @@ class IntegrationManager {
     const decrypted = decryptSecret(value);
 
     return typeof decrypted === "string" ? decrypted : undefined;
+  }
+
+  public async testIntegration(
+    input: SaveIntegrationInput,
+  ): Promise<IntegrationTestResult> {
+    if (input.type !== "confluence") {
+      return {
+        ok: false,
+        message:
+          "Connection testing is currently available for Confluence integrations only.",
+      };
+    }
+
+    const baseUrl = normalizeConfluenceBaseUrl(input.baseUrl || "");
+    const accountEmail = input.accountEmail?.trim() || "";
+    const credential = this.resolveCredentialForInput(input);
+    const missingFields = [
+      !baseUrl ? "base URL" : null,
+      !accountEmail ? "account email" : null,
+      !credential ? "API token" : null,
+    ].filter(Boolean);
+
+    if (missingFields.length > 0) {
+      return {
+        ok: false,
+        message: `Confluence needs a ${missingFields.join(", ")} before the connection can be tested.`,
+      };
+    }
+
+    try {
+      await fetchConfluenceJson(
+        `${baseUrl}/rest/api/space?limit=1`,
+        accountEmail,
+        credential,
+      );
+      return {
+        ok: true,
+        statusCode: 200,
+        message:
+          "Connection ok. Confluence accepted the configured credentials.",
+      };
+    } catch (error) {
+      const statusCode = getResponseStatusCode(error);
+      const details = getConfluenceErrorDetails(error);
+
+      getLogger().warn("Confluence connection test failed", {
+        integrationId: input.id || null,
+        baseUrl,
+        accountEmail,
+        statusCode: statusCode || null,
+        details: details || null,
+      });
+
+      return {
+        ok: false,
+        statusCode,
+        message: getConfluenceErrorMessage(statusCode),
+        details,
+      };
+    }
   }
 
   public setIntegrationStatus(
@@ -277,6 +344,19 @@ class IntegrationManager {
       ...(this.secretsStore.get("integrationCredentials") || {}),
     };
   }
+
+  private resolveCredentialForInput(input: SaveIntegrationInput) {
+    if (input.credential !== undefined) {
+      const trimmedCredential = input.credential.trim();
+      return trimmedCredential || undefined;
+    }
+
+    if (!input.id) {
+      return undefined;
+    }
+
+    return this.getCredential(input.id)?.trim() || undefined;
+  }
 }
 
 function toKnowledgeSource(integration: IntegrationConfig): KnowledgeSource {
@@ -300,6 +380,77 @@ function toKnowledgeSource(integration: IntegrationConfig): KnowledgeSource {
     integrationType: integration.type,
     resourceId: "integration-root",
   };
+}
+
+async function fetchConfluenceJson(
+  url: string,
+  accountEmail: string,
+  apiToken: string,
+) {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Basic ${Buffer.from(`${accountEmail}:${apiToken}`).toString("base64")}`,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Request failed (${response.status}) while calling Confluence: ${body.slice(0, 300)}`,
+    );
+  }
+
+  return response.json();
+}
+
+function normalizeConfluenceBaseUrl(baseUrl: string) {
+  return baseUrl.trim().replace(/\/+$/, "");
+}
+
+function getResponseStatusCode(error: unknown) {
+  if (!(error instanceof Error)) {
+    return undefined;
+  }
+
+  const match = error.message.match(/Request failed \((\d+)\)/);
+  return match ? Number(match[1]) : undefined;
+}
+
+function getConfluenceErrorMessage(statusCode: number | undefined) {
+  if (statusCode === 401) {
+    return "Confluence rejected the credentials (401). Check the base URL, account email, and API token.";
+  }
+
+  if (statusCode === 403) {
+    return "Confluence accepted the request, but this user is not permitted to use Confluence (403). Check product access and space permissions.";
+  }
+
+  return "Confluence connection test failed. Review the configured base URL, account email, and API token.";
+}
+
+function getConfluenceErrorDetails(error: unknown) {
+  if (!(error instanceof Error)) {
+    return String(error);
+  }
+
+  const jsonMessageMatch = error.message.match(/"message":"([^"]+)"/i);
+
+  if (jsonMessageMatch?.[1]) {
+    return jsonMessageMatch[1];
+  }
+
+  const htmlTitleMatch = error.message.match(/<title>([^<]+)<\/title>/i);
+
+  if (htmlTitleMatch?.[1]) {
+    return htmlTitleMatch[1].replace(/\s+/g, " ").trim();
+  }
+
+  return error.message.replace(
+    /^Request failed \(\d+\) while calling Confluence:\s*/i,
+    "",
+  );
 }
 
 function encryptSecret(value: string): string {

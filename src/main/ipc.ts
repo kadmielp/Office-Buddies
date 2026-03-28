@@ -152,6 +152,9 @@ export function setupIpcListeners() {
   ipcMain.handle(IpcMessages.INTEGRATIONS_DELETE, (_, integrationId: string) =>
     getIntegrationManager().deleteIntegration(integrationId),
   );
+  ipcMain.handle(IpcMessages.INTEGRATIONS_TEST, (_, integration) =>
+    getIntegrationManager().testIntegration(integration),
+  );
 
   // State
   ipcMain.handle(IpcMessages.STATE_UPDATE_MODEL_STATE, () =>

@@ -26,6 +26,7 @@ export const IpcMessages = {
   KNOWLEDGE_GET_DYNAMIC_CONTEXT: "clippy_knowledge_get_dynamic_context",
   INTEGRATIONS_SAVE: "clippy_integrations_save",
   INTEGRATIONS_DELETE: "clippy_integrations_delete",
+  INTEGRATIONS_TEST: "clippy_integrations_test",
 
   // State messages
   STATE_UPDATE_MODEL_STATE: "clippy_state_update_model_state",

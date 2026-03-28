@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   IntegrationConfig,
+  IntegrationTestResult,
   IntegrationType,
   KnowledgeFileSource,
   KnowledgeSource,
@@ -10,6 +11,8 @@ import {
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { getThemeIcons } from "../../theme/theme";
+
+type CredentialMode = "none" | "keep" | "replace" | "remove";
 
 export const SettingsKnowledge: React.FC = () => {
   const { settings } = useSharedState();
@@ -23,8 +26,12 @@ export const SettingsKnowledge: React.FC = () => {
     useState(false);
   const [isPickingFiles, setIsPickingFiles] = useState(false);
   const [showSourceBrowser, setShowSourceBrowser] = useState(false);
-  const [showAddIntegrationForm, setShowAddIntegrationForm] = useState(false);
+  const [showIntegrationForm, setShowIntegrationForm] = useState(false);
+  const [editingIntegrationId, setEditingIntegrationId] = useState<
+    string | null
+  >(null);
   const [isSavingIntegration, setIsSavingIntegration] = useState(false);
+  const [isTestingIntegration, setIsTestingIntegration] = useState(false);
   const [integrationName, setIntegrationName] = useState("");
   const [integrationType, setIntegrationType] =
     useState<IntegrationType>("mcp");
@@ -34,18 +41,37 @@ export const SettingsKnowledge: React.FC = () => {
   const [integrationCommand, setIntegrationCommand] = useState("");
   const [integrationBaseUrl, setIntegrationBaseUrl] = useState("");
   const [integrationAccountEmail, setIntegrationAccountEmail] = useState("");
+  const [integrationCredential, setIntegrationCredential] = useState("");
+  const [credentialMode, setCredentialMode] = useState<CredentialMode>("none");
   const [integrationError, setIntegrationError] = useState("");
-  const credentialInputRef = useRef<HTMLInputElement>(null);
+  const [integrationTestResult, setIntegrationTestResult] =
+    useState<IntegrationTestResult | null>(null);
 
   const knowledgeFiles = settings.knowledgeFiles || [];
   const knowledgeSources = settings.knowledgeSources || [];
   const integrations = settings.integrations || [];
+  const editingIntegration = integrations.find(
+    (integration) => integration.id === editingIntegrationId,
+  );
+  const isEditingIntegration = Boolean(editingIntegration);
+  const hasSavedCredential = Boolean(editingIntegration?.hasCredential);
   const unselectedKnowledgeSources = availableKnowledgeSources.filter(
     (source) =>
       !knowledgeSources.some(
         (selectedSource) => selectedSource.id === source.id,
       ),
   );
+  const shouldShowCredentialMode = isEditingIntegration && hasSavedCredential;
+  const shouldShowCredentialInput =
+    !shouldShowCredentialMode || credentialMode === "replace";
+  const credentialLabel =
+    integrationType === "confluence" ? "API token:" : "Credential:";
+  const credentialInputLabel =
+    shouldShowCredentialMode && credentialMode === "replace"
+      ? integrationType === "confluence"
+        ? "New token:"
+        : "New secret:"
+      : credentialLabel;
 
   useEffect(() => {
     const firstAvailableSource = unselectedKnowledgeSources[0]?.id || "";
@@ -63,6 +89,36 @@ export const SettingsKnowledge: React.FC = () => {
       setSelectedKnowledgeSourceId("");
     }
   }, [selectedKnowledgeSourceId, unselectedKnowledgeSources]);
+
+  useEffect(() => {
+    if (!editingIntegrationId) {
+      return;
+    }
+
+    const integrationStillExists = integrations.some(
+      (integration) => integration.id === editingIntegrationId,
+    );
+
+    if (!integrationStillExists) {
+      resetIntegrationForm();
+      setShowIntegrationForm(false);
+    }
+  }, [editingIntegrationId, integrations]);
+
+  useEffect(() => {
+    setIntegrationTestResult(null);
+  }, [
+    editingIntegrationId,
+    integrationName,
+    integrationType,
+    integrationTransport,
+    integrationEndpoint,
+    integrationCommand,
+    integrationBaseUrl,
+    integrationAccountEmail,
+    integrationCredential,
+    credentialMode,
+  ]);
 
   useEffect(() => {
     const filesNeedingRefresh = knowledgeFiles.filter((file) => {
@@ -160,17 +216,101 @@ export const SettingsKnowledge: React.FC = () => {
     );
   }
 
+  function resetIntegrationForm() {
+    setEditingIntegrationId(null);
+    setIntegrationName("");
+    setIntegrationType("mcp");
+    setIntegrationTransport("http");
+    setIntegrationEndpoint("");
+    setIntegrationCommand("");
+    setIntegrationBaseUrl("");
+    setIntegrationAccountEmail("");
+    setIntegrationCredential("");
+    setCredentialMode("none");
+    setIntegrationError("");
+    setIntegrationTestResult(null);
+  }
+
+  function handleStartAddIntegration() {
+    resetIntegrationForm();
+    setShowIntegrationForm(true);
+  }
+
+  function handleStartEditIntegration(integration: IntegrationConfig) {
+    setEditingIntegrationId(integration.id);
+    setIntegrationName(integration.name);
+    setIntegrationType(integration.type);
+    setIntegrationTransport(integration.transport || "http");
+    setIntegrationEndpoint(integration.endpoint || "");
+    setIntegrationCommand(integration.command || "");
+    setIntegrationBaseUrl(integration.baseUrl || "");
+    setIntegrationAccountEmail(integration.accountEmail || "");
+    setIntegrationCredential("");
+    setCredentialMode(integration.hasCredential ? "keep" : "none");
+    setIntegrationError("");
+    setShowIntegrationForm(true);
+  }
+
+  function handleCancelIntegrationForm() {
+    resetIntegrationForm();
+    setShowIntegrationForm(false);
+  }
+
+  function getCredentialPayload():
+    | { ok: true; credential: string | undefined }
+    | { ok: false; message: string } {
+    const trimmedCredential = integrationCredential.trim();
+
+    if (hasSavedCredential) {
+      if (credentialMode === "keep") {
+        return { ok: true, credential: undefined };
+      }
+
+      if (credentialMode === "remove") {
+        return { ok: true, credential: "" };
+      }
+
+      if (!trimmedCredential) {
+        return {
+          ok: false,
+          message:
+            "Enter a new credential or choose to keep or remove the saved one.",
+        };
+      }
+
+      return { ok: true, credential: trimmedCredential };
+    }
+
+    return {
+      ok: true,
+      credential: trimmedCredential || undefined,
+    };
+  }
+
   async function handleDeleteIntegration(integrationId: string) {
+    if (editingIntegrationId === integrationId) {
+      handleCancelIntegrationForm();
+    }
+
     await clippyApi.deleteIntegration(integrationId);
     await loadAvailableKnowledgeSources();
   }
 
   async function handleSaveIntegration() {
+    const credentialPayload = getCredentialPayload();
+
+    if ("message" in credentialPayload) {
+      setIntegrationError(credentialPayload.message);
+      return;
+    }
+
     setIsSavingIntegration(true);
     setIntegrationError("");
+    setIntegrationTestResult(null);
 
     try {
       await clippyApi.saveIntegration({
+        id: editingIntegration?.id,
         name: integrationName,
         type: integrationType,
         transport: integrationType === "mcp" ? integrationTransport : undefined,
@@ -188,20 +328,10 @@ export const SettingsKnowledge: React.FC = () => {
           integrationType === "confluence"
             ? integrationAccountEmail
             : undefined,
-        credential: credentialInputRef.current?.value,
+        credential: credentialPayload.credential,
       });
 
-      setIntegrationName("");
-      setIntegrationEndpoint("");
-      setIntegrationCommand("");
-      setIntegrationBaseUrl("");
-      setIntegrationAccountEmail("");
-      setShowAddIntegrationForm(false);
-
-      if (credentialInputRef.current) {
-        credentialInputRef.current.value = "";
-      }
-
+      handleCancelIntegrationForm();
       await loadAvailableKnowledgeSources();
     } catch (error) {
       setIntegrationError(
@@ -209,6 +339,53 @@ export const SettingsKnowledge: React.FC = () => {
       );
     } finally {
       setIsSavingIntegration(false);
+    }
+  }
+
+  async function handleTestIntegration() {
+    const credentialPayload = getCredentialPayload();
+
+    if ("message" in credentialPayload) {
+      setIntegrationError(credentialPayload.message);
+      setIntegrationTestResult(null);
+      return;
+    }
+
+    setIsTestingIntegration(true);
+    setIntegrationError("");
+    setIntegrationTestResult(null);
+
+    try {
+      const result = await clippyApi.testIntegration({
+        id: editingIntegration?.id,
+        name: integrationName,
+        type: integrationType,
+        transport: integrationType === "mcp" ? integrationTransport : undefined,
+        endpoint:
+          integrationType === "mcp" && integrationTransport === "http"
+            ? integrationEndpoint
+            : undefined,
+        command:
+          integrationType === "mcp" && integrationTransport === "stdio"
+            ? integrationCommand
+            : undefined,
+        baseUrl:
+          integrationType === "confluence" ? integrationBaseUrl : undefined,
+        accountEmail:
+          integrationType === "confluence"
+            ? integrationAccountEmail
+            : undefined,
+        credential: credentialPayload.credential,
+      });
+
+      setIntegrationTestResult(result);
+    } catch (error) {
+      setIntegrationTestResult({
+        ok: false,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsTestingIntegration(false);
     }
   }
 
@@ -227,9 +404,8 @@ export const SettingsKnowledge: React.FC = () => {
         >
           <div style={{ flex: "1 1 280px" }}>
             <p style={{ margin: "8px 0 0 0" }}>
-              Files and connected sources are configured here. Mini chat has
-              its own knowledge toggle when you want to use them for a quick
-              lookup.
+              Files and connected sources are configured here. Mini chat has its
+              own knowledge toggle when you want to use them for a quick lookup.
             </p>
           </div>
         </div>
@@ -438,6 +614,10 @@ export const SettingsKnowledge: React.FC = () => {
               style={{ padding: "10px", display: "grid", gap: "8px" }}
             >
               <strong>Configured Integrations</strong>
+              <span>
+                Edit an integration to fix its endpoint, email, or credential
+                without removing attached knowledge sources.
+              </span>
               {integrations.length === 0 ? (
                 <span>No integrations configured yet.</span>
               ) : (
@@ -445,18 +625,28 @@ export const SettingsKnowledge: React.FC = () => {
                   <ConfiguredIntegrationRow
                     key={integration.id}
                     integration={integration}
+                    onEdit={() => handleStartEditIntegration(integration)}
                     onDelete={() => handleDeleteIntegration(integration.id)}
                   />
                 ))
               )}
             </div>
 
-            {showAddIntegrationForm && (
+            {showIntegrationForm && (
               <div
                 className="sunken-panel"
                 style={{ padding: "10px", display: "grid", gap: "8px" }}
               >
-                <strong>Add Integration</strong>
+                <strong>
+                  {isEditingIntegration
+                    ? "Edit Integration"
+                    : "Add Integration"}
+                </strong>
+                <span>
+                  {isEditingIntegration
+                    ? "Update the connection details here. Attached sources stay connected."
+                    : "Create a reusable connection first, then attach it as a knowledge source above."}
+                </span>
                 <div className="field-row" style={{ marginBottom: 0 }}>
                   <label htmlFor="integrationName" style={{ minWidth: "72px" }}>
                     Name:
@@ -580,50 +770,96 @@ export const SettingsKnowledge: React.FC = () => {
                     </div>
                   </>
                 )}
-                <div className="field-row" style={{ marginBottom: 0 }}>
-                  <label
-                    htmlFor="integrationCredential"
-                    style={{ minWidth: "72px" }}
-                  >
-                    {integrationType === "confluence"
-                      ? "API token:"
-                      : "Credential:"}
-                  </label>
-                  <input
-                    id="integrationCredential"
-                    ref={credentialInputRef}
-                    type="password"
-                    placeholder={
-                      integrationType === "confluence"
-                        ? "Atlassian API token"
-                        : "Optional token or secret"
-                    }
-                    autoComplete="off"
-                  />
-                </div>
+                {shouldShowCredentialMode && (
+                  <div className="field-row" style={{ marginBottom: 0 }}>
+                    <label
+                      htmlFor="integrationCredentialMode"
+                      style={{ minWidth: "72px" }}
+                    >
+                      {credentialLabel}
+                    </label>
+                    <select
+                      id="integrationCredentialMode"
+                      value={credentialMode}
+                      onChange={(event) =>
+                        setCredentialMode(event.target.value as CredentialMode)
+                      }
+                    >
+                      <option value="keep">Keep saved credential</option>
+                      <option value="replace">Replace saved credential</option>
+                      <option value="remove">Remove saved credential</option>
+                    </select>
+                  </div>
+                )}
+                {shouldShowCredentialInput && (
+                  <div className="field-row" style={{ marginBottom: 0 }}>
+                    <label
+                      htmlFor="integrationCredential"
+                      style={{ minWidth: "72px" }}
+                    >
+                      {credentialInputLabel}
+                    </label>
+                    <input
+                      id="integrationCredential"
+                      type="password"
+                      value={integrationCredential}
+                      placeholder={
+                        integrationType === "confluence"
+                          ? "Atlassian API token"
+                          : "Optional token or secret"
+                      }
+                      autoComplete="off"
+                      onChange={(event) =>
+                        setIntegrationCredential(event.target.value)
+                      }
+                    />
+                  </div>
+                )}
                 <p style={{ margin: 0 }}>
-                  {integrationType === "confluence"
-                    ? "The API token is stored separately from renderer settings state. Office Buddies will try to search and fetch matching Confluence pages when you ask a question."
-                    : "Credentials are sent straight to the main process and stored separately from renderer settings state."}
+                  {hasSavedCredential && credentialMode === "keep"
+                    ? "A credential is already stored for this integration and will be kept unless you choose another option."
+                    : hasSavedCredential && credentialMode === "remove"
+                      ? "Saving now will remove the stored credential for this integration."
+                      : integrationType === "confluence"
+                        ? "The API token is stored separately from renderer settings state. Office Buddies will try to search and fetch matching Confluence pages when you ask a question."
+                        : "Credentials are sent straight to the main process and stored separately from renderer settings state."}
                 </p>
                 {integrationError && (
                   <p style={{ margin: 0 }}>{integrationError}</p>
                 )}
+                {integrationTestResult && (
+                  <p style={{ margin: 0 }}>
+                    {integrationTestResult.message}
+                    {integrationTestResult.details
+                      ? ` ${integrationTestResult.details}`
+                      : ""}
+                  </p>
+                )}
                 <div className="field-row" style={{ marginBottom: 0 }}>
+                  {integrationType === "confluence" && (
+                    <button
+                      type="button"
+                      onClick={handleTestIntegration}
+                      disabled={isSavingIntegration || isTestingIntegration}
+                    >
+                      {isTestingIntegration ? "Testing..." : "Test Connection"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleSaveIntegration}
-                    disabled={isSavingIntegration}
+                    disabled={isSavingIntegration || isTestingIntegration}
                   >
-                    {isSavingIntegration ? "Saving..." : "Save Integration"}
+                    {isSavingIntegration
+                      ? "Saving..."
+                      : isEditingIntegration
+                        ? "Save Changes"
+                        : "Save Integration"}
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowAddIntegrationForm(false);
-                      setIntegrationError("");
-                    }}
-                    disabled={isSavingIntegration}
+                    onClick={handleCancelIntegrationForm}
+                    disabled={isSavingIntegration || isTestingIntegration}
                   >
                     Cancel
                   </button>
@@ -635,13 +871,19 @@ export const SettingsKnowledge: React.FC = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setShowAddIntegrationForm((current) => !current);
-                  setIntegrationError("");
+                  if (showIntegrationForm && !isEditingIntegration) {
+                    handleCancelIntegrationForm();
+                    return;
+                  }
+
+                  handleStartAddIntegration();
                 }}
               >
-                {showAddIntegrationForm
+                {showIntegrationForm && !isEditingIntegration
                   ? "Hide Add Integration"
-                  : "+ Add Integration"}
+                  : showIntegrationForm
+                    ? "+ Add Another Integration"
+                    : "+ Add Integration"}
               </button>
             </div>
           </div>
@@ -673,8 +915,9 @@ const KnowledgeListItem: React.FC<{
 
 const ConfiguredIntegrationRow: React.FC<{
   integration: IntegrationConfig;
+  onEdit: () => void;
   onDelete: () => void;
-}> = ({ integration, onDelete }) => {
+}> = ({ integration, onEdit, onDelete }) => {
   const target =
     integration.type === "confluence"
       ? integration.baseUrl
@@ -701,6 +944,9 @@ const ConfiguredIntegrationRow: React.FC<{
         )}
         <div className="settings-knowledge-item-meta">{credentialState}</div>
         <div style={{ marginTop: "6px" }}>
+          <button type="button" onClick={onEdit}>
+            Edit
+          </button>{" "}
           <button type="button" onClick={onDelete}>
             Delete Integration
           </button>

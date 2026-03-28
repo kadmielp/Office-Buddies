@@ -93,6 +93,8 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.INTEGRATIONS_SAVE, integration),
   deleteIntegration: (integrationId: string) =>
     ipcRenderer.invoke(IpcMessages.INTEGRATIONS_DELETE, integrationId),
+  testIntegration: (integration) =>
+    ipcRenderer.invoke(IpcMessages.INTEGRATIONS_TEST, integration),
 
   // State
   getFullState: () => ipcRenderer.invoke(IpcMessages.STATE_GET_FULL),

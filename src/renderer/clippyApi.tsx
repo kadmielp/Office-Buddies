@@ -1,6 +1,7 @@
 import { ElectronLlmRenderer } from "@electron/llm";
 import {
   IntegrationConfig,
+  IntegrationTestResult,
   IntegrationType,
   KnowledgeFileSource,
   KnowledgeSource,
@@ -76,6 +77,17 @@ export type ClippyApi = {
     credential?: string;
   }) => Promise<IntegrationConfig>;
   deleteIntegration: (integrationId: string) => Promise<void>;
+  testIntegration: (integration: {
+    id?: string;
+    name: string;
+    type: IntegrationType;
+    transport?: McpTransportType;
+    endpoint?: string;
+    command?: string;
+    baseUrl?: string;
+    accountEmail?: string;
+    credential?: string;
+  }) => Promise<IntegrationTestResult>;
   // State
   offStateChanged: () => void;
   onStateChanged: (callback: (state: SharedState) => void) => void;

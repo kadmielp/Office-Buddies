@@ -51,6 +51,13 @@ export interface IntegrationConfig {
   hasCredential: boolean;
 }
 
+export interface IntegrationTestResult {
+  ok: boolean;
+  message: string;
+  details?: string;
+  statusCode?: number;
+}
+
 export interface SettingsState {
   aiProvider?: AiProvider;
   selectedModel?: string;

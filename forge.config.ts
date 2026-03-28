@@ -239,7 +239,7 @@ const config: ForgeConfig = {
       (arch) => ({
         name: "OfficeBuddies",
         authors: packageJson.author?.name || packageJson.productName,
-        exe: "OfficeBuddies.exe",
+        exe: `${packageJson.productName}.exe`,
         noMsi: true,
         remoteReleases: "",
         loadingGif: "./assets/boot.gif",
@@ -342,6 +342,8 @@ function getNodeLlamaBinaryDependenciesToKeep(
           "@node-llama-cpp/linux-x64-vulkan",
         ];
   }
+
+  return [];
 }
 
 /**

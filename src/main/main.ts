@@ -17,6 +17,7 @@ import {
   unregisterGlobalShortcuts,
 } from "./shortcuts";
 import { startProactiveServer } from "./proactive-server";
+import { createTray, destroyTray, isTrayQuitInProgress } from "./tray";
 
 async function onReady() {
   console.info(`Welcome to Office Buddies v${app.getVersion()}`);
@@ -27,6 +28,7 @@ async function onReady() {
   setupIpcListeners();
   setupWindowListener();
   await createMainWindow();
+  await createTray();
   registerGlobalShortcuts();
   startProactiveServer();
 }
@@ -48,13 +50,14 @@ app.on("ready", onReady);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (process.platform !== "darwin" && isTrayQuitInProgress()) {
     app.quit();
   }
 });
 
 app.on("will-quit", () => {
   unregisterGlobalShortcuts();
+  destroyTray();
 });
 
 app.on("activate", () => {

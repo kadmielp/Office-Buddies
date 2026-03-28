@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.10] - 2026-03-28
+
+### Added
+
+- Added a native Windows tray icon and tray menu so Office Buddies can be restored, opened to chat or settings, toggled to start with Windows, or quit from the notification area.
+
+### Changed
+
+- Changed Windows window behavior so the assistant overlay and chat window stay out of the taskbar and the app continues running in the background until explicitly quit from the tray.
+
+### Fixed
+
+- Fixed a packaged Windows startup crash where eager knowledge-parser imports pulled PDF.js into the main process and failed on missing browser-only globals such as `DOMMatrix`.
+- Fixed the Windows tray icon in packaged builds by resolving it from the installed executable instead of a missing bundled asset path.
+
 ## [0.6.9] - 2026-03-28
 
 ### Added

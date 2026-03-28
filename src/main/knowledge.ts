@@ -1,9 +1,7 @@
 import { randomUUID } from "crypto";
 import { app, dialog } from "electron";
 import fs from "fs";
-import mammoth from "mammoth";
 import path from "path";
-import { PDFParse } from "pdf-parse";
 
 import { KnowledgeFileSource, KnowledgeSource } from "../shared/shared-state";
 import { getIntegrationManager } from "./integrations";
@@ -171,6 +169,7 @@ async function readTextPreview(filePath: string): Promise<string | undefined> {
 }
 
 async function readDocxPreview(filePath: string): Promise<string | undefined> {
+  const mammoth = await loadMammoth();
   const result = await mammoth.extractRawText({ path: filePath });
 
   if (result.messages.length > 0) {
@@ -181,10 +180,20 @@ async function readDocxPreview(filePath: string): Promise<string | undefined> {
 }
 
 async function readPdfPreview(filePath: string): Promise<string | undefined> {
+  const { PDFParse } = await loadPdfParse();
   const buffer = await fs.promises.readFile(filePath);
   const parser = new PDFParse({ data: buffer });
   const result = await parser.getText();
   return normalizePreviewText(result.text);
+}
+
+async function loadMammoth() {
+  const mammothModule = await import("mammoth");
+  return mammothModule.default;
+}
+
+async function loadPdfParse() {
+  return import("pdf-parse");
 }
 
 function normalizePreviewText(content: string): string | undefined {

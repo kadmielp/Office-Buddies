@@ -13,6 +13,7 @@ import { getStateManager } from "./state";
 import { getDebugManager } from "./debug";
 import { popupAppMenu } from "./menu";
 import { runBuddyAction } from "./buddy-actions";
+import { isTrayQuitInProgress, refreshTrayMenu, shouldMinimizeToTray } from "./tray";
 
 let mainWindow: BrowserWindow | undefined;
 const allowedMinimizeWindows = new WeakSet<BrowserWindow>();
@@ -103,6 +104,37 @@ function setupMinimizeProtection(window: BrowserWindow) {
   });
 }
 
+function hideWindow(window: BrowserWindow) {
+  allowedHideWindows.add(window);
+  window.hide();
+}
+
+function shouldKeepWindowInTray(window: BrowserWindow) {
+  if (!shouldMinimizeToTray() || isTrayQuitInProgress()) {
+    return false;
+  }
+
+  return window === getMainWindow() || isChatWindow(window);
+}
+
+function setupTrayCloseBehavior(window: BrowserWindow) {
+  window.on("close", (event) => {
+    if (!shouldKeepWindowInTray(window)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (window === getMainWindow()) {
+      hideAssistantToTray();
+      return;
+    }
+
+    hideWindow(window);
+    refreshTrayMenu();
+  });
+}
+
 /**
  * Get the main window
  *
@@ -150,6 +182,7 @@ export async function createMainWindow() {
     roundedCorners: false,
     thickFrame: false,
     title: "Office Buddies",
+    skipTaskbar: shouldMinimizeToTray(),
     alwaysOnTop: Boolean(settings.clippyAlwaysOnTop),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -187,6 +220,8 @@ export function setupWindowListener() {
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);
       setupMinimizeProtection(browserWindow);
+      setupTrayCloseBehavior(browserWindow);
+      browserWindow.setSkipTaskbar(shouldMinimizeToTray());
 
       if (!isMainWindow) {
         contextMenu({
@@ -221,7 +256,11 @@ export function setupWindowListener() {
           browserWindow,
         ]);
         syncAlwaysOnTopWithSettings();
+        refreshTrayMenu();
       });
+
+      browserWindow.on("show", refreshTrayMenu);
+      browserWindow.on("hide", refreshTrayMenu);
     },
   );
 }
@@ -290,6 +329,7 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         roundedCorners: false,
         minHeight: 400,
         minWidth: 400,
+        skipTaskbar: shouldMinimizeToTray(),
         alwaysOnTop: Boolean(
           getStateManager().store.get("settings").chatAlwaysOnTop,
         ),
@@ -386,8 +426,7 @@ export function toggleChatWindow() {
   }
 
   if (chatWindow.isVisible()) {
-    allowedHideWindows.add(chatWindow);
-    chatWindow.hide();
+    hideWindow(chatWindow);
   } else {
     syncAlwaysOnTopWithSettings();
     const mainWindow = getMainWindow();
@@ -398,6 +437,8 @@ export function toggleChatWindow() {
     chatWindow.show();
     chatWindow.focus();
   }
+
+  refreshTrayMenu();
 }
 
 /**
@@ -460,6 +501,44 @@ export function setMainWindowSize(width: number, height: number) {
     width,
     height,
   });
+}
+
+export function showAssistantFromTray() {
+  const window = getMainWindow();
+
+  if (!window) {
+    return;
+  }
+
+  syncAlwaysOnTopWithSettings();
+
+  if (!window.isVisible()) {
+    window.show();
+  }
+
+  if (window.isMinimized()) {
+    window.restore();
+  }
+
+  window.focus();
+  refreshTrayMenu();
+}
+
+export function hideAssistantToTray() {
+  const window = getMainWindow();
+
+  if (!window) {
+    return;
+  }
+
+  const chatWindow = getChatWindow();
+
+  if (chatWindow?.isVisible()) {
+    hideWindow(chatWindow);
+  }
+
+  hideWindow(window);
+  refreshTrayMenu();
 }
 
 /**

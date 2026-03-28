@@ -23,6 +23,7 @@ import { getLogger } from "./logger";
 import { setupAppMenu } from "./menu";
 import { startProactiveServer } from "./proactive-server";
 import { syncWindowsStartupSetting } from "./startup";
+import { refreshTrayMenu } from "./tray";
 
 const ENCRYPTED_PREFIX = "ob_enc_v1:";
 type SensitiveSettingsKey =
@@ -300,6 +301,7 @@ export class StateManager {
 
     // Update the menu, which contains state
     setupAppMenu();
+    refreshTrayMenu();
 
     // Log the settings change by getting a deep diff
     const diff = Object.keys(nextSettings).reduce(

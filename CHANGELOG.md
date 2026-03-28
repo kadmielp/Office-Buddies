@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.9] - 2026-03-28
+
+### Added
+
+- Added native `Notion` knowledge integrations, including secure token storage, connection testing, and support for attaching Notion as a reusable connected source.
+
+### Changed
+
+- Connected-source retrieval can now search shared Notion pages and fetch page markdown at question time, alongside the existing Confluence flow.
+- Updated Knowledge settings and tutorial copy so the integration picker, saved integration list, and setup guidance all reflect Notion support.
+
 ## [0.6.8] - 2026-03-28
 
 ### Changed

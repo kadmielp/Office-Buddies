@@ -65,10 +65,12 @@ export const SettingsKnowledge: React.FC = () => {
   const shouldShowCredentialInput =
     !shouldShowCredentialMode || credentialMode === "replace";
   const credentialLabel =
-    integrationType === "confluence" ? "API token:" : "Credential:";
+    integrationType === "confluence" || integrationType === "notion"
+      ? "API token:"
+      : "Credential:";
   const credentialInputLabel =
     shouldShowCredentialMode && credentialMode === "replace"
-      ? integrationType === "confluence"
+      ? integrationType === "confluence" || integrationType === "notion"
         ? "New token:"
         : "New secret:"
       : credentialLabel;
@@ -605,9 +607,9 @@ export const SettingsKnowledge: React.FC = () => {
               <strong>Configure how Office Buddies connects</strong>
             </div>
             <p style={{ margin: 0 }}>
-              MCP and Confluence are currently supported integration types. This
-              keeps knowledge sources separate from the connection method they
-              come from.
+              MCP, Confluence, and Notion are supported integration types. This
+              keeps knowledge sources separate from the connection method they come
+              from.
             </p>
             <div
               className="sunken-panel"
@@ -671,6 +673,7 @@ export const SettingsKnowledge: React.FC = () => {
                   >
                     <option value="mcp">MCP</option>
                     <option value="confluence">Confluence</option>
+                    <option value="notion">Notion</option>
                   </select>
                 </div>
                 {integrationType === "mcp" && (
@@ -732,7 +735,7 @@ export const SettingsKnowledge: React.FC = () => {
                       }
                     />
                   </div>
-                ) : (
+                ) : integrationType === "confluence" ? (
                   <>
                     <div className="field-row" style={{ marginBottom: 0 }}>
                       <label
@@ -769,6 +772,11 @@ export const SettingsKnowledge: React.FC = () => {
                       />
                     </div>
                   </>
+                ) : (
+                  <p style={{ margin: 0 }}>
+                    Share the relevant pages with your Notion integration, then
+                    paste the integration token below.
+                  </p>
                 )}
                 {shouldShowCredentialMode && (
                   <div className="field-row" style={{ marginBottom: 0 }}>
@@ -806,6 +814,8 @@ export const SettingsKnowledge: React.FC = () => {
                       placeholder={
                         integrationType === "confluence"
                           ? "Atlassian API token"
+                          : integrationType === "notion"
+                            ? "Notion integration token"
                           : "Optional token or secret"
                       }
                       autoComplete="off"
@@ -822,6 +832,8 @@ export const SettingsKnowledge: React.FC = () => {
                       ? "Saving now will remove the stored credential for this integration."
                       : integrationType === "confluence"
                         ? "The API token is stored separately from renderer settings state. Office Buddies will try to search and fetch matching Confluence pages when you ask a question."
+                        : integrationType === "notion"
+                          ? "The API token is stored separately from renderer settings state. Office Buddies will try to search and fetch shared Notion pages when you ask a question."
                         : "Credentials are sent straight to the main process and stored separately from renderer settings state."}
                 </p>
                 {integrationError && (
@@ -836,7 +848,8 @@ export const SettingsKnowledge: React.FC = () => {
                   </p>
                 )}
                 <div className="field-row" style={{ marginBottom: 0 }}>
-                  {integrationType === "confluence" && (
+                  {(integrationType === "confluence" ||
+                    integrationType === "notion") && (
                     <button
                       type="button"
                       onClick={handleTestIntegration}
@@ -921,6 +934,8 @@ const ConfiguredIntegrationRow: React.FC<{
   const target =
     integration.type === "confluence"
       ? integration.baseUrl
+      : integration.type === "notion"
+        ? "Shared Notion pages"
       : integration.transport === "stdio"
         ? integration.command
         : integration.endpoint;
@@ -930,6 +945,8 @@ const ConfiguredIntegrationRow: React.FC<{
   const title =
     integration.type === "confluence"
       ? `${integration.name} (confluence)`
+      : integration.type === "notion"
+        ? `${integration.name} (notion)`
       : `${integration.name} (${integration.type} via ${integration.transport || "http"})`;
 
   return (

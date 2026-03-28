@@ -7,11 +7,21 @@ import { getIntegrationManager } from "./integrations";
 import { getLogger } from "./logger";
 import { getStateManager } from "./state";
 
+const NOTION_API_BASE_URL = "https://api.notion.com/v1";
+const NOTION_API_VERSION = "2026-03-11";
+
 type ConfluenceSearchResult = {
   id: string;
   title: string;
   text: string;
   storageValue?: string;
+  url?: string;
+};
+
+type NotionSearchResult = {
+  id: string;
+  title: string;
+  text: string;
   url?: string;
 };
 
@@ -123,6 +133,19 @@ export async function buildDynamicKnowledgeContext(
 
     if (integration.type === "confluence") {
       const section = await buildConfluenceKnowledgeSection(
+        trimmedQuery,
+        source,
+        integration,
+      );
+
+      if (section) {
+        lines.push(section.context);
+        references.push(...section.references);
+      }
+    }
+
+    if (integration.type === "notion") {
+      const section = await buildNotionKnowledgeSection(
         trimmedQuery,
         source,
         integration,
@@ -251,6 +274,97 @@ async function buildConfluenceKnowledgeSection(
     });
     return {
       context: `- Source ${source.name}: Confluence retrieval failed. ${message}`,
+      references: [],
+    };
+  }
+}
+
+async function buildNotionKnowledgeSection(
+  query: string,
+  source: KnowledgeSource,
+  integration: IntegrationConfig,
+): Promise<KnowledgeContextSection> {
+  const integrationManager = getIntegrationManager();
+  const token = integrationManager.getCredential(integration.id)?.trim();
+
+  if (!token) {
+    integrationManager.setIntegrationStatus(integration.id, "Error");
+    return {
+      context: `- Source ${source.name}: Notion is missing an integration token.`,
+      references: [],
+    };
+  }
+
+  try {
+    const directUrlMatches = await fetchNotionMatchesFromUrls(query, token);
+    getLogger().info("Notion direct URL lookup completed", {
+      integrationId: integration.id,
+      sourceId: source.id,
+      directUrlMatchCount: directUrlMatches.length,
+    });
+    const matches =
+      directUrlMatches.length > 0
+        ? directUrlMatches
+        : await searchNotionMatches(query, token);
+
+    integrationManager.setIntegrationStatus(integration.id, "Connected");
+    getLogger().info("Notion retrieval completed", {
+      integrationId: integration.id,
+      sourceId: source.id,
+      matchCount: matches.length,
+      usedDirectUrlLookup: directUrlMatches.length > 0,
+      matchedPageIds: matches.map((match) => match.id),
+    });
+
+    if (matches.length === 0) {
+      return {
+        context: `- Source ${source.name}: no matching Notion pages were found for the current query.`,
+        references: [],
+      };
+    }
+
+    const lines = [
+      `- Source ${source.name}: matched ${matches.length} Notion page(s).`,
+    ];
+    const references: MessageReference[] = [];
+
+    matches.slice(0, MAX_MATCHES_PER_SOURCE).forEach((match, index) => {
+      lines.push(`  Match ${index + 1} title: ${match.title}`);
+
+      if (match.url) {
+        lines.push(`  Match ${index + 1} url: ${match.url}`);
+      }
+
+      const evidenceChunks = selectRelevantEvidenceChunks(match, query).slice(
+        0,
+        MAX_EVIDENCE_PER_MATCH,
+      );
+
+      if (evidenceChunks.length > 0) {
+        references.push(buildNotionReference(source, match, evidenceChunks[0]));
+      }
+
+      evidenceChunks.forEach((chunk, chunkIndex) => {
+        lines.push(
+          `  Match ${index + 1} evidence ${chunkIndex + 1}: ${chunk.text}`,
+        );
+      });
+    });
+
+    return {
+      context: lines.join("\n"),
+      references,
+    };
+  } catch (error) {
+    integrationManager.setIntegrationStatus(integration.id, "Error");
+    const message = error instanceof Error ? error.message : String(error);
+    getLogger().warn("Notion retrieval failed", {
+      integrationId: integration.id,
+      sourceId: source.id,
+      message,
+    });
+    return {
+      context: `- Source ${source.name}: Notion retrieval failed. ${message}`,
       references: [],
     };
   }
@@ -492,6 +606,174 @@ async function fetchConfluencePageText(
     apiToken,
   );
   return pageContent.text;
+}
+
+async function fetchNotionMatchesFromUrls(
+  query: string,
+  token: string,
+): Promise<NotionSearchResult[]> {
+  const urls = extractUrls(query).filter(isNotionUrl);
+  const matches: NotionSearchResult[] = [];
+
+  for (const url of urls) {
+    const pageId = extractNotionPageId(url);
+
+    if (!pageId) {
+      continue;
+    }
+
+    const match = await fetchNotionPageById(pageId, token, url);
+
+    if (match) {
+      matches.push(match);
+    }
+  }
+
+  return dedupeBy(matches, (match) => match.id);
+}
+
+async function searchNotionMatches(
+  query: string,
+  token: string,
+): Promise<NotionSearchResult[]> {
+  const searchTerms = dedupeBy(
+    [
+      ...extractTitleCandidates(query),
+      ...extractTextCandidates(query),
+      normalizeWhitespace(query),
+    ].filter((candidate) => candidate.length >= 3),
+    (candidate) => candidate.toLowerCase(),
+  ).slice(0, MAX_SEARCH_CANDIDATES);
+  const matchesById = new Map<string, NotionSearchResult & { score: number }>();
+  let completedSearches = 0;
+  let lastError: unknown = null;
+
+  for (const term of searchTerms) {
+    try {
+      const results = await searchNotionWithQuery(term, token);
+      completedSearches += 1;
+
+      for (const result of results) {
+        const relevanceScore = scoreConfluenceResult(result, query);
+        const existing = matchesById.get(result.id);
+
+        if (!existing) {
+          matchesById.set(result.id, {
+            ...result,
+            score: relevanceScore,
+          });
+          continue;
+        }
+
+        existing.score += relevanceScore;
+        existing.text =
+          result.text.length > existing.text.length
+            ? result.text
+            : existing.text;
+        existing.url = existing.url || result.url;
+      }
+    } catch (error) {
+      lastError = error;
+
+      if (
+        error instanceof Error &&
+        /(401|403|404|unauthorized|forbidden|object_not_found)/i.test(
+          error.message,
+        )
+      ) {
+        throw error;
+      }
+    }
+  }
+
+  if (completedSearches === 0 && lastError) {
+    throw lastError;
+  }
+
+  return Array.from(matchesById.values())
+    .sort((left, right) => right.score - left.score)
+    .map(({ score: _score, ...result }) => result)
+    .slice(0, MAX_MATCHES_PER_SOURCE);
+}
+
+async function searchNotionWithQuery(
+  query: string,
+  token: string,
+): Promise<NotionSearchResult[]> {
+  const payload = await fetchNotionJson(`${NOTION_API_BASE_URL}/search`, token, {
+    query,
+    page_size: MAX_MATCHES_PER_SOURCE,
+  });
+  const results = Array.isArray(payload?.results) ? payload.results : [];
+  const pageResults = results.filter((result: any) => result?.object === "page");
+  const mappedResults = await Promise.all(
+    pageResults.map((result: any) => mapNotionResult(result, token)),
+  );
+
+  return mappedResults.filter(
+    (result): result is NotionSearchResult => result !== null,
+  );
+}
+
+async function mapNotionResult(
+  result: any,
+  token: string,
+): Promise<NotionSearchResult | null> {
+  const id = typeof result?.id === "string" ? result.id : "";
+  const title = getNotionPageTitle(result);
+  const url = typeof result?.url === "string" ? result.url : undefined;
+
+  if (!id || !title) {
+    return null;
+  }
+
+  try {
+    const markdown = await fetchNotionPageMarkdown(id, token);
+
+    return {
+      id,
+      title,
+      text: markdown,
+      url,
+    };
+  } catch (error) {
+    getLogger().warn("Unable to fetch Notion page markdown", {
+      pageId: id,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+async function fetchNotionPageById(
+  pageId: string,
+  token: string,
+  fallbackUrl?: string,
+): Promise<NotionSearchResult | null> {
+  const page = await fetchNotionJson(
+    `${NOTION_API_BASE_URL}/pages/${encodeURIComponent(pageId)}`,
+    token,
+  );
+  const title = getNotionPageTitle(page) || `Notion page ${pageId}`;
+  const markdown = await fetchNotionPageMarkdown(pageId, token);
+
+  return {
+    id: pageId,
+    title,
+    text: markdown,
+    url: (typeof page?.url === "string" && page.url) || fallbackUrl,
+  };
+}
+
+async function fetchNotionPageMarkdown(
+  pageId: string,
+  token: string,
+): Promise<string> {
+  const payload = await fetchNotionJson(
+    `${NOTION_API_BASE_URL}/pages/${encodeURIComponent(pageId)}/markdown`,
+    token,
+  );
+  return normalizeWhitespace(typeof payload?.markdown === "string" ? payload.markdown : "");
 }
 
 async function fetchConfluencePageContent(
@@ -975,6 +1257,22 @@ function buildConfluenceReference(
   };
 }
 
+function buildNotionReference(
+  source: KnowledgeSource,
+  match: NotionSearchResult,
+  evidenceChunk: ConfluenceEvidenceChunk,
+): MessageReference {
+  return {
+    id: `notion:${source.id}:${match.id}`,
+    kind: "notion",
+    title: match.title,
+    sourceName: source.name,
+    location: evidenceChunk.location,
+    url: match.url,
+    snippet: trimReferenceSnippet(evidenceChunk.snippet || evidenceChunk.text),
+  };
+}
+
 function findBestExcerptWindow(text: string, query: string) {
   const haystack = text.toLowerCase();
   const keywordTokens = extractKeywordTokens(query);
@@ -1190,6 +1488,32 @@ function normalizeConfluenceBaseUrl(baseUrl: string) {
   return baseUrl.trim().replace(/\/+$/, "");
 }
 
+async function fetchNotionJson(
+  url: string,
+  token: string,
+  body?: unknown,
+): Promise<any> {
+  const response = await fetch(url, {
+    method: body ? "POST" : "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "Notion-Version": NOTION_API_VERSION,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.text();
+    throw new Error(
+      `Request failed (${response.status}) while calling Notion: ${responseBody.slice(0, 300)}`,
+    );
+  }
+
+  return response.json();
+}
+
 function safeGetOrigin(url: string) {
   try {
     return new URL(url).origin;
@@ -1198,8 +1522,64 @@ function safeGetOrigin(url: string) {
   }
 }
 
+function isNotionUrl(url: string) {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname === "www.notion.so" || hostname.endsWith(".notion.site");
+  } catch {
+    return false;
+  }
+}
+
 function normalizeQuery(query: string) {
   return normalizeWhitespace(query.replace(/[\u201C\u201D]/g, '"'));
+}
+
+function extractNotionPageId(url: string) {
+  const normalizedUrl = url.split("?")[0];
+  const match = normalizedUrl.match(/([0-9a-f]{32})(?:$|[#-])/i);
+
+  if (!match?.[1]) {
+    return "";
+  }
+
+  const raw = match[1].toLowerCase();
+  return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}-${raw.slice(16, 20)}-${raw.slice(20)}`;
+}
+
+function getNotionPageTitle(page: any): string {
+  const titleProperty = Object.values(page?.properties || {}).find(
+    (property: any) => property?.type === "title",
+  ) as any;
+  const titleParts = Array.isArray(titleProperty?.title)
+    ? titleProperty.title
+    : [];
+
+  const richTextTitle = titleParts
+    .map((part: any) => {
+      if (typeof part?.plain_text === "string") {
+        return part.plain_text;
+      }
+
+      return "";
+    })
+    .join("")
+    .trim();
+
+  if (richTextTitle) {
+    return richTextTitle;
+  }
+
+  if (typeof page?.url === "string" && page.url) {
+    try {
+      const slug = page.url.split("/").pop()?.split("?")[0] || "";
+      return decodeURIComponent(slug.replace(/-/g, " ")).trim();
+    } catch {
+      return "";
+    }
+  }
+
+  return "";
 }
 
 function normalizeWhitespace(value: string) {

@@ -6,12 +6,15 @@ This guide shows how knowledge is organized in Office Buddies:
 - `Knowledge Sources`: read-only connected sources attached to the current session
 - `Integrations`: the connection layer that discovers those knowledge sources
 
-Today, `MCP` and `Confluence` are available integration types. The UI is still
+Today, `MCP`, `Confluence`, and `Notion` are available integration types. The UI is still
 structured so additional native connectors can plug into the same knowledge
 source flow later.
 
 For attached Confluence sources, Office Buddies now tries to search and fetch
 matching page content at question time.
+
+For attached Notion sources, Office Buddies searches the pages shared with your
+integration and fetches page markdown at question time.
 
 ## Where to find it
 
@@ -66,6 +69,8 @@ Use this when the knowledge lives in a connected system instead of a local file.
    - For `Confluence`:
      - `Base URL`
      - `Email`
+     - `API token`
+   - For `Notion`:
      - `API token`
 3. Click `Save Integration`.
 

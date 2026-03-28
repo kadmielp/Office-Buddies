@@ -16,6 +16,8 @@ import { getLogger } from "./logger";
 import { getStateManager } from "./state";
 
 const ENCRYPTED_PREFIX = "ob_mcp_enc_v1:";
+const NOTION_API_BASE_URL = "https://api.notion.com/v1";
+const NOTION_API_VERSION = "2026-03-11";
 
 function isEncryptedValue(value: unknown): value is string {
   return typeof value === "string" && value.startsWith(ENCRYPTED_PREFIX);
@@ -130,61 +132,108 @@ class IntegrationManager {
   public async testIntegration(
     input: SaveIntegrationInput,
   ): Promise<IntegrationTestResult> {
-    if (input.type !== "confluence") {
+    if (input.type === "confluence") {
+      const baseUrl = normalizeConfluenceBaseUrl(input.baseUrl || "");
+      const accountEmail = input.accountEmail?.trim() || "";
+      const credential = this.resolveCredentialForInput(input);
+      const missingFields = [
+        !baseUrl ? "base URL" : null,
+        !accountEmail ? "account email" : null,
+        !credential ? "API token" : null,
+      ].filter(Boolean);
+
+      if (missingFields.length > 0) {
+        return {
+          ok: false,
+          message: `Confluence needs a ${missingFields.join(", ")} before the connection can be tested.`,
+        };
+      }
+
+      try {
+        await fetchConfluenceJson(
+          `${baseUrl}/rest/api/space?limit=1`,
+          accountEmail,
+          credential,
+        );
+        return {
+          ok: true,
+          statusCode: 200,
+          message:
+            "Connection ok. Confluence accepted the configured credentials.",
+        };
+      } catch (error) {
+        const statusCode = getResponseStatusCode(error);
+        const details = getConfluenceErrorDetails(error);
+
+        getLogger().warn("Confluence connection test failed", {
+          integrationId: input.id || null,
+          baseUrl,
+          accountEmail,
+          statusCode: statusCode || null,
+          details: details || null,
+        });
+
+        return {
+          ok: false,
+          statusCode,
+          message: getConfluenceErrorMessage(statusCode),
+          details,
+        };
+      }
+    }
+
+    if (input.type === "notion") {
+      const credential = this.resolveCredentialForInput(input);
+
+      if (!credential) {
+        return {
+          ok: false,
+          message: "Notion needs an integration token before the connection can be tested.",
+        };
+      }
+
+      try {
+        await fetchNotionJson(`${NOTION_API_BASE_URL}/users/me`, {
+          method: "GET",
+          token: credential,
+        });
+        return {
+          ok: true,
+          statusCode: 200,
+          message:
+            "Connection ok. Notion accepted the configured integration token.",
+        };
+      } catch (error) {
+        const statusCode = getResponseStatusCode(error);
+        const details = getNotionErrorDetails(error);
+
+        getLogger().warn("Notion connection test failed", {
+          integrationId: input.id || null,
+          statusCode: statusCode || null,
+          details: details || null,
+        });
+
+        return {
+          ok: false,
+          statusCode,
+          message: getNotionErrorMessage(statusCode),
+          details,
+        };
+      }
+    }
+
+    if (input.type !== "mcp") {
       return {
         ok: false,
-        message:
-          "Connection testing is currently available for Confluence integrations only.",
+        message: `Unsupported integration type for connection testing: ${input.type}.`,
       };
     }
 
-    const baseUrl = normalizeConfluenceBaseUrl(input.baseUrl || "");
-    const accountEmail = input.accountEmail?.trim() || "";
-    const credential = this.resolveCredentialForInput(input);
-    const missingFields = [
-      !baseUrl ? "base URL" : null,
-      !accountEmail ? "account email" : null,
-      !credential ? "API token" : null,
-    ].filter(Boolean);
-
-    if (missingFields.length > 0) {
-      return {
-        ok: false,
-        message: `Confluence needs a ${missingFields.join(", ")} before the connection can be tested.`,
-      };
-    }
-
-    try {
-      await fetchConfluenceJson(
-        `${baseUrl}/rest/api/space?limit=1`,
-        accountEmail,
-        credential,
-      );
-      return {
-        ok: true,
-        statusCode: 200,
-        message:
-          "Connection ok. Confluence accepted the configured credentials.",
-      };
-    } catch (error) {
-      const statusCode = getResponseStatusCode(error);
-      const details = getConfluenceErrorDetails(error);
-
-      getLogger().warn("Confluence connection test failed", {
-        integrationId: input.id || null,
-        baseUrl,
-        accountEmail,
-        statusCode: statusCode || null,
-        details: details || null,
-      });
-
-      return {
-        ok: false,
-        statusCode,
-        message: getConfluenceErrorMessage(statusCode),
-        details,
-      };
-    }
+    return {
+      ok: false,
+      message:
+        "Connection testing is currently available for Confluence and Notion integrations only.",
+    };
   }
 
   public setIntegrationStatus(
@@ -295,6 +344,21 @@ class IntegrationManager {
       };
     }
 
+    if (input.type === "notion") {
+      return {
+        id: integrationId,
+        name,
+        type: "notion",
+        transport: undefined,
+        endpoint: undefined,
+        command: undefined,
+        baseUrl: undefined,
+        accountEmail: undefined,
+        status: "Available",
+        hasCredential,
+      };
+    }
+
     throw new Error(`Unsupported integration type: ${input.type}`);
   }
 
@@ -363,12 +427,16 @@ function toKnowledgeSource(integration: IntegrationConfig): KnowledgeSource {
   const target =
     integration.type === "confluence"
       ? integration.baseUrl || "Base URL unavailable"
+      : integration.type === "notion"
+        ? "Shared pages visible to the integration"
       : integration.transport === "stdio"
         ? integration.command || "Command unavailable"
         : integration.endpoint || "Endpoint unavailable";
   const meta =
     integration.type === "confluence"
       ? `CONFLUENCE | ${target}`
+      : integration.type === "notion"
+        ? `NOTION | ${target}`
       : `${integration.type.toUpperCase()} via ${(integration.transport || "http").toUpperCase()} | ${target}`;
 
   return {
@@ -399,6 +467,35 @@ async function fetchConfluenceJson(
     const body = await response.text();
     throw new Error(
       `Request failed (${response.status}) while calling Confluence: ${body.slice(0, 300)}`,
+    );
+  }
+
+  return response.json();
+}
+
+async function fetchNotionJson(
+  url: string,
+  options: {
+    method: "GET" | "POST";
+    token: string;
+    body?: unknown;
+  },
+) {
+  const response = await fetch(url, {
+    method: options.method,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${options.token}`,
+      "Notion-Version": NOTION_API_VERSION,
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Request failed (${response.status}) while calling Notion: ${body.slice(0, 300)}`,
     );
   }
 
@@ -449,6 +546,39 @@ function getConfluenceErrorDetails(error: unknown) {
 
   return error.message.replace(
     /^Request failed \(\d+\) while calling Confluence:\s*/i,
+    "",
+  );
+}
+
+function getNotionErrorMessage(statusCode: number | undefined) {
+  if (statusCode === 401) {
+    return "Notion rejected the token (401). Check the integration token and try again.";
+  }
+
+  if (statusCode === 403) {
+    return "Notion accepted the request, but this integration does not have permission to read that content (403). Check the integration capabilities and shared pages.";
+  }
+
+  if (statusCode === 404) {
+    return "Notion could not find content for this integration (404). Make sure the relevant pages are shared with the integration.";
+  }
+
+  return "Notion connection test failed. Review the configured integration token and sharing permissions.";
+}
+
+function getNotionErrorDetails(error: unknown) {
+  if (!(error instanceof Error)) {
+    return String(error);
+  }
+
+  const jsonMessageMatch = error.message.match(/"message":"([^"]+)"/i);
+
+  if (jsonMessageMatch?.[1]) {
+    return jsonMessageMatch[1];
+  }
+
+  return error.message.replace(
+    /^Request failed \(\d+\) while calling Notion:\s*/i,
     "",
   );
 }

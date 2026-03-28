@@ -15,6 +15,15 @@ export type MessageReference =
     }
   | {
       id: string;
+      kind: "notion";
+      title: string;
+      sourceName?: string;
+      location?: string;
+      url?: string;
+      snippet?: string;
+    }
+  | {
+      id: string;
       kind: "file";
       title: string;
       sourceName?: string;

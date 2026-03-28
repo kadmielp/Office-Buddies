@@ -16,7 +16,7 @@ export type AiProvider =
 
 export type KnowledgeFileStatus = "Ready" | "Indexed" | "Error";
 export type KnowledgeSourceStatus = "Connected" | "Available" | "Error";
-export type IntegrationType = "mcp" | "confluence";
+export type IntegrationType = "mcp" | "confluence" | "notion";
 export type McpTransportType = "http" | "stdio";
 
 export interface KnowledgeFileSource {

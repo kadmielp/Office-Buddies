@@ -53,9 +53,9 @@ body {
 }
 
 .bubble-title-shortcuts > button {
-  min-width: 58px;
-  padding-left: 10px;
-  padding-right: 10px;
+  min-width: 76px;
+  padding-left: 14px;
+  padding-right: 14px;
   text-align: center;
 }
 
@@ -145,12 +145,38 @@ body {
   gap: 12px;
 }
 
+.app-gallery--embedded {
+  min-height: unset;
+  gap: 8px;
+}
+
+.app-gallery--embedded .app-gallery-hero {
+  gap: 10px;
+}
+
+.app-gallery--embedded .app-gallery-copy {
+  gap: 8px;
+}
+
+.app-gallery--embedded .app-gallery-speech {
+  min-height: 58px;
+  padding: 8px;
+}
+
+.app-gallery--embedded .app-gallery-description {
+  min-height: 44px;
+}
+
 .app-gallery-hero {
   display: flex;
   gap: 12px;
   align-items: flex-start;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.app-gallery-name {
+  font-weight: 700;
 }
 
 .app-gallery-preview {
@@ -188,10 +214,24 @@ body {
   margin-top: auto;
 }
 
+.app-gallery--embedded .app-gallery-nav {
+  margin-top: 2px;
+}
+
 .app-gallery-footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.app-gallery-footer--embedded {
+  margin-top: 4px;
+}
+
+.settings-appearance-gallery-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
 }
 
 .chat-container {

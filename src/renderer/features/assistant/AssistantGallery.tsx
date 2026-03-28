@@ -294,7 +294,13 @@ function AssistantPreview({
   );
 }
 
-export function AssistantGallery() {
+type AssistantGalleryProps = {
+  embedded?: boolean;
+};
+
+export function AssistantGallery({
+  embedded = false,
+}: AssistantGalleryProps) {
   const { settings } = useSharedState();
   const { setCurrentView } = useBubbleView();
   const galleryAgents = useMemo(() => {
@@ -313,6 +319,10 @@ export function AssistantGallery() {
   const isSoundEnabled = !settings.disableSound;
   const initialIndex = Math.max(galleryAgents.indexOf(selectedAgent), 0);
   const [agentIndex, setAgentIndex] = useState(initialIndex);
+
+  useEffect(() => {
+    setAgentIndex(Math.max(galleryAgents.indexOf(selectedAgent), 0));
+  }, [galleryAgents, selectedAgent]);
 
   const currentAgent = galleryAgents[agentIndex] || "Clippy";
   const details = ASSISTANT_COPY[currentAgent] || {
@@ -333,26 +343,31 @@ export function AssistantGallery() {
     }
   };
 
-  const onOk = () => {
+  const onApply = () => {
     clippyApi.setState("settings.selectedAgent", currentAgent);
-    setCurrentView("chat");
+
+    if (!embedded) {
+      setCurrentView("chat");
+    }
   };
 
   const onCancel = () => {
     setCurrentView("chat");
   };
 
-  return (
-    <div className="app-page assistant-gallery-page">
-      <p className="app-inline-note">
-        You can scroll through the different assistants by using the &lt;Back
-        and Next&gt; buttons. When you are finished selecting your assistant,
-        click the OK button.
-      </p>
+  const galleryContent = (
+    <>
+      {!embedded && (
+        <p className="app-inline-note">
+          You can scroll through the different assistants by using the &lt;Back
+          and Next&gt; buttons. When you are finished selecting your
+          assistant, click the OK button.
+        </p>
+      )}
 
-      <fieldset className="app-fill" style={{ margin: 0 }}>
-        <legend>{details.displayName}</legend>
-        <div className="app-gallery">
+      <fieldset className={embedded ? undefined : "app-fill"} style={{ margin: 0 }}>
+        <legend>{embedded ? "Assistant Gallery" : details.displayName}</legend>
+        <div className={`app-gallery${embedded ? " app-gallery--embedded" : ""}`}>
           <div className="app-gallery-hero">
             <div className="app-gallery-preview">
               <AssistantPreview
@@ -361,6 +376,7 @@ export function AssistantGallery() {
               />
             </div>
             <div className="app-gallery-copy">
+              <div className="app-gallery-name">{details.displayName}</div>
               <div className="app-gallery-speech">{details.speech}</div>
               <div className="app-gallery-description">
                 {details.description}
@@ -378,11 +394,30 @@ export function AssistantGallery() {
               Next &gt;
             </button>
           </div>
+          {embedded && (
+            <div className="app-gallery-footer app-gallery-footer--embedded">
+              <button
+                onClick={onApply}
+                disabled={currentAgent === selectedAgent}
+              >
+                Apply Assistant
+              </button>
+            </div>
+          )}
         </div>
       </fieldset>
+    </>
+  );
 
+  if (embedded) {
+    return galleryContent;
+  }
+
+  return (
+    <div className="app-page assistant-gallery-page">
+      {galleryContent}
       <div className="app-gallery-footer">
-        <button onClick={onOk}>
+        <button onClick={onApply}>
           OK
         </button>
         <button onClick={onCancel}>

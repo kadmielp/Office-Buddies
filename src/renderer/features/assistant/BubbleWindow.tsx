@@ -5,7 +5,6 @@ import { Chat } from "../chat/Chat";
 import { Settings } from "../settings/Settings";
 import { useBubbleView } from "../../contexts/BubbleViewContext";
 import { Chats } from "../chat/Chats";
-import { AssistantGallery } from "./AssistantGallery";
 import { useChat } from "../../contexts/ChatContext";
 import loadingGif from "../../../../assets/loading.gif";
 
@@ -18,28 +17,32 @@ export function Bubble() {
 
   if (currentView === "chat") {
     content = <Chat />;
-  } else if (currentView.startsWith("settings")) {
+  } else if (
+    currentView.startsWith("settings") ||
+    currentView === "assistant-gallery"
+  ) {
     content = <Settings onClose={() => setCurrentView("chat")} />;
   } else if (currentView === "chats") {
     content = <Chats onClose={() => setCurrentView("chat")} />;
-  } else if (currentView === "assistant-gallery") {
-    content = <AssistantGallery />;
   }
 
-  const isAssistantGallery = currentView === "assistant-gallery";
-  const isSettingsView = currentView.startsWith("settings");
-  const isAssistantHeaderMode = isAssistantGallery || isSettingsView;
-  const isGallerySelected = isAssistantGallery;
+  const isSettingsView =
+    currentView.startsWith("settings") || currentView === "assistant-gallery";
+  const showAssistantHeaderShortcuts = true;
   const isOptionsSelected = isSettingsView;
   const isChatsSelected = currentView === "chats";
 
   const handleChatsClick = useCallback(() => {
-    if (currentView === "chats") {
-      setCurrentView("chat");
-    } else {
+    if (currentView !== "chats") {
       setCurrentView("chats");
     }
   }, [setCurrentView, currentView]);
+
+  const handleOptionsClick = useCallback(() => {
+    if (!isSettingsView) {
+      setCurrentView("settings-general");
+    }
+  }, [isSettingsView, setCurrentView]);
 
   return (
     <div
@@ -48,34 +51,13 @@ export function Bubble() {
     >
       <div className="app-drag title-bar">
         <div className="title-bar-text">
-          {isAssistantHeaderMode
+          {showAssistantHeaderShortcuts && currentView !== "chat"
             ? "Office Assistant"
             : "Chat with Office Buddies"}
         </div>
         <div className="title-bar-controls app-no-drag">
           <div className="bubble-title-shortcuts">
-            {isAssistantHeaderMode ? (
-              <>
-                <button
-                  className={
-                    isGallerySelected ? "header-tab-active" : undefined
-                  }
-                  aria-pressed={isGallerySelected}
-                  onClick={() => setCurrentView("assistant-gallery")}
-                >
-                  Gallery
-                </button>
-                <button
-                  className={
-                    isOptionsSelected ? "header-tab-active" : undefined
-                  }
-                  aria-pressed={isOptionsSelected}
-                  onClick={() => setCurrentView("settings-general")}
-                >
-                  Options
-                </button>
-              </>
-            ) : (
+            {showAssistantHeaderShortcuts && (
               <>
                 <button
                   className={isChatsSelected ? "header-tab-active" : undefined}
@@ -83,6 +65,15 @@ export function Bubble() {
                   onClick={handleChatsClick}
                 >
                   Chats
+                </button>
+                <button
+                  className={
+                    isOptionsSelected ? "header-tab-active" : undefined
+                  }
+                  aria-pressed={isOptionsSelected}
+                  onClick={handleOptionsClick}
+                >
+                  Options
                 </button>
               </>
             )}

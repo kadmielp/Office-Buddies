@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.11] - 2026-03-29
+
+### Fixed
+
+- Hardened Windows always-on-top recovery for the assistant and chat windows by reasserting their top-most state after show, restore, focus, blur, and minimize-protection transitions so they are less likely to slip behind other apps.
+
 ## [0.6.10] - 2026-03-28
 
 ### Added

@@ -18,6 +18,11 @@ import { isTrayQuitInProgress, refreshTrayMenu, shouldMinimizeToTray } from "./t
 let mainWindow: BrowserWindow | undefined;
 const allowedMinimizeWindows = new WeakSet<BrowserWindow>();
 const allowedHideWindows = new WeakSet<BrowserWindow>();
+const topmostReassertionTimers = new WeakMap<BrowserWindow, NodeJS.Timeout>();
+
+function getAlwaysOnTopLevel() {
+  return process.platform === "win32" ? "screen-saver" : "normal";
+}
 
 function setWindowAlwaysOnTop(
   window: BrowserWindow | undefined,
@@ -28,9 +33,7 @@ function setWindowAlwaysOnTop(
   }
 
   const shouldStayOnTop = Boolean(enabled);
-  const alwaysOnTopLevel =
-    process.platform === "win32" ? "screen-saver" : "normal";
-  window.setAlwaysOnTop(shouldStayOnTop, alwaysOnTopLevel);
+  window.setAlwaysOnTop(shouldStayOnTop, getAlwaysOnTopLevel());
 
   if (shouldStayOnTop) {
     window.moveTop();
@@ -57,8 +60,42 @@ function shouldProtectWindowFromMinimize(window: BrowserWindow) {
   return false;
 }
 
+function reassertWindowAlwaysOnTop(window: BrowserWindow) {
+  if (window.isDestroyed() || !shouldProtectWindowFromMinimize(window)) {
+    return;
+  }
+
+  // Re-toggle the flag on Windows because some shell transitions can leave
+  // the assistant visible but behind normal app windows.
+  if (process.platform === "win32") {
+    window.setAlwaysOnTop(false);
+  }
+
+  window.setAlwaysOnTop(true, getAlwaysOnTopLevel());
+  window.moveTop();
+}
+
+function scheduleWindowTopmostReassertion(
+  window: BrowserWindow,
+  delayMs = 0,
+) {
+  const existingTimer = topmostReassertionTimers.get(window);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+  }
+
+  const timer = setTimeout(() => {
+    topmostReassertionTimers.delete(window);
+    reassertWindowAlwaysOnTop(window);
+  }, delayMs);
+
+  topmostReassertionTimers.set(window, timer);
+}
+
 function setupMinimizeProtection(window: BrowserWindow) {
   const reassertProtectedWindow = () => {
+    scheduleWindowTopmostReassertion(window);
+
     setTimeout(() => {
       if (window.isDestroyed() || !shouldProtectWindowFromMinimize(window)) {
         return;
@@ -72,7 +109,7 @@ function setupMinimizeProtection(window: BrowserWindow) {
         window.showInactive();
       }
 
-      window.moveTop();
+      reassertWindowAlwaysOnTop(window);
     }, 0);
   };
 
@@ -132,6 +169,40 @@ function setupTrayCloseBehavior(window: BrowserWindow) {
 
     hideWindow(window);
     refreshTrayMenu();
+  });
+}
+
+function setupAlwaysOnTopLifecycle(window: BrowserWindow) {
+  const maybeReassertAlwaysOnTop = () => {
+    if (!shouldProtectWindowFromMinimize(window)) {
+      return;
+    }
+
+    scheduleWindowTopmostReassertion(window);
+  };
+
+  window.on("show", maybeReassertAlwaysOnTop);
+  window.on("restore", maybeReassertAlwaysOnTop);
+  window.on("focus", maybeReassertAlwaysOnTop);
+
+  if (process.platform === "win32") {
+    window.on("blur", () => {
+      if (!shouldProtectWindowFromMinimize(window)) {
+        return;
+      }
+
+      scheduleWindowTopmostReassertion(window, 50);
+    });
+  }
+
+  window.on("closed", () => {
+    const timer = topmostReassertionTimers.get(window);
+    if (!timer) {
+      return;
+    }
+
+    clearTimeout(timer);
+    topmostReassertionTimers.delete(window);
   });
 }
 
@@ -220,6 +291,7 @@ export function setupWindowListener() {
       setupWindowOpenHandler(browserWindow);
       setupNavigationHandler(browserWindow);
       setupMinimizeProtection(browserWindow);
+      setupAlwaysOnTopLifecycle(browserWindow);
       setupTrayCloseBehavior(browserWindow);
       browserWindow.setSkipTaskbar(shouldMinimizeToTray());
 

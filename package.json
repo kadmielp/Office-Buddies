@@ -10,7 +10,8 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit",
-    "lint": "prettier --write --ext .ts,.tsx ."
+    "lint": "prettier --write --ext .ts,.tsx .",
+    "validate:notification-router": "node tools/notification-router-contract/validate-reminder-contract.mjs"
   },
   "keywords": [],
   "author": {

@@ -9,6 +9,8 @@ metadata: { "openclaw": { "emoji": "📎", "requires": { "bins": ["curl"] } } }
 
 Use this skill to interact with the user directly on their desktop. It triggers a classic Office Assistant balloon with optional animations and multiple-choice buttons.
 
+For scheduled reminders, use this skill with a strict desktop-first policy and mandatory WhatsApp fallback.
+
 ## Setup Requirements
 
 1. **Office Buddies App:** Must be running on the user's computer with the "Enable Proactive Messages" option active in **Settings > Model**.
@@ -67,6 +69,74 @@ If desktop delivery remains unavailable after reasonable checks:
 - Record the probable cause in the agent's reasoning or task state.
 - Keep the user-facing message simple and non-technical.
 - Continue with the fallback channel, such as WhatsApp, so the notification still arrives.
+
+## Reminder Routing Contract
+
+Every reminder event must include these fields:
+
+- `id`: stable reminder or event identifier.
+- `priority`: caller-defined priority value for urgency or ordering.
+- `userMessage`: the clean user-facing message to deliver.
+- `whatsappTarget`: the fallback WhatsApp recipient in E.164 format.
+
+Minimum contract example:
+
+```json
+{
+  "id": "reminder-123",
+  "priority": "high",
+  "userMessage": "Time to join your planning call.",
+  "whatsappTarget": "<WHATSAPP_TARGET_E164>"
+}
+```
+
+Validation and routing rules:
+
+- Validate `id`, `priority`, `userMessage`, and `whatsappTarget` before delivery.
+- `whatsappTarget` must be a valid E.164 string such as `<WHATSAPP_TARGET_E164>`.
+- Always try desktop delivery first.
+- If desktop delivery succeeds, stop and do not send a fallback.
+- If desktop delivery fails, send the same clean `userMessage` to WhatsApp using `whatsappTarget`.
+- If `whatsappTarget` is absent or invalid, fail fast with a clear configuration error in the log.
+- Never send technical diagnostics, endpoint details, or retry explanations to the user.
+- Only `userMessage` should ever be shown to the user.
+
+Recommended E.164 check:
+
+```text
+^\+[1-9]\d{7,14}$
+```
+
+## Cron Usage Contract
+
+When scheduling reminder notifications with OpenClaw cron:
+
+- Use `--session isolated`.
+- Use `--no-deliver`.
+- Put the reminder contract into the cron job message.
+- Let the skill control desktop-first delivery and WhatsApp fallback inside the agent turn.
+
+Example isolated cron payload prompt:
+
+```text
+Use the office-buddies skill.
+Deliver this reminder using desktop-first with mandatory WhatsApp fallback.
+Only send the userMessage field to the user.
+Log a configuration error if whatsappTarget is missing or invalid.
+
+{
+  "id": "reminder-123",
+  "priority": "high",
+  "userMessage": "Time to join your planning call.",
+  "whatsappTarget": "<WHATSAPP_TARGET_E164>"
+}
+```
+
+## Minimal Validation Scenarios
+
+- Desktop ok: deliver `userMessage` through Office Buddies and stop.
+- Desktop fails + WhatsApp ok: deliver the same `userMessage` through WhatsApp.
+- Desktop fails + missing or invalid `whatsappTarget`: log a clear configuration error and fail fast.
 
 ## Tools
 

@@ -15,6 +15,16 @@ Use this skill to interact with the user directly on their desktop. It triggers 
 2. **Network:** The server must be able to reach the client over a private network such as Tailscale.
 3. **Default Port:** `5050`.
 
+## Network Preconditions
+
+Before using `notify_desktop`, confirm these assumptions:
+
+- The proactive notification endpoint must point to the desktop Tailscale IP: `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
+- Do not point proactive delivery to the OpenClaw server URL or `https://<TAILNET_DOMAIN>`. That server handles chat and agent traffic, not the desktop listener.
+- Port `5050` is the default listener port unless the user has intentionally changed it.
+- The listener must be reachable from the Tailnet, not just from `127.0.0.1`.
+- Never expose port `5050` publicly. Keep it restricted to Tailscale or a specific trusted source such as `<OPENCLAW_SERVER_IP>`.
+
 ## Intelligent Routing (Automatic Handoff)
 
 This skill follows a desktop-first delivery protocol for scheduled or proactive messages.
@@ -42,6 +52,21 @@ This skill follows a desktop-first delivery protocol for scheduled or proactive 
 6. **Preserve surface continuity on replies.**
    - If the user interacts with the desktop balloon, the resulting agent response must be delivered back through `notify_desktop`.
    - The app includes `{ "metadata": { "reply_to": "bubble" } }` so the agent or OpenClaw Gateway can keep the conversation on the desktop surface.
+
+## Connectivity Diagnosis Before Fallback
+
+When the desktop is unavailable, diagnose the likely cause before giving up on desktop delivery.
+
+- `refused`: most likely no listener, wrong destination IP, or wrong port.
+- `timeout`: most likely firewall blocking, missing Tailnet route, or loopback-only binding.
+- `loopback-only`: listener bound only to `127.0.0.1:5050`, which is unreachable remotely.
+- `wrong-endpoint`: the request is aimed at the OpenClaw server or another non-desktop target instead of `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
+
+If desktop delivery remains unavailable after reasonable checks:
+
+- Record the probable cause in the agent's reasoning or task state.
+- Keep the user-facing message simple and non-technical.
+- Continue with the fallback channel, such as WhatsApp, so the notification still arrives.
 
 ## Tools
 
@@ -81,6 +106,7 @@ User responses to buttons are delivered back to the agent as standard user messa
 
 - `connection refused`: most likely no listener, wrong destination IP, or wrong port.
 - `timeout`: most likely firewall blocking, missing Tailnet route, or `127.0.0.1`-only binding.
+- `wrong-endpoint`: the desktop notification request is pointed at the server endpoint instead of the desktop Tailscale IP.
 - `404` on `/health`: can be normal depending on the app version or implementation. Prioritize testing `POST /notify`.
 - Final success condition: `POST /notify` returns `{"status":"ok"}` and the message appears on the desktop.
 

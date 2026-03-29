@@ -32,6 +32,8 @@ Use this checklist to get proactive delivery working in under 10 steps.
 9. From the OpenClaw server, send a test `POST` to `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
 10. Treat the setup as successful only when `POST /notify` returns `{"status":"ok"}` and the message appears on the desktop.
 
+Common mistake to avoid: the proactive endpoint must target the desktop listener at `http://<TAILSCALE_IP_DESKTOP>:5050/notify`, not the OpenClaw server URL.
+
 ---
 
 ## 3. Part I: Outbound Connection
@@ -111,6 +113,13 @@ Expected output includes one of:
 - `<TAILSCALE_IP_DESKTOP>:5050`
 
 If the listener appears only as `127.0.0.1:5050`, the app is bound to loopback only. In that state, OpenClaw cannot reach it over Tailscale even though the local app may seem healthy.
+
+Also confirm that the proactive destination is the desktop listener, not the OpenClaw server:
+
+```text
+Correct:  http://<TAILSCALE_IP_DESKTOP>:5050/notify
+Incorrect: https://<TAILNET_DOMAIN>/notify
+```
 
 **From the OpenClaw server, test raw TCP connectivity:**
 
@@ -219,6 +228,18 @@ What to check:
 - Re-enable the listener in Office Buddies.
 - Re-run `netstat -ano | findstr :5050`.
 - Confirm OpenClaw is calling `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
+
+### `wrong-endpoint`
+
+Most likely cause:
+
+- The proactive request is pointed at the OpenClaw server or another non-desktop address instead of the desktop listener.
+
+What to check:
+
+- Confirm the proactive target is `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
+- Do not reuse the server URL `https://<TAILNET_DOMAIN>` for desktop delivery.
+- Verify the desktop Tailscale IP with `tailscale ip -4` before retrying.
 
 ### `timeout`
 

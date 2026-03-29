@@ -1,97 +1,194 @@
-# OpenClaw 🦞 + Office Buddies: Tailscale Integration Guide
+# OpenClaw + Office Buddies: Tailscale Integration Guide
 
-This guide provides a step-by-step flow to connect your **OpenClaw** ([https://openclaw.ai](https://openclaw.ai)) agent server with the **Office Buddies** desktop assistant using a secure **Tailscale** private network.
+This guide walks through a secure way to connect your **OpenClaw** agent server with the **Office Buddies** desktop assistant over **Tailscale** for both chat and proactive desktop notifications.
 
 ---
 
 ## 1. Prerequisites
 
-- **Tailscale** installed and active on both the server (OpenClaw) and the client (Windows/macOS/Linux).
+- **Tailscale** installed and active on both the server and the desktop.
 - Both devices signed into the same Tailnet.
-- Node.js and npm installed (if building from source).
+- Node.js and npm installed if you are building from source.
+- Use placeholders only in documentation, configs, and examples:
+  - `<TAILSCALE_IP_DESKTOP>`
+  - `<OPENCLAW_SERVER_IP>`
+  - `<TAILNET_DOMAIN>`
+  - `<TOKEN>`
 
 ---
 
-## 2. Part I: Outbound Connection (Chatting with Zero)
+## 2. Quick Start
 
-Allows the App to send messages to the Server.
+Use this checklist to get proactive delivery working in under 10 steps.
+
+1. Connect both the OpenClaw server and the desktop to the same Tailnet.
+2. Start Office Buddies and enable **Proactive Messages (Listener)** on port `5050`.
+3. On the desktop, run `tailscale ip -4` and record `<TAILSCALE_IP_DESKTOP>`.
+4. On the desktop, run `netstat -ano | findstr :5050`.
+5. Confirm the listener shows `0.0.0.0:5050` or `<TAILSCALE_IP_DESKTOP>:5050`.
+6. If it shows only `127.0.0.1:5050`, restart or re-enable the listener. If needed, add the Windows `portproxy` fallback described below.
+7. Allow inbound TCP `5050` only from `100.64.0.0/10` or, preferably, only from `<OPENCLAW_SERVER_IP>`.
+8. From the OpenClaw server, run `nc -vz <TAILSCALE_IP_DESKTOP> 5050`.
+9. From the OpenClaw server, send a test `POST` to `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
+10. Treat the setup as successful only when `POST /notify` returns `{"status":"ok"}` and the message appears on the desktop.
+
+---
+
+## 3. Part I: Outbound Connection
+
+This path allows Office Buddies to send chat traffic to OpenClaw.
 
 ### A. Server Setup (OpenClaw)
 
 1. Generate a secure access token:
-   ```bash
-   # Run on your server
-   NEW_TOKEN=$(openssl rand -hex 32)
-   openclaw config set gateway.auth.token "$NEW_TOKEN"
-   echo "$NEW_TOKEN" # Save this!
-   ```
+
+```bash
+NEW_TOKEN=$(openssl rand -hex 32)
+openclaw config set gateway.auth.token "$NEW_TOKEN"
+echo "$NEW_TOKEN"
+```
+
+Store the generated token securely and refer to it as `<TOKEN>` in documentation.
+
 2. Enable the OpenAI-compatible endpoint:
-   ```bash
-   # Required for Office Buddies chat functionality
-   openclaw config set gateway.http.endpoints.chatCompletions.enabled true
-   ```
+
+```bash
+openclaw config set gateway.http.endpoints.chatCompletions.enabled true
+```
+
 3. Start the gateway with Tailscale support:
-   ```bash
-   openclaw gateway run --bind loopback --tailscale serve --force
-   ```
-4. Copy your Tailnet URL (e.g., `https://your-agent.ts.net`).
+
+```bash
+openclaw gateway run --bind loopback --tailscale serve --force
+```
+
+4. Copy your Tailnet URL, for example `https://<TAILNET_DOMAIN>`.
 
 ### B. App Setup (Office Buddies)
 
 1. Go to **Settings > Model**.
-2. Select **OpenClaw** as the Provider.
-3. Paste your Tailnet URL in **Endpoint URL**.
-4. Paste the token from Step A-1 in **API Key**.
-5. Click **Refresh Models** and select your preferred agent (e.g., `google-antigravity/gemini-3-flash`).
+2. Select **OpenClaw** as the provider.
+3. Paste `https://<TAILNET_DOMAIN>` into **Endpoint URL**.
+4. Paste `<TOKEN>` into **API Key**.
+5. Click **Refresh Models** and select your preferred model or agent.
 
 ---
 
-## 3. Part II: Inbound Connection (Proactive Messages)
+## 4. Part II: Inbound Connection (Proactive Messages)
 
-Allows the Agent to "call" you on the desktop with animations and buttons.
+This path allows OpenClaw to send proactive notifications to the desktop with animations and action buttons.
 
-### A. Enable Listener in App
+### A. Enable the Listener in Office Buddies
 
-1. Stay in **Settings > Model** (with OpenClaw selected).
+1. Stay in **Settings > Model** with **OpenClaw** selected.
 2. Locate the **Proactive Messages** section.
-3. Check **"Enable Proactive Messages (Listener)"**.
-4. Set the **Port** (default: `5050`).
+3. Enable **Proactive Messages (Listener)**.
+4. Set the port to `5050` unless you intentionally use a different one.
 
-The agent will automatically prioritize the desktop app if it is online and reachable.
+The desktop should be reachable on the Tailnet, not only on localhost.
 
-### B. Configure Firewall
+### B. Preflight Connectivity Checks
 
-The client device must allow incoming connections on the selected port.
+Run these checks before concluding that the desktop delivery path is broken.
 
-**For Windows (PowerShell as Administrator):**
+**On the desktop, get the Tailscale IPv4:**
+
+```bash
+tailscale ip -4
+```
+
+Use the result as `<TAILSCALE_IP_DESKTOP>`.
+
+**On Windows, validate the listener:**
 
 ```powershell
-# Allow incoming traffic on port 5050 ONLY from your Tailscale network
+netstat -ano | findstr :5050
+```
+
+Expected output includes one of:
+
+- `0.0.0.0:5050`
+- `<TAILSCALE_IP_DESKTOP>:5050`
+
+If the listener appears only as `127.0.0.1:5050`, the app is bound to loopback only. In that state, OpenClaw cannot reach it over Tailscale even though the local app may seem healthy.
+
+**From the OpenClaw server, test raw TCP connectivity:**
+
+```bash
+nc -vz <TAILSCALE_IP_DESKTOP> 5050
+```
+
+**Then test the notification endpoint:**
+
+```bash
+curl -m 5 -X POST http://<TAILSCALE_IP_DESKTOP>:5050/notify \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Connectivity test from OpenClaw","animation":"GetAttention"}'
+```
+
+Some builds may not expose `/health`, or may return `404` there. Prioritize `POST /notify` as the real delivery test.
+
+### C. Fixing a Loopback-Only Listener
+
+If the desktop is listening only on `127.0.0.1:5050`:
+
+1. Restart Office Buddies.
+2. Disable and re-enable **Proactive Messages (Listener)**.
+3. Re-run `netstat -ano | findstr :5050`.
+
+If the app still binds to loopback on Windows, use `portproxy` as a safe fallback:
+
+```powershell
+netsh interface portproxy add v4tov4 listenaddress=<TAILSCALE_IP_DESKTOP> listenport=5050 connectaddress=127.0.0.1 connectport=5050
+```
+
+To remove the proxy later:
+
+```powershell
+netsh interface portproxy delete v4tov4 listenaddress=<TAILSCALE_IP_DESKTOP> listenport=5050
+```
+
+This exposes the listener on the Tailscale interface while still forwarding to the loopback-only app locally.
+
+### D. Configure Firewall Safely
+
+Allow inbound TCP `5050` only from trusted private addresses.
+
+**Windows (PowerShell as Administrator), allow the Tailnet only:**
+
+```powershell
 New-NetFirewallRule -DisplayName "Office Buddies Proactive" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5050 -RemoteAddress 100.64.0.0/10
 ```
 
-**For Linux (using ufw):**
+**Windows, tighter rule for a single OpenClaw server:**
+
+```powershell
+New-NetFirewallRule -DisplayName "Office Buddies Proactive (OpenClaw Only)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5050 -RemoteAddress <OPENCLAW_SERVER_IP>
+```
+
+**Linux with `ufw`:**
 
 ```bash
 sudo ufw allow from 100.64.0.0/10 to any port 5050 proto tcp
 ```
 
-**For macOS:**
+**macOS:**
+
 Check **System Settings > Network > Firewall > Options** and ensure Office Buddies is allowed to receive incoming connections.
 
-### C. Sending Messages (For Developers/Agents)
+Do not open port `5050` to the public internet.
 
-The agent sends a POST request to: `http://<CLIENT_TAILSCALE_IP>:5050/notify`.
+### E. Sending Messages
 
-**Using the included Skill:**
-We have included a ready-to-use OpenClaw Skill to make this integration seamless. You can find it at [`skills/office-buddies/SKILL.md`](skills/office-buddies/SKILL.md).
+OpenClaw sends proactive messages to:
 
-To use it:
+```text
+http://<TAILSCALE_IP_DESKTOP>:5050/notify
+```
 
-1. Copy the `skills/office-buddies` folder to your OpenClaw workspace.
-2. Your agent will now have the `notify_desktop` tool available.
+The included skill lives at [`skills/office-buddies/SKILL.md`](../../skills/office-buddies/SKILL.md).
 
-**Payload Example (Manual):**
+Manual payload example:
 
 ```json
 {
@@ -105,34 +202,77 @@ To use it:
 }
 ```
 
-_Note: `loop` defaults to `true` if an animation is provided._
+---
+
+## 5. Troubleshooting by Symptom
+
+### `connection refused`
+
+Most likely causes:
+
+- No listener is running.
+- The destination IP is wrong.
+- The destination port is wrong.
+
+What to check:
+
+- Re-enable the listener in Office Buddies.
+- Re-run `netstat -ano | findstr :5050`.
+- Confirm OpenClaw is calling `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
+
+### `timeout`
+
+Most likely causes:
+
+- Firewall is blocking inbound TCP `5050`.
+- Tailscale routing is missing or broken.
+- The app is bound only to `127.0.0.1:5050`.
+
+What to check:
+
+- Re-run `tailscale ip -4` on the desktop.
+- Test TCP from the server with `nc -vz <TAILSCALE_IP_DESKTOP> 5050`.
+- Review firewall rules and keep them limited to `100.64.0.0/10` or `<OPENCLAW_SERVER_IP>`.
+- If `netstat` shows only `127.0.0.1:5050`, use the listener restart flow or `portproxy`.
+
+### `404` on `/health`
+
+This can be normal depending on the implementation. Do not use it as the primary success signal for proactive desktop delivery.
+
+Use this instead:
+
+```bash
+curl -m 5 -X POST http://<TAILSCALE_IP_DESKTOP>:5050/notify \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Final verification","animation":"GetAttention"}'
+```
+
+### Buttons do not respond
+
+The feedback loop requires the **OpenClaw** provider to remain active in Office Buddies. Button clicks are forwarded back as messages prefixed with `[Office Buddies Action]`.
+
+### Final success criteria
+
+The setup is healthy only when both conditions are true:
+
+- `POST /notify` returns `{"status":"ok"}`
+- The message appears on the desktop
 
 ---
 
-## 4. Troubleshooting
+## 6. Security Note
 
-| Issue                                 | Solution                                                                                                                                                                                |
-| :------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Connection Refused**                | Verify the Firewall rule (Step 3-B). Run `netstat -ano                                                                                                                                  | findstr :5050`to ensure the app is listening on`0.0.0.0:5050`. |
-| **Timeout on Test**                   | Ensure the client device is active on Tailscale. Use `Test-NetConnection -ComputerName <CLIENT_IP> -Port 5050` in PowerShell to verify connectivity.                                    |
-| **Chat window opens on notification** | Ensure you are running the latest version of Office Buddies (`git pull`). Notifications are designed to appear in the classic speech balloon only.                                      |
-| **Buttons don't respond**             | Feedback loop requires the **OpenClaw Provider** to be active and correctly configured in the Model tab. The response will appear as a message prefixed with `[Office Buddies Action]`. |
+- Never expose port `5050` to the public internet.
+- Restrict inbound access to `100.64.0.0/10` or, ideally, to `<OPENCLAW_SERVER_IP>` only.
+- Never commit or publish real IPs, domains, tokens, phone numbers, user IDs, account IDs, or screenshots with sensitive values.
 
 ---
 
-## 5. Security Note
+## 7. Smart Reminders and Commands
 
-- **No Public Exposure:** Port 5050 is never exposed to the internet.
-- **Restricted Access:** The `-RemoteAddress 100.64.0.0/10` flag ensures that only devices in your private Tailnet can send notifications to your desktop.
-- **Privacy:** Your Tailscale IP is never hardcoded in the repository or public documentation.
+Since Office Buddies extends your OpenClaw agent, you can use natural language in chat to schedule tasks such as:
 
----
+- "Remind me to wash the dishes at 16:46"
+- "Schedule a morning summary every day at 8:00 AM"
 
-## 6. Smart Reminders & Commands
-
-Since Office Buddies is an extension of your OpenClaw agent, you can type natural language commands in the chat window to schedule tasks:
-
-- _"Remind me to wash the dishes at 16:46"_
-- _"Schedule a morning summary every day at 8:00 AM"_
-
-The agent will use its internal `cron` tools to set these up. If you encounter issues with scheduling, ensure your OpenClaw Gateway is updated to the latest version.
+If scheduling behaves unexpectedly, verify that your OpenClaw gateway is updated and healthy before troubleshooting the proactive delivery path.

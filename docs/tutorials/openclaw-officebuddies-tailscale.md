@@ -297,3 +297,90 @@ Since Office Buddies extends your OpenClaw agent, you can use natural language i
 - "Schedule a morning summary every day at 8:00 AM"
 
 If scheduling behaves unexpectedly, verify that your OpenClaw gateway is updated and healthy before troubleshooting the proactive delivery path.
+
+## 8. Reminder Contract and Cron Examples
+
+For reminder-style notifications, standardize on a desktop-first router contract with mandatory WhatsApp fallback.
+
+Required reminder fields:
+
+- `id`
+- `priority`
+- `userMessage`
+- `whatsappTarget` in E.164 format
+
+Example contract:
+
+```json
+{
+  "id": "reminder-123",
+  "priority": "high",
+  "userMessage": "Time to join your planning call.",
+  "whatsappTarget": "<WHATSAPP_TARGET_E164>"
+}
+```
+
+Delivery rules:
+
+- Always try Office Buddies first.
+- If desktop delivery fails, send the same clean `userMessage` to WhatsApp using `whatsappTarget`.
+- If `whatsappTarget` is missing or invalid, fail fast with a configuration error in the log.
+- Never send technical text to the user.
+
+Use the existing Office Buddies skill at [`skills/office-buddies/SKILL.md`](../../skills/office-buddies/SKILL.md).
+
+### Cron Example: One-Shot Reminder
+
+```bash
+openclaw cron add \
+  --name "Planning call reminder" \
+  --at "2026-03-29T14:00:00Z" \
+  --session isolated \
+  --message "Use the office-buddies skill. Deliver this reminder using desktop-first with mandatory WhatsApp fallback. Only send the userMessage field to the user. Log a configuration error if whatsappTarget is missing or invalid.
+
+  {
+    \"id\": \"reminder-123\",
+    \"priority\": \"high\",
+    \"userMessage\": \"Time to join your planning call.\",
+    \"whatsappTarget\": \"<WHATSAPP_TARGET_E164>\"
+  }" \
+  --no-deliver
+```
+
+### Cron Example: Recurring Reminder
+
+```bash
+openclaw cron add \
+  --name "Daily standup reminder" \
+  --cron "45 8 * * 1-5" \
+  --tz "Europe/Budapest" \
+  --session isolated \
+  --message "Use the office-buddies skill. Deliver this reminder using desktop-first with mandatory WhatsApp fallback. Only send the userMessage field to the user. Log a configuration error if whatsappTarget is missing or invalid.
+
+  {
+    \"id\": \"daily-standup\",
+    \"priority\": \"normal\",
+    \"userMessage\": \"Daily standup starts in 15 minutes.\",
+    \"whatsappTarget\": \"<WHATSAPP_TARGET_E164>\"
+  }" \
+  --no-deliver
+```
+
+These examples intentionally keep `--session isolated` and `--no-deliver` so the cron job runs in a dedicated session and the agent controls the desktop-first plus WhatsApp fallback logic itself.
+
+## 9. Minimum Validation Matrix
+
+Validate these three cases whenever you change reminder routing behavior:
+
+1. Desktop ok, no fallback:
+   - `notify_desktop` returns success.
+   - WhatsApp is not called.
+   - The user sees only `userMessage`.
+2. Desktop fails, WhatsApp ok:
+   - Desktop delivery fails with a classified cause such as `timeout` or `refused`.
+   - The same `userMessage` is sent to `whatsappTarget`.
+   - The user does not see technical diagnostics.
+3. Desktop fails, missing or invalid `whatsappTarget`:
+   - Routing stops with a clear configuration error in the log.
+   - No malformed WhatsApp send is attempted.
+   - The failure is operator-visible without exposing technical text to the user.

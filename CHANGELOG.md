@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.12] - 2026-04-02
+
+### Fixed
+
+- Fixed OpenClaw remote chat setup so Office Buddies loads model IDs from the configured gateway instead of using stale hardcoded model names that newer OpenClaw servers reject as invalid.
+- Fixed the OpenClaw fallback model used by chat and proactive action feedback so requests default to the generic `openclaw` model ID instead of invalid legacy values.
+
 ## [0.6.11] - 2026-03-29
 
 ### Fixed

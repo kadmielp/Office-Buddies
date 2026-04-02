@@ -3,13 +3,7 @@ import { MessageRecord } from "../types/interfaces";
 
 export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
-export const OPENCLAW_DEFAULT_MODEL = "google-antigravity/gemini-3-flash";
-export const OPENCLAW_STATIC_MODELS = [
-  "google-antigravity/gemini-3-flash",
-  "google-antigravity/claude-opus-4-6-thinking",
-  "google-antigravity/claude-sonnet-4-6",
-  "openai-codex/gpt-5.3-codex",
-];
+export const OPENCLAW_DEFAULT_MODEL = "openclaw";
 
 type RemoteProvider = "openai" | "gemini" | "maritaca" | "openclaw";
 const DEFAULT_REMOTE_MAX_TOKENS = 512;
@@ -228,7 +222,33 @@ export async function fetchRemoteProviderModels(
   settings: SettingsState,
 ): Promise<string[]> {
   if (provider === "openclaw") {
-    return OPENCLAW_STATIC_MODELS;
+    if (!settings.openclawEndpoint?.trim()) {
+      return [OPENCLAW_DEFAULT_MODEL];
+    }
+
+    let baseUrl = ensureProtocol(settings.openclawEndpoint).replace(/\/+$/, "");
+    if (!baseUrl.endsWith("/v1")) {
+      baseUrl += "/v1";
+    }
+
+    try {
+      const payload = await fetchJson(`${baseUrl}/models`, {
+        Authorization: `Bearer ${settings.openclawApiKey || ""}`,
+      });
+
+      const models = ((payload?.data as Array<any>) || [])
+        .map((item) => item?.id)
+        .filter((id) => typeof id === "string")
+        .sort();
+
+      if (models.length > 0) {
+        return models;
+      }
+    } catch {
+      // Fall back to the generic gateway model id when model discovery is unavailable.
+    }
+
+    return [OPENCLAW_DEFAULT_MODEL];
   }
 
   if (provider === "openai") {

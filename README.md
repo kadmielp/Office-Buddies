@@ -83,6 +83,8 @@ Configure providers in `Settings > Model`.
 
 Remote provider requests are executed in the Electron main process via IPC.
 
+On Windows, provider settings are stored locally in `%APPDATA%\Office Buddies\config.json`. The OpenClaw endpoint is readable there, while sensitive keys such as `openclawApiKey` are stored encrypted by Electron safe storage.
+
 ## Connections and Knowledge
 
 Configure this area in `Settings > Knowledge`.

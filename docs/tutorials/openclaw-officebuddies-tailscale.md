@@ -272,6 +272,21 @@ curl -m 5 -X POST http://<TAILSCALE_IP_DESKTOP>:5050/notify \
 
 The feedback loop requires the **OpenClaw** provider to remain active in Office Buddies. Button clicks are forwarded back as messages prefixed with `[Office Buddies Action]`.
 
+### `401 Unauthorized` or `403 missing scope`
+
+Most likely causes:
+
+- Office Buddies is still using an old or incorrect OpenClaw credential.
+- The OpenClaw server was reinstalled or rotated auth state, invalidating the previously saved credential.
+- The saved bearer token is valid for a different OpenClaw auth flow and does not include the required scope.
+
+What to check:
+
+- Open `Settings > Model` and re-enter the OpenClaw endpoint and API key.
+- On Windows, confirm the locally saved settings in `%APPDATA%\Office Buddies\config.json`.
+- Verify that `openclawEndpoint` points to the current Gateway URL.
+- If needed, clear and re-enter the saved OpenClaw key before retrying.
+
 ### Final success criteria
 
 The setup is healthy only when both conditions are true:

@@ -16,6 +16,7 @@ import {
 } from "./windows";
 import { IpcMessages } from "../shared/ipc-messages";
 import { getModelManager } from "./model-manager";
+import { OPENCLAW_DEFAULT_MODEL } from "./remote-ai";
 import { getStateManager } from "./state";
 import { getChatManager } from "./chats";
 import { ChatWithMessages, MessageReference } from "../types/interfaces";
@@ -285,7 +286,7 @@ export function setupIpcListeners() {
               Authorization: `Bearer ${settings.openclawApiKey || ""}`,
             },
             body: JSON.stringify({
-              model: settings.remoteModel || "default",
+              model: settings.remoteModel || OPENCLAW_DEFAULT_MODEL,
               messages: [
                 {
                   role: "user",

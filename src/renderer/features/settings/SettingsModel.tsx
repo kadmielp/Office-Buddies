@@ -120,14 +120,7 @@ export const SettingsModel: React.FC = () => {
       (selectedProvider === "maritaca" && !!settings.maritacaApiKey?.trim()) ||
       (selectedProvider === "openclaw" && !!settings.openclawEndpoint?.trim());
 
-    // In OpenClaw, if we have endpoint, we always show the static models
-    if (
-      selectedProvider === "openclaw" &&
-      !!settings.openclawEndpoint?.trim()
-    ) {
-      // In a real app we might want to fetch, but we know the Gateway models
-      // and we just updated the main process to return static ones.
-    } else if (!hasApiKey) {
+    if (!hasApiKey) {
       setRemoteModelOptions([]);
       setRemoteModelsError("");
       return;
@@ -183,6 +176,8 @@ export const SettingsModel: React.FC = () => {
     settings.openAiApiKey,
     settings.geminiApiKey,
     settings.maritacaApiKey,
+    settings.openclawEndpoint,
+    settings.openclawApiKey,
     settings.remoteModel,
   ]);
 

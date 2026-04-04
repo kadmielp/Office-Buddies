@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+## [0.6.13] - 2026-04-05
+
+### Changed
+
+- Upgraded the packaged Electron runtime and refreshed transitive Vite bundler dependencies to clear the shipped Electron, Rollup, and Picomatch security advisories without changing the app's build flow.
+
+### Fixed
+
+- Fixed GitHub Actions installs by aligning the ESLint toolchain on ESLint 9 so `npm ci` succeeds again in CI and release workflows.
+- Fixed production dependency auditing by overriding vulnerable transitive packages used by document parsing and local-model support, bringing production audit results back to zero known vulnerabilities.
+
 ## [0.6.12] - 2026-04-02
 
 ### Fixed

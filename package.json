@@ -1,7 +1,7 @@
 {
   "name": "office-buddies",
   "productName": "Office Buddies",
-  "version": "0.6.12",
+  "version": "0.6.13",
   "description": "Office Buddies",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "electron": "39.8.6",
-    "eslint": "^10.0.1",
+    "eslint": "^9.39.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",

@@ -65,6 +65,9 @@
     "update-electron-app": "^3.1.1"
   },
   "overrides": {
-    "@electron/windows-sign": "2.0.2"
+    "@electron/windows-sign": "2.0.2",
+    "@xmldom/xmldom": "0.8.12",
+    "simple-git": "3.33.0",
+    "tar": "7.5.13"
   }
 }

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.14] - 2026-04-05
+
+### Changed
+
+- Updated the GitHub release workflow to publish tag builds as visible releases instead of draft-only releases.
+
+### Fixed
+
+- Fixed the Ubuntu release job by installing the Linux packaging tools required for Electron Forge `.deb` and `.rpm` makers before running `npm run make`.
+
 ## [0.6.13] - 2026-04-05
 
 ### Changed

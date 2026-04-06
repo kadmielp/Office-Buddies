@@ -53,6 +53,11 @@ body {
   gap: 6px;
 }
 
+.right-panel-footer {
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
 .field-row-stacked {
   display: flex;
   flex-direction: column;
@@ -148,6 +153,22 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.frame-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.frame-action-grid button {
+  width: 100%;
+  min-width: 0;
+}
+
+.frame-action-grid > * {
+  margin-top: 0;
 }
 
 .sound-row {

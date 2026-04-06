@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Polished the Animation Studio frame editor by moving the save action under the editor, reorganizing frame buttons into a clearer two-column layout, and keeping the select-all toggle label consistent during re-renders.
+
 ## [0.6.14] - 2026-04-05
 
 ### Changed

@@ -126,6 +126,19 @@ function updateSequenceCaptureToggle() {
     : "Enable to append frames while clicking map cells";
 }
 
+function updateSelectAllFramesToggle() {
+  const frames = getCurrentFrames();
+  const selectedCount = new Set(
+    (state.selectedFrameIndices || []).filter(
+      (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+    ),
+  ).size;
+  const allSelected = frames.length > 0 && selectedCount === frames.length;
+  elements.selectAllFramesBtn.textContent = allSelected
+    ? "❖ Deselect all"
+    : "❖ Select All";
+}
+
 async function fetchJson(endpoint, options) {
   const response = await fetch(endpoint, options);
   const data = await response.json();
@@ -709,6 +722,8 @@ function renderFrameList() {
     state.selectedFrameIndices = [state.selectedFrameIndex];
   }
 
+  updateSelectAllFramesToggle();
+
   frames.forEach((frame, index) => {
     const option = document.createElement("option");
     option.value = String(index);
@@ -1261,9 +1276,8 @@ function bindEvents() {
       .sort((a, b) => a - b);
 
     state.selectedFrameIndices = selected;
-    state.selectedFrameIndex = selected.length
-      ? selected[0]
-      : Number(elements.frameList.value);
+    state.selectedFrameIndex = selected.length ? selected[0] : -1;
+    updateSelectAllFramesToggle();
     renderFrameEditor();
     drawMap();
     renderAnimationPreview(state.selectedFrameIndex);
@@ -1482,6 +1496,22 @@ function bindEvents() {
     if (!frames.length) {
       return;
     }
+
+    const allSelected =
+      new Set(
+        (state.selectedFrameIndices || []).filter(
+          (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+        ),
+      ).size === frames.length;
+
+    if (allSelected) {
+      state.selectedFrameIndices = [];
+      state.selectedFrameIndex = -1;
+      renderFrameList();
+      setStatus(`Deselected ${frames.length} frame(s)`);
+      return;
+    }
+
     state.selectedFrameIndices = frames.map((_, i) => i);
     state.selectedFrameIndex = 0;
     renderFrameList();

@@ -16,6 +16,7 @@
   selectedLibrarySoundId: "",
   historyStack: [],
   redoStack: [],
+  copiedFrames: [],
   lastSavedDefinitionJson: null,
   previewSoundEnabled: false,
   previewPathChoice: 0,
@@ -901,6 +902,67 @@ function getSelectedFrameIndices() {
   return [];
 }
 
+function copySelectedFramesToClipboard() {
+  const frames = getCurrentFrames();
+  const selected = getSelectedFrameIndices();
+  if (!selected.length) {
+    setStatus("Select at least 1 frame to copy");
+    return false;
+  }
+
+  state.copiedFrames = selected.map((index) => deepClone(frames[index]));
+  setStatus(`Copied ${state.copiedFrames.length} frame(s)`);
+  return true;
+}
+
+function pasteCopiedFramesFromClipboard() {
+  if (!state.selectedAnimation) {
+    setStatus("Select an animation first");
+    return false;
+  }
+
+  if (!Array.isArray(state.copiedFrames) || !state.copiedFrames.length) {
+    setStatus("Copy at least 1 frame first");
+    return false;
+  }
+
+  pushHistorySnapshot();
+  const frames = getCurrentFrames();
+  const selected = getSelectedFrameIndices();
+  const insertAt = selected.length
+    ? selected[selected.length - 1] + 1
+    : frames.length;
+  const clones = state.copiedFrames.map((frame) => deepClone(frame));
+  frames.splice(insertAt, 0, ...clones);
+
+  state.selectedFrameIndices = clones.map((_, i) => insertAt + i);
+  state.selectedFrameIndex = state.selectedFrameIndices[0] ?? -1;
+  renderFrameList();
+  setStatus(`Pasted ${clones.length} frame(s)`);
+  return true;
+}
+
+function shouldHandleFrameClipboardShortcut() {
+  const activeElement = document.activeElement;
+  if (
+    activeElement &&
+    activeElement !== elements.frameList &&
+    activeElement !== elements.animationList
+  ) {
+    const tagName = activeElement.tagName;
+    if (
+      activeElement.isContentEditable ||
+      tagName === "INPUT" ||
+      tagName === "TEXTAREA" ||
+      tagName === "SELECT"
+    ) {
+      return false;
+    }
+  }
+
+  return Boolean(state.selectedAnimation);
+}
+
 function clearFrameBranchFields(frame, editableBranchIndex) {
   if (!frame || typeof frame !== "object") {
     return;
@@ -1646,6 +1708,28 @@ function bindEvents() {
 
     renderFrameList();
     setStatus(`Removed ${selected.length} frame(s)`);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if ((!event.ctrlKey && !event.metaKey) || event.altKey) {
+      return;
+    }
+
+    if (!shouldHandleFrameClipboardShortcut()) {
+      return;
+    }
+
+    const key = event.key.toLowerCase();
+    if (key === "c") {
+      event.preventDefault();
+      copySelectedFramesToClipboard();
+      return;
+    }
+
+    if (key === "v") {
+      event.preventDefault();
+      pasteCopiedFramesFromClipboard();
+    }
   });
 
   elements.moveUpBtn.addEventListener("click", () => {

@@ -122,25 +122,51 @@
                   <select id="frameList" size="14" multiple></select>
                 </div>
                 <div class="field-row-stacked">
-                  <label for="durationInput">Duration (ms)</label>
-                  <input id="durationInput" type="number" min="0" step="10" />
+                  <div class="frame-input-grid">
+                    <div class="frame-input-field">
+                      <label for="durationInput">Duration (ms)</label>
+                      <input
+                        id="durationInput"
+                        type="number"
+                        min="0"
+                        step="10"
+                      />
+                    </div>
 
-                  <label for="soundSelect">Sound</label>
-                  <div class="field-row sound-row">
-                    <select id="soundSelect"></select>
-                    <button id="playFrameSoundBtn" type="button">⯈ Play</button>
+                    <div class="frame-input-field">
+                      <label for="soundSelect">Sound</label>
+                      <div class="field-row sound-row">
+                        <select id="soundSelect"></select>
+                        <button id="playFrameSoundBtn" type="button">
+                          ⯈
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  <label for="exitBranchInput">Exit Branch</label>
-                  <input id="exitBranchInput" type="number" min="0" step="1" />
+                  <div class="frame-input-grid">
+                    <div class="frame-input-field">
+                      <label for="exitBranchInput">Exit Branch</label>
+                      <input
+                        id="exitBranchInput"
+                        type="number"
+                        min="0"
+                        step="1"
+                      />
+                    </div>
 
-                  <label for="branchFrameIndexInput">Branch Frame Index</label>
-                  <input
-                    id="branchFrameIndexInput"
-                    type="number"
-                    min="0"
-                    step="1"
-                  />
+                    <div class="frame-input-field">
+                      <label for="branchFrameIndexInput"
+                        >Branch Frame Index</label
+                      >
+                      <input
+                        id="branchFrameIndexInput"
+                        type="number"
+                        min="0"
+                        step="1"
+                      />
+                    </div>
+                  </div>
 
                   <label for="weightInput">Weight (%)</label>
                   <input

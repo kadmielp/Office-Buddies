@@ -304,33 +304,72 @@ function getPreviewPathProbability(frameIndex, optionIndex = null) {
   return 0;
 }
 
-function getDisplayedPreviewProbability(currentFrameIndex) {
+function getPreviewPathTargetFrameIndex(frameIndex, optionIndex = null) {
   const frames = getCurrentFrames();
   if (!frames.length) {
+    return -1;
+  }
+
+  const options = getPreviewPathOptions(frameIndex);
+  if (!options.length) {
+    return (frameIndex + 1) % frames.length;
+  }
+
+  const choice = Number.isInteger(optionIndex)
+    ? optionIndex
+    : Number(state.previewPathChoice);
+  const boundedChoice =
+    Number.isInteger(choice) && choice >= 0 && choice < options.length ? choice : 0;
+  return options[boundedChoice]?.frameIndex ?? -1;
+}
+
+function getDisplayedPreviewProbability(currentFrameIndex) {
+  const frames = getCurrentFrames();
+  if (!frames.length || currentFrameIndex < 0 || currentFrameIndex >= frames.length) {
     return null;
   }
 
-  if (
+  const startIndex =
     Number.isInteger(state.selectedFrameIndex) &&
     state.selectedFrameIndex >= 0 &&
     state.selectedFrameIndex < frames.length
-  ) {
-    return getPreviewPathProbability(state.selectedFrameIndex);
+      ? state.selectedFrameIndex
+      : currentFrameIndex;
+
+  let cursor = startIndex;
+  let cumulativeProbability = 100;
+  const visited = new Set();
+
+  while (!visited.has(cursor)) {
+    visited.add(cursor);
+
+    const localProbability = getPreviewPathProbability(cursor);
+    if (Number.isFinite(localProbability)) {
+      cumulativeProbability = (cumulativeProbability * localProbability) / 100;
+    }
+
+    if (cursor === currentFrameIndex) {
+      return Math.round(cumulativeProbability * 100) / 100;
+    }
+
+    const nextFrameIndex = getPreviewPathTargetFrameIndex(cursor);
+    if (
+      !Number.isInteger(nextFrameIndex) ||
+      nextFrameIndex < 0 ||
+      nextFrameIndex >= frames.length
+    ) {
+      break;
+    }
+
+    cursor = nextFrameIndex;
   }
 
-  return getPreviewPathProbability(currentFrameIndex);
+  return null;
 }
 
 function getAnimationPathChoiceCount() {
-  const frames = getCurrentFrames();
-  let maxOptions = 1;
-  for (let i = 0; i < frames.length; i += 1) {
-    const count = getPreviewPathOptions(i).length;
-    if (count > maxOptions) {
-      maxOptions = count;
-    }
-  }
-  return Math.max(1, maxOptions);
+  const count = getPreviewPathOptions(state.selectedFrameIndex).length;
+  return Math.max(1, count);
 }
 
 function getActiveEditableBranchIndex() {
@@ -338,10 +377,6 @@ function getActiveEditableBranchIndex() {
   const branches = Array.isArray(frame?.branching?.branches)
     ? frame.branching.branches
     : [];
-  if (!branches.length) {
-    return 0;
-  }
-
   const options = getPreviewPathOptions(state.selectedFrameIndex);
   const choice = Number(state.previewPathChoice);
   if (Number.isInteger(choice) && choice >= 0 && choice < options.length) {
@@ -354,6 +389,10 @@ function getActiveEditableBranchIndex() {
         0,
         Math.min(selectedOption.branchIndex, branches.length - 1),
       );
+    }
+
+    if (selectedOption?.kind === "exit" || selectedOption?.kind === "next") {
+      return branches.length;
     }
   }
 

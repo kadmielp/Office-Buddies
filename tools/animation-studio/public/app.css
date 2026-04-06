@@ -167,13 +167,49 @@ textarea {
 }
 
 .sound-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px;
   align-items: center;
   gap: 6px;
 }
 
+.sound-row > * {
+  margin: 0;
+}
+
 .sound-row select {
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
+}
+
+.sound-row button {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+}
+
+.frame-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.frame-input-grid > * {
+  margin-top: 0;
+}
+
+.frame-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.frame-input-field input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .branch-selector {

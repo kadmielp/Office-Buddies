@@ -1612,19 +1612,7 @@ clippy.ready("Genius", {
               1240,
               372
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 2,
-                weight: 75
-              },
-              {
-                frameIndex: 5,
-                weight: 10
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 350,
@@ -1641,7 +1629,7 @@ clippy.ready("Genius", {
           branching: {
             branches: [
               {
-                frameIndex: 3,
+                frameIndex: 2,
                 weight: 80
               },
               {
@@ -1649,7 +1637,8 @@ clippy.ready("Genius", {
                 weight: 3
               }
             ]
-          }
+          },
+          exitBranch: 4
         },
         {
           duration: 450,
@@ -1695,7 +1684,7 @@ clippy.ready("Genius", {
           branching: {
             branches: [
               {
-                frameIndex: 5,
+                frameIndex: 2,
                 weight: 60
               },
               {

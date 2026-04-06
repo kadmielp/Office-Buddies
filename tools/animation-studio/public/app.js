@@ -41,6 +41,7 @@ const elements = {
   animationList: document.getElementById("animationList"),
   newAnimationBtn: document.getElementById("newAnimationBtn"),
   renameAnimationBtn: document.getElementById("renameAnimationBtn"),
+  duplicateAnimationBtn: document.getElementById("duplicateAnimationBtn"),
   deleteAnimationBtn: document.getElementById("deleteAnimationBtn"),
   mapMeta: document.getElementById("mapMeta"),
   selectedCell: document.getElementById("selectedCell"),
@@ -1395,6 +1396,42 @@ function bindEvents() {
     state.payload.definition.animations = renamed;
     selectAnimation(nextName);
     setStatus(`Renamed ${currentName} -> ${nextName}`);
+  });
+
+  elements.duplicateAnimationBtn.addEventListener("click", () => {
+    if (!state.payload || !state.selectedAnimation) {
+      return;
+    }
+
+    const sourceName = state.selectedAnimation;
+    const duplicateName = window.prompt(
+      "Duplicate animation as",
+      `${sourceName}_Copy`,
+    );
+    if (!duplicateName) {
+      return;
+    }
+    if (!/^[A-Za-z0-9_]+$/.test(duplicateName)) {
+      setStatus(
+        "Use only letters, numbers, and underscore for animation names",
+      );
+      return;
+    }
+    if (duplicateName === sourceName) {
+      setStatus("Duplicate name must be different");
+      return;
+    }
+
+    const animations = getAnimationsObject();
+    if (animations[duplicateName]) {
+      setStatus("Animation name already exists");
+      return;
+    }
+
+    pushHistorySnapshot();
+    animations[duplicateName] = deepClone(animations[sourceName]);
+    selectAnimation(duplicateName);
+    setStatus(`Duplicated ${sourceName} -> ${duplicateName}`);
   });
 
   elements.deleteAnimationBtn.addEventListener("click", () => {

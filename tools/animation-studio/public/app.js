@@ -1575,19 +1575,37 @@ function bindEvents() {
 
   elements.removeFrameBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
-    if (
-      state.selectedFrameIndex < 0 ||
-      state.selectedFrameIndex >= frames.length
-    ) {
+    const selected = Array.from(
+      new Set(
+        (state.selectedFrameIndices || []).filter(
+          (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+        ),
+      ),
+    ).sort((a, b) => b - a);
+
+    if (!selected.length) {
       return;
     }
 
     pushHistorySnapshot();
-    frames.splice(state.selectedFrameIndex, 1);
-    state.selectedFrameIndex = Math.max(0, state.selectedFrameIndex - 1);
-    state.selectedFrameIndices = [state.selectedFrameIndex];
+    for (const index of selected) {
+      frames.splice(index, 1);
+    }
+
+    if (frames.length === 0) {
+      state.selectedFrameIndex = -1;
+      state.selectedFrameIndices = [];
+    } else {
+      const nextIndex = Math.max(
+        0,
+        Math.min(selected[selected.length - 1], frames.length - 1),
+      );
+      state.selectedFrameIndex = nextIndex;
+      state.selectedFrameIndices = [nextIndex];
+    }
+
     renderFrameList();
-    setStatus("Frame removed");
+    setStatus(`Removed ${selected.length} frame(s)`);
   });
 
   elements.frameList.addEventListener("keydown", (event) => {
@@ -1632,30 +1650,36 @@ function bindEvents() {
 
   elements.moveUpBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
-    const i = state.selectedFrameIndex;
-    if (i <= 0 || i >= frames.length) {
+    const selected = getSelectedFrameIndices();
+    if (!selected.length || selected[0] <= 0) {
       return;
     }
 
     pushHistorySnapshot();
-    [frames[i - 1], frames[i]] = [frames[i], frames[i - 1]];
-    state.selectedFrameIndex = i - 1;
-    state.selectedFrameIndices = [state.selectedFrameIndex];
+    selected.forEach((index) => {
+      [frames[index - 1], frames[index]] = [frames[index], frames[index - 1]];
+    });
+    state.selectedFrameIndices = selected.map((index) => index - 1);
+    state.selectedFrameIndex = state.selectedFrameIndices[0];
     renderFrameList();
+    setStatus(`Moved ${selected.length} frame(s) up`);
   });
 
   elements.moveDownBtn.addEventListener("click", () => {
     const frames = getCurrentFrames();
-    const i = state.selectedFrameIndex;
-    if (i < 0 || i >= frames.length - 1) {
+    const selected = getSelectedFrameIndices();
+    if (!selected.length || selected[selected.length - 1] >= frames.length - 1) {
       return;
     }
 
     pushHistorySnapshot();
-    [frames[i], frames[i + 1]] = [frames[i + 1], frames[i]];
-    state.selectedFrameIndex = i + 1;
-    state.selectedFrameIndices = [state.selectedFrameIndex];
+    [...selected].reverse().forEach((index) => {
+      [frames[index], frames[index + 1]] = [frames[index + 1], frames[index]];
+    });
+    state.selectedFrameIndices = selected.map((index) => index + 1);
+    state.selectedFrameIndex = state.selectedFrameIndices[0];
     renderFrameList();
+    setStatus(`Moved ${selected.length} frame(s) down`);
   });
 
   elements.selectAllFramesBtn.addEventListener("click", () => {

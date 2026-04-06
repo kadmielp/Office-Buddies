@@ -38,7 +38,10 @@
               <fieldset class="animation-preview">
                 <legend>Animation Preview</legend>
                 <div class="animation-preview-wrap sunken-panel">
-                  <span id="previewFrameText">Frame: -</span>
+                  <div class="animation-preview-overlay">
+                    <span id="previewFrameText">Frame: -</span>
+                    <span id="previewProbabilityText">Prob: -</span>
+                  </div>
                   <canvas id="animationPreviewCanvas"></canvas>
                 </div>
                 <div class="preview-controls">

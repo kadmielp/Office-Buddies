@@ -13,6 +13,7 @@
   activeTab: "frames",
   previewTimer: null,
   previewFrameIndex: 0,
+  previewStartFrameIndex: 0,
   selectedLibrarySoundId: "",
   historyStack: [],
   redoStack: [],
@@ -35,6 +36,8 @@ const elements = {
   togglePreviewSoundBtn: document.getElementById("togglePreviewSoundBtn"),
   previewFrameText: document.getElementById("previewFrameText"),
   previewProbabilityText: document.getElementById("previewProbabilityText"),
+  framePreviewCanvas: document.getElementById("framePreviewCanvas"),
+  framePreviewText: document.getElementById("framePreviewText"),
   framesTabBtn: document.getElementById("framesTabBtn"),
   soundsTabBtn: document.getElementById("soundsTabBtn"),
   framesTabContent: document.getElementById("framesTabContent"),
@@ -83,6 +86,7 @@ const elements = {
 
 const mapCtx = elements.mapCanvas.getContext("2d");
 const previewCtx = elements.animationPreviewCanvas.getContext("2d");
+const framePreviewCtx = elements.framePreviewCanvas.getContext("2d");
 
 function setStatus(text) {
   elements.statusText.textContent = text;
@@ -330,10 +334,10 @@ function getDisplayedPreviewProbability(currentFrameIndex) {
   }
 
   const startIndex =
-    Number.isInteger(state.selectedFrameIndex) &&
-    state.selectedFrameIndex >= 0 &&
-    state.selectedFrameIndex < frames.length
-      ? state.selectedFrameIndex
+    Number.isInteger(state.previewStartFrameIndex) &&
+    state.previewStartFrameIndex >= 0 &&
+    state.previewStartFrameIndex < frames.length
+      ? state.previewStartFrameIndex
       : currentFrameIndex;
 
   let cursor = startIndex;
@@ -450,35 +454,24 @@ function stopAnimationPreview() {
   updatePreviewPlayToggle();
 }
 
-function renderAnimationPreview(frameIndex = 0) {
-  if (!state.payload) {
-    return;
-  }
-
-  const [fw, fh] = state.payload.frameSize;
+function drawPreviewFrame(canvas, ctx, frameIndex = 0) {
+  const [fw, fh] = state.payload?.frameSize || [128, 128];
   const frames = getCurrentFrames();
-  const bounded = Math.max(
-    0,
-    Math.min(frameIndex, Math.max(0, frames.length - 1)),
-  );
-  state.previewFrameIndex = bounded;
-
-  elements.animationPreviewCanvas.width = fw;
-  elements.animationPreviewCanvas.height = fh;
-  previewCtx.clearRect(0, 0, fw, fh);
-  previewCtx.fillStyle = "#1f1f1f";
-  previewCtx.fillRect(0, 0, fw, fh);
+  canvas.width = fw;
+  canvas.height = fh;
+  ctx.clearRect(0, 0, fw, fh);
+  ctx.fillStyle = "#1f1f1f";
+  ctx.fillRect(0, 0, fw, fh);
 
   if (!frames.length || !state.mapImage) {
-    elements.previewFrameText.textContent = "Frame: -";
-    elements.previewProbabilityText.textContent = "Prob: -";
-    return;
+    return -1;
   }
 
+  const bounded = Math.max(0, Math.min(frameIndex, frames.length - 1));
   const frame = frames[bounded];
   const coordsList = getFrameImageCoordsList(frame);
   for (const coords of coordsList) {
-    previewCtx.drawImage(
+    ctx.drawImage(
       state.mapImage,
       coords.x,
       coords.y,
@@ -489,6 +482,38 @@ function renderAnimationPreview(frameIndex = 0) {
       fw,
       fh,
     );
+  }
+
+  return bounded;
+}
+
+function renderSelectedFramePreview() {
+  const bounded = drawPreviewFrame(
+    elements.framePreviewCanvas,
+    framePreviewCtx,
+    state.selectedFrameIndex,
+  );
+  elements.framePreviewText.textContent = Number.isInteger(bounded) && bounded >= 0
+    ? `Frame: ${bounded}`
+    : "Frame: -";
+}
+
+function renderAnimationPreview(frameIndex = 0) {
+  const bounded = drawPreviewFrame(
+    elements.animationPreviewCanvas,
+    previewCtx,
+    frameIndex,
+  );
+
+  if (bounded < 0) {
+    elements.previewFrameText.textContent = "Frame: -";
+    elements.previewProbabilityText.textContent = "Prob: -";
+    return;
+  }
+
+  state.previewFrameIndex = bounded;
+  if (!state.previewTimer) {
+    state.previewStartFrameIndex = bounded;
   }
 
   elements.previewFrameText.textContent = `Frame: ${bounded}`;
@@ -512,6 +537,7 @@ function playAnimationPreview(options = {}) {
     : Math.max(0, Math.min(state.previewFrameIndex, frames.length - 1));
 
   stopAnimationPreview();
+  state.previewStartFrameIndex = startIndex;
   let cursor = startIndex;
 
   const getNextFrameIndex = (currentIndex) => {
@@ -695,6 +721,7 @@ function restoreSnapshot(snapshot) {
     0,
     Number(snapshot.previewFrameIndex) || 0,
   );
+  state.previewStartFrameIndex = state.previewFrameIndex;
   state.previewPathChoice = 0;
 
   renderAnimationList();
@@ -948,6 +975,7 @@ function renderFrameList() {
   renderFrameEditor();
   renderPreviewPathSelector();
   drawMap();
+  renderSelectedFramePreview();
   renderAnimationPreview(state.previewFrameIndex);
 }
 
@@ -1236,6 +1264,7 @@ function selectAnimation(name) {
   const previousPreviewFrameIndex = state.previewFrameIndex;
   stopAnimationPreview();
   state.previewPathChoice = 0;
+  state.previewStartFrameIndex = previousPreviewFrameIndex;
   state.selectedAnimation = name;
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
@@ -1260,6 +1289,7 @@ async function loadAgent(name) {
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
   state.previewPathChoice = 0;
+  state.previewStartFrameIndex = 0;
   state.sequenceCaptureEnabled = false;
   state.selectedCell = null;
   state.mapZoom = 1;
@@ -1667,7 +1697,7 @@ function bindEvents() {
     updateSelectAllFramesToggle();
     renderFrameEditor();
     drawMap();
-    renderAnimationPreview(state.selectedFrameIndex);
+    renderSelectedFramePreview();
   });
 
   const applyFrameEditorChange = () => {

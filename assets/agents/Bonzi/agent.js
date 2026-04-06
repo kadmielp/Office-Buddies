@@ -1324,7 +1324,16 @@ clippy.ready("Bonzi", {
               0,
               0
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 1,
+                weight: 80
+              }
+            ]
+          },
+          exitBranch: 14
         },
         {
           duration: 100,
@@ -1442,7 +1451,160 @@ clippy.ready("Bonzi", {
               3200,
               800
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 28,
+                weight: 100
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ],
+          sound: "2"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              3040
+            ]
           ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              3040
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              3200
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              3200
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              3200
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              3200
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 1,
+                weight: 50
+              }
+            ]
+          },
+          exitBranch: 29
         },
         {
           duration: 100,
@@ -3398,146 +3560,6 @@ clippy.ready("Bonzi", {
         }
       ],
       useExitBranching: true
-    },
-    GetAttention2: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ],
-          sound: "2"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1600,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1800,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2000,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2200,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2400,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2600,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2800,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3000,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3200,
-              3040
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              3200
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              200,
-              3200
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              400,
-              3200
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              600,
-              3200
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
     },
     MoveRight: {
       frames: [

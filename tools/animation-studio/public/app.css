@@ -140,6 +140,10 @@ body {
   min-height: 0;
 }
 
+.frame-editor-column {
+  min-height: 0;
+}
+
 textarea {
   resize: vertical;
 }
@@ -312,6 +316,19 @@ textarea {
   height: auto;
 }
 
+.frame-preview-wrap {
+  min-height: 190px;
+  flex: 1 1 auto;
+}
+
+#framePreviewCanvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 100%;
+  max-height: 220px;
+  height: auto;
+}
+
 .animation-preview-overlay {
   position: absolute;
   top: 8px;
@@ -326,7 +343,8 @@ textarea {
 }
 
 #previewFrameText,
-#previewProbabilityText {
+#previewProbabilityText,
+#framePreviewText {
   position: static;
   min-width: 62px;
   height: 18px;

@@ -10,7 +10,9 @@ All notable changes to this project will be documented in this file.
 - Added Animation Studio session redo support and disabled the `Save`, `Undo`, and `Redo` buttons whenever there is nothing to do.
 - Polished the Animation Studio preview and tab layout with cleaner alignment, centered preview controls, an in-canvas frame counter, and roomier editor tabs.
 - Added animation-level duplication controls in Animation Studio and reorganized the animation action block into a tighter 2x2 layout.
+- Expanded Animation Studio frame multi-select editing so `Up`, `Down`, and `Delete` act on all selected frames together, matching the existing keyboard delete behavior.
 - Updated the bundled Genius assistant animation data with the latest frame, branch, and sound edits from Animation Studio.
+- Updated the bundled Merlin assistant animation data with the latest frame timing, branch, and image-sequence edits from Animation Studio.
 
 ## [0.6.14] - 2026-04-05
 

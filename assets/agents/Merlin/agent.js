@@ -651,6 +651,15 @@ clippy.ready("Merlin", {
           ]
         },
         {
+          duration: 1000,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ]
+        },
+        {
           duration: 100,
           images: [
             [
@@ -660,7 +669,31 @@ clippy.ready("Merlin", {
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              1152,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              768
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -904,9 +937,6 @@ clippy.ready("Merlin", {
               }
             ]
           }
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -1285,7 +1315,7 @@ clippy.ready("Merlin", {
     Writing: {
       frames: [
         {
-          duration: 100,
+          duration: 150,
           images: [
             [
               0,
@@ -1293,258 +1323,6 @@ clippy.ready("Merlin", {
             ]
           ],
           sound: "11"
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1792,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1920,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              2048,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              2176,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 400,
-          images: [
-            [
-              2304,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              1024,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              1920
-            ]
-          ],
-          sound: "29"
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              256,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              512,
-              1920
-            ]
-          ],
-          sound: "32"
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              640,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              896,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              640,
-              1920
-            ]
-          ],
-          sound: "32"
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              896,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1024,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 1000,
-          images: [
-            [
-              128,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 500,
-          images: [
-            [
-              256,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 1000,
-          images: [
-            [
-              128,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1920
-            ]
-          ],
-          sound: "30"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2432,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1920
-            ]
-          ]
-        }
-      ],
-      useExitBranching: true
-    },
-    Write: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ],
-          sound: "11",
-          branching: {
-            branches: [
-              {
-                frameIndex: 2,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
         },
         {
           duration: 200,
@@ -1684,11 +1462,156 @@ clippy.ready("Merlin", {
           branching: {
             branches: [
               {
-                frameIndex: 21,
-                weight: 100
+                frameIndex: 31,
+                weight: 20
               }
             ]
           }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              256,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              384,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 150,
+          images: [
+            [
+              512,
+              1920
+            ]
+          ],
+          sound: "29"
+        },
+        {
+          duration: 200,
+          images: [
+            [
+              640,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 150,
+          images: [
+            [
+              896,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 200,
+          images: [
+            [
+              384,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              640,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              512,
+              1920
+            ]
+          ],
+          sound: "32"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              896,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1920
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 17,
+                weight: 50
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
@@ -1726,9 +1649,6 @@ clippy.ready("Merlin", {
               1920
             ]
           ]
-        },
-        {
-          duration: 0
         }
       ]
     },
@@ -2447,68 +2367,6 @@ clippy.ready("Merlin", {
             ]
           ],
           sound: "28"
-        }
-      ],
-      useExitBranching: true
-    },
-    StartListening: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true
@@ -4408,194 +4266,6 @@ clippy.ready("Merlin", {
       ],
       useExitBranching: true
     },
-    Read: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1408
-            ]
-          ],
-          sound: "11"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              256,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              512,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              640,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              896,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1024,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              1152,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              1280,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1408
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 19,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1408
-            ]
-          ],
-          sound: "30"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2176,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2304,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
     Wave: {
       frames: [
         {
@@ -4743,7 +4413,22 @@ clippy.ready("Merlin", {
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              2304,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2176,
+              512
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -5782,204 +5467,6 @@ clippy.ready("Merlin", {
       ],
       useExitBranching: true
     },
-    WriteContinued: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              256,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              512,
-              1920
-            ]
-          ],
-          sound: "29"
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              640,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              896,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              384,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              640,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              512,
-              1920
-            ]
-          ],
-          sound: "32"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              896,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              1920
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 20,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1920
-            ]
-          ],
-          sound: "30"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
     Confused: {
       frames: [
         {
@@ -6269,7 +5756,7 @@ clippy.ready("Merlin", {
         }
       ]
     },
-    Search: {
+    Searching: {
       frames: [
         {
           duration: 100,
@@ -6664,84 +6151,6 @@ clippy.ready("Merlin", {
         }
       ]
     },
-    Hearing_4: {
-      frames: [
-        {
-          duration: 30,
-          images: [
-            [
-              1408,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 3250,
-          images: [
-            [
-              1536,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              2048
-            ],
-            [
-              1664,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1536,
-              2048
-            ],
-            [
-              1792,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              2048
-            ],
-            [
-              1664,
-              2048
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 1,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
     LookUpReturn: {
       frames: [
         {
@@ -6782,30 +6191,75 @@ clippy.ready("Merlin", {
         }
       ]
     },
-    Hearing_1: {
+    Listening: {
       frames: [
         {
-          duration: 30,
+          duration: 100,
           images: [
             [
-              2560,
-              2048
+              0,
+              0
             ]
           ]
         },
         {
-          duration: 3500,
+          duration: 100,
           images: [
             [
-              0,
-              2176
+              1536,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1792,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 2000,
+          images: [
+            [
+              2048,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              768
             ]
           ],
           branching: {
             branches: [
               {
-                frameIndex: 1,
-                weight: 10
+                frameIndex: 5,
+                weight: 20
               }
             ]
           }
@@ -6814,25 +6268,8 @@ clippy.ready("Merlin", {
           duration: 100,
           images: [
             [
-              0,
-              2176
-            ],
-            [
-              128,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              0,
-              2176
-            ],
-            [
-              256,
-              2176
+              1792,
+              768
             ]
           ]
         },
@@ -6840,22 +6277,19 @@ clippy.ready("Merlin", {
           duration: 100,
           images: [
             [
-              0,
-              2176
-            ],
+              1664,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
             [
-              128,
-              2176
+              1536,
+              768
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 1,
-                weight: 100
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -6863,6 +6297,59 @@ clippy.ready("Merlin", {
             [
               0,
               0
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 11,
+                weight: 5
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1792,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2176,
+              2304
             ]
           ]
         }
@@ -7030,220 +6517,6 @@ clippy.ready("Merlin", {
         }
       ],
       useExitBranching: true
-    },
-    Hearing_3: {
-      frames: [
-        {
-          duration: 30,
-          images: [
-            [
-              1664,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 3400,
-          images: [
-            [
-              1792,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              2176
-            ],
-            [
-              1920,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1792,
-              2176
-            ],
-            [
-              2048,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              2176
-            ],
-            [
-              1920,
-              2176
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 1,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    WriteReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ]
-          ],
-          sound: "30"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2432,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    Hearing_2: {
-      frames: [
-        {
-          duration: 30,
-          images: [
-            [
-              2176,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 3500,
-          images: [
-            [
-              2304,
-              2176
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 1,
-                weight: 10
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2304,
-              2176
-            ],
-            [
-              2432,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              2304,
-              2176
-            ],
-            [
-              2560,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2304,
-              2176
-            ],
-            [
-              2432,
-              2176
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 1,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
     },
     RestPose: {
       frames: [
@@ -7456,68 +6729,6 @@ clippy.ready("Merlin", {
         }
       ]
     },
-    Think: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              256
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              256
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1920,
-              256
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              2048,
-              256
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2176,
-              256
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ],
-      useExitBranching: true
-    },
     Blink: {
       frames: [
         {
@@ -7704,68 +6915,6 @@ clippy.ready("Merlin", {
           ]
         }
       ]
-    },
-    StopListening: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2176,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ],
-      useExitBranching: true
     },
     MoveDown: {
       frames: [
@@ -7972,220 +7121,6 @@ clippy.ready("Merlin", {
         }
       ],
       useExitBranching: true
-    },
-    ReadContinued: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              1280,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              640,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 200,
-          images: [
-            [
-              768,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              640,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              768,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              896,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 400,
-          images: [
-            [
-              1024,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 250,
-          images: [
-            [
-              896,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              1024,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1408
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 22,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1408
-            ]
-          ],
-          sound: "30"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2176,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2304,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
     },
     LookDown: {
       frames: [
@@ -8793,321 +7728,6 @@ clippy.ready("Merlin", {
               0
             ]
           ]
-        }
-      ],
-      useExitBranching: true
-    },
-    ReadReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2560,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1408
-            ]
-          ],
-          sound: "30"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2176,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2304,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    Searching: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              256,
-              512
-            ]
-          ],
-          sound: "11",
-          branching: {
-            branches: [
-              {
-                frameIndex: 3,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              256,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              512,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              640,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              896,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              1024,
-              512
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 10,
-                weight: 90
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              1024,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              1152,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              1280,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              1408,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 150,
-          images: [
-            [
-              1536,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              512
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 9,
-                weight: 85
-              },
-              {
-                frameIndex: 17,
-                weight: 5
-              },
-              {
-                frameIndex: 18,
-                weight: 5
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              512
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 9,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 1800,
-          images: [
-            [
-              896,
-              512
-            ]
-          ],
-          sound: "8",
-          branching: {
-            branches: [
-              {
-                frameIndex: 9,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 2300,
-          images: [
-            [
-              896,
-              512
-            ]
-          ],
-          sound: "27",
-          branching: {
-            branches: [
-              {
-                frameIndex: 9,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 0
         }
       ],
       useExitBranching: true

@@ -15,6 +15,8 @@
   previewFrameIndex: 0,
   selectedLibrarySoundId: "",
   historyStack: [],
+  redoStack: [],
+  lastSavedDefinitionJson: null,
   previewSoundEnabled: false,
   previewPathChoice: 0,
   sequenceCaptureEnabled: false,
@@ -25,6 +27,7 @@ const elements = {
   loadAgentBtn: document.getElementById("loadAgentBtn"),
   saveBtn: document.getElementById("saveBtn"),
   undoBtn: document.getElementById("undoBtn"),
+  redoBtn: document.getElementById("redoBtn"),
   statusText: document.getElementById("statusText"),
   animationPreviewCanvas: document.getElementById("animationPreviewCanvas"),
   toggleAnimationPlayBtn: document.getElementById("toggleAnimationPlayBtn"),
@@ -437,23 +440,85 @@ function deepClone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function pushHistorySnapshot() {
-  if (!state.payload?.definition) {
-    return;
-  }
+function serializeDefinition(definition) {
+  return JSON.stringify(definition ?? null);
+}
 
-  state.historyStack.push({
+function createHistorySnapshot() {
+  return {
     definition: deepClone(state.payload.definition),
     selectedAnimation: state.selectedAnimation,
     selectedFrameIndex: state.selectedFrameIndex,
     selectedFrameIndices: deepClone(state.selectedFrameIndices),
     selectedCell: state.selectedCell,
     previewFrameIndex: state.previewFrameIndex,
-  });
+  };
+}
+
+function hasPendingFrameEditorChanges() {
+  const frame = getCurrentFrames()[state.selectedFrameIndex];
+  if (!frame) {
+    return false;
+  }
+
+  const branches = Array.isArray(frame?.branching?.branches)
+    ? frame.branching.branches
+    : [];
+  const editableBranchIndex = getActiveEditableBranchIndex();
+  const activeBranch = branches[editableBranchIndex] || null;
+
+  return (
+    elements.durationInput.value !== String(Number(frame.duration ?? 0)) ||
+    elements.soundSelect.value !== (frame.sound ? String(frame.sound) : "") ||
+    elements.exitBranchInput.value !==
+      (Number.isInteger(frame.exitBranch) ? String(frame.exitBranch) : "") ||
+    elements.branchFrameIndexInput.value !==
+      (Number.isInteger(activeBranch?.frameIndex)
+        ? String(activeBranch.frameIndex)
+        : "") ||
+    elements.weightInput.value !==
+      (Number.isFinite(Number(activeBranch?.weight))
+        ? String(Number(activeBranch.weight))
+        : "") ||
+    elements.imagesInput.value !== formatImages(frame.images)
+  );
+}
+
+function isSessionDirty() {
+  if (!state.currentAgent || !state.payload?.definition) {
+    return false;
+  }
+
+  if (state.lastSavedDefinitionJson !== serializeDefinition(state.payload.definition)) {
+    return true;
+  }
+
+  return hasPendingFrameEditorChanges();
+}
+
+function updateToolbarButtons() {
+  elements.undoBtn.disabled = state.historyStack.length === 0;
+  elements.redoBtn.disabled = state.redoStack.length === 0;
+  elements.saveBtn.disabled = !isSessionDirty();
+}
+
+function pushHistorySnapshot(options = {}) {
+  const { clearRedo = true } = options;
+  if (!state.payload?.definition) {
+    return;
+  }
+
+  state.historyStack.push(createHistorySnapshot());
 
   if (state.historyStack.length > 100) {
     state.historyStack.shift();
   }
+
+  if (clearRedo) {
+    state.redoStack = [];
+  }
+
+  updateToolbarButtons();
 }
 
 function restoreSnapshot(snapshot) {
@@ -492,6 +557,7 @@ function restoreSnapshot(snapshot) {
   renderMapMeta();
   drawMap();
   renderAnimationPreview(state.previewFrameIndex);
+  updateToolbarButtons();
 }
 
 function frameToCell(frame) {
@@ -761,6 +827,7 @@ function renderFrameEditor() {
     elements.weightInput.value = "";
     elements.imagesInput.value = "";
     renderPreviewPathSelector();
+    updateToolbarButtons();
     return;
   }
 
@@ -784,6 +851,7 @@ function renderFrameEditor() {
     : "";
   elements.imagesInput.value = formatImages(frame.images);
   renderPreviewPathSelector();
+  updateToolbarButtons();
 }
 
 function parseImages(text) {
@@ -992,6 +1060,8 @@ async function loadAgent(name) {
   state.previewSoundEnabled = false;
   state.soundCache.clear();
   state.historyStack = [];
+  state.redoStack = [];
+  state.lastSavedDefinitionJson = serializeDefinition(payload.definition);
 
   state.mapImage = await new Promise((resolve, reject) => {
     const img = new Image();
@@ -1010,6 +1080,7 @@ async function loadAgent(name) {
   renderFrameList();
   drawMap();
   playAnimationPreview();
+  updateToolbarButtons();
   setStatus(`Loaded ${name}`);
 }
 
@@ -1064,6 +1135,7 @@ async function saveAgent(options = {}) {
     );
   }
   state.payload.definition = reloaded.definition;
+  state.lastSavedDefinitionJson = serializeDefinition(reloaded.definition);
   if (!getAnimationsObject()[state.selectedAnimation]) {
     state.selectedAnimation = animationNames().at(0) || null;
   }
@@ -1093,10 +1165,28 @@ async function undoLastChange() {
   }
 
   stopAnimationPreview();
+  state.redoStack.push(createHistorySnapshot());
+  if (state.redoStack.length > 100) {
+    state.redoStack.shift();
+  }
   const snapshot = state.historyStack.pop();
   restoreSnapshot(snapshot);
   playAnimationPreview();
   setStatus("Undid last change in session");
+}
+
+async function redoLastChange() {
+  if (!state.redoStack.length) {
+    setStatus("Nothing to redo");
+    return;
+  }
+
+  stopAnimationPreview();
+  pushHistorySnapshot({ clearRedo: false });
+  const snapshot = state.redoStack.pop();
+  restoreSnapshot(snapshot);
+  playAnimationPreview();
+  setStatus("Redid last change in session");
 }
 
 async function playSoundById(soundId, options = {}) {
@@ -1206,6 +1296,14 @@ function bindEvents() {
   elements.undoBtn.addEventListener("click", async () => {
     try {
       await undoLastChange();
+    } catch (error) {
+      setStatus(error.message);
+    }
+  });
+
+  elements.redoBtn.addEventListener("click", async () => {
+    try {
+      await redoLastChange();
     } catch (error) {
       setStatus(error.message);
     }
@@ -1347,6 +1445,18 @@ function bindEvents() {
   );
   elements.weightInput.addEventListener("change", applyFrameEditorChange);
   elements.imagesInput.addEventListener("change", applyFrameEditorChange);
+
+  const updateSaveButtonState = () => {
+    updateToolbarButtons();
+  };
+
+  elements.durationInput.addEventListener("input", updateSaveButtonState);
+  elements.soundSelect.addEventListener("input", updateSaveButtonState);
+  elements.soundSelect.addEventListener("change", updateSaveButtonState);
+  elements.exitBranchInput.addEventListener("input", updateSaveButtonState);
+  elements.branchFrameIndexInput.addEventListener("input", updateSaveButtonState);
+  elements.weightInput.addEventListener("input", updateSaveButtonState);
+  elements.imagesInput.addEventListener("input", updateSaveButtonState);
 
   elements.prevBranchBtn.addEventListener("click", () => {
     const count = getAnimationPathChoiceCount();
@@ -1694,6 +1804,8 @@ function bindEvents() {
 
     drawMap();
   });
+
+  updateToolbarButtons();
 }
 
 async function bootstrap() {

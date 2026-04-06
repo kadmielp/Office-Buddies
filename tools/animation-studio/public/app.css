@@ -53,11 +53,6 @@ body {
   gap: 6px;
 }
 
-.right-panel-footer {
-  justify-content: flex-end;
-  margin-top: auto;
-}
-
 .field-row-stacked {
   display: flex;
   flex-direction: column;
@@ -306,6 +301,17 @@ menu[role="tablist"] {
 
 menu[role="tablist"] > button {
   min-width: 90px;
+}
+
+menu[role="tablist"] > button[aria-selected="true"] {
+  box-shadow:
+    inset -1px -1px #fff,
+    inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf,
+    inset 2px 2px grey;
+  text-shadow: 1px 1px #222;
+  position: relative;
+  top: 1px;
 }
 
 @media (max-width: 1300px) {

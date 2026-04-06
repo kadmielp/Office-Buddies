@@ -97,7 +97,7 @@ clippy.ready("Genius", {
           branching: {
             branches: [
               {
-                frameIndex: 6,
+                frameIndex: 7,
                 weight: 50
               },
               {
@@ -3326,7 +3326,8 @@ clippy.ready("Genius", {
               868,
               930
             ]
-          ]
+          ],
+          sound: "18"
         },
         {
           duration: 100,
@@ -5207,19 +5208,7 @@ clippy.ready("Genius", {
               744,
               0
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 6,
-                weight: 50
-              },
-              {
-                frameIndex: 12,
-                weight: 40
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 260,
@@ -7019,243 +7008,6 @@ clippy.ready("Genius", {
             [
               0,
               0
-            ]
-          ]
-        }
-      ]
-    },
-    Idle2: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 0,
-                weight: 85
-              }
-            ]
-          }
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1860,
-              372
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 0,
-                weight: 75
-              },
-              {
-                frameIndex: 20,
-                weight: 10
-              }
-            ]
-          }
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1240,
-              1302
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 13,
-                weight: 50
-              }
-            ]
-          }
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1364,
-              1302
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1488,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1612,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1736,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              1860,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 330,
-          images: [
-            [
-              1984,
-              1395
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 8,
-                weight: 90
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2108,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              2232,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              2356,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              2480,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 130,
-          images: [
-            [
-              2604,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 1000,
-          images: [
-            [
-              2728,
-              1395
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 14,
-                weight: 90
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2604,
-              1395
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              496,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              372,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              248,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1984,
-              1209
-            ]
-          ]
-        },
-        {
-          duration: 330,
-          images: [
-            [
-              1736,
-              372
             ]
           ]
         }

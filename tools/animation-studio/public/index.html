@@ -121,7 +121,7 @@
                 <div class="frame-list-column">
                   <select id="frameList" size="14" multiple></select>
                 </div>
-                <div class="field-row-stacked">
+                <div class="field-row-stacked frame-editor-column">
                   <div class="frame-input-grid">
                     <div class="frame-input-field">
                       <label for="durationInput">Duration (ms)</label>
@@ -191,6 +191,13 @@
                     <button id="invertFramesBtn">↕ Invert Selected</button>
                     <button id="duplicateFrameBtn">🗐 Duplicate</button>
                     <button id="clearBranchFieldsBtn">∅ Clear Branch</button>
+                  </div>
+
+                  <div class="animation-preview-wrap frame-preview-wrap sunken-panel">
+                    <div class="animation-preview-overlay">
+                      <span id="framePreviewText">Frame: -</span>
+                    </div>
+                    <canvas id="framePreviewCanvas"></canvas>
                   </div>
                 </div>
               </div>

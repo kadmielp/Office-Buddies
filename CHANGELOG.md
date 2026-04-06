@@ -15,7 +15,9 @@ All notable changes to this project will be documented in this file.
 - Improved Animation Studio branch previewing with a per-path `Prob` overlay, cleaner top-corner preview badges, and preview path options that now reflect only real branch outcomes while still allowing looping playback when switching branch views.
 - Improved Animation Studio branch editing so additional splits can be created from fallback paths and branch probabilities are calculated cumulatively along the selected preview path.
 - Tightened the Animation Studio frame inspector layout by placing `Duration`/`Sound` and `Exit Branch`/`Branch Frame Index` side by side and shrinking the inline sound preview button.
+- Separated the selected-frame preview from the main Animation Preview so clicking frames no longer changes the looping preview state or branch probability readout.
 - Updated the bundled Genius assistant animation data with the latest frame, branch, and sound edits from Animation Studio.
+- Updated the bundled Bonzi assistant animation data with the latest frame additions, branching changes, and animation cleanup from Animation Studio.
 - Updated the bundled Merlin assistant animation data with the latest frame timing, branch, and image-sequence edits from Animation Studio.
 
 ## [0.6.14] - 2026-04-05

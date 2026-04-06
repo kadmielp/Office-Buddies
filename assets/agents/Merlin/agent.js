@@ -245,7 +245,16 @@ clippy.ready("Merlin", {
               0,
               0
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 24,
+                weight: 15
+              }
+            ]
+          },
+          exitBranch: 1
         },
         {
           duration: 100,
@@ -363,15 +372,7 @@ clippy.ready("Merlin", {
               1152,
               128
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 18,
-                weight: 25
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -467,7 +468,184 @@ clippy.ready("Merlin", {
               2048,
               128
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 42,
+                weight: 100
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              768
+            ]
           ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              896,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 90,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "4"
+        },
+        {
+          duration: 90,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "4"
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "28"
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "22"
+        },
+        {
+          duration: 90,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "2"
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 80,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "28"
+        },
+        {
+          duration: 90,
+          images: [
+            [
+              1280,
+              768
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              768
+            ]
+          ],
+          sound: "28"
         },
         {
           duration: 100,
@@ -2187,189 +2365,6 @@ clippy.ready("Merlin", {
           ]
         }
       ]
-    },
-    Congratulate_2: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              896,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 90,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "4"
-        },
-        {
-          duration: 90,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "4"
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "28"
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "22"
-        },
-        {
-          duration: 90,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "2"
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 80,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "28"
-        },
-        {
-          duration: 90,
-          images: [
-            [
-              1280,
-              768
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              768
-            ]
-          ],
-          sound: "28"
-        }
-      ],
-      useExitBranching: true
     },
     Idle2_2: {
       frames: [

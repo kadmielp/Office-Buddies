@@ -1,3522 +1,7112 @@
 clippy.ready("Bonzi", {
   overlayCount: 2,
-  sounds: ["1", "2", "3", "4", "5", "6", "7"],
-  framesize: [200, 160],
+  sounds: [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+  ],
+  framesize: [
+    200,
+    160
+  ],
   animations: {
     MoveLeft: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 0]],
+          images: [
+            [
+              200,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 0]],
+          images: [
+            [
+              400,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 0]],
+          images: [
+            [
+              600,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 0]],
+          images: [
+            [
+              800,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 0]],
-          sound: "3",
+          images: [
+            [
+              1000,
+              0
+            ]
+          ],
+          sound: "3"
         },
         {
           duration: 100,
-          images: [[1200, 0]],
+          images: [
+            [
+              1200,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 0]],
+          images: [
+            [
+              1400,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 0]],
+          images: [
+            [
+              1600,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 0]],
-        },
-      ],
+          images: [
+            [
+              1800,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Congratulate: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 0]],
+          images: [
+            [
+              2000,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 0]],
+          images: [
+            [
+              2200,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 0]],
+          images: [
+            [
+              2400,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 0]],
-          sound: "6",
+          images: [
+            [
+              2600,
+              0
+            ]
+          ],
+          sound: "6"
         },
         {
           duration: 100,
-          images: [[2800, 0]],
+          images: [
+            [
+              2800,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 0]],
+          images: [
+            [
+              2600,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 0]],
+          images: [
+            [
+              2800,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 0]],
+          images: [
+            [
+              2600,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 0]],
+          images: [
+            [
+              3000,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 0]],
+          images: [
+            [
+              2600,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 0]],
-        },
-      ],
+          images: [
+            [
+              3000,
+              0
+            ]
+          ]
+        }
+      ]
     },
     GoodBye: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 0]],
+          images: [
+            [
+              3200,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 160]],
+          images: [
+            [
+              0,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 160]],
+          images: [
+            [
+              200,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 160]],
+          images: [
+            [
+              400,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 160]],
+          images: [
+            [
+              600,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 160]],
+          images: [
+            [
+              800,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 160]],
+          images: [
+            [
+              1000,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 160]],
-          sound: "1",
+          images: [
+            [
+              1200,
+              160
+            ]
+          ],
+          sound: "1"
         },
         {
           duration: 100,
-          images: [[1400, 160]],
+          images: [
+            [
+              1400,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 160]],
+          images: [
+            [
+              1600,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 160]],
+          images: [
+            [
+              1800,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 160]],
+          images: [
+            [
+              2000,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 160]],
+          images: [
+            [
+              2200,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 160]],
+          images: [
+            [
+              2400,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 160]],
+          images: [
+            [
+              2600,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 160]],
+          images: [
+            [
+              2800,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 160]],
+          images: [
+            [
+              3000,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 160]],
+          images: [
+            [
+              3200,
+              160
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 320]],
+          images: [
+            [
+              0,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 320]],
+          images: [
+            [
+              200,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 320]],
+          images: [
+            [
+              400,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 320]],
+          images: [
+            [
+              600,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 320]],
+          images: [
+            [
+              800,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 320]],
-        },
-      ],
+          images: [
+            [
+              1000,
+              320
+            ]
+          ]
+        }
+      ]
     },
     Acknowledge: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 320]],
+          images: [
+            [
+              1200,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 320]],
+          images: [
+            [
+              1400,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 320]],
+          images: [
+            [
+              1600,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 320]],
+          images: [
+            [
+              1800,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 320]],
+          images: [
+            [
+              2000,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Suggest: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Explain: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 320]],
+          images: [
+            [
+              2200,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 320]],
+          images: [
+            [
+              2400,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 320]],
+          images: [
+            [
+              2600,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 320]],
+          images: [
+            [
+              2800,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 320]],
+          images: [
+            [
+              3000,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 320]],
-        },
+          images: [
+            [
+              3200,
+              320
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Decline: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     DontRecognize: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Writing: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle3_3: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle3_2: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle3_1: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     ReadReturn: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     StartListening: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle2_2: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Announce: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 960]],
+          images: [
+            [
+              1200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 960]],
+          images: [
+            [
+              1400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 960]],
+          images: [
+            [
+              1600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 960]],
+          images: [
+            [
+              1800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 960]],
+          images: [
+            [
+              2000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 960]],
+          images: [
+            [
+              2200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 960]],
+          images: [
+            [
+              2400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 960]],
+          images: [
+            [
+              2600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 960]],
+          images: [
+            [
+              2800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 960]],
+          images: [
+            [
+              3000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 960]],
+          images: [
+            [
+              3200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1120]],
+          images: [
+            [
+              0,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1120]],
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1120]],
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1120]],
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1120]],
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1120]],
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1120]],
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1120]],
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1120]],
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1120]],
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1120]],
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1120]],
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[2200, 1120]],
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1120]],
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1120]],
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1120]],
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1120]],
+          images: [
+            [
+              2400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1120]],
+          images: [
+            [
+              2600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1120]],
+          images: [
+            [
+              2800,
+              1120
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[3000, 1120]],
+          images: [
+            [
+              3000,
+              1120
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[3000, 1120]],
+          images: [
+            [
+              3000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1120]],
+          images: [
+            [
+              2800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1120]],
+          images: [
+            [
+              2600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1120]],
+          images: [
+            [
+              2400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1120]],
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1120]],
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1120]],
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[2200, 1120]],
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1120]],
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1120]],
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1120]],
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1120]],
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1120]],
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1120]],
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1120]],
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1120]],
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1120]],
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1120]],
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1120]],
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1120]],
+          images: [
+            [
+              0,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 960]],
+          images: [
+            [
+              3200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 960]],
+          images: [
+            [
+              3000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 960]],
+          images: [
+            [
+              2800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 960]],
+          images: [
+            [
+              2600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 960]],
+          images: [
+            [
+              2400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 960]],
+          images: [
+            [
+              2200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 960]],
+          images: [
+            [
+              2000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 960]],
+          images: [
+            [
+              1800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 960]],
+          images: [
+            [
+              1600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 960]],
+          images: [
+            [
+              1400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 960]],
+          images: [
+            [
+              1200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     GetAttention: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 800]],
+          images: [
+            [
+              3200,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 960]],
+          images: [
+            [
+              0,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 960]],
+          images: [
+            [
+              200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 960]],
+          images: [
+            [
+              400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 960]],
+          images: [
+            [
+              600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 960]],
-          sound: "4",
+          images: [
+            [
+              800,
+              960
+            ]
+          ],
+          sound: "4"
         },
         {
           duration: 100,
-          images: [[1000, 960]],
+          images: [
+            [
+              1000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 960]],
+          images: [
+            [
+              400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 960]],
+          images: [
+            [
+              600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 960]],
+          images: [
+            [
+              800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 960]],
+          images: [
+            [
+              1000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 960]],
+          images: [
+            [
+              0,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 800]],
+          images: [
+            [
+              3200,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle2_1: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 960]],
+          images: [
+            [
+              1200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 960]],
+          images: [
+            [
+              1400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 960]],
+          images: [
+            [
+              1600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 960]],
+          images: [
+            [
+              1800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 960]],
+          images: [
+            [
+              2000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 960]],
+          images: [
+            [
+              2200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 960]],
+          images: [
+            [
+              2400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 960]],
+          images: [
+            [
+              2600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 960]],
+          images: [
+            [
+              2800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 960]],
+          images: [
+            [
+              3000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 960]],
+          images: [
+            [
+              3200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1120]],
+          images: [
+            [
+              0,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1120]],
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1120]],
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1120]],
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1120]],
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1120]],
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
         },
         {
           duration: 3000,
-          images: [[1400, 1120]],
+          images: [
+            [
+              1400,
+              1120
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 52,
-                weight: 25,
+                weight: 25
               },
               {
                 frameIndex: 26,
-                weight: 25,
+                weight: 25
               },
               {
                 frameIndex: 33,
-                weight: 25,
-              },
-            ],
-          },
+                weight: 25
+              }
+            ]
+          }
         },
         {
           duration: 100,
-          images: [[1600, 1120]],
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1120]],
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
         },
         {
           duration: 2000,
-          images: [[2000, 1120]],
+          images: [
+            [
+              2000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1120]],
+          images: [
+            [
+              2200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1120]],
+          images: [
+            [
+              1800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1120]],
+          images: [
+            [
+              1600,
+              1120
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 19,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 100,
-          images: [[2400, 1120]],
+          images: [
+            [
+              2400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1120]],
+          images: [
+            [
+              2600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1120]],
+          images: [
+            [
+              2800,
+              1120
+            ]
+          ]
         },
         {
           duration: 2500,
-          images: [[3000, 1120]],
+          images: [
+            [
+              3000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1120]],
+          images: [
+            [
+              2800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1120]],
+          images: [
+            [
+              2600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1120]],
+          images: [
+            [
+              2400,
+              1120
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 19,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 100,
-          images: [[1200, 1120]],
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1120]],
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1120]],
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1120]],
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1120]],
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1120]],
+          images: [
+            [
+              3200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1280]],
+          images: [
+            [
+              0,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1120]],
+          images: [
+            [
+              3200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1120]],
+          images: [
+            [
+              3200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1280]],
+          images: [
+            [
+              0,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1120]],
+          images: [
+            [
+              3200,
+              1120
+            ]
+          ]
         },
         {
           duration: 300,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1120]],
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1120]],
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1120]],
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1120]],
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1120]],
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 19,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 100,
-          images: [[1200, 1120]],
+          images: [
+            [
+              1200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1120]],
+          images: [
+            [
+              1000,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1120]],
+          images: [
+            [
+              800,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1120]],
+          images: [
+            [
+              600,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1120]],
+          images: [
+            [
+              400,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1120]],
+          images: [
+            [
+              200,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1120]],
+          images: [
+            [
+              0,
+              1120
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 960]],
+          images: [
+            [
+              3200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 960]],
+          images: [
+            [
+              3000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 960]],
+          images: [
+            [
+              2800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 960]],
+          images: [
+            [
+              2600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 960]],
+          images: [
+            [
+              2400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 960]],
+          images: [
+            [
+              2200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 960]],
+          images: [
+            [
+              2000,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 960]],
+          images: [
+            [
+              1800,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 960]],
+          images: [
+            [
+              1600,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 960]],
+          images: [
+            [
+              1400,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 960]],
+          images: [
+            [
+              1200,
+              960
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     GestureLeft: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1280]],
+          images: [
+            [
+              200,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1280]],
+          images: [
+            [
+              400,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1280]],
+          images: [
+            [
+              600,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1280]],
+          images: [
+            [
+              800,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1280]],
+          images: [
+            [
+              1000,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1280]],
-        },
+          images: [
+            [
+              1200,
+              1280
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Surprised: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle1_5: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1280]],
+          images: [
+            [
+              1400,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1280]],
+          images: [
+            [
+              1600,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1280]],
+          images: [
+            [
+              1800,
+              1280
+            ]
+          ]
         },
         {
           duration: 900,
-          images: [[2000, 1280]],
+          images: [
+            [
+              2000,
+              1280
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 70,
+                weight: 70
               },
               {
                 frameIndex: 8,
-                weight: 21,
-              },
+                weight: 21
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              1280
             ],
-          },
+            [
+              2200,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2000, 1280],
-            [2200, 1280],
-          ],
+            [
+              2000,
+              1280
+            ],
+            [
+              2400,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2000, 1280],
-            [2400, 1280],
-          ],
-        },
-        {
-          duration: 100,
-          images: [
-            [2000, 1280],
-            [2200, 1280],
-          ],
+            [
+              2000,
+              1280
+            ],
+            [
+              2200,
+              1280
+            ]
+          ]
         },
         {
           duration: 1000,
-          images: [[2000, 1280]],
+          images: [
+            [
+              2000,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1280]],
+          images: [
+            [
+              1800,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1280]],
+          images: [
+            [
+              1600,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1280]],
+          images: [
+            [
+              1400,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle1_4: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1280]],
+          images: [
+            [
+              2600,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1280]],
+          images: [
+            [
+              2800,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 1280]],
+          images: [
+            [
+              3000,
+              1280
+            ]
+          ]
         },
         {
           duration: 900,
-          images: [[3200, 1280]],
+          images: [
+            [
+              3200,
+              1280
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 60,
+                weight: 60
               },
               {
                 frameIndex: 8,
-                weight: 40,
-              },
+                weight: 40
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              1280
             ],
-          },
+            [
+              0,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [3200, 1280],
-            [0, 1440],
-          ],
+            [
+              3200,
+              1280
+            ],
+            [
+              200,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [3200, 1280],
-            [200, 1440],
-          ],
-        },
-        {
-          duration: 100,
-          images: [
-            [3200, 1280],
-            [0, 1440],
-          ],
+            [
+              3200,
+              1280
+            ],
+            [
+              0,
+              1440
+            ]
+          ]
         },
         {
           duration: 900,
-          images: [[3200, 1280]],
+          images: [
+            [
+              3200,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 1280]],
+          images: [
+            [
+              3000,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1280]],
+          images: [
+            [
+              2800,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1280]],
+          images: [
+            [
+              2600,
+              1280
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     LookRight: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 800]],
+          images: [
+            [
+              1800,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 800]],
+          images: [
+            [
+              2000,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 800]],
+          images: [
+            [
+              2200,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 800]],
+          images: [
+            [
+              2400,
+              800
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[2600, 800]],
+          images: [
+            [
+              2600,
+              800
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 6,
-                weight: 33,
+                weight: 33
               },
               {
                 frameIndex: 7,
-                weight: 33,
+                weight: 33
               },
               {
                 frameIndex: 8,
-                weight: 34,
-              },
-            ],
-          },
+                weight: 34
+              }
+            ]
+          }
         },
         {
           duration: 1400,
-          images: [[2600, 800]],
+          images: [
+            [
+              2600,
+              800
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 8,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 3500,
-          images: [[2600, 800]],
+          images: [
+            [
+              2600,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2600, 800],
-            [2800, 800],
-          ],
+            [
+              2600,
+              800
+            ],
+            [
+              2800,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2600, 800],
-            [3000, 800],
-          ],
+            [
+              2600,
+              800
+            ],
+            [
+              3000,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2600, 800],
-            [2800, 800],
-          ],
+            [
+              2600,
+              800
+            ],
+            [
+              2800,
+              800
+            ]
+          ]
         },
         {
           duration: 1200,
-          images: [[2600, 800]],
+          images: [
+            [
+              2600,
+              800
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     GestureUp: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1440]],
+          images: [
+            [
+              1200,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1440]],
+          images: [
+            [
+              1400,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1440]],
+          images: [
+            [
+              1600,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1440]],
+          images: [
+            [
+              1800,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1440]],
+          images: [
+            [
+              2000,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1440]],
+          images: [
+            [
+              2200,
+              1440
+            ]
+          ]
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Idle1_1: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1440]],
+          images: [
+            [
+              2400,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1440]],
+          images: [
+            [
+              2600,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1440]],
+          images: [
+            [
+              2800,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 1440]],
+          images: [
+            [
+              3000,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1440]],
+          images: [
+            [
+              3200,
+              1440
+            ]
+          ]
         },
         {
           duration: 1100,
-          images: [[0, 1600]],
+          images: [
+            [
+              0,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1440]],
+          images: [
+            [
+              3200,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 1440]],
+          images: [
+            [
+              3000,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1440]],
+          images: [
+            [
+              2800,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1440]],
+          images: [
+            [
+              2600,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1440]],
+          images: [
+            [
+              2400,
+              1440
+            ]
+          ]
         },
         {
           duration: 1300,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 0,
-                weight: 70,
-              },
-            ],
-          },
-        },
-      ],
+                weight: 70
+              }
+            ]
+          }
+        }
+      ]
     },
     Idle1_3: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1600]],
+          images: [
+            [
+              200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1600]],
+          images: [
+            [
+              400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1600]],
+          images: [
+            [
+              600,
+              1600
+            ]
+          ]
         },
         {
           duration: 500,
-          images: [[800, 1600]],
+          images: [
+            [
+              800,
+              1600
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 50,
+                weight: 50
               },
               {
                 frameIndex: 8,
-                weight: 50,
-              },
+                weight: 50
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              800,
+              1600
             ],
-          },
+            [
+              1000,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [800, 1600],
-            [1000, 1600],
-          ],
+            [
+              800,
+              1600
+            ],
+            [
+              1200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [800, 1600],
-            [1200, 1600],
-          ],
-        },
-        {
-          duration: 100,
-          images: [
-            [800, 1600],
-            [1000, 1600],
-          ],
+            [
+              800,
+              1600
+            ],
+            [
+              1000,
+              1600
+            ]
+          ]
         },
         {
           duration: 1000,
-          images: [[800, 1600]],
+          images: [
+            [
+              800,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1600]],
+          images: [
+            [
+              600,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1600]],
+          images: [
+            [
+              400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1600]],
+          images: [
+            [
+              200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle1_2: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1600]],
+          images: [
+            [
+              1400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1600]],
+          images: [
+            [
+              1600,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1600]],
+          images: [
+            [
+              1800,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1600]],
+          images: [
+            [
+              2000,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1600]],
+          images: [
+            [
+              2200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1600]],
+          images: [
+            [
+              1400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1600]],
+          images: [
+            [
+              1600,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1600]],
+          images: [
+            [
+              1800,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1600]],
+          images: [
+            [
+              2000,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1600]],
+          images: [
+            [
+              2200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1600]],
+          images: [
+            [
+              1400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1600]],
+          images: [
+            [
+              1600,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1600]],
+          images: [
+            [
+              1800,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1600]],
+          images: [
+            [
+              2000,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1600]],
+          images: [
+            [
+              2200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Read: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Processing: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Alert: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1760]],
-        },
-      ],
+          images: [
+            [
+              600,
+              1760
+            ]
+          ]
+        }
+      ]
     },
     DoMagic1: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     DoMagic2: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Confused: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2880]],
+          images: [
+            [
+              200,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2880]],
+          images: [
+            [
+              400,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2880]],
+          images: [
+            [
+              600,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2880]],
+          images: [
+            [
+              800,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2880]],
+          images: [
+            [
+              1000,
+              2880
+            ]
+          ]
         },
         {
           duration: 300,
           images: [
-            [1400, 2880],
-            [1200, 2880],
-          ],
+            [
+              1400,
+              2880
+            ],
+            [
+              1200,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1400, 2880],
-            [1600, 2880],
-          ],
+            [
+              1400,
+              2880
+            ],
+            [
+              1600,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1400, 2880],
-            [1800, 2880],
-          ],
+            [
+              1400,
+              2880
+            ],
+            [
+              1800,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1400, 2880],
-            [1600, 2880],
-          ],
+            [
+              1400,
+              2880
+            ],
+            [
+              1600,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1400, 2880],
-            [1200, 2880],
-          ],
+            [
+              1400,
+              2880
+            ],
+            [
+              1200,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1400, 2880],
-            [1600, 2880],
-          ],
+            [
+              1400,
+              2880
+            ],
+            [
+              1600,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1400, 2880],
-            [1800, 2880],
-          ],
-        },
+            [
+              1400,
+              2880
+            ],
+            [
+              1800,
+              2880
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     GetAttention2: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-          sound: "2",
+          images: [
+            [
+              0,
+              0
+            ]
+          ],
+          sound: "2"
         },
         {
           duration: 100,
-          images: [[1600, 3040]],
+          images: [
+            [
+              1600,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 3040]],
+          images: [
+            [
+              1800,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 3040]],
+          images: [
+            [
+              2000,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 3040]],
+          images: [
+            [
+              2200,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 3040]],
+          images: [
+            [
+              2400,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 3040]],
+          images: [
+            [
+              2600,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 3040]],
+          images: [
+            [
+              2800,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 3040]],
+          images: [
+            [
+              3000,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 3040]],
+          images: [
+            [
+              3200,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 3200]],
+          images: [
+            [
+              0,
+              3200
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 3200]],
+          images: [
+            [
+              200,
+              3200
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 3200]],
+          images: [
+            [
+              400,
+              3200
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 3200]],
+          images: [
+            [
+              600,
+              3200
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     MoveRight: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1760]],
+          images: [
+            [
+              800,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1760]],
+          images: [
+            [
+              1000,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1760]],
+          images: [
+            [
+              1200,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1760]],
+          images: [
+            [
+              1400,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1760]],
-          sound: "3",
+          images: [
+            [
+              1600,
+              1760
+            ]
+          ],
+          sound: "3"
         },
         {
           duration: 100,
-          images: [[1800, 1760]],
+          images: [
+            [
+              1800,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 1760]],
+          images: [
+            [
+              2000,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1760]],
+          images: [
+            [
+              2200,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1760]],
+          images: [
+            [
+              2400,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1760]],
-        },
-      ],
+          images: [
+            [
+              2600,
+              1760
+            ]
+          ]
+        }
+      ]
     },
     Reading: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     LookUp: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-        {
-          duration: 100,
-          images: [[400, 2080]],
-        },
-        {
-          duration: 100,
-          images: [[200, 2080]],
-        },
-        {
-          duration: 100,
-          images: [[0, 2080]],
-        },
-        {
-          duration: 400,
-          images: [[2400, 2080]],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 33,
-              },
-              {
-                frameIndex: 6,
-                weight: 33,
-              },
-              {
-                frameIndex: 5,
-                weight: 34,
-              },
-            ],
-          },
-        },
-        {
-          duration: 1400,
-          images: [[2400, 2080]],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 100,
-              },
-            ],
-          },
-        },
-        {
-          duration: 3500,
-          images: [[2400, 2080]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2400, 2080],
-            [2600, 2080],
+            [
+              400,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 400,
+          images: [
+            [
+              2400,
+              2080
+            ]
           ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 7,
+                weight: 33
+              },
+              {
+                frameIndex: 6,
+                weight: 33
+              },
+              {
+                frameIndex: 5,
+                weight: 34
+              }
+            ]
+          }
+        },
+        {
+          duration: 1400,
+          images: [
+            [
+              2400,
+              2080
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 7,
+                weight: 100
+              }
+            ]
+          }
+        },
+        {
+          duration: 3500,
+          images: [
+            [
+              2400,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              2080
+            ],
+            [
+              2600,
+              2080
+            ]
+          ]
         },
         {
           duration: 180,
           images: [
-            [2400, 2080],
-            [2800, 2080],
-          ],
+            [
+              2400,
+              2080
+            ],
+            [
+              2800,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2400, 2080],
-            [2600, 2080],
-          ],
+            [
+              2400,
+              2080
+            ],
+            [
+              2600,
+              2080
+            ]
+          ]
         },
         {
           duration: 1200,
-          images: [[2400, 2080]],
+          images: [
+            [
+              2400,
+              2080
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 4,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     WriteContinued: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Search: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 480]],
+          images: [
+            [
+              0,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 480]],
+          images: [
+            [
+              200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 480]],
+          images: [
+            [
+              400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 480]],
+          images: [
+            [
+              600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 480]],
+          images: [
+            [
+              800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 480]],
+          images: [
+            [
+              1000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 480]],
+          images: [
+            [
+              1200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 480]],
+          images: [
+            [
+              1400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 480]],
+          images: [
+            [
+              1600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 480]],
+          images: [
+            [
+              1800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 480]],
+          images: [
+            [
+              2000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 480]],
+          images: [
+            [
+              2200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 480]],
+          images: [
+            [
+              2400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 480]],
+          images: [
+            [
+              2600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 480]],
+          images: [
+            [
+              2800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 480]],
+          images: [
+            [
+              3000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 480]],
+          images: [
+            [
+              3200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 640]],
+          images: [
+            [
+              0,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 640]],
+          images: [
+            [
+              200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 640]],
+          images: [
+            [
+              400,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 640]],
+          images: [
+            [
+              600,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 640]],
+          images: [
+            [
+              800,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 640]],
+          images: [
+            [
+              1000,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 640]],
+          images: [
+            [
+              1200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 640]],
+          images: [
+            [
+              1400,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 640]],
+          images: [
+            [
+              1600,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 640]],
+          images: [
+            [
+              1800,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 640]],
+          images: [
+            [
+              2000,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 640]],
+          images: [
+            [
+              2200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 640]],
+          images: [
+            [
+              2400,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 480]],
+          images: [
+            [
+              1600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 480]],
+          images: [
+            [
+              1800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 480]],
+          images: [
+            [
+              2000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 480]],
+          images: [
+            [
+              2200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 480]],
+          images: [
+            [
+              2400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 640]],
+          images: [
+            [
+              0,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 640]],
+          images: [
+            [
+              2600,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 640]],
+          images: [
+            [
+              2800,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 640]],
+          images: [
+            [
+              3000,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 640]],
+          images: [
+            [
+              3200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 800]],
+          images: [
+            [
+              0,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 800]],
+          images: [
+            [
+              200,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Uncertain: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1920]],
+          images: [
+            [
+              800,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1920]],
+          images: [
+            [
+              1000,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 1920]],
+          images: [
+            [
+              1200,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 1920]],
+          images: [
+            [
+              1400,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 1920]],
+          images: [
+            [
+              1600,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 1920]],
+          images: [
+            [
+              1800,
+              1920
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 11,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 100,
-          images: [[2000, 1920]],
+          images: [
+            [
+              2000,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 1920]],
+          images: [
+            [
+              2200,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1920]],
+          images: [
+            [
+              2400,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1920]],
-        },
+          images: [
+            [
+              2600,
+              1920
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     LookLeft: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1440]],
+          images: [
+            [
+              1000,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1440]],
+          images: [
+            [
+              800,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1440]],
+          images: [
+            [
+              600,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1440]],
+          images: [
+            [
+              400,
+              1440
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[2800, 1920]],
+          images: [
+            [
+              2800,
+              1920
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 6,
-                weight: 33,
+                weight: 33
               },
               {
                 frameIndex: 7,
-                weight: 33,
+                weight: 33
               },
               {
                 frameIndex: 8,
-                weight: 34,
-              },
-            ],
-          },
+                weight: 34
+              }
+            ]
+          }
         },
         {
           duration: 1400,
-          images: [[2800, 1920]],
+          images: [
+            [
+              2800,
+              1920
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 8,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 3500,
-          images: [[2800, 1920]],
+          images: [
+            [
+              2800,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2800, 1920],
-            [3000, 1920],
-          ],
+            [
+              2800,
+              1920
+            ],
+            [
+              3000,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2800, 1920],
-            [3200, 1920],
-          ],
+            [
+              2800,
+              1920
+            ],
+            [
+              3200,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2800, 1920],
-            [3000, 1920],
-          ],
+            [
+              2800,
+              1920
+            ],
+            [
+              3000,
+              1920
+            ]
+          ]
         },
         {
           duration: 1200,
-          images: [[2800, 1920]],
+          images: [
+            [
+              2800,
+              1920
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100,
-              },
-            ],
-          },
-        },
+                weight: 100
+              }
+            ]
+          }
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     LookDownReturn: {
       frames: [
         {
           duration: 100,
-          images: [[800, 800]],
+          images: [
+            [
+              800,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 800]],
+          images: [
+            [
+              600,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 800]],
+          images: [
+            [
+              400,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     LookUpReturn: {
       frames: [
         {
           duration: 100,
-          images: [[0, 2080]],
+          images: [
+            [
+              0,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2080]],
+          images: [
+            [
+              200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2080]],
+          images: [
+            [
+              400,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     LookLeftReturn: {
       frames: [
         {
           duration: 100,
-          images: [[400, 1440]],
+          images: [
+            [
+              400,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1440]],
+          images: [
+            [
+              600,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 1440]],
+          images: [
+            [
+              800,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 1440]],
+          images: [
+            [
+              1000,
+              1440
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Greet: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2080]],
+          images: [
+            [
+              600,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2080]],
+          images: [
+            [
+              800,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2080]],
+          images: [
+            [
+              1000,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 2080]],
+          images: [
+            [
+              1200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 2080]],
+          images: [
+            [
+              1400,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 2080]],
+          images: [
+            [
+              1600,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 2080]],
+          images: [
+            [
+              1800,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 2080]],
+          images: [
+            [
+              2000,
+              2080
+            ]
+          ]
         },
         {
           duration: 200,
-          images: [[2200, 2080]],
+          images: [
+            [
+              2200,
+              2080
+            ]
+          ]
         },
         {
           duration: 200,
-          images: [[2200, 2080]],
+          images: [
+            [
+              2200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 2080]],
+          images: [
+            [
+              2000,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 2080]],
+          images: [
+            [
+              1800,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 2080]],
+          images: [
+            [
+              1600,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 2080]],
+          images: [
+            [
+              1400,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 2080]],
+          images: [
+            [
+              1200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2080]],
+          images: [
+            [
+              1000,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2080]],
+          images: [
+            [
+              800,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2080]],
+          images: [
+            [
+              600,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Hearing_1: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Idle1_6: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2080]],
+          images: [
+            [
+              400,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2080]],
+          images: [
+            [
+              200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2080]],
+          images: [
+            [
+              0,
+              2080
+            ]
+          ]
         },
         {
           duration: 900,
-          images: [[2400, 2080]],
+          images: [
+            [
+              2400,
+              2080
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 60,
+                weight: 60
               },
               {
                 frameIndex: 8,
-                weight: 40,
-              },
-            ],
-          },
+                weight: 40
+              }
+            ]
+          }
         },
         {
           duration: 100,
           images: [
-            [2400, 2080],
-            [2600, 2080],
-          ],
+            [
+              2400,
+              2080
+            ],
+            [
+              2600,
+              2080
+            ]
+          ]
         },
         {
           duration: 180,
           images: [
-            [2400, 2080],
-            [2800, 2080],
-          ],
+            [
+              2400,
+              2080
+            ],
+            [
+              2800,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [2400, 2080],
-            [2600, 2080],
-          ],
+            [
+              2400,
+              2080
+            ],
+            [
+              2600,
+              2080
+            ]
+          ]
         },
         {
           duration: 1200,
-          images: [[2400, 2080]],
+          images: [
+            [
+              2400,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2080]],
+          images: [
+            [
+              0,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2080]],
+          images: [
+            [
+              200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2080]],
+          images: [
+            [
+              400,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     WriteReturn: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Hearing_2: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     GestureRight: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 3040]],
+          images: [
+            [
+              400,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 3040]],
+          images: [
+            [
+              600,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 3040]],
+          images: [
+            [
+              800,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 3040]],
+          images: [
+            [
+              1000,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 3040]],
+          images: [
+            [
+              1200,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 3040]],
-        },
+          images: [
+            [
+              1400,
+              3040
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Think: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2240]],
+          images: [
+            [
+              800,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2240]],
+          images: [
+            [
+              1000,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 2240]],
+          images: [
+            [
+              1200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 2240]],
+          images: [
+            [
+              1400,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 2240]],
+          images: [
+            [
+              1600,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 2240]],
+          images: [
+            [
+              1800,
+              2240
+            ]
+          ]
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Blink: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [0, 0],
-            [2000, 2880],
-          ],
+            [
+              0,
+              0
+            ],
+            [
+              2000,
+              2880
+            ]
+          ]
         },
         {
           duration: 200,
           images: [
-            [0, 0],
-            [2200, 2880],
-          ],
+            [
+              0,
+              0
+            ],
+            [
+              2200,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [0, 0],
-            [2000, 2880],
-          ],
+            [
+              0,
+              0
+            ],
+            [
+              2000,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Write: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     MoveRightReturn: {
       frames: [
         {
           duration: 100,
-          images: [[2600, 1760]],
+          images: [
+            [
+              2600,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 2400]],
+          images: [
+            [
+              1600,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 2400]],
+          images: [
+            [
+              1800,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 2400]],
+          images: [
+            [
+              2000,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 2400]],
+          images: [
+            [
+              2200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 2400]],
+          images: [
+            [
+              2400,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2400]],
-          sound: "5",
+          images: [
+            [
+              2600,
+              2400
+            ]
+          ],
+          sound: "5"
         },
         {
           duration: 100,
-          images: [[2800, 2400]],
+          images: [
+            [
+              2800,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2400]],
+          images: [
+            [
+              3000,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     MoveUpReturn: {
       frames: [
         {
           duration: 100,
-          images: [[3200, 2400]],
+          images: [
+            [
+              3200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2560]],
+          images: [
+            [
+              0,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2560]],
+          images: [
+            [
+              200,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2560]],
-          sound: "5",
+          images: [
+            [
+              400,
+              2560
+            ]
+          ],
+          sound: "5"
         },
         {
           duration: 100,
-          images: [[600, 2560]],
+          images: [
+            [
+              600,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2560]],
+          images: [
+            [
+              800,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Show: {
       frames: [
         {
           duration: 100,
-          images: [[1000, 320]],
+          images: [
+            [
+              1000,
+              320
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2560]],
+          images: [
+            [
+              1000,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 2560]],
+          images: [
+            [
+              1200,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 2560]],
+          images: [
+            [
+              1400,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 2560]],
+          images: [
+            [
+              1600,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 2560]],
+          images: [
+            [
+              1800,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 2560]],
+          images: [
+            [
+              2000,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 2560]],
+          images: [
+            [
+              2200,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 2560]],
+          images: [
+            [
+              2400,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2560]],
+          images: [
+            [
+              2600,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 2560]],
+          images: [
+            [
+              2800,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2560]],
+          images: [
+            [
+              3000,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2560]],
+          images: [
+            [
+              3200,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2720]],
+          images: [
+            [
+              0,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2720]],
+          images: [
+            [
+              200,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2720]],
+          images: [
+            [
+              400,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2720]],
+          images: [
+            [
+              600,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2720]],
+          images: [
+            [
+              800,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2720]],
+          images: [
+            [
+              1000,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 2720]],
+          images: [
+            [
+              1200,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 2720]],
-          sound: "7",
+          images: [
+            [
+              1400,
+              2720
+            ]
+          ],
+          sound: "7"
         },
         {
           duration: 100,
-          images: [[1600, 2720]],
+          images: [
+            [
+              1600,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 2720]],
+          images: [
+            [
+              1800,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 2720]],
+          images: [
+            [
+              2000,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 2720]],
+          images: [
+            [
+              2200,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 2720]],
+          images: [
+            [
+              2400,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Wave: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 2240]],
+          images: [
+            [
+              2000,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 2240]],
+          images: [
+            [
+              2200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 2240]],
+          images: [
+            [
+              2400,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2240]],
+          images: [
+            [
+              2600,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 2240]],
+          images: [
+            [
+              2800,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2240]],
+          images: [
+            [
+              3000,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2240]],
+          images: [
+            [
+              3200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2400]],
+          images: [
+            [
+              0,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2400]],
+          images: [
+            [
+              200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2400]],
+          images: [
+            [
+              400,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2400]],
+          images: [
+            [
+              600,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2400]],
+          images: [
+            [
+              400,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2400]],
+          images: [
+            [
+              200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2400]],
+          images: [
+            [
+              0,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2240]],
+          images: [
+            [
+              3200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2400]],
+          images: [
+            [
+              0,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2400]],
+          images: [
+            [
+              200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2400]],
+          images: [
+            [
+              400,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2400]],
+          images: [
+            [
+              600,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2400]],
+          images: [
+            [
+              400,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2400]],
+          images: [
+            [
+              200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2400]],
+          images: [
+            [
+              0,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2240]],
+          images: [
+            [
+              3200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2400]],
+          images: [
+            [
+              800,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 2400]],
+          images: [
+            [
+              1000,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 2400]],
+          images: [
+            [
+              1200,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 2400]],
+          images: [
+            [
+              1400,
+              2400
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Searching: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 480]],
+          images: [
+            [
+              0,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 480]],
+          images: [
+            [
+              200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 480]],
+          images: [
+            [
+              400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 480]],
+          images: [
+            [
+              600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 480]],
+          images: [
+            [
+              800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 480]],
+          images: [
+            [
+              1000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 480]],
+          images: [
+            [
+              1200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 480]],
+          images: [
+            [
+              1400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 480]],
+          images: [
+            [
+              1600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 480]],
+          images: [
+            [
+              1800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 480]],
+          images: [
+            [
+              2000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 480]],
+          images: [
+            [
+              2200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 480]],
+          images: [
+            [
+              2400,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 480]],
+          images: [
+            [
+              2600,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 480]],
+          images: [
+            [
+              2800,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 480]],
+          images: [
+            [
+              3000,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 480]],
+          images: [
+            [
+              3200,
+              480
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 640]],
+          images: [
+            [
+              0,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 640]],
+          images: [
+            [
+              200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 640]],
+          images: [
+            [
+              400,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 640]],
+          images: [
+            [
+              600,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 640]],
+          images: [
+            [
+              800,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 640]],
+          images: [
+            [
+              1000,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1200, 640]],
+          images: [
+            [
+              1200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1400, 640]],
+          images: [
+            [
+              1400,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1600, 640]],
+          images: [
+            [
+              1600,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 640]],
+          images: [
+            [
+              1800,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 640]],
+          images: [
+            [
+              2000,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 640]],
+          images: [
+            [
+              2200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 640]],
+          images: [
+            [
+              2400,
+              640
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 8,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 100,
-          images: [[2600, 640]],
+          images: [
+            [
+              2600,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 640]],
+          images: [
+            [
+              2800,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 640]],
+          images: [
+            [
+              3000,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 640]],
+          images: [
+            [
+              3200,
+              640
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 800]],
+          images: [
+            [
+              0,
+              800
+            ]
+          ]
         },
         {
           duration: 0,
-          images: [[200, 800]],
+          images: [
+            [
+              200,
+              800
+            ]
+          ]
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     StopListening: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     MoveDown: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2720]],
+          images: [
+            [
+              2600,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 2720]],
+          images: [
+            [
+              2800,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2720]],
+          images: [
+            [
+              3000,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2720]],
-          sound: "3",
+          images: [
+            [
+              3200,
+              2720
+            ]
+          ],
+          sound: "3"
         },
         {
           duration: 100,
-          images: [[0, 2880]],
-        },
-      ],
+          images: [
+            [
+              0,
+              2880
+            ]
+          ]
+        }
+      ]
     },
     ReadContinued: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     LookDown: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 800]],
+          images: [
+            [
+              400,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 800]],
+          images: [
+            [
+              600,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 800]],
+          images: [
+            [
+              800,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1000, 800]],
+          images: [
+            [
+              1000,
+              800
+            ]
+          ]
         },
         {
           duration: 400,
-          images: [[1200, 800]],
+          images: [
+            [
+              1200,
+              800
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 6,
-                weight: 33,
+                weight: 33
               },
               {
                 frameIndex: 7,
-                weight: 33,
+                weight: 33
               },
               {
                 frameIndex: 8,
-                weight: 34,
-              },
-            ],
-          },
+                weight: 34
+              }
+            ]
+          }
         },
         {
           duration: 1400,
-          images: [[1200, 800]],
+          images: [
+            [
+              1200,
+              800
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 8,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
           duration: 3500,
-          images: [[1200, 800]],
+          images: [
+            [
+              1200,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1200, 800],
-            [1400, 800],
-          ],
+            [
+              1200,
+              800
+            ],
+            [
+              1400,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1200, 800],
-            [1600, 800],
-          ],
+            [
+              1200,
+              800
+            ],
+            [
+              1600,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
           images: [
-            [1200, 800],
-            [1400, 800],
-          ],
+            [
+              1200,
+              800
+            ],
+            [
+              1400,
+              800
+            ]
+          ]
         },
         {
           duration: 1200,
-          images: [[1200, 800]],
+          images: [
+            [
+              1200,
+              800
+            ]
+          ],
           branching: {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100,
-              },
-            ],
-          },
+                weight: 100
+              }
+            ]
+          }
         },
         {
-          duration: 0,
-        },
+          duration: 0
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Sad: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2080]],
+          images: [
+            [
+              3000,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2080]],
+          images: [
+            [
+              3200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2240]],
+          images: [
+            [
+              0,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2240]],
+          images: [
+            [
+              200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2240]],
+          images: [
+            [
+              400,
+              2240
+            ]
+          ]
         },
         {
           duration: 3000,
-          images: [[600, 2240]],
+          images: [
+            [
+              600,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2240]],
+          images: [
+            [
+              400,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2240]],
+          images: [
+            [
+              200,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 2240]],
+          images: [
+            [
+              0,
+              2240
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2080]],
+          images: [
+            [
+              3200,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2080]],
+          images: [
+            [
+              3000,
+              2080
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     LookRightReturn: {
       frames: [
         {
           duration: 100,
-          images: [[2400, 800]],
+          images: [
+            [
+              2400,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2200, 800]],
+          images: [
+            [
+              2200,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2000, 800]],
+          images: [
+            [
+              2000,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[1800, 800]],
+          images: [
+            [
+              1800,
+              800
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     MoveDownReturn: {
       frames: [
         {
           duration: 100,
-          images: [[2400, 2880]],
+          images: [
+            [
+              2400,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2720]],
+          images: [
+            [
+              3200,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2720]],
-          sound: "5",
+          images: [
+            [
+              3000,
+              2720
+            ]
+          ],
+          sound: "5"
         },
         {
           duration: 100,
-          images: [[2800, 2720]],
+          images: [
+            [
+              2800,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2720]],
+          images: [
+            [
+              2600,
+              2720
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     MoveLeftReturn: {
       frames: [
         {
           duration: 100,
-          images: [[2800, 1760]],
+          images: [
+            [
+              2800,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 1760]],
+          images: [
+            [
+              3000,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1760]],
+          images: [
+            [
+              3200,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1920]],
+          images: [
+            [
+              0,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1920]],
-          sound: "5",
+          images: [
+            [
+              200,
+              1920
+            ]
+          ],
+          sound: "5"
         },
         {
           duration: 100,
-          images: [[400, 1920]],
+          images: [
+            [
+              400,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 1920]],
+          images: [
+            [
+              600,
+              1920
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     GestureDown: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2880]],
+          images: [
+            [
+              2600,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 2880]],
+          images: [
+            [
+              2800,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2880]],
+          images: [
+            [
+              3000,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2880]],
+          images: [
+            [
+              3200,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 3040]],
+          images: [
+            [
+              0,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 3040]],
+          images: [
+            [
+              200,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 3040]],
+          images: [
+            [
+              0,
+              3040
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 2880]],
+          images: [
+            [
+              3200,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 2880]],
+          images: [
+            [
+              3000,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 2880]],
+          images: [
+            [
+              2800,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 2880]],
+          images: [
+            [
+              2600,
+              2880
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     Process: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     RestPose: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
-        },
-      ],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
     },
     Pleased: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1600]],
+          images: [
+            [
+              2400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1600]],
+          images: [
+            [
+              2600,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2800, 1600]],
+          images: [
+            [
+              2800,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3000, 1600]],
+          images: [
+            [
+              3000,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[3200, 1600]],
+          images: [
+            [
+              3200,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 1760]],
+          images: [
+            [
+              0,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 1760]],
+          images: [
+            [
+              200,
+              1760
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 1760]],
+          images: [
+            [
+              400,
+              1760
+            ]
+          ]
         },
         {
           duration: 1000,
-          images: [[2800, 1600]],
+          images: [
+            [
+              2800,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2600, 1600]],
+          images: [
+            [
+              2600,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[2400, 1600]],
+          images: [
+            [
+              2400,
+              1600
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[0, 0]],
-        },
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        }
       ],
-      useExitBranching: true,
+      useExitBranching: true
     },
     MoveUp: {
       frames: [
         {
           duration: 100,
-          images: [[0, 0]],
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[800, 2560]],
+          images: [
+            [
+              800,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[600, 2560]],
+          images: [
+            [
+              600,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[400, 2560]],
+          images: [
+            [
+              400,
+              2560
+            ]
+          ]
         },
         {
           duration: 100,
-          images: [[200, 2560]],
-          sound: "3",
+          images: [
+            [
+              200,
+              2560
+            ]
+          ],
+          sound: "3"
         },
         {
           duration: 100,
-          images: [[0, 2560]],
-        },
-      ],
-    },
-  },
+          images: [
+            [
+              0,
+              2560
+            ]
+          ]
+        }
+      ]
+    }
+  }
 });

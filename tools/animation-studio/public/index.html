@@ -16,9 +16,8 @@
         <section class="toolbar field-row">
           <label for="agentSelect">Assistant</label>
           <select id="agentSelect"></select>
-          <button id="loadAgentBtn">Load</button>
-          <button id="saveBtn">Save agent.js</button>
-          <button id="undoBtn" type="button">Undo</button>
+          <button id="loadAgentBtn">⌛ Load</button>
+          <button id="undoBtn" type="button">↶ Undo</button>
           <span id="statusText" class="status-text"></span>
         </section>
 
@@ -70,7 +69,7 @@
             </div>
             <div class="field-row map-zoom-row">
               <span>Zoom</span>
-              <button id="zoomOutBtn" type="button">-</button>
+              <button id="zoomOutBtn" type="button">−</button>
               <button id="zoomResetBtn" type="button">100%</button>
               <button id="zoomInBtn" type="button">+</button>
               <span id="zoomLabel">100%</span>
@@ -97,7 +96,7 @@
                 aria-selected="true"
                 aria-controls="framesTabContent"
               >
-                Frames
+                ▢ Frames
               </button>
               <button
                 id="soundsTabBtn"
@@ -105,7 +104,7 @@
                 aria-selected="false"
                 aria-controls="soundsTabContent"
               >
-                Sound Library
+                ♫ Sound Library
               </button>
             </menu>
 
@@ -125,7 +124,7 @@
                   <label for="soundSelect">Sound</label>
                   <div class="field-row sound-row">
                     <select id="soundSelect"></select>
-                    <button id="playFrameSoundBtn" type="button">Play</button>
+                    <button id="playFrameSoundBtn" type="button">⯈ Play</button>
                   </div>
 
                   <label for="exitBranchInput">Exit Branch</label>
@@ -153,15 +152,15 @@
                   >
                   <textarea id="imagesInput" rows="6"></textarea>
 
-                  <div class="field-row wrap">
-                    <button id="addFrameBtn">Add</button>
-                    <button id="duplicateFrameBtn">Duplicate</button>
-                    <button id="removeFrameBtn">Remove</button>
-                    <button id="moveUpBtn">Up</button>
-                    <button id="moveDownBtn">Down</button>
-                    <button id="selectAllFramesBtn">Select All</button>
-                    <button id="invertFramesBtn">Invert Selected</button>
-                    <button id="applyFrameBtn">Apply</button>
+                  <div class="frame-action-grid">
+                    <button id="moveUpBtn">▲ Up    </button>
+                    <button id="addFrameBtn">⊕ Add</button>
+                    <button id="moveDownBtn">▼ Down</button>
+                    <button id="removeFrameBtn">✘ Remove</button>
+                    <button id="selectAllFramesBtn">❖ Select All</button>
+                    <button id="invertFramesBtn">↕ Invert Selected</button>
+                    <button id="duplicateFrameBtn">🗐 Duplicate</button>
+                    <button id="applyFrameBtn">✔ Apply</button>
                   </div>
                 </div>
               </div>
@@ -182,6 +181,10 @@
                 <span id="selectedLibrarySoundText">Selected: (none)</span>
               </div>
             </fieldset>
+
+            <div class="right-panel-footer field-row">
+              <button id="saveBtn" type="button">🖪 Save</button>
+            </div>
           </section>
         </section>
       </div>

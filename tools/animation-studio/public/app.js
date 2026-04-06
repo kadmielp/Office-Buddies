@@ -72,7 +72,7 @@ const elements = {
   moveDownBtn: document.getElementById("moveDownBtn"),
   selectAllFramesBtn: document.getElementById("selectAllFramesBtn"),
   invertFramesBtn: document.getElementById("invertFramesBtn"),
-  applyFrameBtn: document.getElementById("applyFrameBtn"),
+  clearBranchFieldsBtn: document.getElementById("clearBranchFieldsBtn"),
 };
 
 const mapCtx = elements.mapCanvas.getContext("2d");
@@ -807,10 +807,56 @@ function parseImages(text) {
   return images;
 }
 
-function applyFrameEditor() {
+function getSelectedFrameIndices() {
+  const frames = getCurrentFrames();
+  const selected = Array.from(
+    new Set(
+      (state.selectedFrameIndices || []).filter(
+        (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
+      ),
+    ),
+  ).sort((a, b) => a - b);
+
+  if (selected.length) {
+    return selected;
+  }
+
+  if (
+    Number.isInteger(state.selectedFrameIndex) &&
+    state.selectedFrameIndex >= 0 &&
+    state.selectedFrameIndex < frames.length
+  ) {
+    return [state.selectedFrameIndex];
+  }
+
+  return [];
+}
+
+function clearFrameBranchFields(frame, editableBranchIndex) {
+  if (!frame || typeof frame !== "object") {
+    return;
+  }
+
+  delete frame.exitBranch;
+
+  if (
+    frame.branching &&
+    Array.isArray(frame.branching.branches) &&
+    frame.branching.branches.length > editableBranchIndex
+  ) {
+    frame.branching.branches.splice(editableBranchIndex, 1);
+    if (frame.branching.branches.length === 0) {
+      delete frame.branching;
+    }
+  }
+}
+
+function applyFrameEditor(options = {}) {
+  const { statusText = `Updated frame ${state.selectedFrameIndex} in session` } =
+    options;
   const frame = getCurrentFrames()[state.selectedFrameIndex];
   if (!frame) {
-    return;
+    return false;
   }
 
   const duration = Number(elements.durationInput.value || "0");
@@ -845,16 +891,7 @@ function applyFrameEditor() {
   const editableBranchIndex = getActiveEditableBranchIndex();
 
   if (!hasBranchFrameIndex && !hasWeight) {
-    if (
-      frame.branching &&
-      Array.isArray(frame.branching.branches) &&
-      frame.branching.branches.length > editableBranchIndex
-    ) {
-      frame.branching.branches.splice(editableBranchIndex, 1);
-      if (frame.branching.branches.length === 0) {
-        delete frame.branching;
-      }
-    }
+    clearFrameBranchFields(frame, editableBranchIndex);
   } else {
     if (!hasBranchFrameIndex || !hasWeight) {
       throw new Error(
@@ -895,7 +932,29 @@ function applyFrameEditor() {
   frame.images = parseImages(elements.imagesInput.value);
 
   renderFrameList();
-  setStatus(`Applied edits to frame ${state.selectedFrameIndex}`);
+  if (statusText) {
+    setStatus(statusText);
+  }
+  return true;
+}
+
+function applyFrameEditorToSession(options = {}) {
+  const { statusText } = options;
+
+  if (state.selectedFrameIndex < 0) {
+    return;
+  }
+
+  pushHistorySnapshot();
+  try {
+    const applied = applyFrameEditor({ statusText });
+    if (!applied) {
+      state.historyStack.pop();
+    }
+  } catch (error) {
+    state.historyStack.pop();
+    throw error;
+  }
 }
 
 function selectAnimation(name) {
@@ -978,7 +1037,7 @@ async function saveAgent(options = {}) {
 
   try {
     if (shouldApplyCurrentFrame && state.selectedFrameIndex >= 0) {
-      applyFrameEditor();
+      applyFrameEditor({ statusText: null });
     }
   } catch (error) {
     setStatus(error.message);
@@ -1027,17 +1086,6 @@ async function saveAgent(options = {}) {
   setStatus(`Saved: ${savedPath}`);
 }
 
-async function applyAndPersistFrame() {
-  pushHistorySnapshot();
-  try {
-    applyFrameEditor();
-  } catch (error) {
-    state.historyStack.pop();
-    throw error;
-  }
-  await saveAgent({ applyCurrentFrame: false });
-}
-
 async function undoLastChange() {
   if (!state.historyStack.length) {
     setStatus("Nothing to undo");
@@ -1047,9 +1095,8 @@ async function undoLastChange() {
   stopAnimationPreview();
   const snapshot = state.historyStack.pop();
   restoreSnapshot(snapshot);
-  await saveAgent({ applyCurrentFrame: false });
   playAnimationPreview();
-  setStatus("Undid last change");
+  setStatus("Undid last change in session");
 }
 
 async function playSoundById(soundId, options = {}) {
@@ -1283,50 +1330,23 @@ function bindEvents() {
     renderAnimationPreview(state.selectedFrameIndex);
   });
 
-  elements.applyFrameBtn.addEventListener("click", () => {
-    (async () => {
-      try {
-        await applyAndPersistFrame();
-      } catch (error) {
-        setStatus(error.message);
-      }
-    })();
-  });
-
-  const runApplyAndPersist = () => {
-    (async () => {
-      try {
-        await applyAndPersistFrame();
-      } catch (error) {
-        setStatus(error.message);
-      }
-    })();
+  const applyFrameEditorChange = () => {
+    try {
+      applyFrameEditorToSession();
+    } catch (error) {
+      setStatus(error.message);
+    }
   };
 
-  const applyOnEnter = (event) => {
-    if (event.key !== "Enter") {
-      return;
-    }
-    event.preventDefault();
-    runApplyAndPersist();
-  };
-
-  const applyOnTextareaEnter = (event) => {
-    if (event.key !== "Enter") {
-      return;
-    }
-    if (!event.ctrlKey && !event.metaKey) {
-      return;
-    }
-    event.preventDefault();
-    runApplyAndPersist();
-  };
-
-  elements.durationInput.addEventListener("keydown", applyOnEnter);
-  elements.exitBranchInput.addEventListener("keydown", applyOnEnter);
-  elements.branchFrameIndexInput.addEventListener("keydown", applyOnEnter);
-  elements.weightInput.addEventListener("keydown", applyOnEnter);
-  elements.imagesInput.addEventListener("keydown", applyOnTextareaEnter);
+  elements.durationInput.addEventListener("change", applyFrameEditorChange);
+  elements.soundSelect.addEventListener("change", applyFrameEditorChange);
+  elements.exitBranchInput.addEventListener("change", applyFrameEditorChange);
+  elements.branchFrameIndexInput.addEventListener(
+    "change",
+    applyFrameEditorChange,
+  );
+  elements.weightInput.addEventListener("change", applyFrameEditorChange);
+  elements.imagesInput.addEventListener("change", applyFrameEditorChange);
 
   elements.prevBranchBtn.addEventListener("click", () => {
     const count = getAnimationPathChoiceCount();
@@ -1541,6 +1561,24 @@ function bindEvents() {
     setStatus(`Inverted ${selected.length} selected frame(s)`);
   });
 
+  elements.clearBranchFieldsBtn.addEventListener("click", () => {
+    const frames = getCurrentFrames();
+    const selected = getSelectedFrameIndices();
+    if (!selected.length) {
+      setStatus("Select at least 1 frame");
+      return;
+    }
+
+    pushHistorySnapshot();
+    const editableBranchIndex = getActiveEditableBranchIndex();
+    selected.forEach((index) => {
+      clearFrameBranchFields(frames[index], editableBranchIndex);
+    });
+
+    renderFrameList();
+    setStatus(`Cleared branch fields for ${selected.length} frame(s) in session`);
+  });
+
   elements.replaceImageBtn.addEventListener("click", () => {
     const frame = getCurrentFrames()[state.selectedFrameIndex];
     const coords = selectedCellCoords();
@@ -1593,7 +1631,13 @@ function bindEvents() {
     }
     elements.soundSelect.value = soundId;
     setEditorTab("frames");
-    setStatus(`Selected sound ${soundId} for frame editor`);
+    try {
+      applyFrameEditorToSession({
+        statusText: `Updated sound for frame ${state.selectedFrameIndex} in session`,
+      });
+    } catch (error) {
+      setStatus(error.message);
+    }
   });
 
   elements.mapCanvas.addEventListener("click", (event) => {

@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Polished the Animation Studio frame editor by moving the save action under the editor, reorganizing frame buttons into a clearer two-column layout, and keeping the select-all toggle label consistent during re-renders.
+- Refined the Animation Studio frame editor with in-session field editing, a one-click branch-clear action, clearer button layout, pressed tab states, and save/undo controls together in the toolbar.
+- Updated the bundled Genius assistant animation data with the latest frame, branch, and sound edits from Animation Studio.
 
 ## [0.6.14] - 2026-04-05
 

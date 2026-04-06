@@ -2991,7 +2991,15 @@ clippy.ready("Merlin", {
               0,
               0
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 20,
+                weight: 60
+              }
+            ]
+          }
         },
         {
           duration: 100,
@@ -3072,6 +3080,504 @@ clippy.ready("Merlin", {
             [
               896,
               1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              1024
+            ]
+          ],
+          sound: "14"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              896,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              1024
+            ]
+          ],
+          sound: "14"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              896,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              640,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              512,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              384,
+              1024
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 56,
+                weight: 100
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              384,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              512,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              640,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              896
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              896,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              896
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 150,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1536,
+              896
+            ]
+          ],
+          sound: "19"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1792,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1920,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              2048,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1792,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1920,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1536,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1792,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1920,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              2048,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1920,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1536,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 200,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              2048,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1792,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              896
+            ],
+            [
+              1920,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2176,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2304,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2432,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2560,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              256,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              896
+            ]
+          ],
+          sound: "25"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              640,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              512,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              384,
+              896
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
             ]
           ]
         }

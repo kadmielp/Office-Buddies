@@ -276,23 +276,37 @@ textarea {
   height: auto;
 }
 
-#previewFrameText {
+.animation-preview-overlay {
   position: absolute;
   top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 8px;
+  right: 8px;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: space-between;
+  align-items: start;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#previewFrameText,
+#previewProbabilityText {
+  position: static;
   min-width: 62px;
-  display: inline-flex;
+  height: 18px;
+  margin: 0;
+  padding: 0 6px;
+  display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 1px 6px;
+  line-height: 1;
+  white-space: nowrap;
   color: #ffffff;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid #6b6b6b;
   box-sizing: border-box;
-  pointer-events: none;
-  z-index: 1;
+  align-self: start;
 }
 
 #toggleAnimationPlayBtn,

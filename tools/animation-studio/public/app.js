@@ -34,6 +34,7 @@ const elements = {
   toggleAnimationPlayBtn: document.getElementById("toggleAnimationPlayBtn"),
   togglePreviewSoundBtn: document.getElementById("togglePreviewSoundBtn"),
   previewFrameText: document.getElementById("previewFrameText"),
+  previewProbabilityText: document.getElementById("previewProbabilityText"),
   framesTabBtn: document.getElementById("framesTabBtn"),
   soundsTabBtn: document.getElementById("soundsTabBtn"),
   framesTabContent: document.getElementById("framesTabContent"),
@@ -204,22 +205,120 @@ function getPreviewPathOptions(frameIndex) {
   const branches = Array.isArray(frame?.branching?.branches)
     ? frame.branching.branches
     : [];
+  let cumulative = 0;
   for (let i = 0; i < branches.length; i += 1) {
     const branch = branches[i];
     const target = Number(branch?.frameIndex);
     const weight = Number(branch?.weight);
-    if (Number.isInteger(target) && Number.isFinite(weight) && weight > 0) {
+    if (!Number.isInteger(target) || !Number.isFinite(weight) || weight <= 0) {
+      continue;
+    }
+
+    const nextCumulative = cumulative + weight;
+    const effectiveWeight = Math.max(
+      0,
+      Math.min(100, nextCumulative) - Math.min(100, cumulative),
+    );
+    if (effectiveWeight > 0) {
       pushOption(target, "branch", i);
+    }
+    cumulative = nextCumulative;
+  }
+
+  const fallbackWeight = Math.max(0, 100 - Math.min(100, cumulative));
+  if (fallbackWeight > 0) {
+    if (Number.isInteger(frame.exitBranch)) {
+      pushOption(frame.exitBranch, "exit");
+    } else if (frames.length > 0) {
+      pushOption((frameIndex + 1) % frames.length, "next");
     }
   }
 
-  if (Number.isInteger(frame.exitBranch)) {
-    pushOption(frame.exitBranch, "exit");
-  } else if (frames.length > 0) {
-    pushOption((frameIndex + 1) % frames.length, "next");
+  return options;
+}
+
+function getPreviewPathProbability(frameIndex, optionIndex = null) {
+  const frames = getCurrentFrames();
+  if (!frames.length || frameIndex < 0 || frameIndex >= frames.length) {
+    return null;
   }
 
-  return options;
+  const frame = frames[frameIndex] || {};
+  const options = getPreviewPathOptions(frameIndex);
+  if (!options.length) {
+    return null;
+  }
+
+  const choice = Number.isInteger(optionIndex)
+    ? optionIndex
+    : Number(state.previewPathChoice);
+  const boundedChoice =
+    Number.isInteger(choice) && choice >= 0 && choice < options.length ? choice : 0;
+  const selectedOption = options[boundedChoice];
+  if (!selectedOption) {
+    return null;
+  }
+
+  const branches = Array.isArray(frame?.branching?.branches)
+    ? frame.branching.branches
+    : [];
+  const weightedBranches = branches
+    .map((branch, branchIndex) => ({
+      branchIndex,
+      frameIndex: Number(branch?.frameIndex),
+      weight: Number(branch?.weight),
+    }))
+    .filter(
+      (branch) =>
+        Number.isInteger(branch.frameIndex) &&
+        branch.frameIndex >= 0 &&
+        branch.frameIndex < frames.length &&
+        Number.isFinite(branch.weight) &&
+        branch.weight > 0,
+    );
+
+  let cumulative = 0;
+  for (const branch of weightedBranches) {
+    const nextCumulative = cumulative + branch.weight;
+    const normalizedWeight = Math.max(
+      0,
+      Math.min(100, nextCumulative) - Math.min(100, cumulative),
+    );
+    if (
+      selectedOption.kind === "branch" &&
+      selectedOption.branchIndex === branch.branchIndex
+    ) {
+      return normalizedWeight;
+    }
+    cumulative = nextCumulative;
+  }
+
+  const fallbackWeight = Math.max(0, 100 - Math.min(100, cumulative));
+  if (
+    (selectedOption.kind === "exit" || selectedOption.kind === "next") &&
+    fallbackWeight > 0
+  ) {
+    return fallbackWeight;
+  }
+
+  return 0;
+}
+
+function getDisplayedPreviewProbability(currentFrameIndex) {
+  const frames = getCurrentFrames();
+  if (!frames.length) {
+    return null;
+  }
+
+  if (
+    Number.isInteger(state.selectedFrameIndex) &&
+    state.selectedFrameIndex >= 0 &&
+    state.selectedFrameIndex < frames.length
+  ) {
+    return getPreviewPathProbability(state.selectedFrameIndex);
+  }
+
+  return getPreviewPathProbability(currentFrameIndex);
 }
 
 function getAnimationPathChoiceCount() {
@@ -333,6 +432,7 @@ function renderAnimationPreview(frameIndex = 0) {
 
   if (!frames.length || !state.mapImage) {
     elements.previewFrameText.textContent = "Frame: -";
+    elements.previewProbabilityText.textContent = "Prob: -";
     return;
   }
 
@@ -353,6 +453,10 @@ function renderAnimationPreview(frameIndex = 0) {
   }
 
   elements.previewFrameText.textContent = `Frame: ${bounded}`;
+  const probability = getDisplayedPreviewProbability(bounded);
+  elements.previewProbabilityText.textContent = Number.isFinite(probability)
+    ? `Prob: ${probability}%`
+    : "Prob: -";
 }
 
 function playAnimationPreview(options = {}) {
@@ -1562,12 +1666,13 @@ function bindEvents() {
     if (count <= 1) {
       return;
     }
+    const wasPlaying = Boolean(state.previewTimer);
     const current = Number(state.previewPathChoice);
     const currentIndex = Number.isInteger(current) ? current : 0;
     state.previewPathChoice = (currentIndex - 1 + count) % count;
     renderFrameEditor();
-    if (state.previewTimer) {
-      playAnimationPreview({ startIndex: 0 });
+    if (wasPlaying) {
+      playAnimationPreview({ startIndex: state.selectedFrameIndex });
     } else {
       renderAnimationPreview(state.selectedFrameIndex);
     }
@@ -1578,12 +1683,13 @@ function bindEvents() {
     if (count <= 1) {
       return;
     }
+    const wasPlaying = Boolean(state.previewTimer);
     const current = Number(state.previewPathChoice);
     const currentIndex = Number.isInteger(current) ? current : 0;
     state.previewPathChoice = (currentIndex + 1) % count;
     renderFrameEditor();
-    if (state.previewTimer) {
-      playAnimationPreview({ startIndex: 0 });
+    if (wasPlaying) {
+      playAnimationPreview({ startIndex: state.selectedFrameIndex });
     } else {
       renderAnimationPreview(state.selectedFrameIndex);
     }

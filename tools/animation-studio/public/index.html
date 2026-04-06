@@ -29,7 +29,7 @@
             <div class="field-row-stacked">
               <input id="animationSearch" placeholder="Filter animations" />
               <select id="animationList" size="20"></select>
-              <div class="field-row">
+              <div class="animation-actions">
                 <button id="newAnimationBtn">New</button>
                 <button id="renameAnimationBtn">Rename</button>
                 <button id="deleteAnimationBtn">Delete</button>
@@ -37,9 +37,10 @@
               <fieldset class="animation-preview">
                 <legend>Animation Preview</legend>
                 <div class="animation-preview-wrap sunken-panel">
+                  <span id="previewFrameText">Frame: -</span>
                   <canvas id="animationPreviewCanvas"></canvas>
                 </div>
-                <div class="field-row preview-controls">
+                <div class="preview-controls">
                   <button id="toggleAnimationPlayBtn" type="button">
                     Play
                   </button>
@@ -50,14 +51,11 @@
                   >
                     Sound: Off
                   </button>
-                  <span id="previewFrameText">Frame: -</span>
                 </div>
-                <div
-                  class="field-row branch-selector branch-selector-under-preview"
-                >
-                  <button id="prevBranchBtn" type="button">&lt;</button>
+                <div class="branch-selector branch-selector-under-preview">
+                  <button id="prevBranchBtn" type="button">◀</button>
                   <span id="branchPositionText">Branch 1/1</span>
-                  <button id="nextBranchBtn" type="button">&gt;</button>
+                  <button id="nextBranchBtn" type="button">▶</button>
                 </div>
               </fieldset>
             </div>

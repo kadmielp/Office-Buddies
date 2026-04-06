@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Refined the Animation Studio frame editor with in-session field editing, a one-click branch-clear action, clearer button layout, pressed tab states, and save/undo controls together in the toolbar.
 - Added Animation Studio session redo support and disabled the `Save`, `Undo`, and `Redo` buttons whenever there is nothing to do.
+- Polished the Animation Studio preview and tab layout with cleaner alignment, centered preview controls, an in-canvas frame counter, and roomier editor tabs.
 - Updated the bundled Genius assistant animation data with the latest frame, branch, and sound edits from Animation Studio.
 
 ## [0.6.14] - 2026-04-05

@@ -48,7 +48,7 @@
     "prettier": "3.5.3",
     "ts-node": "^10.9.2",
     "typescript": "~5.8.3",
-    "vite": "^7.3.1"
+    "vite": "^8.0.3"
   },
   "dependencies": {
     "@electron/llm": "^1.1.1",

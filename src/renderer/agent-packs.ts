@@ -16,6 +16,9 @@ import geniusMap from "../../assets/agents/Genius/map.png";
 import linksAgentScript from "../../assets/agents/Links/agent.js?raw";
 import linksSoundScript from "../../assets/agents/Links/sounds-mp3.js?raw";
 import linksMap from "../../assets/agents/Links/map.png";
+import lifeAgentScript from "../../assets/agents/Life/agent.js?raw";
+import lifeSoundScript from "../../assets/agents/Life/sounds-mp3.js?raw";
+import lifeMap from "../../assets/agents/Life/map.png";
 import merlinAgentScript from "../../assets/agents/Merlin/agent.js?raw";
 import merlinSoundScript from "../../assets/agents/Merlin/sounds-mp3.js?raw";
 import merlinMap from "../../assets/agents/Merlin/map.png";
@@ -110,6 +113,12 @@ const RAW_AGENT_FILES: RawAgentFiles[] = [
     mapSrc: linksMap,
     agentScript: linksAgentScript,
     soundScript: linksSoundScript,
+  },
+  {
+    name: "Life",
+    mapSrc: lifeMap,
+    agentScript: lifeAgentScript,
+    soundScript: lifeSoundScript,
   },
   {
     name: "Merlin",

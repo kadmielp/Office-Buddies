@@ -737,6 +737,10 @@ function frameToCell(frame) {
     return null;
   }
   const first = frame.images[0];
+  if (Number.isFinite(first)) {
+    return cellIndexToCoords(Number(first));
+  }
+
   if (!Array.isArray(first) || first.length < 2) {
     return null;
   }
@@ -984,8 +988,18 @@ function formatImages(images) {
     return "";
   }
   return images
-    .filter((image) => Array.isArray(image) && image.length >= 2)
-    .map((image) => `${image[0]},${image[1]}`)
+    .map((image) => {
+      if (Number.isFinite(image)) {
+        return String(Number(image));
+      }
+
+      if (Array.isArray(image) && image.length >= 2) {
+        return `${image[0]},${image[1]}`;
+      }
+
+      return "";
+    })
+    .filter(Boolean)
     .join("\n");
 }
 
@@ -1036,11 +1050,20 @@ function parseImages(text) {
   const images = [];
   for (const line of lines) {
     const normalized = line.replace(/\s+/g, "");
-    const [xRaw, yRaw] = normalized.split(",");
+    if (/^#?\d+$/.test(normalized)) {
+      images.push(Number(normalized.replace("#", "")));
+      continue;
+    }
+
+    const [xRaw, yRaw, ...extraParts] = normalized.split(",");
+    if (extraParts.length > 0) {
+      throw new Error(`Invalid image coordinate: ${line}`);
+    }
+
     const x = Number(xRaw);
     const y = Number(yRaw);
     if (!Number.isFinite(x) || !Number.isFinite(y)) {
-      throw new Error(`Invalid image coordinate: ${line}`);
+      throw new Error(`Invalid image reference: ${line}`);
     }
     images.push([x, y]);
   }

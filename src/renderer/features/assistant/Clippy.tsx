@@ -185,6 +185,7 @@ export function Clippy() {
   const idleTimeoutRef = useRef<number | undefined>(undefined);
   const speechTimeoutRef = useRef<number | undefined>(undefined);
   const copyFeedbackTimeoutRef = useRef<number | undefined>(undefined);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const activeAnimationRef = useRef<string>("Default");
   const hasPlayedWelcomeRef = useRef<boolean>(false);
   const idleStartedAtRef = useRef<number | null>(null);
@@ -311,6 +312,16 @@ export function Clippy() {
     }
   }, []);
 
+  const stopCurrentAudio = useCallback(() => {
+    if (!currentAudioRef.current) {
+      return;
+    }
+
+    currentAudioRef.current.pause();
+    currentAudioRef.current.currentTime = 0;
+    currentAudioRef.current = null;
+  }, []);
+
   const scheduleBuddySpeechDismiss = useCallback(() => {
     clearSpeechTimeout();
     speechTimeoutRef.current = window.setTimeout(() => {
@@ -371,6 +382,7 @@ export function Clippy() {
   const playSound = useCallback(
     (soundKey?: string) => {
       if (settings.disableSound) {
+        stopCurrentAudio();
         return;
       }
 
@@ -384,10 +396,21 @@ export function Clippy() {
         return;
       }
 
+      stopCurrentAudio();
       const audio = new Audio(source);
-      void audio.play().catch(() => {});
+      currentAudioRef.current = audio;
+      audio.addEventListener("ended", () => {
+        if (currentAudioRef.current === audio) {
+          currentAudioRef.current = null;
+        }
+      });
+      void audio.play().catch(() => {
+        if (currentAudioRef.current === audio) {
+          currentAudioRef.current = null;
+        }
+      });
     },
-    [agentPack.sounds, settings.disableSound],
+    [agentPack.sounds, settings.disableSound, stopCurrentAudio],
   );
 
   const runAnimation = useCallback(
@@ -399,6 +422,7 @@ export function Clippy() {
 
       activeAnimationRef.current = key;
       clearFrameTimeout();
+      stopCurrentAudio();
 
       const animation = agentPack.animations[key];
 
@@ -436,6 +460,7 @@ export function Clippy() {
       drawFrame,
       isSpriteReady,
       playSound,
+      stopCurrentAudio,
     ],
   );
 
@@ -764,6 +789,16 @@ export function Clippy() {
       spriteImageRef.current = null;
     };
   }, [agentPack.mapSrc, runAnimation]);
+
+  useEffect(() => {
+    if (settings.disableSound) {
+      stopCurrentAudio();
+    }
+
+    return () => {
+      stopCurrentAudio();
+    };
+  }, [settings.disableSound, stopCurrentAudio]);
 
   useEffect(() => {
     if (

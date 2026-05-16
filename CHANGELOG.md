@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.15] - 2026-05-16
+
 ### Changed
 
 - Refined the Animation Studio frame editor with in-session field editing, a one-click branch-clear action, clearer button layout, pressed tab states, and save/undo controls together in the toolbar.

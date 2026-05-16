@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "run_dir": "G:\\Vibing\\clippy-codex\\tmp\\hatch-pet\\life",
+  "spritesheet": "G:\\Vibing\\clippy-codex\\tmp\\hatch-pet\\life\\final\\spritesheet.webp",
+  "validation": "G:\\Vibing\\clippy-codex\\tmp\\hatch-pet\\life\\final\\validation.json",
+  "contact_sheet": "G:\\Vibing\\clippy-codex\\tmp\\hatch-pet\\life\\qa\\contact-sheet.png",
+  "review": "G:\\Vibing\\clippy-codex\\tmp\\hatch-pet\\life\\qa\\review.json",
+  "videos": null,
+  "package": "C:\\Users\\Orion\\.codex\\pets\\life"
+}

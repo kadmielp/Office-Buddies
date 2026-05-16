@@ -1,0 +1,13 @@
+{
+  "createdAt": "2026-05-16T18:17:15.756Z",
+  "animationName": "SendMail2",
+  "inputVideo": "C:\\Users\\Orion\\Downloads\\Life-animations\\videos\\SendMail2.mp4",
+  "sourceOutputDir": "G:\\Vibing\\clippy-codex\\assets\\agents\\Lifey",
+  "copiedFiles": [
+    "map.png",
+    "agent.js",
+    "sounds-mp3.js",
+    "pipeline.config.json"
+  ],
+  "restoreHint": "Copy these files back into the output folder to restore the state before this animation append."
+}

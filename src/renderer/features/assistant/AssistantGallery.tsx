@@ -42,11 +42,11 @@ const ASSISTANT_COPY: Record<string, AssistantDetails> = {
     description:
       "If you're on the prowl for answers in Office, Links can chase them down for you.",
   },
-  Life: {
-    displayName: "Life",
+  Lifey: {
+    displayName: "Lifey",
     speech: "System ready. Let's make something useful.",
     description:
-      "Life is a confident retro CRT computer in a sharp blue suit, ready to process ideas with a friendly glow.",
+      "Lifey is a confident retro CRT computer in a sharp blue suit, ready to process ideas with a friendly glow.",
   },
   Rocky: {
     displayName: "Rocky",
@@ -91,7 +91,7 @@ const ASSISTANT_ORDER = [
   "F1",
   "Merlin",
   "Links",
-  "Life",
+  "Lifey",
   "Rocky",
   "Bonzi",
   "Genie",

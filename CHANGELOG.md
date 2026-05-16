@@ -19,6 +19,11 @@ All notable changes to this project will be documented in this file.
 - Updated the bundled Genius assistant animation data with the latest frame, branch, and sound edits from Animation Studio.
 - Updated the bundled Bonzi assistant animation data with the latest frame additions, branching changes, and animation cleanup from Animation Studio.
 - Updated the bundled Merlin assistant animation data with the latest frame timing, branch, and image-sequence edits from Animation Studio.
+- Updated the bundled Lifey assistant animation data with the latest Animation Studio edits.
+
+### Fixed
+
+- Fixed Animation Studio frame editing for numeric sprite-frame references so generated animations show their frame numbers instead of `n/a` and do not lose their image when another field is edited.
 
 ## [0.6.14] - 2026-04-05
 

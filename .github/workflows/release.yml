@@ -94,11 +94,29 @@ jobs:
           AZURE_CODE_SIGNING_ACCOUNT_NAME: ${{ secrets.AZURE_CODE_SIGNING_ACCOUNT_NAME }}
           AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ secrets.AZURE_CODE_SIGNING_CERTIFICATE_PROFILE_NAME }}
 
+      - name: Extract release notes
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          $changelog = Get-Content -Raw -Path CHANGELOG.md
+          $escapedVersion = [regex]::Escape($version)
+          $match = [regex]::Match(
+            $changelog,
+            "(?s)## \[$escapedVersion\] - \d{4}-\d{2}-\d{2}\r?\n(?<body>.*?)(?=\r?\n## \[|$)"
+          )
+          $body = if ($match.Success) { $match.Groups["body"].Value.Trim() } else { "" }
+          if (-not $body) {
+            $body = "Release $env:GITHUB_REF_NAME"
+          fi
+          Set-Content -Path release-notes.md -Value $body -NoNewline
+
       - name: Upload release artifacts
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           draft: false
+          body_path: release-notes.md
           files: |
             out/**/*.deb
             out/**/*.dmg

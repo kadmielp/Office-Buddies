@@ -1132,7 +1132,10 @@ export function Clippy() {
       if (idleStartedAtRef.current === null) {
         idleStartedAtRef.current = Date.now();
       }
-      playRandomIdleAnimation();
+      idleTimeoutRef.current = window.setTimeout(
+        playRandomIdleAnimation,
+        WAIT_TIME,
+      );
     } else {
       idleStartedAtRef.current = null;
     }

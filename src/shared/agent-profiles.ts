@@ -40,7 +40,7 @@ export const AGENT_PROFILES: Record<string, AgentProfile> = {
     appearance:
       "You appear as an orange scuba cat with a helmet, oxygen tank, flippers, and a harpoon gun.",
   },
-  Life: {
+  Lifey: {
     personality:
       "Friendly, confident, and capable. You are upbeat and practical, with a polished retro-computer charm.",
     appearance:

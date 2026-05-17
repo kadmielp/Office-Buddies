@@ -156,6 +156,12 @@ Detailed docs:
 - [`tools/animation-studio/README.md`](tools/animation-studio/README.md)
 - [`docs/tutorials/animation-studio.md`](docs/tutorials/animation-studio.md)
 
+### Creating Animations from Videos
+
+To create assistant/agent animations from videos, you can use
+[kadmielp/Office-Buddies-Mascot-Pipeline](https://github.com/kadmielp/Office-Buddies-Mascot-Pipeline.git)
+to extract and prepare sprite animation assets before editing them in Animation Studio.
+
 ## Scope and Intent
 
 This project is not trying to beat every chat client in features.

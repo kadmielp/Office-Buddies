@@ -78,7 +78,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [chatRecords, setChatRecords] = useState<Record<string, ChatRecord>>(
     {},
   );
-  const [animationKey, setAnimationKey] = useState<string>("");
+  // Queue of pending animation cues: a key enqueues, "" pops the finished head.
+  const [animationQueue, setAnimationQueue] = useState<string[]>([]);
+  const animationKey = animationQueue[0] ?? "";
+  const setAnimationKey = useCallback((key: string) => {
+    setAnimationQueue((queue) => {
+      if (!key) return queue.slice(1);
+      return queue[queue.length - 1] === key ? queue : [...queue, key];
+    });
+  }, []);
   const [status, setStatus] = useState<ClippyNamedStatus>("welcome");
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [isStartingNewChat, setIsStartingNewChat] = useState(false);

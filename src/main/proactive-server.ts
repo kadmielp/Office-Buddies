@@ -7,6 +7,13 @@ import { handleAgentEvent } from "./agent-events";
 import { AgentEventResponse, getAgentAdapter } from "./agents";
 import { AGENT_EVENT_PATH } from "../shared/agent-events";
 import { timingSafeEqual } from "crypto";
+import { getAgentHookInfo } from "./agent-hooks";
+
+function hasInstalledAgentHooks(): boolean {
+  return (["claude-code", "codex"] as const).some(
+    (source) => getAgentHookInfo(source).status !== "not_installed",
+  );
+}
 
 let server: http.Server | null = null;
 let activePort: number | null = null;
@@ -32,7 +39,9 @@ export function startProactiveServer() {
   const settings = getStateManager().getSettings();
   const port = settings.proactivePort || 5050;
 
-  if (!settings.enableProactiveMessages) {
+  // Installed Claude Code / Codex hooks post here, so they keep it running
+  // even when OpenClaw notifications are off.
+  if (!settings.enableProactiveMessages && !hasInstalledAgentHooks()) {
     stopProactiveServer();
     listenerError = null;
     return;
@@ -61,6 +70,13 @@ export function startProactiveServer() {
     }
 
     if (req.method === "POST" && req.url === "/notify") {
+      if (!getStateManager().getSettings().enableProactiveMessages) {
+        req.resume();
+        res.writeHead(403);
+        res.end();
+        return;
+      }
+
       let body = "";
       req.on("data", (chunk) => {
         body += chunk.toString();

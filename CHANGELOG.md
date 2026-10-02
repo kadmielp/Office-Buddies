@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-10-03
+
+### Fixed
+
+- Claude Code and Codex hook notifications no longer need the OpenClaw listener checkbox: the local listener now starts automatically while either agent's hooks are installed. The checkbox now only controls OpenClaw (`/notify`), which is rejected while it is off.
+
 ## [0.7.1] - 2026-10-03
 
 ### Fixed

@@ -24,8 +24,11 @@ export const SettingsAgents: React.FC = () => {
   const isListenerEnabled = !!settings.enableProactiveMessages;
   const [listener, setListener] = useState<ListenerStatus | null>(null);
 
-  // The listener restarts after these settings change; check once it has had
-  // a moment to start (or fail).
+  const [statusTick, setStatusTick] = useState(0);
+  const refreshListener = useCallback(() => setStatusTick((tick) => tick + 1), []);
+
+  // The listener restarts after these settings or hooks change; check once it
+  // has had a moment to start (or fail).
   useEffect(() => {
     const timer = window.setTimeout(() => {
       clippyApi
@@ -35,7 +38,7 @@ export const SettingsAgents: React.FC = () => {
     }, 500);
 
     return () => window.clearTimeout(timer);
-  }, [isListenerEnabled, settings.proactivePort]);
+  }, [isListenerEnabled, settings.proactivePort, statusTick]);
 
   return (
     <div>
@@ -43,7 +46,7 @@ export const SettingsAgents: React.FC = () => {
         <legend>Listener</legend>
         <Checkbox
           id="enableProactive"
-          label="Listen for agent and OpenClaw notifications"
+          label="Listen for OpenClaw notifications"
           checked={isListenerEnabled}
           onChange={(checked) => {
             clippyApi.setState("settings.enableProactiveMessages", checked);
@@ -64,7 +67,7 @@ export const SettingsAgents: React.FC = () => {
             }}
           />
         </div>
-        {isListenerEnabled && listener && (
+        {listener && (listener.running || isListenerEnabled) && (
           <p style={{ margin: "6px 0 0" }}>
             {listener.running ? (
               <>
@@ -79,18 +82,19 @@ export const SettingsAgents: React.FC = () => {
           </p>
         )}
         <p style={{ marginBottom: 0 }}>
-          Office Buddies listens on 127.0.0.1 only. Installed hooks include a
-          private token, so other programs can't post fake requests.
+          The listener also runs automatically while Claude Code or Codex hooks
+          are installed. It listens on 127.0.0.1 only, and installed hooks
+          include a private token, so other programs can't post fake requests.
         </p>
       </fieldset>
       <AgentHookRow
         source="claude-code"
-        isListenerEnabled={isListenerEnabled}
+        onChanged={refreshListener}
         extra={<ClaudePopupsOption />}
       />
       <AgentHookRow
         source="codex"
-        isListenerEnabled={isListenerEnabled}
+        onChanged={refreshListener}
         note={
           <>
             Codex only runs hooks you have approved. After installing, run{" "}
@@ -107,10 +111,10 @@ export const SettingsAgents: React.FC = () => {
 
 const AgentHookRow: React.FC<{
   source: AgentSource;
-  isListenerEnabled: boolean;
+  onChanged: () => void;
   note?: React.ReactNode;
   extra?: React.ReactNode;
-}> = ({ source, isListenerEnabled, note, extra }) => {
+}> = ({ source, onChanged, note, extra }) => {
   const { settings } = useSharedState();
   const [info, setInfo] = useState<AgentHookInfo | null>(null);
   const [pending, setPending] = useState<PendingChange | null>(null);
@@ -156,6 +160,7 @@ const AgentHookRow: React.FC<{
           : await clippyApi.uninstallAgentHooks(source),
       );
       setPending(null);
+      onChanged();
     } catch (reason) {
       setError(String(reason));
     }
@@ -177,9 +182,6 @@ const AgentHookRow: React.FC<{
       </p>
       {note && <p>{note}</p>}
       {extra}
-      {!isListenerEnabled && info?.status !== "not_installed" && (
-        <p>Turn on the listener above, or the buddy won't hear anything.</p>
-      )}
       <Checkbox
         id={`agentShowFinished-${source}`}
         label='Show "Finished" notifications'

@@ -38,7 +38,7 @@ import {
   refreshKnowledgeFiles,
 } from "./knowledge";
 import { buildDynamicKnowledgeContext } from "./knowledge-runtime";
-import { getListenerStatus } from "./proactive-server";
+import { getListenerStatus, startProactiveServer } from "./proactive-server";
 import { isInstallableAgent } from "./agents";
 import {
   areClaudePopupsHidden,
@@ -333,12 +333,17 @@ export function setupIpcListeners() {
     (_, source: AgentSource, mode: "install" | "uninstall") =>
       previewAgentHooks(assertAgentSource(source), mode),
   );
-  ipcMain.handle(IpcMessages.AGENT_HOOKS_INSTALL, (_, source: AgentSource) =>
-    installAgentHooks(assertAgentSource(source)),
-  );
-  ipcMain.handle(IpcMessages.AGENT_HOOKS_UNINSTALL, (_, source: AgentSource) =>
-    uninstallAgentHooks(assertAgentSource(source)),
-  );
+  // The listener runs whenever hooks are installed, so refresh it afterwards.
+  ipcMain.handle(IpcMessages.AGENT_HOOKS_INSTALL, (_, source: AgentSource) => {
+    const info = installAgentHooks(assertAgentSource(source));
+    startProactiveServer();
+    return info;
+  });
+  ipcMain.handle(IpcMessages.AGENT_HOOKS_UNINSTALL, (_, source: AgentSource) => {
+    const info = uninstallAgentHooks(assertAgentSource(source));
+    startProactiveServer();
+    return info;
+  });
 
   // Proactive
   ipcMain.handle(

@@ -3,10 +3,18 @@ import { getStateManager } from "./state";
 import { getMainWindow } from "./windows";
 import { IpcMessages } from "../shared/ipc-messages";
 import { getLogger } from "./logger";
+import {
+  AgentEventResponse,
+  handleAgentEvent,
+  isAgentSource,
+} from "./agent-events";
+import { AGENT_EVENT_PATH } from "../shared/agent-events";
+import { timingSafeEqual } from "crypto";
 
 let server: http.Server | null = null;
 let activePort: number | null = null;
 const PROACTIVE_BIND_ADDRESS = "127.0.0.1";
+const MAX_AGENT_EVENT_BYTES = 256 * 1024;
 
 export function startProactiveServer() {
   const settings = getStateManager().getSettings();
@@ -29,6 +37,16 @@ export function startProactiveServer() {
   }
 
   server = http.createServer((req, res) => {
+    const requestUrl = new URL(
+      req.url || "/",
+      `http://${PROACTIVE_BIND_ADDRESS}`,
+    );
+
+    if (req.method === "POST" && requestUrl.pathname === AGENT_EVENT_PATH) {
+      handleAgentEventRequest(req, res, requestUrl);
+      return;
+    }
+
     if (req.method === "POST" && req.url === "/notify") {
       let body = "";
       req.on("data", (chunk) => {
@@ -92,3 +110,100 @@ export function stopProactiveServer() {
   }
 }
 
+function handleAgentEventRequest(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  requestUrl: URL,
+) {
+  const source = requestUrl.searchParams.get("agent");
+  const token = getStateManager().getSettings().agentHookToken || "";
+
+  if (!isAgentSource(source) || !isAuthorized(req, token)) {
+    req.resume();
+    res.writeHead(401);
+    res.end();
+    return;
+  }
+
+  let body = "";
+  let tooLarge = false;
+
+  req.on("data", (chunk) => {
+    if (tooLarge) {
+      return;
+    }
+
+    body += chunk.toString();
+
+    if (body.length > MAX_AGENT_EVENT_BYTES) {
+      tooLarge = true;
+    }
+  });
+
+  req.on("end", () => {
+    if (tooLarge) {
+      res.writeHead(413);
+      res.end();
+      return;
+    }
+
+    let payload: unknown;
+
+    try {
+      payload = JSON.parse(body);
+    } catch (error) {
+      getLogger().error("Failed to parse agent event", error);
+      res.writeHead(400);
+      res.end();
+      return;
+    }
+
+    // Questions keep the request open until they are answered or released.
+    handleAgentEvent(source, payload, req.headers, (callback) => {
+      // The agent may already have hung up while the event was being checked.
+      if (res.destroyed && !res.writableEnded) {
+        callback();
+        return;
+      }
+
+      res.on("close", () => {
+        if (!res.writableEnded) {
+          callback();
+        }
+      });
+    })
+      .catch((error): AgentEventResponse => {
+        getLogger().error("Failed to handle agent event", error);
+        return null;
+      })
+      .then((response) => {
+        if (res.writableEnded || res.destroyed) {
+          return;
+        }
+
+        if (!response) {
+          // Empty 2xx body: hooks treat this as "no decision".
+          res.writeHead(204);
+          res.end();
+          return;
+        }
+
+        res.writeHead(200, {
+          "Content-Type": "application/json; charset=utf-8",
+        });
+        res.end(JSON.stringify(response));
+      });
+  });
+}
+
+function isAuthorized(req: http.IncomingMessage, token: string): boolean {
+  const header = req.headers.authorization || "";
+  const expected = Buffer.from(`Bearer ${token}`);
+  const actual = Buffer.from(header);
+
+  return (
+    token.length > 0 &&
+    actual.length === expected.length &&
+    timingSafeEqual(actual, expected)
+  );
+}

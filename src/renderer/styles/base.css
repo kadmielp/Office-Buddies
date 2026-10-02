@@ -36,8 +36,8 @@ body {
 }
 
 .bubble-window {
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
+  width: 100%;
+  height: 100%;
   margin: 0;
   overflow: hidden;
   position: relative;
@@ -129,6 +129,10 @@ body {
 
 .app-inline-note {
   margin: 0;
+}
+
+.app-muted-note {
+  color: #555;
 }
 
 .app-actions {
@@ -236,76 +240,106 @@ body {
 
 .chat-container {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: 100%;
-  padding: 15px;
-  gap: 10px;
-  overflow-anchor: none;
+  min-height: 0;
+  padding: 8px 8px 0;
+  gap: 8px;
+}
+
+.chat-transcript {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 8px 8px;
+  user-select: text;
+}
+
+.chat-message {
+  padding-top: 8px;
+}
+
+.chat-message-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 16px;
+}
+
+.chat-message-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.chat-message-body {
+  min-width: 0;
+  padding: 2px 0 0 21px;
+  overflow-wrap: anywhere;
+}
+
+.chat-message-body p,
+.chat-message-body ul,
+.chat-message-body ol,
+.chat-message-body pre {
+  margin: 0 0 6px;
+}
+
+.chat-message-body > :last-child {
+  margin-bottom: 0;
+}
+
+.chat-message-body ul,
+.chat-message-body ol {
+  padding-left: 20px;
 }
 
 .chat-composer {
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   gap: 8px;
-  margin-top: auto;
 }
 
 .chat-composer-input {
   flex: 1 1 auto;
   width: 80px;
-  min-height: 23px;
-  resize: vertical;
+  min-height: 54px;
+  resize: none;
 }
 
-.chat-message {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.chat-message.is-user {
-  justify-content: flex-end;
-}
-
-.chat-message.is-assistant {
-  justify-content: flex-start;
-}
-
-.chat-message-body {
-  min-width: 0;
-  width: fit-content;
-  text-align: left;
-  overflow-wrap: anywhere;
-}
-
-.chat-message.is-user .chat-message-body {
-  max-width: 82%;
-}
-
-.chat-message.is-assistant .chat-message-body {
-  max-width: calc(100% - 40px);
-}
-
-.chat-message-icon {
-  width: 24px;
-  height: 24px;
-  margin-top: 10px;
+.chat-composer .chat-composer-send {
   flex: none;
+  min-width: 72px;
+  height: auto;
+}
+
+.chat-status-bar {
+  flex: none;
+  margin: 0 -8px;
+}
+
+.chat-status-bar .status-bar-field {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chat-status-bar .chat-status-bar-provider {
+  flex: 0 1 40%;
 }
 
 .chat-message-actions {
-  margin-top: 12px;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .chat-message-action {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
   text-align: left;
   cursor: pointer;
 }
@@ -326,10 +360,7 @@ body {
 }
 
 .chat-message-references-label {
-  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .chat-message-reference {
@@ -401,4 +432,154 @@ body {
   bottom: 0;
   width: 4px;
   cursor: col-resize;
+}
+
+/* Coding agent request card (shared across themes; buttons use theme styles). */
+.buddy-speech-content.buddy-agent-card {
+  margin-right: 0;
+  white-space: normal;
+}
+
+.buddy-agent-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  margin-bottom: 4px;
+}
+
+.buddy-agent-card-kind {
+  font-weight: 700;
+}
+
+.buddy-agent-card-kind.is-needs-input::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #d83b01;
+  vertical-align: 1px;
+}
+
+.buddy-agent-card-source {
+  opacity: 0.75;
+  font-size: 0.92em;
+}
+
+.buddy-agent-card-message {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.buddy-agent-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.buddy-agent-card-pager {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.92em;
+}
+
+.buddy-agent-card-pager button {
+  min-width: 24px;
+  width: 24px;
+  padding: 0;
+}
+
+.buddy-agent-card-buttons {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.buddy-agent-badge {
+  position: absolute;
+  top: 0;
+  z-index: 20;
+  min-width: 22px;
+  min-height: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 2px solid #fff;
+  border-radius: 11px;
+  background: #d83b01;
+  color: #fff;
+  font: 700 12px/18px Tahoma, "Segoe UI", sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+/* Agent questions: a vertical list of the theme's own balloon bullets. */
+.buddy-agent-question-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.buddy-speech-options.buddy-agent-question-options {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.buddy-agent-question-options .buddy-speech-option {
+  justify-content: flex-start;
+  min-height: 24px;
+  padding: 2px 4px;
+  text-align: left;
+}
+
+.buddy-agent-question-options .buddy-speech-option:disabled {
+  opacity: 0.5;
+  text-decoration: none;
+  cursor: default;
+}
+
+.buddy-agent-question-options .buddy-speech-option-dot {
+  flex: none;
+}
+
+.buddy-agent-question-handoff {
+  opacity: 0.8;
+}
+
+.buddy-agent-question-handoff .buddy-speech-option-dot {
+  filter: grayscale(1);
+}
+
+.buddy-agent-question-check .field-row {
+  margin: 2px 4px;
+}
+
+/* Agent permission requests: what the tool will run, then Allow / Deny. */
+.buddy-agent-permission-description {
+  margin: 4px 0 0;
+  opacity: 0.8;
+  font-size: 0.92em;
+}
+
+.buddy-agent-permission-detail {
+  max-height: 96px;
+  margin: 6px 0 0;
+  padding: 4px 6px;
+  overflow: auto;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  background: rgba(127, 127, 127, 0.1);
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-break: break-all;
 }

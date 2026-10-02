@@ -398,7 +398,10 @@ export function setupWindowOpenHandler(browserWindow: BrowserWindow) {
         frame: false,
         x: newWindowPosition?.x,
         y: newWindowPosition?.y,
-        roundedCorners: false,
+        // Windows 11 rounds frameless windows natively; the Win11 theme relies
+        // on it. Theme changes restart the app, so reading it here is enough.
+        roundedCorners:
+          getStateManager().store.get("settings").uiDesign === "Win11",
         minHeight: 400,
         minWidth: 400,
         skipTaskbar: shouldMinimizeToTray(),

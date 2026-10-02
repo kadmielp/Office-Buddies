@@ -22,11 +22,11 @@ This guide walks through a secure way to connect your **OpenClaw** agent server 
 Use this checklist to get proactive delivery working in under 10 steps.
 
 1. Connect both the OpenClaw server and the desktop to the same Tailnet.
-2. Start Office Buddies and enable **Proactive Messages (Listener)** on port `5050`.
+2. Start Office Buddies and, in **Settings > Agents**, turn on **Listen for agent and OpenClaw notifications** on port `5050`.
 3. On the desktop, run `tailscale ip -4` and record `<TAILSCALE_IP_DESKTOP>`.
-4. On the desktop, run `netstat -ano | findstr :5050`.
-5. Confirm the listener shows `0.0.0.0:5050` or `<TAILSCALE_IP_DESKTOP>:5050`.
-6. If it shows only `127.0.0.1:5050`, restart or re-enable the listener. If needed, add the Windows `portproxy` fallback described below.
+4. On the desktop, run `netstat -ano | findstr :5050` and confirm the listener shows `127.0.0.1:5050`. Office Buddies always binds to loopback only.
+5. Expose it on the Tailscale interface with the Windows `portproxy` rule from [section C](#c-exposing-the-listener-on-tailscale).
+6. Run `netsh interface portproxy show v4tov4` and confirm `<TAILSCALE_IP_DESKTOP>  5050  127.0.0.1  5050` is listed.
 7. Allow inbound TCP `5050` only from `100.64.0.0/10` or, preferably, only from `<OPENCLAW_SERVER_IP>`.
 8. From the OpenClaw server, run `nc -vz <TAILSCALE_IP_DESKTOP> 5050`.
 9. From the OpenClaw server, send a test `POST` to `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
@@ -82,12 +82,11 @@ This path allows OpenClaw to send proactive notifications to the desktop with an
 
 ### A. Enable the Listener in Office Buddies
 
-1. Stay in **Settings > Model** with **OpenClaw** selected.
-2. Locate the **Proactive Messages** section.
-3. Enable **Proactive Messages (Listener)**.
-4. Set the port to `5050` unless you intentionally use a different one.
+1. Open **Settings > Agents**.
+2. Under **Listener**, turn on **Listen for agent and OpenClaw notifications**.
+3. Set the port to `5050` unless you intentionally use a different one.
 
-The desktop should be reachable on the Tailnet, not only on localhost.
+The same listener also receives [coding agent notifications](./coding-agent-notifications.md). It binds to `127.0.0.1` only, so OpenClaw reaches it through the `portproxy` rule in [section C](#c-exposing-the-listener-on-tailscale).
 
 ### B. Preflight Connectivity Checks
 
@@ -107,12 +106,9 @@ Use the result as `<TAILSCALE_IP_DESKTOP>`.
 netstat -ano | findstr :5050
 ```
 
-Expected output includes one of:
+Expected output includes `127.0.0.1:5050` (the app) and, once the `portproxy` rule from section C is in place, `<TAILSCALE_IP_DESKTOP>:5050` (the proxy).
 
-- `0.0.0.0:5050`
-- `<TAILSCALE_IP_DESKTOP>:5050`
-
-If the listener appears only as `127.0.0.1:5050`, the app is bound to loopback only. In that state, OpenClaw cannot reach it over Tailscale even though the local app may seem healthy.
+If you only see `127.0.0.1:5050`, the app is healthy but OpenClaw can't reach it over Tailscale yet. Add the `portproxy` rule.
 
 Also confirm that the proactive destination is the desktop listener, not the OpenClaw server:
 
@@ -137,15 +133,9 @@ curl -m 5 -X POST http://<TAILSCALE_IP_DESKTOP>:5050/notify \
 
 Some builds may not expose `/health`, or may return `404` there. Prioritize `POST /notify` as the real delivery test.
 
-### C. Fixing a Loopback-Only Listener
+### C. Exposing the Listener on Tailscale
 
-If the desktop is listening only on `127.0.0.1:5050`:
-
-1. Restart Office Buddies.
-2. Disable and re-enable **Proactive Messages (Listener)**.
-3. Re-run `netstat -ano | findstr :5050`.
-
-If the app still binds to loopback on Windows, use `portproxy` as a safe fallback:
+Office Buddies binds its listener to `127.0.0.1` only, so nothing on the network can reach it directly. To let OpenClaw in over Tailscale, forward the Tailscale interface to it with `portproxy` (run in an elevated PowerShell):
 
 ```powershell
 netsh interface portproxy add v4tov4 listenaddress=<TAILSCALE_IP_DESKTOP> listenport=5050 connectaddress=127.0.0.1 connectport=5050
@@ -227,6 +217,7 @@ What to check:
 
 - Re-enable the listener in Office Buddies.
 - Re-run `netstat -ano | findstr :5050`.
+- Confirm the `portproxy` rule exists with `netsh interface portproxy show v4tov4`. Without it, the loopback-only listener can't be reached over Tailscale.
 - Confirm OpenClaw is calling `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
 
 ### `wrong-endpoint`

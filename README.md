@@ -16,7 +16,7 @@
 
 Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
-Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic with selectable Windows 98 and Windows XP themes.
+Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic with selectable Windows 11, Windows XP and Windows 98 themes.
 It is also a tribute to the nostalgic assistants that marked generations.
 
 ## What This Fork Is
@@ -37,8 +37,9 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 
 - Multiple classic assistants, each with their own animation set and sounds.
 - Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
-- Optional remote providers: OpenAI, Google, Maritaca, and OpenClaw 🦞.
+- Optional remote providers: OpenAI, Google, Maritaca, OpenClaw 🦞, and Hermes.
 - Receive notifications from your OpenClaw 🦞 ([Learn more](docs/tutorials/openclaw-officebuddies-tailscale.md)).
+- Coding agent notifications: Claude Code and Codex tell your buddy when they need you or have finished, and you can answer their multiple-choice questions from the balloon ([Learn more](docs/tutorials/coding-agent-notifications.md)).
 - OpenClaw Skill included for easy agent integration ([View Skill](skills/office-buddies/SKILL.md)).
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
@@ -50,14 +51,27 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
   - `Win + F3`: Summarize
   - `Win + F4`: Explain in a simple way (like I'm 5)
   - `Win + F5`: Rewrite in a friendlier tone
-- Selectable Windows 98 and Windows XP-inspired UI themes and interaction patterns.
+- Selectable Windows 11, Windows XP and Windows 98-inspired UI themes and interaction patterns.
+- A Windows Messenger-style chat window: a transcript of "Name says:" lines, a multi-line message box, and a status bar showing what the buddy is doing.
 
 ## UI Themes
 
 You can switch the app chrome in `Settings > Appearance > UI Design`.
 
-- `Win98`: classic Office Buddies look.
+- `Win11` (default): Windows 11-inspired theme built on 11.css. It follows the Windows light/dark setting, and the chat window gets native Windows 11 rounded corners.
 - `WinXP`: Windows XP-inspired theme for the main app windows and controls.
+- `Win98`: classic Office Buddies look.
+
+Existing installs keep the theme they already have.
+
+## Chat Window
+
+The chat window is laid out like Windows Messenger in every theme:
+
+- Messages appear in a single transcript as **Name says:** lines with a small icon, newest at the bottom (the transcript scrolls itself as replies arrive).
+- Type in the multi-line box and press `Enter` to send (`Shift + Enter` for a new line). While a reply is streaming, the `Send` button becomes `Abort`.
+- The status bar at the bottom shows `Ready`, `<Buddy> is thinking...` or `<Buddy> is typing a message...`, plus the active model.
+- `Chats` in the title bar opens your chat history; `Options` opens the settings.
 
 ## Buddy Actions and Speech Balloon
 
@@ -80,10 +94,25 @@ Configure providers in `Settings > Model`.
 - `Google`: API key + hosted model selection.
 - `Maritaca`: API key + hosted model selection.
 - `OpenClaw`: optional remote provider for proactive assistant integrations.
+- `Hermes`: a local Hermes agent through its OpenAI-compatible API (defaults to `http://127.0.0.1:8642`).
 
 Remote provider requests are executed in the Electron main process via IPC.
 
-On Windows, provider settings are stored locally in `%APPDATA%\Office Buddies\config.json`. The OpenClaw endpoint is readable there, while sensitive keys such as `openclawApiKey` are stored encrypted by Electron safe storage.
+On Windows, provider settings are stored locally in `%APPDATA%\Office Buddies\config.json`. Endpoints such as the OpenClaw and Hermes URLs are readable there, while sensitive keys such as `openclawApiKey` are stored encrypted by Electron safe storage.
+
+## Coding Agent Notifications
+
+Configure this in `Settings > Agents`.
+
+Office Buddies can sit next to your coding agents and tell you when one needs you:
+
+- **Needs your input**: the agent is waiting on a permission prompt or your reply.
+- **Question**: the agent asked a multiple-choice question. Answer it from the balloon's bullet options, or choose `Answer in <agent> instead` to reply in the agent's own window.
+- **Finished**: the agent stopped working. These can be turned off per agent.
+
+Supported agents are Claude Code and Codex. `Settings > Agents` installs the hooks for you, shows exactly what will change in the agent's config file before writing it, and keeps a backup. The listener only accepts connections from this computer (`127.0.0.1`), and each hook carries a private token.
+
+See the [coding agent notifications tutorial](docs/tutorials/coding-agent-notifications.md) for setup and troubleshooting.
 
 ## Connections and Knowledge
 
@@ -103,6 +132,7 @@ Helpful docs:
 
 - [Knowledge tutorial](docs/tutorials/knowledge-files-and-mcp.md)
 - [OpenClaw proactive setup](docs/tutorials/openclaw-officebuddies-tailscale.md)
+- [Coding agent notifications](docs/tutorials/coding-agent-notifications.md)
 
 ## Downloading Local Models
 
@@ -110,6 +140,30 @@ For local mode, GGUF models are supported. Good sources include quantizations fr
 
 - [TheBloke](https://huggingface.co/thebloke)
 - [Unsloth](https://huggingface.co/unsloth)
+
+## Development
+
+```bash
+npm install
+npm start
+```
+
+`npm start` runs the app with Electron Forge and Vite. Renderer changes (React components and theme CSS) reload while it runs; changes to the main process or preload need a restart (type `rs` in the terminal). The chat window copies its stylesheets when it opens, so close and reopen it to see CSS changes there.
+
+Other scripts:
+
+- `npm run typecheck`: TypeScript checks for the renderer and main process.
+- `npm run lint` / `npm run lint:fix`: Prettier formatting.
+
+### Themes
+
+Each UI design lives in `src/renderer/styles/themes/<design>/`, registered in `src/renderer/theme/theme.ts`:
+
+- `win98/` imports [98.css](https://github.com/jdan/98.css) from npm.
+- `winxp/` vendors [XP.css](https://github.com/botoxparty/XP.css) (`xp.css`).
+- `win11/` vendors [11.css](https://github.com/kadmielp/11.css) (`11.css`, copied from its `dist/11.css`). Its icons are Fluent UI System Icons with a built-in light/dark switch.
+
+Each folder layers `*.extended.css` (window chrome), `theme.css` (fonts and app surfaces) and `layout.css` (settings, tables, speech balloon and mini chat) on top of its library. Shared layout that is the same in every theme lives in `src/renderer/styles/base.css`.
 
 ## Build Windows EXE
 
@@ -177,6 +231,8 @@ Special thanks to:
 - [Kevan Atteberry](https://www.kevanatteberry.com/) for designing Clippy.
 - [Jordan Scales (@jdan)](https://github.com/jdan) for the Windows 98 visual language.
 - [botoxparty/XP.css](https://botoxparty.github.io/XP.css/) for the Windows XP visual language used by the XP theme.
+- [11.css](https://github.com/kadmielp/11.css) for the Windows 11 visual language used by the Win11 theme.
+- [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) (© Microsoft Corporation, MIT License) for the Win11 theme icons.
 - [Alex Meub's Windows 98 Icons](https://win98icons.alexmeub.com/) as the source for some icons used in this project.
 - [Pooya Parsa (@pi0)](https://github.com/pi0) and contributors who helped preserve/extract assistant animation data.
 - [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for making local inference practical in Node/Electron.

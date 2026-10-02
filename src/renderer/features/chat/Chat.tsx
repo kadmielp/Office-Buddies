@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Message } from "./Message";
 import { ChatInput } from "./ChatInput";
@@ -9,13 +9,42 @@ import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
 
 export function Chat() {
   const { settings } = useSharedState();
-  const { setAnimationKey, setStatus, status, messages, addMessage } =
-    useChat();
+  const {
+    setAnimationKey,
+    setStatus,
+    status,
+    messages,
+    addMessage,
+    isModelLoaded,
+  } = useChat();
+  const transcriptRef = useRef<HTMLDivElement>(null);
   const [streamingMessageContent, setStreamingMessageContent] =
     useState<string>("");
   const [lastRequestUUID, setLastRequestUUID] = useState<string>(
     crypto.randomUUID(),
   );
+
+  // Keep the newest message in view, like a messenger transcript.
+  useEffect(() => {
+    const transcript = transcriptRef.current;
+
+    if (transcript) {
+      transcript.scrollTop = transcript.scrollHeight;
+    }
+  }, [messages, streamingMessageContent, status]);
+
+  const agentName = settings.selectedAgent || "Clippy";
+  const statusText = !isModelLoaded
+    ? "Waiting for a model to load..."
+    : status === "thinking"
+      ? `${agentName} is thinking...`
+      : status === "responding"
+        ? `${agentName} is typing a message...`
+        : "Ready";
+  const providerText =
+    settings.aiProvider === "local" || !settings.aiProvider
+      ? settings.selectedModel || "No model selected"
+      : settings.remoteModel || settings.aiProvider;
 
   const handleAbortMessage = () => {
     abortProviderRequest(settings, lastRequestUUID);
@@ -85,20 +114,28 @@ export function Chat() {
 
   return (
     <div className="chat-container">
-      {messages.map((message) => (
-        <Message key={message.id} message={message} />
-      ))}
-      {status === "responding" && (
-        <Message
-          message={{
-            id: "streaming",
-            content: streamingMessageContent,
-            sender: "clippy",
-            createdAt: Date.now(),
-          }}
-        />
-      )}
+      <div className="chat-transcript" ref={transcriptRef}>
+        {messages.map((message) => (
+          <Message key={message.id} message={message} />
+        ))}
+        {status === "responding" && (
+          <Message
+            message={{
+              id: "streaming",
+              content: streamingMessageContent,
+              sender: "clippy",
+              createdAt: Date.now(),
+            }}
+          />
+        )}
+      </div>
       <ChatInput onSend={handleSendMessage} onAbort={handleAbortMessage} />
+      <div className="status-bar chat-status-bar">
+        <p className="status-bar-field">{statusText}</p>
+        <p className="status-bar-field chat-status-bar-provider">
+          {providerText}
+        </p>
+      </div>
     </div>
   );
 }

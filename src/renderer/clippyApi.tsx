@@ -20,6 +20,14 @@ import {
   BuddyAction,
 } from "../types/interfaces";
 import { DebugState } from "../shared/debug-state";
+import type {
+  AgentHookInfo,
+  AgentQuestionAnswers,
+  AgentHookPreview,
+  AgentQueueItem,
+  AgentQueueUpdate,
+  AgentSource,
+} from "../shared/agent-events";
 
 import type { BubbleView } from "./contexts/BubbleViewContext";
 import { Data } from "electron";
@@ -127,10 +135,10 @@ export type ClippyApi = {
   offProactiveSpeech: () => void;
   // Remote AI Providers
   fetchRemoteProviderModels: (
-    provider: "openai" | "gemini" | "maritaca" | "openclaw",
+    provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes",
   ) => Promise<string[]>;
   promptRemoteProvider: (payload: {
-    provider: "openai" | "gemini" | "maritaca" | "openclaw";
+    provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
     systemPrompt: string;
     history: MessageRecord[];
     requestUUID?: string;
@@ -150,6 +158,25 @@ export type ClippyApi = {
     }) => void,
   ) => void;
   offProactiveMessage: () => void;
+  // Coding agent notifications
+  getAgentQueue: () => Promise<AgentQueueItem[]>;
+  dismissAgentQueueItem: (id: string) => Promise<void>;
+  openAgentQueueItem: (id: string) => Promise<void>;
+  answerAgentQuestion: (
+    id: string,
+    answers: AgentQuestionAnswers,
+  ) => Promise<void>;
+  decideAgentPermission: (id: string, allow: boolean) => Promise<void>;
+  handOffAgentQueueItem: (id: string) => Promise<void>;
+  onAgentQueueUpdated: (callback: (update: AgentQueueUpdate) => void) => void;
+  offAgentQueueUpdated: () => void;
+  getAgentHookInfo: (source: AgentSource) => Promise<AgentHookInfo>;
+  previewAgentHooks: (
+    source: AgentSource,
+    mode: "install" | "uninstall",
+  ) => Promise<AgentHookPreview>;
+  installAgentHooks: (source: AgentSource) => Promise<AgentHookInfo>;
+  uninstallAgentHooks: (source: AgentSource) => Promise<AgentHookInfo>;
 };
 
 declare global {

@@ -68,15 +68,16 @@ export const SettingsAppearance: React.FC = () => {
               setPendingUiDesign(event.target.value as typeof settings.uiDesign);
             }}
           >
-            <option value="Win98">Win98</option>
+            <option value="Win11">Win11</option>
             <option value="WinXP">WinXP</option>
+            <option value="Win98">Win98</option>
           </select>
         </div>
         <div className="field-row" style={{ marginTop: 8 }}>
           <button onClick={() => void onApplyUiDesign()} disabled={!hasPendingUiDesignChange}>
             Apply and Restart
           </button>
-          <span style={{ color: "#555" }}>Theme changes require a restart.</span>
+          <span className="app-muted-note">Theme changes require a restart.</span>
         </div>
       </fieldset>
       <fieldset>

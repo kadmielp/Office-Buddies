@@ -75,7 +75,7 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
         className={`chat-composer-input${
           isModelReplying ? " chat-input-busy is-busy" : ""
         }`}
-        rows={1}
+        rows={3}
         ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -84,6 +84,7 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
         placeholder={placeholder}
       />
       <button
+        className="chat-composer-send default"
         disabled={!isModelLoaded}
         onMouseDown={(e) => e.preventDefault()}
         onClick={handleSendOrAbort}

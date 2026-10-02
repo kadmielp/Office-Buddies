@@ -25,6 +25,11 @@ import {
 import { Message } from "../chat/Message";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
 import { getThemeIcons } from "../../theme/theme";
+import { AgentQueueCard } from "../agents/AgentQueueCard";
+import type {
+  AgentEventKind,
+  AgentQueueItem,
+} from "../../../shared/agent-events";
 
 const WAIT_TIME = 60000;
 const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
@@ -202,6 +207,8 @@ export function Clippy() {
     animation?: string;
     loop?: boolean;
   } | null>(null);
+  const [agentQueue, setAgentQueue] = useState<AgentQueueItem[]>([]);
+  const [agentCardId, setAgentCardId] = useState<string | null>(null);
   const [switchTargetAgent, setSwitchTargetAgent] = useState<string | null>(
     null,
   );
@@ -274,8 +281,15 @@ export function Clippy() {
           },
         ]
       : miniChatMessages;
-  const hasSpeechBubble =
+  const isBalloonBusy =
     isMiniChatOpen || Boolean(buddySpeech) || Boolean(proactiveSpeech);
+  // Agent requests never take over the balloon; they wait until it is idle.
+  const agentCardIndex = Math.max(
+    0,
+    agentQueue.findIndex((item) => item.id === agentCardId),
+  );
+  const agentCardItem = isBalloonBusy ? null : agentQueue[agentCardIndex];
+  const hasSpeechBubble = isBalloonBusy || Boolean(agentCardItem);
 
   const clearFrameTimeout = useCallback(() => {
     if (frameTimeoutRef.current) {
@@ -863,6 +877,44 @@ export function Clippy() {
       clippyApi.offProactiveSpeech();
     };
   }, []);
+
+  useEffect(() => {
+    const playAgentAnimation = (kind: AgentEventKind) => {
+      const candidates =
+        kind === "finished"
+          ? AGENT_FINISHED_ANIMATIONS
+          : AGENT_ATTENTION_ANIMATIONS;
+      const animation = candidates.find((key) => agentPack.animations[key]);
+
+      if (animation) {
+        setManualAnimationKey(animation);
+      }
+    };
+
+    clippyApi.offAgentQueueUpdated();
+    clippyApi.onAgentQueueUpdated(({ items, arrived }) => {
+      setAgentQueue(items);
+
+      if (arrived) {
+        playAgentAnimation(arrived.kind);
+      }
+    });
+
+    return () => {
+      clippyApi.offAgentQueueUpdated();
+    };
+  }, [agentPack.animations]);
+
+  useEffect(() => {
+    clippyApi.getAgentQueue().then(setAgentQueue).catch(console.error);
+  }, []);
+
+  const showAgentQueue = useCallback(() => {
+    clearSpeechTimeout();
+    setIsMiniChatOpen(false);
+    setBuddySpeech(null);
+    setProactiveSpeech(null);
+  }, [clearSpeechTimeout]);
 
   const scheduleProactiveSpeechDismiss = useCallback(() => {
     clearSpeechTimeout();
@@ -1464,9 +1516,8 @@ export function Clippy() {
                             : message.references
                           ).map((reference) => {
                             const isOpenable = canOpenReference(reference);
-                            const referenceLabel = buildMiniChatReferenceLabel(
-                              reference,
-                            );
+                            const referenceLabel =
+                              buildMiniChatReferenceLabel(reference);
 
                             return (
                               <div
@@ -1718,6 +1769,32 @@ export function Clippy() {
           <div className="buddy-speech-tail" />
         </div>
       )}
+      {agentCardItem && (
+        <AgentQueueCard
+          item={agentCardItem}
+          position={agentCardIndex + 1}
+          total={agentQueue.length}
+          onPrevious={() =>
+            setAgentCardId(agentQueue[agentCardIndex - 1]?.id ?? null)
+          }
+          onNext={() =>
+            setAgentCardId(agentQueue[agentCardIndex + 1]?.id ?? null)
+          }
+        />
+      )}
+      {isBalloonBusy && agentQueue.length > 0 && (
+        <button
+          className="buddy-agent-badge app-no-drag"
+          aria-label={`${agentQueue.length} agent request${
+            agentQueue.length === 1 ? "" : "s"
+          } waiting`}
+          title="Show agent requests"
+          style={{ left: `${Math.floor(agentPack.frameWidth * 0.62)}px` }}
+          onClick={showAgentQueue}
+        >
+          {agentQueue.length}
+        </button>
+      )}
       <div
         className="app-drag"
         style={{
@@ -1755,9 +1832,19 @@ export function Clippy() {
   );
 }
 
+const AGENT_ATTENTION_ANIMATIONS = ["GetAttention", "Alert"];
+const AGENT_FINISHED_ANIMATIONS = [
+  "Congratulate",
+  "Pleased",
+  "Greeting",
+  "GetAttention",
+];
+
 function canOpenReference(reference: MessageReference) {
-  return ("url" in reference && Boolean(reference.url)) ||
-    ("path" in reference && Boolean(reference.path));
+  return (
+    ("url" in reference && Boolean(reference.url)) ||
+    ("path" in reference && Boolean(reference.path))
+  );
 }
 
 function buildMiniChatReferenceLabel(reference: MessageReference) {

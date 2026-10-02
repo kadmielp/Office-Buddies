@@ -11,6 +11,7 @@ export type BubbleView =
   | "settings-model"
   | "settings-parameters"
   | "settings-knowledge"
+  | "settings-agents"
   | "settings-advanced"
   | "settings-about";
 

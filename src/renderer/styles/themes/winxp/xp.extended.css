@@ -1,9 +1,6 @@
-.bubble-container.window {
-  padding: 1px;
-  background: #ece9d8;
-  box-shadow:
-    inset 0 0 0 1px #7aa2e4,
-    inset 0 0 0 2px #0c57d8;
+/* Keep the content inside XP.css's 3px window frame instead of painting over it. */
+.bubble-window > .window-content {
+  margin: 0 3px;
 }
 
 .window-content {
@@ -27,4 +24,69 @@ fieldset button:first-of-type {
 
 fieldset button:last-of-type {
   margin-right: 0;
+}
+
+/* XP.css leaves textareas borderless; match its text inputs instead. */
+textarea {
+  border: 1px solid #7f9db9;
+}
+
+/* Text buttons in the title bar, styled like XP's caption buttons. */
+.title-bar-controls .bubble-title-shortcuts > button {
+  min-width: 0;
+  min-height: 21px;
+  height: 21px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  background: linear-gradient(
+    180deg,
+    #5a8cf5 0%,
+    #3a72ee 12%,
+    #2160e8 50%,
+    #1a56e0 88%,
+    #1449c9 100%
+  );
+  box-shadow:
+    inset 1px 1px rgba(255, 255, 255, 0.35),
+    inset -1px -1px rgba(0, 32, 140, 0.45);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px !important;
+  line-height: 19px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.title-bar-controls .bubble-title-shortcuts > button:not(:disabled):hover {
+  background: linear-gradient(
+    180deg,
+    #7ba6ff 0%,
+    #5389f9 12%,
+    #3c76f2 50%,
+    #3069ea 88%,
+    #235ad6 100%
+  );
+  box-shadow:
+    inset 1px 1px rgba(255, 255, 255, 0.45),
+    inset -1px -1px rgba(0, 32, 140, 0.45);
+}
+
+.title-bar-controls .bubble-title-shortcuts > button:not(:disabled):active,
+.title-bar-controls .bubble-title-shortcuts > button.header-tab-active {
+  background: linear-gradient(
+    180deg,
+    #0d3fb4 0%,
+    #1549c4 20%,
+    #1a54d6 80%,
+    #2462e4 100%
+  );
+  box-shadow:
+    inset 1px 1px rgba(0, 20, 100, 0.6),
+    inset -1px -1px rgba(255, 255, 255, 0.2);
+}
+
+.title-bar-controls .bubble-title-shortcuts > button:focus-visible {
+  outline: 1px dotted #fff;
+  outline-offset: -4px;
 }

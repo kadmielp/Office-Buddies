@@ -77,8 +77,7 @@ ul.tree-view {
 .bubble-loading-card,
 .app-gallery-preview,
 .app-gallery-speech,
-.chat-message-body {
-  border: 2px solid #808080;
+.chat-transcript {
   background: #fff;
   box-shadow:
     inset -1px -1px #fff,
@@ -104,21 +103,55 @@ ul.tree-view {
   color: #666;
 }
 
-.chat-message-body {
-  padding: 8px 10px;
+.chat-transcript {
+  color: #000;
 }
 
-.chat-message.is-assistant .chat-message-body {
-  background: #fff7c7;
+.chat-message-says {
+  color: #808080;
+}
+
+.chat-message-sender {
+  font-weight: 700;
+}
+
+.chat-message.is-assistant .chat-message-sender {
+  color: #000080;
+}
+
+.chat-message.is-user .chat-message-sender {
+  color: #800000;
 }
 
 .chat-message-action {
-  padding: 4px 8px;
+  min-height: 0;
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: #000080;
+}
+
+.chat-message-action:hover {
+  text-decoration: underline;
 }
 
 .chat-message-action-dot {
   background: #000080;
   box-shadow: inset -1px -1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.chat-message-reference {
+  background: silver;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #fff,
+    inset -2px -2px grey,
+    inset 2px 2px #dfdfdf;
+}
+
+.chat-composer .chat-composer-send {
+  font-weight: 700;
 }
 
 .app-table th {

@@ -66,4 +66,17 @@ export const IpcMessages = {
   // Proactive messages
   PROACTIVE_MESSAGE: "clippy_proactive_message",
   PROACTIVE_ACTION_CLICK: "clippy_proactive_action_click",
+
+  // Coding agent notifications
+  AGENT_QUEUE_UPDATED: "clippy_agent_queue_updated",
+  AGENT_QUEUE_GET: "clippy_agent_queue_get",
+  AGENT_QUEUE_DISMISS: "clippy_agent_queue_dismiss",
+  AGENT_QUEUE_OPEN: "clippy_agent_queue_open",
+  AGENT_QUEUE_ANSWER: "clippy_agent_queue_answer",
+  AGENT_QUEUE_DECIDE: "clippy_agent_queue_decide",
+  AGENT_QUEUE_HANDOFF: "clippy_agent_queue_handoff",
+  AGENT_HOOKS_STATUS: "clippy_agent_hooks_status",
+  AGENT_HOOKS_PREVIEW: "clippy_agent_hooks_preview",
+  AGENT_HOOKS_INSTALL: "clippy_agent_hooks_install",
+  AGENT_HOOKS_UNINSTALL: "clippy_agent_hooks_uninstall",
 };

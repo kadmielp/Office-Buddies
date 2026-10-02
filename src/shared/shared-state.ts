@@ -6,13 +6,14 @@ export type DefaultFont =
   | "Tahoma"
   | "System Default";
 export type DefaultFontSize = number;
-export type UiDesign = "Win98" | "WinXP";
+export type UiDesign = "Win98" | "WinXP" | "Win11";
 export type AiProvider =
   | "local"
   | "openai"
   | "gemini"
   | "maritaca"
-  | "openclaw";
+  | "openclaw"
+  | "hermes";
 
 export type KnowledgeFileStatus = "Ready" | "Indexed" | "Error";
 export type KnowledgeSourceStatus = "Connected" | "Available" | "Error";
@@ -68,6 +69,8 @@ export interface SettingsState {
   maritacaApiKey?: string;
   openclawApiKey?: string;
   openclawEndpoint?: string;
+  hermesApiKey?: string;
+  hermesEndpoint?: string;
   selectedAgent?: string;
   systemPrompt?: string;
   clippyAlwaysOnTop?: boolean;
@@ -83,6 +86,8 @@ export interface SettingsState {
   startWithWindows?: boolean;
   enableProactiveMessages?: boolean;
   proactivePort?: number;
+  agentHookToken?: string;
+  agentShowFinished?: Partial<Record<"claude-code" | "codex", boolean>>;
   useKnowledgeAtStart?: boolean;
   useKnowledgeInMiniChat?: boolean;
   knowledgeFiles?: KnowledgeFileSource[];
@@ -142,8 +147,8 @@ export const DEFAULT_SETTINGS: SettingsState = {
   remoteMaxTokens: 512,
   topK: 10,
   temperature: 0.7,
-  uiDesign: "Win98",
-  defaultFont: "Tahoma",
+  uiDesign: "Win11",
+  defaultFont: "System Default",
   defaultFontSize: 12,
   disableAutoUpdate: false,
   disableSound: false,

@@ -38,6 +38,22 @@ import {
   refreshKnowledgeFiles,
 } from "./knowledge";
 import { buildDynamicKnowledgeContext } from "./knowledge-runtime";
+import {
+  answerAgentQuestion,
+  decideAgentPermission,
+  dismissAgentQueueItem,
+  handOffAgentQueueItem,
+  getAgentQueue,
+  isAgentSource,
+  openAgentQueueItem,
+} from "./agent-events";
+import {
+  getAgentHookInfo,
+  installAgentHooks,
+  previewAgentHooks,
+  uninstallAgentHooks,
+} from "./agent-hooks";
+import type { AgentQuestionAnswers, AgentSource } from "../shared/agent-events";
 import { KnowledgeFileSource } from "../shared/shared-state";
 import { getIntegrationManager } from "./integrations";
 
@@ -217,7 +233,7 @@ export function setupIpcListeners() {
     async (
       _,
       payload: {
-        provider: "openai" | "gemini" | "maritaca" | "openclaw";
+        provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
         systemPrompt: string;
         history: ChatWithMessages["messages"];
       },
@@ -235,7 +251,7 @@ export function setupIpcListeners() {
     async (
       event,
       payload: {
-        provider: "openai" | "gemini" | "maritaca" | "openclaw";
+        provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
         systemPrompt: string;
         history: ChatWithMessages["messages"];
         requestUUID: string;
@@ -267,6 +283,42 @@ export function setupIpcListeners() {
   // Clipboard
   ipcMain.handle(IpcMessages.CLIPBOARD_WRITE, (_, data: Data) =>
     clipboard.write(data, "clipboard"),
+  );
+
+  // Coding agent notifications
+  ipcMain.handle(IpcMessages.AGENT_QUEUE_GET, () => getAgentQueue());
+  ipcMain.handle(IpcMessages.AGENT_QUEUE_DISMISS, (_, id: string) =>
+    dismissAgentQueueItem(id),
+  );
+  ipcMain.handle(IpcMessages.AGENT_QUEUE_OPEN, (_, id: string) =>
+    openAgentQueueItem(id),
+  );
+  ipcMain.handle(
+    IpcMessages.AGENT_QUEUE_ANSWER,
+    (_, id: string, answers: AgentQuestionAnswers) =>
+      answerAgentQuestion(id, answers),
+  );
+  ipcMain.handle(
+    IpcMessages.AGENT_QUEUE_DECIDE,
+    (_, id: string, allow: boolean) =>
+      decideAgentPermission(id, allow === true),
+  );
+  ipcMain.handle(IpcMessages.AGENT_QUEUE_HANDOFF, (_, id: string) =>
+    handOffAgentQueueItem(id),
+  );
+  ipcMain.handle(IpcMessages.AGENT_HOOKS_STATUS, (_, source: AgentSource) =>
+    getAgentHookInfo(assertAgentSource(source)),
+  );
+  ipcMain.handle(
+    IpcMessages.AGENT_HOOKS_PREVIEW,
+    (_, source: AgentSource, mode: "install" | "uninstall") =>
+      previewAgentHooks(assertAgentSource(source), mode),
+  );
+  ipcMain.handle(IpcMessages.AGENT_HOOKS_INSTALL, (_, source: AgentSource) =>
+    installAgentHooks(assertAgentSource(source)),
+  );
+  ipcMain.handle(IpcMessages.AGENT_HOOKS_UNINSTALL, (_, source: AgentSource) =>
+    uninstallAgentHooks(assertAgentSource(source)),
   );
 
   // Proactive
@@ -318,4 +370,12 @@ export function setupIpcListeners() {
       }
     },
   );
+}
+
+function assertAgentSource(source: unknown): AgentSource {
+  if (!isAgentSource(source)) {
+    throw new Error(`Unknown agent source: ${String(source)}`);
+  }
+
+  return source;
 }

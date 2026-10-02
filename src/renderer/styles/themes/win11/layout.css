@@ -1,0 +1,597 @@
+/* Windows 11 theme: app-specific layout (settings, tables, buddy speech and
+   mini chat). Geometry matches the Win98/WinXP themes; colours are tokens. */
+
+hr {
+  margin: 12px 0;
+  border: none;
+  border-top: 1px solid var(--w11-divider);
+}
+
+pre {
+  text-wrap: pretty;
+}
+
+fieldset:not(:first-child) {
+  margin-top: 12px;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+textarea.chat-input-busy::placeholder {
+  color: var(--w11-text-disabled) !important;
+  opacity: 1;
+}
+
+/* Settings tabs (TabList) */
+.tab-panel[role="tabpanel"] > :first-child {
+  margin-top: 0;
+}
+
+.tab-panel[role="tabpanel"] > :last-child {
+  margin-bottom: 0;
+}
+
+.settings-appearance-gallery-section {
+  border-top-color: var(--w11-divider);
+}
+
+/* TableView */
+.app-table-frame {
+  overflow: auto;
+  padding: 0;
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-overlay);
+  background: var(--w11-card-solid);
+}
+
+table.interactive.app-table thead th {
+  padding: 0;
+}
+
+.app-table-header-cell .app-table-header-content {
+  min-height: 32px;
+  padding: 0 8px;
+  justify-content: space-between;
+}
+
+/* The app's tables use fixed column widths sized for the 98/XP themes. */
+table.interactive.app-table tbody > tr > td {
+  padding: 0 8px;
+}
+
+.app-table-sort-indicator {
+  color: var(--w11-text-2);
+  font-size: 10px;
+}
+
+table.interactive.app-table tbody tr[aria-selected="true"] > * {
+  background-color: var(--w11-subtle-hover);
+}
+
+table.interactive.app-table tbody tr[aria-selected="true"] > :first-child {
+  background-image: linear-gradient(var(--w11-accent), var(--w11-accent));
+  background-position: 0 center;
+  background-repeat: no-repeat;
+  background-size: 3px 16px;
+}
+
+.app-table-header-cell .app-table-resize-handle {
+  width: 6px;
+}
+
+.app-table-header-cell .app-table-resize-handle:hover {
+  background: var(--w11-subtle-hover) !important;
+}
+
+/* Knowledge settings */
+.settings-knowledge-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.settings-knowledge-item + .settings-knowledge-item {
+  border-top: 1px solid var(--w11-divider);
+}
+
+.settings-knowledge-item-title {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.settings-knowledge-item-meta {
+  margin-top: 2px;
+  color: var(--w11-text-2);
+  line-height: 1.25;
+}
+
+.settings-knowledge-badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1px solid var(--w11-control-stroke);
+  border-radius: var(--w11-radius-control);
+  background: var(--w11-control-fill);
+  font-size: var(--w11-font-size-caption);
+  line-height: 1.2;
+}
+
+/* Buddy speech: a Windows 11 teaching tip next to the assistant. */
+.buddy-speech {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 10px);
+  z-index: 30;
+  box-sizing: border-box;
+  width: 300px;
+  max-height: 660px;
+  padding: 12px 12px 10px;
+  overflow: visible; /* the tail sits just outside the balloon */
+  border: 1px solid var(--w11-surface-stroke);
+  border-radius: var(--w11-radius-overlay);
+  background: var(--w11-flyout);
+  box-shadow: var(--w11-shadow-flyout);
+  color: var(--w11-text);
+  font-family: var(--w11-font);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.buddy-speech-content {
+  max-height: 226px;
+  margin-right: 24px;
+  padding-right: 4px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.buddy-speech-content p {
+  margin: 0 0 6px;
+}
+
+.buddy-speech-content p:last-child {
+  margin-bottom: 0;
+}
+
+.buddy-speech-content ul,
+.buddy-speech-content ol {
+  margin: 0 0 6px 18px;
+  padding: 0;
+}
+
+.buddy-speech-content li {
+  margin: 0 0 2px;
+}
+
+/* Tail: a rotated square sharing the flyout's fill and border. */
+.buddy-speech-tail {
+  position: absolute;
+  right: 30px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  border-right: 1px solid var(--w11-surface-stroke);
+  border-bottom: 1px solid var(--w11-surface-stroke);
+  background: var(--w11-flyout);
+  transform: rotate(45deg);
+}
+
+.buddy-speech-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--w11-radius-control);
+  background: transparent;
+  color: var(--w11-text-2);
+  font-size: 0;
+  cursor: default;
+}
+
+.buddy-speech-close::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 12px;
+  height: 12px;
+  background-color: currentColor;
+  -webkit-mask: url("./icons/dismiss.svg") center / contain no-repeat;
+  mask: url("./icons/dismiss.svg") center / contain no-repeat;
+}
+
+.buddy-speech-close:not(:disabled):hover {
+  background: var(--w11-subtle-hover);
+  color: var(--w11-text);
+}
+
+.buddy-speech-close:not(:disabled):active {
+  background: var(--w11-subtle-pressed);
+}
+
+.buddy-speech-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--w11-divider);
+}
+
+.buddy-speech-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: 2px 4px;
+  border: none;
+  border-radius: var(--w11-radius-control);
+  background: transparent;
+  color: var(--w11-accent-text);
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: center;
+  appearance: none;
+  cursor: default;
+}
+
+.buddy-speech-option:not(:disabled):hover {
+  background: var(--w11-subtle-hover);
+}
+
+.buddy-speech-option:focus-visible {
+  outline: 2px solid var(--w11-focus-outer);
+  outline-offset: -2px;
+}
+
+.buddy-speech-option-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--w11-accent);
+}
+
+/* Mini chat */
+.buddy-speech-mini-chat {
+  --buddy-frame: var(--w11-control-stroke);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 415px;
+  padding: 40px 12px 10px;
+}
+
+.buddy-speech-mini-chat.has-toolbar {
+  padding-top: 40px;
+}
+
+.buddy-speech-mini-chat .buddy-speech-close {
+  top: 6px;
+  right: 6px;
+}
+
+.buddy-mini-chat-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 24px;
+}
+
+.buddy-mini-chat-toolbar-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.buddy-mini-chat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 178px;
+  margin: 0;
+  padding: 0 4px 1px 0;
+  overflow-y: auto;
+}
+
+.buddy-mini-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.buddy-mini-chat-message.is-user {
+  align-items: flex-end;
+}
+
+.buddy-mini-chat-message.is-assistant {
+  align-items: flex-start;
+}
+
+.buddy-mini-chat-message-label {
+  color: var(--w11-text-2);
+  font-size: 11px;
+}
+
+.buddy-mini-chat-message-body {
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-overlay);
+  background: var(--w11-card-solid);
+  color: var(--w11-text);
+  line-height: 1.35;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.buddy-mini-chat-message.is-user .buddy-mini-chat-message-body {
+  border-color: transparent;
+  background: var(--w11-accent);
+  color: var(--w11-on-accent);
+}
+
+.buddy-mini-chat-message-body p {
+  margin: 0;
+}
+
+.buddy-mini-chat-message-body ul,
+.buddy-mini-chat-message-body ol {
+  margin: 1px 0 1px 18px;
+  padding: 0;
+}
+
+.buddy-mini-chat-message-body li {
+  margin: 0;
+}
+
+.buddy-mini-chat-message-body li + li {
+  margin-top: 1px;
+}
+
+.buddy-mini-chat-message-body li p {
+  margin: 0;
+}
+
+.buddy-mini-chat-references {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--w11-divider);
+}
+
+.buddy-mini-chat-reference-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.buddy-mini-chat-reference-summary-title,
+.buddy-mini-chat-reference-prefix {
+  color: var(--w11-text-2);
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.buddy-mini-chat-reference {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.buddy-mini-chat-reference-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.buddy-mini-chat-reference-main {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.buddy-mini-chat-reference-title {
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buddy-mini-chat-reference-toggle,
+.buddy-mini-chat-reference-open {
+  flex: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--w11-accent-text);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.1;
+  cursor: default;
+}
+
+.buddy-mini-chat-reference-toggle:not(:disabled):hover,
+.buddy-mini-chat-reference-open:not(:disabled):hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
+.buddy-mini-chat-inline-attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-control);
+  background: var(--w11-subtle-hover);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.buddy-mini-chat-inline-attachment-icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.buddy-mini-chat-attachment-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 24px;
+  padding: 0 8px;
+  overflow: hidden;
+  border-radius: var(--w11-radius-control);
+  font: inherit;
+  vertical-align: middle;
+  appearance: none;
+}
+
+.buddy-mini-chat-attachment-pill-icons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1;
+}
+
+.buddy-mini-chat-attachment-pill-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.buddy-mini-chat-attachment-pill-icon-pending {
+  opacity: 0.55;
+}
+
+.buddy-mini-chat-attachment-pill-count {
+  min-width: 10px;
+  align-self: center;
+  color: var(--w11-text);
+  font-size: 11px;
+  line-height: 1;
+  text-align: center;
+}
+
+.buddy-mini-chat-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  max-height: 96px;
+  margin: 0;
+  resize: vertical;
+  font: inherit;
+}
+
+.buddy-mini-chat-footer {
+  display: grid;
+  gap: 6px;
+  margin-top: 1px;
+  padding-top: 6px;
+  border-top: 1px solid var(--w11-divider);
+}
+
+.buddy-mini-chat-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buddy-mini-chat-option-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 22px;
+  appearance: none;
+}
+
+.buddy-mini-chat-option-pill.is-active {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--w11-accent) 14%, transparent);
+  color: var(--w11-text);
+}
+
+.buddy-mini-chat-option-indicator {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--w11-control-strong-stroke);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.buddy-mini-chat-option-indicator.is-active {
+  border-color: var(--w11-accent);
+  background: var(--w11-accent);
+}
+
+.buddy-mini-chat-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 22px;
+}
+
+.buddy-mini-chat-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--w11-text-2);
+  font-size: 11px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.buddy-mini-chat-shortcut kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--w11-control-stroke-top);
+  border-bottom-color: var(--w11-control-stroke-bottom);
+  border-radius: var(--w11-radius-control);
+  background: var(--w11-control-fill);
+  color: var(--w11-text);
+  font: inherit;
+  font-weight: 600;
+}

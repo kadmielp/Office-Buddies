@@ -22,6 +22,12 @@ let containerDiv: HTMLDivElement | null = null;
 let isInitialized = false;
 
 function getThemeWindowBackground(uiDesign: string) {
+  if (uiDesign === "Win11") {
+    // Follows the 11.css light/dark tokens; falls back to the light colour
+    // until the theme stylesheet has loaded.
+    return "var(--w11-bg-base, #f3f3f3)";
+  }
+
   return uiDesign === "WinXP" ? "#ece9d8" : "#c0c0c0";
 }
 

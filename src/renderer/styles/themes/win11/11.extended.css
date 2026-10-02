@@ -1,0 +1,94 @@
+/* Office Buddies window chrome on top of 11.css. */
+
+/* The chat window is a native Windows 11 window with rounded corners, border
+   and shadow drawn by the OS, so the CSS window frame stays flat. */
+.bubble-container.window {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.bubble-container > .title-bar {
+  border-radius: 0;
+}
+
+.bubble-container .title-bar-controls button:last-child {
+  border-top-right-radius: 0;
+}
+
+.window-content {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+table > tbody > tr > * {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+fieldset button + button {
+  margin-left: var(--w11-grouped-element-spacing);
+}
+
+/* Chats / Options: a Settings-style selector in the title bar. */
+.title-bar-controls .bubble-title-shortcuts {
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.title-bar-controls .bubble-title-shortcuts > button {
+  position: relative;
+  align-self: center;
+  width: auto;
+  min-width: 0;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--w11-radius-control);
+  background: transparent;
+  color: var(--w11-text-2);
+  font-size: var(--w11-font-size-caption);
+  line-height: 28px;
+
+  &::before {
+    display: none;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    border-radius: 1.5px;
+    background: var(--w11-accent);
+    transform: translateX(-50%);
+    transition: width 0.15s ease;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--w11-subtle-hover);
+    color: var(--w11-text);
+  }
+
+  &:not(:disabled):active {
+    background: var(--w11-subtle-pressed);
+    color: var(--w11-text-2);
+  }
+
+  &.header-tab-active {
+    color: var(--w11-text);
+    font-weight: 600;
+
+    &::after {
+      width: 16px;
+    }
+  }
+
+  &:last-child {
+    border-top-right-radius: var(--w11-radius-control);
+  }
+}

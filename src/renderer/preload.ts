@@ -14,6 +14,11 @@ import {
   MessageReference,
 } from "../types/interfaces";
 import { DebugState } from "../shared/debug-state";
+import type {
+  AgentQuestionAnswers,
+  AgentQueueUpdate,
+  AgentSource,
+} from "../shared/agent-events";
 import { BubbleView } from "./contexts/BubbleViewContext";
 
 const clippyApi: ClippyApi = {
@@ -157,10 +162,10 @@ const clippyApi: ClippyApi = {
     ipcRenderer.removeAllListeners(IpcMessages.PROACTIVE_MESSAGE);
   },
   fetchRemoteProviderModels: (
-    provider: "openai" | "gemini" | "maritaca" | "openclaw",
+    provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes",
   ) => ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
   promptRemoteProvider: (payload: {
-    provider: "openai" | "gemini" | "maritaca" | "openclaw";
+    provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
     systemPrompt: string;
     history: ChatWithMessages["messages"];
     requestUUID?: string;
@@ -232,6 +237,35 @@ const clippyApi: ClippyApi = {
   offProactiveMessage: () => {
     ipcRenderer.removeAllListeners(IpcMessages.PROACTIVE_MESSAGE);
   },
+
+  // Coding agent notifications
+  getAgentQueue: () => ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_GET),
+  dismissAgentQueueItem: (id: string) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_DISMISS, id),
+  openAgentQueueItem: (id: string) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_OPEN, id),
+  answerAgentQuestion: (id: string, answers: AgentQuestionAnswers) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_ANSWER, id, answers),
+  decideAgentPermission: (id: string, allow: boolean) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_DECIDE, id, allow),
+  handOffAgentQueueItem: (id: string) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_HANDOFF, id),
+  onAgentQueueUpdated: (callback: (update: AgentQueueUpdate) => void) => {
+    ipcRenderer.on(IpcMessages.AGENT_QUEUE_UPDATED, (_event, update) =>
+      callback(update),
+    );
+  },
+  offAgentQueueUpdated: () => {
+    ipcRenderer.removeAllListeners(IpcMessages.AGENT_QUEUE_UPDATED);
+  },
+  getAgentHookInfo: (source: AgentSource) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_HOOKS_STATUS, source),
+  previewAgentHooks: (source: AgentSource, mode: "install" | "uninstall") =>
+    ipcRenderer.invoke(IpcMessages.AGENT_HOOKS_PREVIEW, source, mode),
+  installAgentHooks: (source: AgentSource) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_HOOKS_INSTALL, source),
+  uninstallAgentHooks: (source: AgentSource) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_HOOKS_UNINSTALL, source),
 };
 
 contextBridge.exposeInMainWorld("clippy", clippyApi);

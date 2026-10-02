@@ -1,11 +1,18 @@
 import { SettingsState } from "../shared/shared-state";
 import { MessageRecord } from "../types/interfaces";
+import {
+  getHarnessApiKey,
+  getHarnessEndpoint,
+  HARNESS_PROVIDERS,
+  HarnessProvider,
+  isHarnessProvider,
+} from "../shared/agent-harness";
 
 export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
-export const OPENCLAW_DEFAULT_MODEL = "openclaw";
+export const OPENCLAW_DEFAULT_MODEL = HARNESS_PROVIDERS.openclaw.defaultModel;
 
-type RemoteProvider = "openai" | "gemini" | "maritaca" | "openclaw";
+type RemoteProvider = "openai" | "gemini" | "maritaca" | HarnessProvider;
 const DEFAULT_REMOTE_MAX_TOKENS = 512;
 const MIN_REMOTE_MAX_TOKENS = 64;
 const MAX_REMOTE_MAX_TOKENS = 8192;
@@ -217,24 +224,46 @@ function ensureProtocol(url: string): string {
   return normalized;
 }
 
+function getHarnessBaseUrl(
+  settings: SettingsState,
+  provider: HarnessProvider,
+): string {
+  const endpoint = getHarnessEndpoint(settings, provider);
+
+  if (!endpoint) {
+    throw new Error(
+      `${HARNESS_PROVIDERS[provider].label} endpoint is missing.`,
+    );
+  }
+
+  const baseUrl = ensureProtocol(endpoint).replace(/\/+$/, "");
+
+  return baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+}
+
+function getHarnessChatUrl(
+  settings: SettingsState,
+  provider: HarnessProvider,
+): string {
+  return `${getHarnessBaseUrl(settings, provider)}/chat/completions`;
+}
+
 export async function fetchRemoteProviderModels(
   provider: RemoteProvider,
   settings: SettingsState,
 ): Promise<string[]> {
-  if (provider === "openclaw") {
-    if (!settings.openclawEndpoint?.trim()) {
-      return [OPENCLAW_DEFAULT_MODEL];
-    }
+  if (isHarnessProvider(provider)) {
+    const { defaultModel } = HARNESS_PROVIDERS[provider];
 
-    let baseUrl = ensureProtocol(settings.openclawEndpoint).replace(/\/+$/, "");
-    if (!baseUrl.endsWith("/v1")) {
-      baseUrl += "/v1";
+    if (!getHarnessEndpoint(settings, provider)) {
+      return [defaultModel];
     }
 
     try {
-      const payload = await fetchJson(`${baseUrl}/models`, {
-        Authorization: `Bearer ${settings.openclawApiKey || ""}`,
-      });
+      const payload = await fetchJson(
+        `${getHarnessBaseUrl(settings, provider)}/models`,
+        { Authorization: `Bearer ${getHarnessApiKey(settings, provider)}` },
+      );
 
       const models = ((payload?.data as Array<any>) || [])
         .map((item) => item?.id)
@@ -245,10 +274,10 @@ export async function fetchRemoteProviderModels(
         return models;
       }
     } catch {
-      // Fall back to the generic gateway model id when model discovery is unavailable.
+      // Fall back to the harness's default model when discovery is unavailable.
     }
 
-    return [OPENCLAW_DEFAULT_MODEL];
+    return [defaultModel];
   }
 
   if (provider === "openai") {
@@ -406,24 +435,13 @@ export async function* promptStreamingRemoteProvider(args: {
     return;
   }
 
-  if (args.provider === "openclaw") {
-    if (!args.settings.openclawEndpoint) {
-      throw new Error("OpenClaw endpoint is missing.");
-    }
-
-    let baseUrl = ensureProtocol(args.settings.openclawEndpoint).replace(
-      /\/+$/,
-      "",
-    );
-    if (!baseUrl.endsWith("/v1")) {
-      baseUrl += "/v1";
-    }
-    const chatUrl = `${baseUrl}/chat/completions`;
-
+  if (isHarnessProvider(args.provider)) {
     yield* streamOpenAiCompatible({
-      endpoint: chatUrl,
-      apiKey: args.settings.openclawApiKey || "",
-      model: args.settings.remoteModel || OPENCLAW_DEFAULT_MODEL,
+      endpoint: getHarnessChatUrl(args.settings, args.provider),
+      apiKey: getHarnessApiKey(args.settings, args.provider),
+      model:
+        args.settings.remoteModel ||
+        HARNESS_PROVIDERS[args.provider].defaultModel,
       temperature: args.settings.temperature,
       maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
@@ -457,24 +475,13 @@ export async function promptRemoteProvider(args: {
     });
   }
 
-  if (args.provider === "openclaw") {
-    if (!args.settings.openclawEndpoint) {
-      throw new Error("OpenClaw endpoint is missing.");
-    }
-
-    let baseUrl = ensureProtocol(args.settings.openclawEndpoint).replace(
-      /\/+$/,
-      "",
-    );
-    if (!baseUrl.endsWith("/v1")) {
-      baseUrl += "/v1";
-    }
-    const chatUrl = `${baseUrl}/chat/completions`;
-
+  if (isHarnessProvider(args.provider)) {
     return promptOpenAiCompatible({
-      endpoint: chatUrl,
-      apiKey: args.settings.openclawApiKey || "",
-      model: args.settings.remoteModel || "",
+      endpoint: getHarnessChatUrl(args.settings, args.provider),
+      apiKey: getHarnessApiKey(args.settings, args.provider),
+      model:
+        args.settings.remoteModel ||
+        HARNESS_PROVIDERS[args.provider].defaultModel,
       temperature: args.settings.temperature,
       maxTokens: resolveRemoteMaxTokens(args.settings),
       systemPrompt: args.systemPrompt,
@@ -538,4 +545,3 @@ export async function promptRemoteProvider(args: {
   const payload = await response.json();
   return getGeminiText(payload);
 }
-

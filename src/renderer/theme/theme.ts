@@ -2,6 +2,7 @@ import type { UiDesign } from "../../shared/shared-state";
 
 import win98StylesheetUrl from "../styles/themes/win98/index.css?url";
 import winxpStylesheetUrl from "../styles/themes/winxp/index.css?url";
+import win11StylesheetUrl from "../styles/themes/win11/index.css?url";
 
 import win98AddressBookIcon from "../styles/themes/win98/icons/address_book-0.png";
 import win98AddressBookUserIcon from "../styles/themes/win98/icons/address_book_user.png";
@@ -38,6 +39,24 @@ import winxpSatelliteUpdatesOffIcon from "../styles/themes/winxp/icons/satellite
 import winxpSatelliteUpdatesOnIcon from "../styles/themes/winxp/icons/satellite_updates_on.png";
 import winxpSpeakerOffIcon from "../styles/themes/winxp/icons/speaker_off.png";
 import winxpSpeakerOnIcon from "../styles/themes/winxp/icons/speaker_on.png";
+
+import win11AddressBookIcon from "../styles/themes/win11/icons/address_book-0.svg";
+import win11AddressBookUserIcon from "../styles/themes/win11/icons/address_book_user.svg";
+import win11AttachmentIcon from "../styles/themes/win11/icons/attachment.svg";
+import win11FileQuestionIcon from "../styles/themes/win11/icons/file_question.svg";
+import win11InfoIcon from "../styles/themes/win11/icons/info.svg";
+import win11KbFilesIcon from "../styles/themes/win11/icons/kb_files.svg";
+import win11KbMcpIcon from "../styles/themes/win11/icons/kb_mcp.svg";
+import win11MsAgentIcon from "../styles/themes/win11/icons/msagent.svg";
+import win11NetworkDriveOffIcon from "../styles/themes/win11/icons/network_drive_off.svg";
+import win11NetworkDriveOnIcon from "../styles/themes/win11/icons/network_drive_on.svg";
+import win11QuestionIcon from "../styles/themes/win11/icons/question.svg";
+import win11RecycleBinEmptyIcon from "../styles/themes/win11/icons/recycle_bin_empty.svg";
+import win11RecycleBinFullIcon from "../styles/themes/win11/icons/recycle_bin_full.svg";
+import win11SatelliteUpdatesOffIcon from "../styles/themes/win11/icons/satellite_updates_off.svg";
+import win11SatelliteUpdatesOnIcon from "../styles/themes/win11/icons/satellite_updates_on.svg";
+import win11SpeakerOffIcon from "../styles/themes/win11/icons/speaker_off.svg";
+import win11SpeakerOnIcon from "../styles/themes/win11/icons/speaker_on.svg";
 
 export type ThemeIcons = {
   addressBook: string;
@@ -101,8 +120,40 @@ const WINXP_ICONS: ThemeIcons = {
   speakerOn: winxpSpeakerOnIcon,
 };
 
+const WIN11_ICONS: ThemeIcons = {
+  addressBook: win11AddressBookIcon,
+  addressBookUser: win11AddressBookUserIcon,
+  attachment: win11AttachmentIcon,
+  fileQuestion: win11FileQuestionIcon,
+  info: win11InfoIcon,
+  kbFiles: win11KbFilesIcon,
+  kbMcp: win11KbMcpIcon,
+  msagent: win11MsAgentIcon,
+  networkDriveOff: win11NetworkDriveOffIcon,
+  networkDriveOn: win11NetworkDriveOnIcon,
+  question: win11QuestionIcon,
+  recycleBinEmpty: win11RecycleBinEmptyIcon,
+  recycleBinFull: win11RecycleBinFullIcon,
+  satelliteUpdatesOff: win11SatelliteUpdatesOffIcon,
+  satelliteUpdatesOn: win11SatelliteUpdatesOnIcon,
+  speakerOff: win11SpeakerOffIcon,
+  speakerOn: win11SpeakerOnIcon,
+};
+
+const THEME_STYLESHEETS: Record<UiDesign, string> = {
+  Win98: win98StylesheetUrl,
+  WinXP: winxpStylesheetUrl,
+  Win11: win11StylesheetUrl,
+};
+
+const THEME_ICONS: Record<UiDesign, ThemeIcons> = {
+  Win98: WIN98_ICONS,
+  WinXP: WINXP_ICONS,
+  Win11: WIN11_ICONS,
+};
+
 export function getThemeStylesheetUrl(uiDesign: UiDesign): string {
-  return uiDesign === "WinXP" ? winxpStylesheetUrl : win98StylesheetUrl;
+  return THEME_STYLESHEETS[uiDesign] ?? THEME_STYLESHEETS.Win11;
 }
 
 export function applyThemeDocument(doc: Document, uiDesign: UiDesign) {
@@ -127,7 +178,7 @@ export function applyThemeDocument(doc: Document, uiDesign: UiDesign) {
   // behind an older theme link after switching designs. Remove any duplicate
   // Office Buddies theme links so the controlled link below is authoritative.
   const knownThemeUrls = new Set(
-    [win98StylesheetUrl, winxpStylesheetUrl].map((url) =>
+    Object.values(THEME_STYLESHEETS).map((url) =>
       new URL(url, doc.baseURI).href,
     ),
   );
@@ -149,5 +200,5 @@ export function applyThemeDocument(doc: Document, uiDesign: UiDesign) {
 }
 
 export function getThemeIcons(uiDesign: UiDesign): ThemeIcons {
-  return uiDesign === "WinXP" ? WINXP_ICONS : WIN98_ICONS;
+  return THEME_ICONS[uiDesign] ?? THEME_ICONS.Win11;
 }

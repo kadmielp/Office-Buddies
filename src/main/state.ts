@@ -1,5 +1,6 @@
 import Store from "electron-store";
 import { safeStorage } from "electron";
+import { randomBytes } from "crypto";
 
 import {
   getMainWindow,
@@ -11,6 +12,7 @@ import {
 import { IpcMessages } from "../shared/ipc-messages";
 import { getModelManager, getModelPath, isModelOnDisk } from "./model-manager";
 import {
+  DEFAULT_SETTINGS,
   DEFAULT_SYSTEM_PROMPT,
   EMPTY_SHARED_STATE,
   IntegrationConfig,
@@ -30,13 +32,15 @@ type SensitiveSettingsKey =
   | "openAiApiKey"
   | "geminiApiKey"
   | "maritacaApiKey"
-  | "openclawApiKey";
+  | "openclawApiKey"
+  | "hermesApiKey";
 
 const SENSITIVE_SETTINGS_KEYS: SensitiveSettingsKey[] = [
   "openAiApiKey",
   "geminiApiKey",
   "maritacaApiKey",
   "openclawApiKey",
+  "hermesApiKey",
 ];
 
 function isSensitiveSettingsPath(path: string): boolean {
@@ -181,8 +185,8 @@ export class StateManager {
       settings.temperature = 0.7;
     }
 
-    if (!settings.uiDesign) {
-      settings.uiDesign = "Win98";
+    if (!["Win98", "WinXP", "Win11"].includes(settings.uiDesign)) {
+      settings.uiDesign = DEFAULT_SETTINGS.uiDesign;
     }
 
     if (settings.remoteMaxTokens === undefined) {
@@ -203,6 +207,10 @@ export class StateManager {
 
     if (settings.startWithWindows === undefined) {
       settings.startWithWindows = false;
+    }
+
+    if (!settings.agentHookToken) {
+      settings.agentHookToken = randomBytes(24).toString("hex");
     }
 
     this.store.set(

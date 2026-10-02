@@ -5,6 +5,11 @@ import type {
 import { clippyApi, electronAi } from "./clippyApi";
 import { Message } from "./features/chat/Message";
 import { ModelState } from "../shared/models";
+import {
+  getHarnessEndpoint,
+  HARNESS_PROVIDERS,
+  isHarnessProvider,
+} from "../shared/agent-harness";
 import { SettingsState } from "../shared/shared-state";
 
 type ProviderName = NonNullable<SettingsState["aiProvider"]>;
@@ -137,8 +142,11 @@ export function getProviderReadiness(
     return { ready: false, reason: "Maritaca API key is missing." };
   }
 
-  if (provider === "openclaw" && !settings.openclawEndpoint?.trim()) {
-    return { ready: false, reason: "OpenClaw endpoint is missing." };
+  if (isHarnessProvider(provider) && !getHarnessEndpoint(settings, provider)) {
+    return {
+      ready: false,
+      reason: `${HARNESS_PROVIDERS[provider].label} endpoint is missing.`,
+    };
   }
 
   return { ready: true };
@@ -170,7 +178,7 @@ export async function* promptStreamingWithProvider(args: {
   remoteAbortControllers.set(args.requestUUID, controller);
 
   try {
-    if (provider === "openai" || provider === "openclaw") {
+    if (provider === "openai" || isHarnessProvider(provider)) {
       const chunks: string[] = [];
       let isDone = false;
       let error: string | null = null;
@@ -255,7 +263,8 @@ async function promptRemoteProvider(args: {
     | "openai"
     | "gemini"
     | "maritaca"
-    | "openclaw";
+    | "openclaw"
+    | "hermes";
   const history = args.history.map((msg) => ({
     id: msg.id,
     sender: msg.sender,
@@ -299,7 +308,7 @@ export async function fetchProviderModels(
     | "openai"
     | "gemini"
     | "maritaca"
-    | "openclaw";
+    | "openclaw"
+    | "hermes";
   return clippyApi.fetchRemoteProviderModels(remoteProvider as any) as any;
 }
-

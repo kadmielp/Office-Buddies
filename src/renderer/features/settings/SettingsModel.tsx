@@ -7,6 +7,11 @@ import { prettyDownloadSpeed } from "../../helpers/convert-download-speed";
 import { ManagedModel } from "../../../shared/models";
 import { isModelDownloading } from "../../../shared/model-helpers";
 import { AiProvider } from "../../../shared/shared-state";
+import {
+  getHarnessEndpoint,
+  HARNESS_PROVIDERS,
+  isHarnessProvider,
+} from "../../../shared/agent-harness";
 import { fetchProviderModels } from "../../ai-provider-client";
 import { useChat } from "../../contexts/ChatContext";
 import { Checkbox } from "../../ui/Checkbox";
@@ -118,7 +123,8 @@ export const SettingsModel: React.FC = () => {
       (selectedProvider === "openai" && !!settings.openAiApiKey?.trim()) ||
       (selectedProvider === "gemini" && !!settings.geminiApiKey?.trim()) ||
       (selectedProvider === "maritaca" && !!settings.maritacaApiKey?.trim()) ||
-      (selectedProvider === "openclaw" && !!settings.openclawEndpoint?.trim());
+      (isHarnessProvider(selectedProvider) &&
+        !!getHarnessEndpoint(settings, selectedProvider));
 
     if (!hasApiKey) {
       setRemoteModelOptions([]);
@@ -178,6 +184,8 @@ export const SettingsModel: React.FC = () => {
     settings.maritacaApiKey,
     settings.openclawEndpoint,
     settings.openclawApiKey,
+    settings.hermesEndpoint,
+    settings.hermesApiKey,
     settings.remoteModel,
   ]);
 
@@ -191,6 +199,8 @@ export const SettingsModel: React.FC = () => {
         return settings.maritacaApiKey || "";
       case "openclaw":
         return settings.openclawApiKey || "";
+      case "hermes":
+        return settings.hermesApiKey || "";
       default:
         return "";
     }
@@ -206,6 +216,8 @@ export const SettingsModel: React.FC = () => {
         return "settings.maritacaApiKey";
       case "openclaw":
         return "settings.openclawApiKey";
+      case "hermes":
+        return "settings.hermesApiKey";
       default:
         return "";
     }
@@ -258,13 +270,14 @@ export const SettingsModel: React.FC = () => {
             <option value={"gemini" as AiProvider}>Google</option>
             <option value={"maritaca" as AiProvider}>Maritaca</option>
             <option value={"openclaw" as AiProvider}>OpenClaw</option>
+            <option value={"hermes" as AiProvider}>Hermes</option>
           </select>
           <img
-              src={
-                selectedProvider === "local"
-                  ? themeIcons.networkDriveOff
-                  : themeIcons.networkDriveOn
-              }
+            src={
+              selectedProvider === "local"
+                ? themeIcons.networkDriveOff
+                : themeIcons.networkDriveOn
+            }
             alt=""
             aria-hidden="true"
             style={{
@@ -290,7 +303,7 @@ export const SettingsModel: React.FC = () => {
                   <option value="">
                     {isLoadingRemoteModels
                       ? "Loading models..."
-                      : selectedProvider === "openclaw"
+                      : isHarnessProvider(selectedProvider)
                         ? "Enter endpoint and refresh."
                         : "Add credentials and refresh."}
                   </option>
@@ -304,16 +317,24 @@ export const SettingsModel: React.FC = () => {
               </select>
             </div>
 
-            {selectedProvider === "openclaw" && (
+            {isHarnessProvider(selectedProvider) && (
               <div className="field-row">
                 <label htmlFor="providerEndpoint">Endpoint URL</label>
                 <input
                   id="providerEndpoint"
                   type="text"
-                  value={settings.openclawEndpoint || ""}
-                  placeholder="e.g., http://tailscale-ip:1337"
+                  value={
+                    settings[HARNESS_PROVIDERS[selectedProvider].endpointKey] ||
+                    ""
+                  }
+                  placeholder={
+                    HARNESS_PROVIDERS[selectedProvider].endpointPlaceholder
+                  }
                   onChange={(e) =>
-                    updateSetting("settings.openclawEndpoint", e.target.value)
+                    updateSetting(
+                      `settings.${HARNESS_PROVIDERS[selectedProvider].endpointKey}`,
+                      e.target.value,
+                    )
                   }
                 />
               </div>
@@ -334,45 +355,10 @@ export const SettingsModel: React.FC = () => {
               />
             </div>
             {selectedProvider === "openclaw" && (
-              <div
-                className="field-row"
-                style={{ marginTop: "10px", alignItems: "flex-start" }}
-              >
-                <Checkbox
-                  id="enableProactive"
-                  label="Enable Proactive Messages (Listener)"
-                  checked={!!settings.enableProactiveMessages}
-                  onChange={(checked) => {
-                    clippyApi.setState(
-                      "settings.enableProactiveMessages",
-                      checked,
-                    );
-                  }}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginLeft: "24px",
-                    marginTop: "4px",
-                  }}
-                >
-                  <label htmlFor="proactivePort">Port:</label>
-                  <input
-                    id="proactivePort"
-                    type="number"
-                    value={settings.proactivePort || 5050}
-                    style={{ width: "60px" }}
-                    onChange={(e) => {
-                      clippyApi.setState(
-                        "settings.proactivePort",
-                        parseInt(e.target.value),
-                      );
-                    }}
-                  />
-                </div>
-              </div>
+              <p style={{ marginTop: "10px" }}>
+                To receive proactive messages from OpenClaw, turn on the
+                listener in Settings › Agents.
+              </p>
             )}
             <div className="field-row">
               <button
@@ -504,4 +490,3 @@ const SettingsModelDownload: React.FC<{
     </div>
   );
 };
-

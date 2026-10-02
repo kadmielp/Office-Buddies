@@ -1,0 +1,184 @@
+/* Windows 11 theme: fonts and app surfaces. Colours come from 11.css tokens,
+   so everything follows the Windows light/dark setting. */
+
+.clippy {
+  /* Windows 11 body text is 14px; the font-size setting's default (12px)
+     maps to it, and the slider still scales everything from there. */
+  --w11-font-size: calc(var(--font-size, 12px) + 2px);
+  --app-overlay-bg: color-mix(in srgb, var(--w11-bg-base) 88%, transparent);
+
+  font-family: var(--w11-font);
+  font-size: var(--w11-font-size);
+  line-height: var(--w11-line-height);
+  color: var(--w11-text);
+}
+
+.clippy[data-font="Tahoma"] {
+  font-family: Tahoma, var(--w11-font);
+}
+
+.clippy[data-font="Comic Sans MS"] {
+  font-family: "Comic Sans MS", var(--w11-font);
+}
+
+.clippy[data-font="Pixelated MS Sans Serif"] {
+  font-family: "Pixelated MS Sans Serif", var(--w11-font);
+  -webkit-font-smoothing: none;
+}
+
+.clippy[data-font="System Default"] {
+  font-family: var(--w11-font);
+}
+
+.clippy button,
+.clippy input,
+.clippy label,
+.clippy legend,
+.clippy option,
+.clippy select,
+.clippy table,
+.clippy textarea,
+.clippy ul.tree-view,
+.clippy .window {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.clippy .title-bar {
+  font-family: var(--w11-font);
+}
+
+.clippy h1 {
+  font-size: 1.75rem;
+}
+
+.clippy h2 {
+  font-size: 1.4rem;
+}
+
+.clippy h3 {
+  font-size: 1.15rem;
+}
+
+.bubble-window-content {
+  background: var(--w11-bg-base);
+}
+
+.bubble-loading-overlay {
+  background: var(--app-overlay-bg);
+}
+
+.bubble-loading-card {
+  min-width: 200px;
+  border: 1px solid var(--w11-surface-stroke);
+  border-radius: var(--w11-radius-overlay);
+  background: var(--w11-flyout);
+  box-shadow: var(--w11-shadow-flyout);
+}
+
+.app-gallery-preview,
+.app-gallery-speech {
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-overlay);
+  background: var(--w11-card-solid);
+}
+
+.app-gallery-description {
+  color: var(--w11-text-2);
+}
+
+/* Chat: Messenger-style transcript on a Windows 11 card. */
+.chat-transcript {
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-overlay);
+  background: var(--w11-card-solid);
+  color: var(--w11-text);
+}
+
+.chat-message-says {
+  color: var(--w11-text-2);
+}
+
+.chat-message-sender {
+  font-weight: 600;
+}
+
+.chat-message.is-assistant .chat-message-sender {
+  color: var(--w11-accent-text);
+}
+
+.chat-message.is-user .chat-message-sender {
+  color: var(--w11-text);
+}
+
+.chat-message-body code {
+  padding: 1px 4px;
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: 4px;
+  background: var(--w11-subtle-hover);
+  font-family: var(--w11-font-mono);
+  font-size: 0.9em;
+}
+
+.chat-message-body pre {
+  padding: 8px 10px;
+  overflow-x: auto;
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-control);
+  background: var(--w11-layer-solid);
+}
+
+.chat-message-body pre code {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.chat-composer .chat-composer-send {
+  align-self: flex-end;
+  min-width: 80px;
+}
+
+.chat-composer-input.is-busy {
+  color: var(--w11-text-disabled);
+}
+
+.chat-status-bar {
+  margin: 0 -8px;
+  border-radius: 0;
+}
+
+.chat-message-action {
+  min-width: 0;
+  min-height: 0;
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  color: var(--w11-accent-text);
+}
+
+.chat-message-action:not(:disabled):hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
+.chat-message-action-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--w11-accent);
+}
+
+.chat-message-reference {
+  border: 1px solid var(--w11-card-stroke);
+  border-radius: var(--w11-radius-control);
+  background: var(--w11-layer);
+}
+
+.chat-message-reference-meta {
+  color: var(--w11-text-2);
+}
+
+.app-inline-note,
+.app-muted-note {
+  color: var(--w11-text-2);
+}

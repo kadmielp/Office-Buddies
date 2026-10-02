@@ -10,6 +10,10 @@ All notable changes to this project will be documented in this file.
 
 - Download feedback for automatic updates: the buddy announces that a new version is downloading, and the tray tooltip shows the download and ready-to-restart states.
 
+### Fixed
+
+- The buddy's notification balloon is no longer hidden behind the chat window: the buddy is raised (without taking focus) when an agent notification, OpenClaw message or update download arrives.
+
 ## [0.7.2] - 2026-10-03
 
 ### Fixed

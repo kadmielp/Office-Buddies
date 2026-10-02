@@ -548,6 +548,30 @@ export function maximizeChatWindow() {
   return getChatWindow()?.maximize();
 }
 
+// Lifts the buddy above the chat window (both share one always-on-top level)
+// so its balloon is readable, without taking keyboard focus.
+export function raiseMainWindow() {
+  const window = getMainWindow();
+
+  if (!window || window.isDestroyed() || !window.isVisible()) {
+    return;
+  }
+
+  if (window.isMinimized()) {
+    window.restore();
+  }
+
+  if (process.platform === "win32") {
+    window.setAlwaysOnTop(false);
+  }
+
+  window.setAlwaysOnTop(
+    Boolean(getStateManager().store.get("settings").clippyAlwaysOnTop),
+    getAlwaysOnTopLevel(),
+  );
+  window.moveTop();
+}
+
 export function setMainWindowAlwaysOnTop(enabled: boolean | undefined) {
   setWindowAlwaysOnTop(getMainWindow(), enabled);
 }

@@ -1,6 +1,6 @@
 import * as http from "http";
 import { getStateManager } from "./state";
-import { getMainWindow } from "./windows";
+import { getMainWindow, raiseMainWindow } from "./windows";
 import { IpcMessages } from "../shared/ipc-messages";
 import { getLogger } from "./logger";
 import { handleAgentEvent } from "./agent-events";
@@ -95,6 +95,8 @@ export function startProactiveServer() {
               actions,
               loop,
             });
+
+            raiseMainWindow();
 
             // Show window if hidden
             if (!mainWindow.isVisible()) {

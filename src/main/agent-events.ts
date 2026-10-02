@@ -12,7 +12,7 @@ import {
 import { IpcMessages } from "../shared/ipc-messages";
 import { getLogger } from "./logger";
 import { getStateManager } from "./state";
-import { getMainWindow } from "./windows";
+import { getMainWindow, raiseMainWindow } from "./windows";
 import { getForegroundProcessName } from "./helpers/foreground-app";
 import { AgentAdapter, AgentEventResponse, getAgentAdapter } from "./agents";
 
@@ -310,4 +310,6 @@ function showMainWindowWithoutFocus() {
   if (!window.isVisible()) {
     window.showInactive();
   }
+
+  raiseMainWindow();
 }

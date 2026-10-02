@@ -2,7 +2,7 @@ import { app, autoUpdater, dialog, shell } from "electron";
 import { updateElectronApp, UpdateSourceType } from "update-electron-app";
 import { getLogger } from "./logger";
 import { getStateManager } from "./state";
-import { getMainWindow } from "./windows";
+import { getMainWindow, raiseMainWindow } from "./windows";
 import { setTrayStatus } from "./tray";
 import { IpcMessages } from "../shared/ipc-messages";
 import fs from "fs";
@@ -67,6 +67,7 @@ function showDownloadFeedback() {
         "A new version of Office Buddies is available. Downloading it in the background...",
       loop: false,
     });
+    raiseMainWindow();
   });
 
   autoUpdater.on("update-downloaded", () => {

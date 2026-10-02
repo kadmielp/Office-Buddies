@@ -1,6 +1,8 @@
 # Animation Studio Tutorial
 
-This guide covers the Animation Studio end-to-end:
+This guide covers the Animation Studio end-to-end. For a quick reference of the tool itself, see its [README](../../tools/animation-studio/README.md).
+
+It covers:
 
 - what it is
 - how to run it

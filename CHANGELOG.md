@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation cleanup: removed the leftover upstream Clippy landing page from `docs/`, added Install and Documentation sections to the README, refreshed the local model list, and grouped the tutorials index.
+
+### Fixed
+
+- The OpenClaw skill now points to `Settings > Agents` for the listener and treats the Windows `portproxy` rule as required, matching the app's loopback-only binding.
+
 ## [0.7.0] - 2026-10-02
 
 ### Added

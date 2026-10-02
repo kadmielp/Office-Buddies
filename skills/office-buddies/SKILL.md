@@ -13,7 +13,7 @@ For scheduled reminders, use this skill with a strict desktop-first policy and m
 
 ## Setup Requirements
 
-1. **Office Buddies App:** Must be running on the user's computer with the "Enable Proactive Messages" option active in **Settings > Model**.
+1. **Office Buddies App:** Must be running on the user's computer with "Listen for agent and OpenClaw notifications" turned on in **Settings > Agents**.
 2. **Network:** The server must be able to reach the client over a private network such as Tailscale.
 3. **Default Port:** `5050`.
 
@@ -24,7 +24,7 @@ Before using `notify_desktop`, confirm these assumptions:
 - The proactive notification endpoint must point to the desktop Tailscale IP: `http://<TAILSCALE_IP_DESKTOP>:5050/notify`.
 - Do not point proactive delivery to the OpenClaw server URL or `https://<TAILNET_DOMAIN>`. That server handles chat and agent traffic, not the desktop listener.
 - Port `5050` is the default listener port unless the user has intentionally changed it.
-- The listener must be reachable from the Tailnet, not just from `127.0.0.1`.
+- The listener must be reachable from the Tailnet. The app binds to `127.0.0.1` only, so this requires the Windows `portproxy` rule described below.
 - Never expose port `5050` publicly. Keep it restricted to Tailscale or a specific trusted source such as `<OPENCLAW_SERVER_IP>`.
 
 ## Intelligent Routing (Automatic Handoff)
@@ -35,18 +35,17 @@ This skill follows a desktop-first delivery protocol for scheduled or proactive 
    - Ask for the desktop Tailscale IPv4 with `tailscale ip -4`.
    - Validate the listener on Windows with `netstat -ano | findstr :5050`.
    - Expected result: `0.0.0.0:5050` or `<TAILSCALE_IP_DESKTOP>:5050`.
-   - If the listener appears only on `127.0.0.1:5050`, classify it as `loopback-only`. The app is alive locally, but unreachable from the Tailnet.
+   - If the listener appears only on `127.0.0.1:5050`, classify it as `loopback-only`. The app is alive locally, but unreachable from the Tailnet until the `portproxy` rule is added.
    - From the OpenClaw server, validate TCP reachability with `nc -vz <TAILSCALE_IP_DESKTOP> 5050`.
    - Then test the endpoint with `curl -m 5 http://<TAILSCALE_IP_DESKTOP>:5050/notify` or a POST JSON payload.
 2. **Classify the likely failure mode.**
-   - `loopback-only`: listener bound only to `127.0.0.1:5050`.
+   - `loopback-only`: listener bound only to `127.0.0.1:5050` (add the `portproxy` rule).
    - `refused`: listener absent, wrong target, or wrong port.
    - `timeout`: firewall block, missing route, or loopback-only binding.
 3. **Try desktop delivery first.**
    - If the app responds with `status: ok`, treat the message as delivered and do not duplicate it on mobile.
 4. **Repair before fallback when possible.**
-   - If the listener is `loopback-only`, tell the user to restart or re-enable the listener in the app.
-   - If the app still binds to loopback on Windows, recommend this fallback:
+   - The app always binds to `127.0.0.1`, so `loopback-only` is the expected state until a Windows `portproxy` rule exposes it on the Tailscale IP. If it is missing, recommend:
      `netsh interface portproxy add v4tov4 listenaddress=<TAILSCALE_IP_DESKTOP> listenport=5050 connectaddress=127.0.0.1 connectport=5050`
 5. **Fallback cleanly when desktop remains unavailable.**
    - If delivery still fails after reasonable connectivity checks, send the message via the fallback channel such as WhatsApp.

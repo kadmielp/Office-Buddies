@@ -108,7 +108,7 @@ jobs:
           $body = if ($match.Success) { $match.Groups["body"].Value.Trim() } else { "" }
           if (-not $body) {
             $body = "Release $env:GITHUB_REF_NAME"
-          fi
+          }
           Set-Content -Path release-notes.md -Value $body -NoNewline
 
       - name: Upload release artifacts

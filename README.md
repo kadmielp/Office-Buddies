@@ -39,7 +39,7 @@ This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 - Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
 - Optional remote providers: OpenAI, Google, Maritaca, OpenClaw 🦞, and Hermes.
 - Receive notifications from your OpenClaw 🦞 ([Learn more](docs/tutorials/openclaw-officebuddies-tailscale.md)).
-- Coding agent notifications: Claude Code and Codex tell your buddy when they need you or have finished, and you can answer their multiple-choice questions from the balloon ([Learn more](docs/tutorials/coding-agent-notifications.md)).
+- Coding agent notifications: Claude Code and Codex tell your buddy when they need you or have finished. Answer their multiple-choice questions and allow or deny their permission requests from the balloon, then jump straight to the conversation ([Learn more](docs/tutorials/coding-agent-notifications.md)).
 - OpenClaw Skill included for easy agent integration ([View Skill](skills/office-buddies/SKILL.md)).
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
@@ -108,7 +108,10 @@ Office Buddies can sit next to your coding agents and tell you when one needs yo
 
 - **Needs your input**: the agent is waiting on a permission prompt or your reply.
 - **Question**: the agent asked a multiple-choice question. Answer it from the balloon's bullet options, or choose `Answer in <agent> instead` to reply in the agent's own window.
+- **Permission**: the agent wants to run a tool. The balloon shows exactly what it will run, with `Allow` and `Deny` bullets.
 - **Finished**: the agent stopped working. These can be turned off per agent.
+
+`Open` takes you to the exact conversation in the Claude desktop app or the Codex app. When you're already looking at the agent's window, the buddy stays quiet and the agent asks there as usual.
 
 Supported agents are Claude Code and Codex. `Settings > Agents` installs the hooks for you, shows exactly what will change in the agent's config file before writing it, and keeps a backup. The listener only accepts connections from this computer (`127.0.0.1`), and each hook carries a private token.
 

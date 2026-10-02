@@ -4,23 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Added
-
-- The buddy now tells you when Claude Code or Codex needs your input or has finished. Requests queue in the speech balloon one at a time: "needs input" first, then oldest first, with one card per session. They never interrupt a balloon you're using; a badge on the buddy shows how many are waiting. `Open` takes you to the Claude desktop session that asked. "Finished" cards show a short generic message rather than the agent's reply.
-- Claude Code's multiple-choice questions can be answered right in the balloon, Office Assistant style: click a bullet, or tick boxes and click `OK`. If you don't answer in about two minutes, or choose "Answer in Claude Code instead", Claude asks in its own window. When the app the session runs in is already in front, the buddy stays quiet and Claude asks there as usual.
-- Allow or deny Claude Code and Codex permission requests from the balloon. The card shows exactly what the agent wants to run. Codex now also reports whether it runs in VS Code or a terminal, so it follows the same "stay quiet when it's in front" rule.
-- Added `Settings > Agents`, where you install or uninstall the Claude Code and Codex hooks with one click. It previews the exact config change and keeps a backup. The listener switch and port moved here from `Settings > Model`.
-- Added Hermes as a chat provider alongside OpenClaw. Both use the same OpenAI-compatible agent harness connection.
-- Added a [coding agent notifications tutorial](docs/tutorials/coding-agent-notifications.md), and documented the chat window, the Hermes provider, and theme development in the README.
-
-### Fixed
-
-- Corrected the OpenClaw + Tailscale guide: the listener moved to `Settings > Agents`, and because it always binds to `127.0.0.1`, the Windows `portproxy` rule is a required step rather than a fallback.
-
 ## [0.6.16] - 2026-10-02
 
 ### Added
 
+- The buddy now tells you when Claude Code or Codex needs your input or has finished. Requests queue in the speech balloon one at a time: "needs input" first, then oldest first, with one card per session. They never interrupt a balloon you're using; a badge on the buddy shows how many are waiting. `Open` takes you to the exact conversation in the Claude desktop app or the Codex app. "Finished" cards show a short generic message rather than the agent's reply.
+- Claude Code's multiple-choice questions can be answered right in the balloon, Office Assistant style: click a bullet, or tick boxes and click `OK`. If you don't answer in about two minutes, or choose "Answer in Claude Code instead", Claude asks in its own window. When the app the session runs in is already in front, the buddy stays quiet and Claude asks there as usual. The same goes for "Finished" cards.
+- Allow or deny Claude Code and Codex permission requests from the balloon. The card shows exactly what the agent wants to run. Codex now also reports whether it runs in the Codex app, VS Code or a terminal, so it follows the same "stay quiet when it's in front" rule.
+- Added `Settings > Agents`, where you install or uninstall the Claude Code and Codex hooks with one click. It previews the exact config change and keeps a backup. The listener switch and port moved here from `Settings > Model`.
+- Added Hermes as a chat provider alongside OpenClaw. Both use the same OpenAI-compatible agent harness connection.
+- Added a [coding agent notifications tutorial](docs/tutorials/coding-agent-notifications.md), and documented the chat window, the Hermes provider, and theme development in the README.
 - Added a Windows 11 UI design (`Win11`), built on 11.css with Fluent UI System Icons. It follows the Windows light/dark setting, uses native Windows 11 rounded corners for the chat window, and is now the default for new installs (existing installs keep their current design). New installs also default to the system font.
 
 ### Changed
@@ -29,6 +22,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Corrected the OpenClaw + Tailscale guide: the listener moved to `Settings > Agents`, and because it always binds to `127.0.0.1`, the Windows `portproxy` rule is a required step rather than a fallback.
 - Fixed a stray 6px strip of background showing along the right and bottom edges of the chat window in both themes.
 - Fixed the Windows XP theme painting over the XP.css window frame, so the chat window now keeps its full blue border and the scrollbar stays inside it.
 - Restyled the title-bar `Chats` and `Options` buttons to match each theme: blue XP caption-style buttons in Windows XP, and properly sized raised buttons with a pressed state in Windows 98.

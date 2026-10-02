@@ -12,9 +12,8 @@
 <p align="center">
   <img src="assets/screenshots/clippy.png" alt="Logo" width="256" />
 </p>
-<p align="center">
 
-Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
+Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Lifey, Links, Merlin, Peedy, Rocky, Rover, and others added over time.
 
 Under the hood, it supports local GGUF models and optional remote providers, while keeping the UI intentionally nostalgic with selectable Windows 11, Windows XP and Windows 98 themes.
 It is also a tribute to the nostalgic assistants that marked generations.
@@ -33,13 +32,48 @@ It is made with respect for:
 
 This app is not affiliated with, endorsed by, or sponsored by Microsoft.
 
+## Install
+
+Download the latest build for your platform from the [Releases page](https://github.com/kadmielp/Office-Buddies/releases): a Windows installer (`.exe`), a macOS `.dmg`/`.zip`, or Linux `.deb`/`.rpm` packages. The Windows build is the primary target; some features (the global `Win + F*` shortcuts, for example) are Windows-only.
+
+To run from source instead, see [Development](#development).
+
+## Documentation
+
+- [Tutorials index](docs/tutorials/index.md)
+- [Coding agent notifications](docs/tutorials/coding-agent-notifications.md)
+- [Knowledge: files and MCP](docs/tutorials/knowledge-files-and-mcp.md)
+- [OpenClaw + Tailscale](docs/tutorials/openclaw-officebuddies-tailscale.md)
+- [Add a new assistant](docs/tutorials/add-new-assistant.md) and [Animation Studio](docs/tutorials/animation-studio.md)
+- [Changelog](CHANGELOG.md) and [License](LICENSE.md)
+
+## Screenshots
+
+<p align="center">
+  <img src="assets/screenshots/chat.png" alt="Chat window" width="360" />
+  &nbsp;
+  <img src="assets/screenshots/speech_balloon.png" alt="Speech balloon with a summary" width="260" />
+</p>
+<p align="center">
+  <em>Left: the Messenger-style chat window. Right: a Buddy action (Summarize) answered in the speech balloon.</em>
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/settings_appearance.png" alt="Settings: Appearance" width="300" />
+  &nbsp;
+  <img src="assets/screenshots/settings_model.png" alt="Settings: Model" width="300" />
+</p>
+<p align="center">
+  <em>Settings: choose the UI theme and window options (left), and pick a local model or provider (right).</em>
+</p>
+
 ## Core Features
 
 - Multiple classic assistants, each with their own animation set and sounds.
 - Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
 - Optional remote providers: OpenAI, Google, Maritaca, OpenClaw 🦞, and Hermes.
 - Receive notifications from your OpenClaw 🦞 ([Learn more](docs/tutorials/openclaw-officebuddies-tailscale.md)).
-- Coding agent notifications: Claude Code and Codex tell your buddy when they need you or have finished. Answer their multiple-choice questions and allow or deny their permission requests from the balloon, then jump straight to the conversation ([Learn more](docs/tutorials/coding-agent-notifications.md)).
+- Coding agent notifications: Claude Code and Codex tell your buddy when they need you or have finished, and you can answer their questions and approve permissions from the balloon ([details below](#coding-agent-notifications)).
 - OpenClaw Skill included for easy agent integration ([View Skill](skills/office-buddies/SKILL.md)).
 - Provider-aware model selection from API-backed model lists.
 - Configurable prompt and generation parameters.
@@ -133,18 +167,17 @@ Currently supported integrations:
 - `Confluence`: connect Atlassian Confluence with base URL, account email, and API token.
 - `Notion`: connect shared Notion pages with an integration token and fetch page markdown at question time.
 
-Helpful docs:
+See the [knowledge tutorial](docs/tutorials/knowledge-files-and-mcp.md) for setup.
 
-- [Knowledge tutorial](docs/tutorials/knowledge-files-and-mcp.md)
-- [OpenClaw proactive setup](docs/tutorials/openclaw-officebuddies-tailscale.md)
-- [Coding agent notifications](docs/tutorials/coding-agent-notifications.md)
+## Local Models
 
-## Downloading Local Models
+`Settings > Model` offers a short list of built-in GGUF models that download on demand:
 
-For local mode, GGUF models are supported. Good sources include quantizations from:
+- Gemma 3 (1B)
+- Gemma 3 (27B)
+- Qwen3 (4B)
 
-- [TheBloke](https://huggingface.co/thebloke)
-- [Unsloth](https://huggingface.co/unsloth)
+You can also load any other GGUF file. Good sources include quantizations from [Unsloth](https://huggingface.co/unsloth) and [TheBloke](https://huggingface.co/thebloke).
 
 ## Development
 

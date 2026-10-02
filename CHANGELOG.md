@@ -4,8 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-10-03
+
 ### Changed
 
+- Refreshed the app icon (Windows, macOS and Linux builds).
 - Documentation cleanup: removed the leftover upstream Clippy landing page from `docs/`, added Install and Documentation sections to the README, refreshed the local model list, and grouped the tutorials index.
 
 ### Fixed

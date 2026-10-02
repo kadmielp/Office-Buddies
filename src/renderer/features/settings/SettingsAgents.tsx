@@ -15,9 +15,27 @@ type PendingChange = {
   preview: AgentHookPreview;
 };
 
+type ListenerStatus = Awaited<
+  ReturnType<typeof clippyApi.getAgentListenerStatus>
+>;
+
 export const SettingsAgents: React.FC = () => {
   const { settings } = useSharedState();
   const isListenerEnabled = !!settings.enableProactiveMessages;
+  const [listener, setListener] = useState<ListenerStatus | null>(null);
+
+  // The listener restarts after these settings change; check once it has had
+  // a moment to start (or fail).
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      clippyApi
+        .getAgentListenerStatus()
+        .then(setListener)
+        .catch(() => {});
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [isListenerEnabled, settings.proactivePort]);
 
   return (
     <div>
@@ -46,6 +64,20 @@ export const SettingsAgents: React.FC = () => {
             }}
           />
         </div>
+        {isListenerEnabled && listener && (
+          <p style={{ margin: "6px 0 0" }}>
+            {listener.running ? (
+              <>
+                Status: <strong>Listening on port {listener.port}</strong>
+              </>
+            ) : (
+              <>
+                Status: <strong>Not listening</strong>
+                {listener.error ? ` · ${listener.error}` : ""}
+              </>
+            )}
+          </p>
+        )}
         <p style={{ marginBottom: 0 }}>
           Office Buddies listens on 127.0.0.1 only. Installed hooks include a
           private token, so other programs can't post fake requests.
@@ -54,6 +86,7 @@ export const SettingsAgents: React.FC = () => {
       <AgentHookRow
         source="claude-code"
         isListenerEnabled={isListenerEnabled}
+        extra={<ClaudePopupsOption />}
       />
       <AgentHookRow
         source="codex"
@@ -61,7 +94,10 @@ export const SettingsAgents: React.FC = () => {
         note={
           <>
             Codex only runs hooks you have approved. After installing, run{" "}
-            <code>/hooks</code> in Codex and trust the Office Buddies hook.
+            <code>/hooks</code> in Codex and trust the Office Buddies hook. To
+            avoid double alerts, also turn off permission, question and
+            turn-completion notifications in the Codex app under Settings ›
+            Notifications.
           </>
         }
       />
@@ -73,7 +109,8 @@ const AgentHookRow: React.FC<{
   source: AgentSource;
   isListenerEnabled: boolean;
   note?: React.ReactNode;
-}> = ({ source, isListenerEnabled, note }) => {
+  extra?: React.ReactNode;
+}> = ({ source, isListenerEnabled, note, extra }) => {
   const { settings } = useSharedState();
   const [info, setInfo] = useState<AgentHookInfo | null>(null);
   const [pending, setPending] = useState<PendingChange | null>(null);
@@ -139,6 +176,7 @@ const AgentHookRow: React.FC<{
         {info?.configPath ? ` · ${info.configPath}` : ""}
       </p>
       {note && <p>{note}</p>}
+      {extra}
       {!isListenerEnabled && info?.status !== "not_installed" && (
         <p>Turn on the listener above, or the buddy won't hear anything.</p>
       )}
@@ -274,3 +312,41 @@ function diffLines(before: string, after: string): DiffLine[] {
 
   return result;
 }
+
+// The Claude desktop app's own pop-ups duplicate the buddy's balloon.
+const ClaudePopupsOption: React.FC = () => {
+  const [state, setState] = useState<{
+    available: boolean;
+    hidden: boolean;
+  } | null>(null);
+  const [changed, setChanged] = useState(false);
+
+  useEffect(() => {
+    clippyApi
+      .getClaudePopups()
+      .then(setState)
+      .catch(() => {});
+  }, []);
+
+  if (!state?.available) {
+    return null;
+  }
+
+  return (
+    <>
+      <Checkbox
+        id="agentHideClaudePopups"
+        label="Hide Claude's own pop-ups (keep the taskbar badge)"
+        checked={state.hidden}
+        onChange={async (checked) => {
+          const hidden = await clippyApi.setClaudePopupsHidden(checked);
+          setState({ ...state, hidden });
+          setChanged(true);
+        }}
+      />
+      {changed && (
+        <p style={{ margin: "2px 0 0 24px" }}>Restart Claude to apply.</p>
+      )}
+    </>
+  );
+};

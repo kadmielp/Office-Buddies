@@ -160,6 +160,13 @@ export type ClippyApi = {
   offProactiveMessage: () => void;
   // Coding agent notifications
   getAgentQueue: () => Promise<AgentQueueItem[]>;
+  getAgentListenerStatus: () => Promise<{
+    running: boolean;
+    port: number | null;
+    error: string | null;
+  }>;
+  getClaudePopups: () => Promise<{ available: boolean; hidden: boolean }>;
+  setClaudePopupsHidden: (hidden: boolean) => Promise<boolean>;
   dismissAgentQueueItem: (id: string) => Promise<void>;
   openAgentQueueItem: (id: string) => Promise<void>;
   answerAgentQuestion: (

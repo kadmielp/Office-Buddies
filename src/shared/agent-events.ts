@@ -1,7 +1,8 @@
 // Path on the local listener (see proactive-server.ts) that receives hooks.
 export const AGENT_EVENT_PATH = "/agent-event";
 
-// Coding agents that can notify the buddy through hooks.
+// Coding agents whose hooks the buddy can install. Any other tool can still
+// post to the listener through the "custom" adapter (see agents/custom.ts).
 export type AgentSource = "claude-code" | "codex";
 
 export const AGENT_SOURCE_LABELS: Record<AgentSource, string> = {
@@ -45,7 +46,10 @@ export type AgentHost =
 export interface AgentQueueItem {
   // One entry per agent session: `${source}:${sessionId}`.
   id: string;
-  source: AgentSource;
+  // The adapter that received the event, such as "claude-code" or "custom".
+  source: string;
+  // Name shown on the card, such as "Claude Code".
+  agentLabel: string;
   kind: AgentEventKind;
   sessionId: string;
   // Session id understood by the host app's deep link, when available.

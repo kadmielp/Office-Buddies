@@ -2,13 +2,9 @@ import { shell } from "electron";
 import type { IncomingHttpHeaders } from "http";
 
 import {
-  AGENT_SOURCE_LABELS,
   AgentHost,
-  AgentPermission,
-  AgentQuestion,
   AgentQuestionAnswers,
   AgentQueueItem,
-  AgentSource,
   isBlockingRequest,
   isWaitingOnUser,
   sortAgentQueue,
@@ -18,32 +14,19 @@ import { getLogger } from "./logger";
 import { getStateManager } from "./state";
 import { getMainWindow } from "./windows";
 import { getForegroundProcessName } from "./helpers/foreground-app";
-
-// Claude Code notification types that mean "the agent is waiting on you".
-const CLAUDE_NEEDS_INPUT_TYPES = new Set([
-  "permission_prompt",
-  "elicitation_dialog",
-  "agent_needs_input",
-]);
-
-const CLAUDE_DESKTOP_SESSION_PATTERN = /^local_[A-Za-z0-9-]{1,64}$/;
-const SESSION_ID_PATTERN = /^[A-Za-z0-9-]{1,128}$/;
-const MAX_MESSAGE_LENGTH = 280;
-const MAX_PERMISSION_DETAIL_LENGTH = 600;
+import { AgentAdapter, AgentEventResponse, getAgentAdapter } from "./agents";
 
 // How long a question or permission request waits in the balloon before the
-// agent shows its own prompt instead. Must stay below the hook timeouts in
-// agent-hooks.ts.
+// agent shows its own prompt instead. Must stay below the hook timeouts in the
+// agent adapters.
 export const REQUEST_WAIT_MS = 110_000;
 
 // After you hand a request back, the agent's own "needs input" notification
 // for it is expected; skip it for this long.
 const HANDOFF_QUIET_MS = 15_000;
 
-// A hook response body, or null for "no decision" (an empty 2xx).
-export type AgentEventResponse = Record<string, unknown> | null;
-
 interface PendingRequest {
+  adapter: AgentAdapter;
   toolInput: Record<string, unknown>;
   respond: (response: AgentEventResponse) => void;
   timer: ReturnType<typeof setTimeout>;
@@ -51,32 +34,25 @@ interface PendingRequest {
 
 // In memory only: agent events go stale, so the queue is cleared on restart.
 const queue = new Map<string, AgentQueueItem>();
-// Hook requests held open until they're answered or released.
+// Requests held open until they're answered or released.
 const pendingRequests = new Map<string, PendingRequest>();
 // Sessions whose request you just handed back, by time of handoff.
 const recentHandoffs = new Map<string, number>();
-
-export function isAgentSource(value: unknown): value is AgentSource {
-  return value === "claude-code" || value === "codex";
-}
 
 export function getAgentQueue(): AgentQueueItem[] {
   return sortAgentQueue([...queue.values()]);
 }
 
-// Resolves with the hook's response body. Questions and permission requests
-// resolve only once they're answered, released or abandoned; everything else
-// resolves right away.
+// Resolves with the response body for the caller. Questions and permission
+// requests resolve only once they're answered, released or abandoned;
+// everything else resolves right away.
 export function handleAgentEvent(
-  source: AgentSource,
+  adapter: AgentAdapter,
   payload: any,
   headers: IncomingHttpHeaders,
   onAbort: (callback: () => void) => void,
 ): Promise<AgentEventResponse> {
-  const item =
-    source === "claude-code"
-      ? normalizeClaudeEvent(payload, headers)
-      : normalizeCodexEvent(payload, headers);
+  const item = adapter.normalize(payload, headers);
 
   if (!item) {
     return Promise.resolve(null);
@@ -101,7 +77,7 @@ export function handleAgentEvent(
     }
 
     if (isBlockingRequest(item.kind)) {
-      return holdRequest(item, payload.tool_input ?? {}, onAbort);
+      return holdRequest(adapter, item, payload.tool_input ?? {}, onAbort);
     }
 
     queueItem(item);
@@ -126,33 +102,22 @@ export function answerAgentQuestion(id: string, answers: AgentQuestionAnswers) {
     }
   }
 
-  settleRequest(id, {
-    hookSpecificOutput: {
-      hookEventName: "PreToolUse",
-      permissionDecision: "allow",
-      permissionDecisionReason: "Answered from Office Buddies",
-      updatedInput: { ...pending.toolInput, answers: validAnswers },
-    },
-  });
+  settleRequest(
+    id,
+    pending.adapter.answerQuestion(item, pending.toolInput, validAnswers),
+  );
   removeItem(id);
 }
 
-// Claude Code and Codex share the PermissionRequest decision format.
 export function decideAgentPermission(id: string, allow: boolean) {
   const item = queue.get(id);
+  const pending = pendingRequests.get(id);
 
-  if (item?.kind !== "permission" || !pendingRequests.has(id)) {
+  if (item?.kind !== "permission" || !pending) {
     return;
   }
 
-  settleRequest(id, {
-    hookSpecificOutput: {
-      hookEventName: "PermissionRequest",
-      decision: allow
-        ? { behavior: "allow" }
-        : { behavior: "deny", message: "Denied from Office Buddies." },
-    },
-  });
+  settleRequest(id, pending.adapter.decidePermission(item, allow));
   removeItem(id);
 }
 
@@ -185,6 +150,7 @@ export async function openAgentQueueItem(id: string) {
 }
 
 function holdRequest(
+  adapter: AgentAdapter,
   item: AgentQueueItem,
   toolInput: Record<string, unknown>,
   onAbort: (callback: () => void) => void,
@@ -199,9 +165,14 @@ function holdRequest(
       removeItem(item.id);
     }, REQUEST_WAIT_MS);
 
-    pendingRequests.set(item.id, { toolInput, respond: resolve, timer });
+    pendingRequests.set(item.id, {
+      adapter,
+      toolInput,
+      respond: resolve,
+      timer,
+    });
     onAbort(() => {
-      // The agent gave up (for example, the user interrupted the turn).
+      // The caller gave up (for example, the user interrupted the turn).
       if (pendingRequests.get(item.id)?.respond === resolve) {
         settleRequest(item.id, null);
         removeItem(item.id);
@@ -274,10 +245,10 @@ function removeItem(id: string) {
 }
 
 function queueItem(item: AgentQueueItem) {
-  const { source } = item;
-
   const showFinished =
-    getStateManager().getSettings().agentShowFinished?.[source] !== false;
+    getStateManager().getSettings().agentShowFinished?.[
+      item.source as "claude-code" | "codex"
+    ] !== false;
 
   if (item.kind === "finished" && !showFinished) {
     // A finished turn still clears a stale "needs input" card for the session.
@@ -301,30 +272,9 @@ function queueItem(item: AgentQueueItem) {
   broadcastQueue(item);
 }
 
-// The link that opens a session in its desktop app, if there is one.
-function getSessionUrl(
-  host: AgentHost,
-  sessionId: string,
-  hostSessionId?: string,
-): string | null {
-  if (host === "claude-desktop" && hostSessionId) {
-    // `claude://resume` imports a copy of the session, and `code/needs-input`
-    // only finds sessions that are waiting on you; `code/continue` opens any
-    // existing desktop session.
-    return `claude://code/continue?session=${encodeURIComponent(hostSessionId)}`;
-  }
-
-  if (host === "codex-desktop" && SESSION_ID_PATTERN.test(sessionId)) {
-    // Codex's hook session id is the app's thread id.
-    return `codex://threads/${encodeURIComponent(sessionId)}`;
-  }
-
-  return null;
-}
-
 // Returns whether the session could be opened.
 async function openAgentSession(item: AgentQueueItem): Promise<boolean> {
-  const url = getSessionUrl(item.host, item.sessionId, item.hostSessionId);
+  const url = getAgentAdapter(item.source)?.sessionUrl(item);
 
   if (!url) {
     return false;
@@ -360,234 +310,4 @@ function showMainWindowWithoutFocus() {
   if (!window.isVisible()) {
     window.showInactive();
   }
-}
-
-function normalizeClaudeEvent(
-  payload: any,
-  headers: IncomingHttpHeaders,
-): AgentQueueItem | null {
-  const sessionId = asString(payload?.session_id);
-
-  if (!sessionId) {
-    return null;
-  }
-
-  const eventName = asString(payload.hook_event_name);
-  const toolName = asString(payload.tool_name);
-  let kind: AgentQueueItem["kind"];
-  let message: string;
-  let questions: AgentQuestion[] | null = null;
-  let permission: AgentPermission | undefined;
-
-  if (
-    eventName === "Notification" &&
-    CLAUDE_NEEDS_INPUT_TYPES.has(asString(payload.notification_type))
-  ) {
-    kind = "needs_input";
-    message = asString(payload.message) || "Claude Code needs your input.";
-  } else if (eventName === "Stop") {
-    kind = "finished";
-    message = finishedMessage("claude-code");
-  } else if (eventName === "PreToolUse" && toolName === "AskUserQuestion") {
-    questions = parseQuestions(payload.tool_input);
-
-    if (!questions) {
-      return null;
-    }
-
-    kind = "question";
-    message = questions[0].question;
-  } else if (
-    eventName === "PermissionRequest" &&
-    toolName &&
-    // Questions are handled by the PreToolUse hook above.
-    toolName !== "AskUserQuestion"
-  ) {
-    kind = "permission";
-    permission = parsePermission(toolName, payload.tool_input);
-    message = permissionMessage("claude-code", permission);
-  } else {
-    return null;
-  }
-
-  const rawHostSessionId = asString(headers["x-agent-host-session"]);
-  const hostSessionId = CLAUDE_DESKTOP_SESSION_PATTERN.test(rawHostSessionId)
-    ? rawHostSessionId
-    : undefined;
-  const host = toClaudeHost(asString(headers["x-agent-entrypoint"]));
-
-  return {
-    id: `claude-code:${sessionId}`,
-    source: "claude-code",
-    kind,
-    sessionId,
-    hostSessionId,
-    host,
-    canOpen: getSessionUrl(host, sessionId, hostSessionId) !== null,
-    cwd: asString(payload.cwd) || undefined,
-    message: truncate(message),
-    questions: questions ?? undefined,
-    permission,
-    receivedAt: Date.now(),
-  };
-}
-
-// The agent's own reply can be long or private, so "finished" cards stay
-// generic; the user opens the session to read it.
-function finishedMessage(source: AgentSource): string {
-  return `${AGENT_SOURCE_LABELS[source]} is done with this task.`;
-}
-
-function permissionMessage(
-  source: AgentSource,
-  permission: AgentPermission,
-): string {
-  return `${AGENT_SOURCE_LABELS[source]} wants to use ${permission.toolName}.`;
-}
-
-// Picks the part of the tool input that says what will actually happen.
-function parsePermission(toolName: string, toolInput: any): AgentPermission {
-  const detail =
-    asString(toolInput?.command) ||
-    asString(toolInput?.file_path) ||
-    asString(toolInput?.path) ||
-    asString(toolInput?.url) ||
-    asString(toolInput?.pattern) ||
-    (toolInput && typeof toolInput === "object"
-      ? JSON.stringify(toolInput, null, 1)
-      : "");
-
-  return {
-    toolName,
-    detail:
-      detail.length > MAX_PERMISSION_DETAIL_LENGTH
-        ? `${detail.slice(0, MAX_PERMISSION_DETAIL_LENGTH - 1)}…`
-        : detail,
-    description: asString(toolInput?.description) || undefined,
-  };
-}
-
-// Returns null when the input isn't something the balloon can answer.
-function parseQuestions(toolInput: any): AgentQuestion[] | null {
-  if (!Array.isArray(toolInput?.questions) || !toolInput.questions.length) {
-    return null;
-  }
-
-  const questions: AgentQuestion[] = [];
-
-  for (const raw of toolInput.questions) {
-    const question = asString(raw?.question);
-    const options = Array.isArray(raw?.options)
-      ? raw.options
-          .map((option: any) => ({
-            label: asString(option?.label),
-            description: asString(option?.description) || undefined,
-          }))
-          .filter((option: { label: string }) => option.label)
-      : [];
-
-    if (!question || options.length === 0) {
-      return null;
-    }
-
-    questions.push({
-      question,
-      header: asString(raw.header) || undefined,
-      multiSelect: raw.multiSelect === true,
-      options,
-    });
-  }
-
-  return questions;
-}
-
-function normalizeCodexEvent(
-  payload: any,
-  headers: IncomingHttpHeaders,
-): AgentQueueItem | null {
-  const sessionId = asString(payload?.session_id);
-
-  if (!sessionId) {
-    return null;
-  }
-
-  const eventName = asString(payload.hook_event_name);
-  let kind: AgentQueueItem["kind"];
-  let message: string;
-  let permission: AgentPermission | undefined;
-
-  if (eventName === "PermissionRequest") {
-    kind = "permission";
-    permission = parsePermission(
-      asString(payload.tool_name) || "a tool",
-      payload.tool_input,
-    );
-    message = permissionMessage("codex", permission);
-  } else if (eventName === "Stop") {
-    kind = "finished";
-    message = finishedMessage("codex");
-  } else {
-    return null;
-  }
-
-  const host = toCodexHost(asString(headers["x-agent-host"]));
-
-  return {
-    id: `codex:${sessionId}`,
-    source: "codex",
-    kind,
-    sessionId,
-    host,
-    canOpen: getSessionUrl(host, sessionId) !== null,
-    cwd: asString(payload.cwd) || undefined,
-    message: truncate(message),
-    permission,
-    receivedAt: Date.now(),
-  };
-}
-
-function toClaudeHost(entrypoint: string): AgentHost {
-  switch (entrypoint) {
-    case "claude-desktop":
-      return "claude-desktop";
-    case "claude-vscode":
-      return "vscode";
-    case "cli":
-      return "terminal";
-    default:
-      return "unknown";
-  }
-}
-
-// The Codex hook script reports where Codex runs (see agent-hooks.ts).
-function toCodexHost(host: string): AgentHost {
-  return host === "codex-desktop" || host === "vscode" || host === "terminal"
-    ? host
-    : "unknown";
-}
-
-function asString(value: unknown): string {
-  if (Array.isArray(value)) {
-    return asString(value[0]);
-  }
-
-  return typeof value === "string" ? value.trim() : "";
-}
-
-// Cards show plain text, so drop the most common Markdown markers.
-function stripMarkdown(text: string): string {
-  return text
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/`([^`]*)`/g, "$1")
-    .replace(/(\*\*|__)(.+?)\1/g, "$2")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
-}
-
-function truncate(text: string): string {
-  const singleLine = stripMarkdown(text).replace(/\s+/g, " ").trim();
-
-  return singleLine.length > MAX_MESSAGE_LENGTH
-    ? `${singleLine.slice(0, MAX_MESSAGE_LENGTH - 1)}…`
-    : singleLine;
 }

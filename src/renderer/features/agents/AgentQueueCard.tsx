@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import {
-  AGENT_SOURCE_LABELS,
   AgentQuestionAnswers,
   AgentQueueItem,
 } from "../../../shared/agent-events";
@@ -266,7 +265,7 @@ const HandoffOption: React.FC<{ item: AgentQueueItem }> = ({ item }) => (
     onClick={() => clippyApi.handOffAgentQueueItem(item.id)}
   >
     <span className="buddy-speech-option-dot" />
-    Answer in {AGENT_SOURCE_LABELS[item.source]} instead
+    Answer in {item.agentLabel} instead
   </button>
 );
 
@@ -275,7 +274,7 @@ const AgentSourceLabel: React.FC<{ item: AgentQueueItem }> = ({ item }) => {
 
   return (
     <span className="buddy-agent-card-source">
-      {AGENT_SOURCE_LABELS[item.source]}
+      {item.agentLabel}
       {folderName ? ` · ${folderName}` : ""}
     </span>
   );

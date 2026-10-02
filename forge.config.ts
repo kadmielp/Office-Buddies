@@ -250,8 +250,10 @@ const config: ForgeConfig = {
       ["win32"],
     ),
     new MakerZIP({}, ["darwin", "win32"]),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    // The packaged binary is named after productName ("Office Buddies"), not
+    // the npm package name the Linux makers look for by default.
+    new MakerRpm({ options: { bin: packageJson.productName } }),
+    new MakerDeb({ options: { bin: packageJson.productName } }),
   ],
   plugins: [
     new VitePlugin({

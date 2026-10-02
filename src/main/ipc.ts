@@ -38,13 +38,19 @@ import {
   refreshKnowledgeFiles,
 } from "./knowledge";
 import { buildDynamicKnowledgeContext } from "./knowledge-runtime";
+import { getListenerStatus } from "./proactive-server";
+import { isInstallableAgent } from "./agents";
+import {
+  areClaudePopupsHidden,
+  isClaudeDesktopInstalled,
+  setClaudePopupsHidden,
+} from "./claude-desktop-prefs";
 import {
   answerAgentQuestion,
   decideAgentPermission,
   dismissAgentQueueItem,
   handOffAgentQueueItem,
   getAgentQueue,
-  isAgentSource,
   openAgentQueueItem,
 } from "./agent-events";
 import {
@@ -287,6 +293,19 @@ export function setupIpcListeners() {
 
   // Coding agent notifications
   ipcMain.handle(IpcMessages.AGENT_QUEUE_GET, () => getAgentQueue());
+  ipcMain.handle(IpcMessages.AGENT_LISTENER_STATUS, () => getListenerStatus());
+  ipcMain.handle(IpcMessages.AGENT_CLAUDE_POPUPS_GET, () => ({
+    available: isClaudeDesktopInstalled(),
+    hidden: areClaudePopupsHidden(),
+  }));
+  ipcMain.handle(IpcMessages.AGENT_CLAUDE_POPUPS_SET, (_, hidden: boolean) => {
+    getStateManager().setStateValue(
+      "settings.agentHideClaudePopups",
+      hidden === true,
+    );
+    setClaudePopupsHidden(hidden === true);
+    return areClaudePopupsHidden();
+  });
   ipcMain.handle(IpcMessages.AGENT_QUEUE_DISMISS, (_, id: string) =>
     dismissAgentQueueItem(id),
   );
@@ -373,7 +392,7 @@ export function setupIpcListeners() {
 }
 
 function assertAgentSource(source: unknown): AgentSource {
-  if (!isAgentSource(source)) {
+  if (!isInstallableAgent(source)) {
     throw new Error(`Unknown agent source: ${String(source)}`);
   }
 

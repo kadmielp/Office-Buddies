@@ -240,6 +240,12 @@ const clippyApi: ClippyApi = {
 
   // Coding agent notifications
   getAgentQueue: () => ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_GET),
+  getAgentListenerStatus: () =>
+    ipcRenderer.invoke(IpcMessages.AGENT_LISTENER_STATUS),
+  getClaudePopups: () =>
+    ipcRenderer.invoke(IpcMessages.AGENT_CLAUDE_POPUPS_GET),
+  setClaudePopupsHidden: (hidden: boolean) =>
+    ipcRenderer.invoke(IpcMessages.AGENT_CLAUDE_POPUPS_SET, hidden),
   dismissAgentQueueItem: (id: string) =>
     ipcRenderer.invoke(IpcMessages.AGENT_QUEUE_DISMISS, id),
   openAgentQueueItem: (id: string) =>

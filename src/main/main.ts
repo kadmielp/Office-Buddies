@@ -8,7 +8,11 @@ if (shouldQuit) {
 import { app, BrowserWindow } from "electron";
 import { loadElectronLlm } from "@electron/llm";
 import { setupIpcListeners } from "./ipc";
-import { createMainWindow, setupWindowListener } from "./windows";
+import {
+  createMainWindow,
+  setupWindowListener,
+  showAssistantFromTray,
+} from "./windows";
 import { getModelManager } from "./model-manager";
 import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
@@ -19,7 +23,23 @@ import {
 import { startProactiveServer } from "./proactive-server";
 import { createTray, destroyTray, isTrayQuitInProgress } from "./tray";
 
+// Only one buddy may run: a second copy couldn't open the agent listener's
+// port, so it hands over to the running one and quits.
+const hasInstanceLock = !shouldQuit && app.requestSingleInstanceLock();
+
+if (!shouldQuit && !hasInstanceLock) {
+  app.quit();
+}
+
+app.on("second-instance", () => {
+  showAssistantFromTray();
+});
+
 async function onReady() {
+  if (!hasInstanceLock) {
+    return;
+  }
+
   console.info(`Welcome to Office Buddies v${app.getVersion()}`);
 
   await setupAutoUpdater();
@@ -67,4 +87,3 @@ app.on("activate", () => {
     createMainWindow();
   }
 });
-

@@ -129,7 +129,7 @@ menu[role="tablist"] > button[role="tab"]:focus {
   line-height: 1.35;
   z-index: 30;
   max-height: 640px;
-  overflow: hidden;
+  overflow: visible; /* the tail sits just outside the balloon */
 }
 
 .buddy-speech-content {

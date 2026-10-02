@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Answer Codex's multiple-choice questions (Plan mode) from the balloon, just like Claude Code's.
+- Any tool can now post questions, permission requests and notifications to the buddy and get the answer back, using the documented custom agent protocol (`/agent-event?agent=custom`).
+- `Settings > Agents` can hide the Claude desktop app's own pop-ups while the buddy handles them (taskbar badges stay), and reminds you to do the same in the Codex app.
+- `Settings > Agents` shows whether the listener is running, and why not.
+
+### Changed
+
+- Agents are now plugged in through small adapters, so the queue, the balloon and the installer no longer contain agent-specific code.
+
+### Fixed
+
+- Only one Office Buddies runs at a time; starting it again brings the running buddy to the front instead of starting a copy that can't receive agent events.
+- Balloon tails now show in the Windows 98 and Windows XP designs.
+- Linux `.deb` and `.rpm` packages build again in the release workflow.
+
 ## [0.6.16] - 2026-10-02
 
 ### Added

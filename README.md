@@ -113,6 +113,8 @@ Office Buddies can sit next to your coding agents and tell you when one needs yo
 
 `Open` takes you to the exact conversation in the Claude desktop app or the Codex app. When you're already looking at the agent's window, the buddy stays quiet and the agent asks there as usual.
 
+Other tools can use the same balloon through a small JSON protocol: post a question or permission request to the local listener and get the user's answer back. See [custom agents](docs/tutorials/coding-agent-notifications.md#5-custom-agents-any-tool).
+
 Supported agents are Claude Code and Codex. `Settings > Agents` installs the hooks for you, shows exactly what will change in the agent's config file before writing it, and keeps a backup. The listener only accepts connections from this computer (`127.0.0.1`), and each hook carries a private token.
 
 See the [coding agent notifications tutorial](docs/tutorials/coding-agent-notifications.md) for setup and troubleshooting.

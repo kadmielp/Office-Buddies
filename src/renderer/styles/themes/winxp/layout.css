@@ -239,7 +239,7 @@ input[type="radio"]:focus + label::before {
   line-height: 1.35;
   z-index: 30;
   max-height: 660px;
-  overflow: hidden;
+  overflow: visible; /* the tail sits just outside the balloon */
 }
 
 .buddy-speech-content {

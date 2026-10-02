@@ -87,6 +87,10 @@ export interface SettingsState {
   enableProactiveMessages?: boolean;
   proactivePort?: number;
   agentHookToken?: string;
+  // Hide the Claude desktop app's own pop-ups while the buddy handles them.
+  agentHideClaudePopups?: boolean;
+  // Claude's notification levels before the buddy changed them.
+  claudeNotificationLevelsBackup?: Record<string, string>;
   agentShowFinished?: Partial<Record<"claude-code" | "codex", boolean>>;
   useKnowledgeAtStart?: boolean;
   useKnowledgeInMiniChat?: boolean;

@@ -3,16 +3,28 @@ import { getStateManager } from "./state";
 import { getMainWindow } from "./windows";
 import { IpcMessages } from "../shared/ipc-messages";
 import { getLogger } from "./logger";
-import {
-  AgentEventResponse,
-  handleAgentEvent,
-  isAgentSource,
-} from "./agent-events";
+import { handleAgentEvent } from "./agent-events";
+import { AgentEventResponse, getAgentAdapter } from "./agents";
 import { AGENT_EVENT_PATH } from "../shared/agent-events";
 import { timingSafeEqual } from "crypto";
 
 let server: http.Server | null = null;
 let activePort: number | null = null;
+let listenerError: string | null = null;
+
+export interface ListenerStatus {
+  running: boolean;
+  port: number | null;
+  error: string | null;
+}
+
+export function getListenerStatus(): ListenerStatus {
+  return {
+    running: server?.listening ?? false,
+    port: activePort,
+    error: listenerError,
+  };
+}
 const PROACTIVE_BIND_ADDRESS = "127.0.0.1";
 const MAX_AGENT_EVENT_BYTES = 256 * 1024;
 
@@ -22,6 +34,7 @@ export function startProactiveServer() {
 
   if (!settings.enableProactiveMessages) {
     stopProactiveServer();
+    listenerError = null;
     return;
   }
 
@@ -89,14 +102,19 @@ export function startProactiveServer() {
 
   activePort = port;
 
+  listenerError = null;
   server.listen(port, PROACTIVE_BIND_ADDRESS, () => {
     getLogger().info(
       `Proactive server listening on ${PROACTIVE_BIND_ADDRESS}:${port}`,
     );
   });
 
-  server.on("error", (error) => {
+  server.on("error", (error: NodeJS.ErrnoException) => {
     getLogger().error("Proactive server error", error);
+    listenerError =
+      error.code === "EADDRINUSE"
+        ? `Port ${port} is already in use by another program (or another copy of Office Buddies).`
+        : error.message;
     stopProactiveServer();
   });
 }
@@ -117,8 +135,9 @@ function handleAgentEventRequest(
 ) {
   const source = requestUrl.searchParams.get("agent");
   const token = getStateManager().getSettings().agentHookToken || "";
+  const adapter = getAgentAdapter(source);
 
-  if (!isAgentSource(source) || !isAuthorized(req, token)) {
+  if (!adapter || !isAuthorized(req, token)) {
     req.resume();
     res.writeHead(401);
     res.end();
@@ -159,7 +178,7 @@ function handleAgentEventRequest(
     }
 
     // Questions keep the request open until they are answered or released.
-    handleAgentEvent(source, payload, req.headers, (callback) => {
+    handleAgentEvent(adapter, payload, req.headers, (callback) => {
       // The agent may already have hung up while the event was being checked.
       if (res.destroyed && !res.writableEnded) {
         callback();

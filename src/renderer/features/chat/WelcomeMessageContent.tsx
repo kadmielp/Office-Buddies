@@ -30,9 +30,8 @@ export const WelcomeMessageContent: React.FC = () => {
         locally, so that you can chat with it offline.
       </p>
       <p>
-        It supports a variety of models, including Google's Gemma3, Meta's
-        Llama3, or Microsoft's Phi-4 Mini. We've already started downloading the
-        smallest model for you in the background. You can choose a bigger, more
+        It supports a variety of models, including Google's Gemma3 or Qwen3. We've
+        already started downloading the smallest model for you in the background. You can choose a bigger, more
         powerful model in the settings.
       </p>
       <p>

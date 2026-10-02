@@ -49,7 +49,6 @@ export const SettingsModel: React.FC = () => {
       header: "Size",
       render: (row) => `${row.size.toLocaleString()} MB`,
     },
-    { key: "company", header: "Company" },
     { key: "downloaded", header: "Downloaded" },
   ];
 
@@ -60,7 +59,6 @@ export const SettingsModel: React.FC = () => {
     return {
       default: model?.name === settings.selectedModel ? "ｘ" : "",
       name: model?.name,
-      company: model?.company,
       size: model?.size,
       downloaded: model.downloaded ? "Yes" : "No",
     };

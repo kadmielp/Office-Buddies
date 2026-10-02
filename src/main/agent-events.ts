@@ -27,6 +27,7 @@ const CLAUDE_NEEDS_INPUT_TYPES = new Set([
 ]);
 
 const CLAUDE_DESKTOP_SESSION_PATTERN = /^local_[A-Za-z0-9-]{1,64}$/;
+const SESSION_ID_PATTERN = /^[A-Za-z0-9-]{1,128}$/;
 const MAX_MESSAGE_LENGTH = 280;
 const MAX_PERMISSION_DETAIL_LENGTH = 600;
 
@@ -214,6 +215,8 @@ function holdRequest(
 // Process names of the apps each kind of session runs in.
 const HOST_PROCESS_NAMES: Record<AgentHost, string[]> = {
   "claude-desktop": ["claude"],
+  // The Codex desktop app's executable is ChatGPT.exe.
+  "codex-desktop": ["chatgpt"],
   vscode: ["code", "code - insiders", "cursor", "windsurf"],
   terminal: [
     "windowsterminal",
@@ -298,17 +301,34 @@ function queueItem(item: AgentQueueItem) {
   broadcastQueue(item);
 }
 
-// Returns whether the session could be opened.
-async function openAgentSession(item: AgentQueueItem): Promise<boolean> {
-  if (item.host !== "claude-desktop" || !item.hostSessionId) {
-    return false;
+// The link that opens a session in its desktop app, if there is one.
+function getSessionUrl(
+  host: AgentHost,
+  sessionId: string,
+  hostSessionId?: string,
+): string | null {
+  if (host === "claude-desktop" && hostSessionId) {
+    // `claude://resume` imports a copy of the session, and `code/needs-input`
+    // only finds sessions that are waiting on you; `code/continue` opens any
+    // existing desktop session.
+    return `claude://code/continue?session=${encodeURIComponent(hostSessionId)}`;
   }
 
-  // `claude://resume` imports a copy of the session; `code/needs-input`
-  // navigates to the existing desktop session instead.
-  const url = `claude://code/needs-input?session=${encodeURIComponent(
-    item.hostSessionId,
-  )}`;
+  if (host === "codex-desktop" && SESSION_ID_PATTERN.test(sessionId)) {
+    // Codex's hook session id is the app's thread id.
+    return `codex://threads/${encodeURIComponent(sessionId)}`;
+  }
+
+  return null;
+}
+
+// Returns whether the session could be opened.
+async function openAgentSession(item: AgentQueueItem): Promise<boolean> {
+  const url = getSessionUrl(item.host, item.sessionId, item.hostSessionId);
+
+  if (!url) {
+    return false;
+  }
 
   try {
     await shell.openExternal(url);
@@ -390,17 +410,20 @@ function normalizeClaudeEvent(
     return null;
   }
 
-  const hostSessionId = asString(headers["x-agent-host-session"]);
+  const rawHostSessionId = asString(headers["x-agent-host-session"]);
+  const hostSessionId = CLAUDE_DESKTOP_SESSION_PATTERN.test(rawHostSessionId)
+    ? rawHostSessionId
+    : undefined;
+  const host = toClaudeHost(asString(headers["x-agent-entrypoint"]));
 
   return {
     id: `claude-code:${sessionId}`,
     source: "claude-code",
     kind,
     sessionId,
-    hostSessionId: CLAUDE_DESKTOP_SESSION_PATTERN.test(hostSessionId)
-      ? hostSessionId
-      : undefined,
-    host: toClaudeHost(asString(headers["x-agent-entrypoint"])),
+    hostSessionId,
+    host,
+    canOpen: getSessionUrl(host, sessionId, hostSessionId) !== null,
     cwd: asString(payload.cwd) || undefined,
     message: truncate(message),
     questions: questions ?? undefined,
@@ -507,12 +530,15 @@ function normalizeCodexEvent(
     return null;
   }
 
+  const host = toCodexHost(asString(headers["x-agent-host"]));
+
   return {
     id: `codex:${sessionId}`,
     source: "codex",
     kind,
     sessionId,
-    host: toCodexHost(asString(headers["x-agent-host"])),
+    host,
+    canOpen: getSessionUrl(host, sessionId) !== null,
     cwd: asString(payload.cwd) || undefined,
     message: truncate(message),
     permission,
@@ -535,7 +561,9 @@ function toClaudeHost(entrypoint: string): AgentHost {
 
 // The Codex hook script reports where Codex runs (see agent-hooks.ts).
 function toCodexHost(host: string): AgentHost {
-  return host === "vscode" || host === "terminal" ? host : "unknown";
+  return host === "codex-desktop" || host === "vscode" || host === "terminal"
+    ? host
+    : "unknown";
 }
 
 function asString(value: unknown): string {

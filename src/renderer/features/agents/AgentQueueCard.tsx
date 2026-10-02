@@ -42,7 +42,6 @@ const AgentNoticeCard: React.FC<AgentQueueCardProps> = ({
   onPrevious,
   onNext,
 }) => {
-  const canOpen = item.host === "claude-desktop" && Boolean(item.hostSessionId);
   const title = item.kind === "finished" ? "Finished" : "Needs your input";
 
   return (
@@ -66,7 +65,7 @@ const AgentNoticeCard: React.FC<AgentQueueCardProps> = ({
           onNext={onNext}
         />
         <div className="buddy-agent-card-buttons">
-          {canOpen && (
+          {item.canOpen && (
             <button onClick={() => clippyApi.openAgentQueueItem(item.id)}>
               Open
             </button>

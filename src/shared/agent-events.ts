@@ -35,7 +35,12 @@ export interface AgentQuestion {
 export type AgentQuestionAnswers = Record<string, string>;
 
 // Where the agent session runs, used to decide whether "Open" is possible.
-export type AgentHost = "claude-desktop" | "vscode" | "terminal" | "unknown";
+export type AgentHost =
+  | "claude-desktop"
+  | "codex-desktop"
+  | "vscode"
+  | "terminal"
+  | "unknown";
 
 export interface AgentQueueItem {
   // One entry per agent session: `${source}:${sessionId}`.
@@ -45,6 +50,8 @@ export interface AgentQueueItem {
   sessionId: string;
   // Session id understood by the host app's deep link, when available.
   hostSessionId?: string;
+  // Whether the buddy can take you to this session in its app.
+  canOpen: boolean;
   host: AgentHost;
   cwd?: string;
   message: string;

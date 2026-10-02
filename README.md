@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/OfficeBuddies.png" alt="Office Buddies" width="128" />
+  <img src="assets/app.png" alt="Office Buddies" width="128" />
 </p>
 <p align="center">
   <img src="https://img.shields.io/github/languages/top/kadmielp/Office-Buddies" alt="GitHub top language" />
@@ -10,7 +10,10 @@
 </p>
 <h1 align="center">Office Buddies</h1>
 <p align="center">
-  <img src="assets/screenshots/clippy.png" alt="Logo" width="256" />
+  <video src="assets/OfficeBuddies-film.mp4" width="720" controls muted playsinline></video>
+</p>
+<p align="center">
+  <a href="assets/OfficeBuddies-film.mp4">Watch the 60-second film</a>
 </p>
 
 Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Lifey, Links, Merlin, Peedy, Rocky, Rover, and others added over time.

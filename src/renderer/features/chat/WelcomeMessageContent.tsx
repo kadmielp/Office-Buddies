@@ -16,28 +16,23 @@ export const WelcomeMessageContent: React.FC = () => {
 
   return (
     <div>
-      <strong>Welcome to Office Buddies!</strong>
+      <strong>Hi, I'm Clippy. Let's get to work.</strong>
       <p>
-        This little app is a love letter and homage to the late, great Clippy,
-        the assistant from Microsoft Office 1997. The character was designed by
-        illustrator Kevan Atteberry, who created more than 15 potential
-        characters for Microsoft's Office Assistants. It is <i>not</i>{" "}
-        affiliated, approved, or supported by Microsoft. Consider it software
-        art or satire.
+        You're running Office Buddies, a fan-made tribute to the Office
+        Assistant from 1997. Clippy was drawn by Kevan Atteberry. This project
+        has nothing to do with Microsoft, who haven't approved or endorsed it.
+        Think of it as a bit of software art.
       </p>
       <p>
-        This version of Office Buddies can run a Large Language Model (LLM)
-        locally, so that you can chat with it offline.
+        I'm here to look after your coding agents. Connect Claude or Codex and
+        I'll tap the glass when they finish. When they have a question or need
+        your approval, I'll ask it right here in the balloon.
       </p>
       <p>
-        It supports a variety of models, including Google's Gemma3 or Qwen3. We've
-        already started downloading the smallest model for you in the background. You can choose a bigger, more
-        powerful model in the settings.
+        No agent handy? I can also run a small model on your machine, offline.
+        It's downloading now, and you can swap in a bigger one in the settings.
       </p>
-      <p>
-        By the way, you can open or close this chat window by clicking right on
-        Clippy's head.
-      </p>
+      <p>To open or close this window, right-click my head.</p>
 
       {downloadingModel && (
         <div style={{ marginTop: "15px", marginBottom: "15px" }}>

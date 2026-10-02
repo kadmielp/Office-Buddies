@@ -4,16 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-02
+
 ### Added
 
 - Answer Codex's multiple-choice questions (Plan mode) from the balloon, just like Claude Code's.
 - Any tool can now post questions, permission requests and notifications to the buddy and get the answer back, using the documented custom agent protocol (`/agent-event?agent=custom`).
 - `Settings > Agents` can hide the Claude desktop app's own pop-ups while the buddy handles them (taskbar badges stay), and reminds you to do the same in the Codex app.
 - `Settings > Agents` shows whether the listener is running, and why not.
+- Animation cues in chat replies are recognised much more reliably: `[Thinking]` and `{GestureUp}` are picked up anywhere in a reply, common loose names such as `[hello]` or `[think]` map to the agent's real animations, and a half-streamed cue is held back until it is complete so it never flashes on screen. Code blocks, inline code, links and indexing like `x[Wave]` are never touched, and at most three animations are queued per reply.
 
 ### Changed
 
 - Agents are now plugged in through small adapters, so the queue, the balloon and the installer no longer contain agent-specific code.
+- Trimmed the built-in local model list to Gemma 3 (1B), Gemma 3 (27B) and Qwen3 (4B). Gemma 3 (4B and 12B), Phi-4 Mini and Llama 3.2 (1B and 3B) are no longer offered, and the `Company` column is gone from the model table.
+- Rewrote the welcome message in the chat: it now introduces the buddy as a companion for your coding agents (finished notices, questions and approvals in the balloon), mentions the offline local model as a fallback, and says to right-click the buddy's head to open or close the window.
 
 ### Fixed
 

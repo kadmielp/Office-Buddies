@@ -13,7 +13,7 @@
   <video src="assets/OfficeBuddies-film.mp4" width="720" controls muted playsinline></video>
 </p>
 <p align="center">
-  <a href="assets/OfficeBuddies-film.mp4">Watch the 60-second film</a>
+  <a href="https://kadmielp.github.io/Office-Buddies/">Visit the website</a> · <a href="assets/OfficeBuddies-film.mp4">Watch the 60-second film</a>
 </p>
 
 Clippy is still here (and yes, still iconic), but Office Buddies treats the app as a home for the broader assistant cast too: Bonzi, F1, Genie, Genius, Lifey, Links, Merlin, Peedy, Rocky, Rover, and others added over time.

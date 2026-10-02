@@ -2,6 +2,9 @@ import { app, autoUpdater, dialog, shell } from "electron";
 import { updateElectronApp, UpdateSourceType } from "update-electron-app";
 import { getLogger } from "./logger";
 import { getStateManager } from "./state";
+import { getMainWindow } from "./windows";
+import { setTrayStatus } from "./tray";
+import { IpcMessages } from "../shared/ipc-messages";
 import fs from "fs";
 import path from "path";
 
@@ -39,7 +42,39 @@ export function setupAutoUpdater() {
       updateInterval: "1 hour",
       logger: require("electron-log"),
     });
+    showDownloadFeedback();
   }
+}
+
+/**
+ * Squirrel reports no download progress, only that a download started and
+ * finished, so the feedback is a balloon plus a tray tooltip while it runs.
+ */
+function showDownloadFeedback() {
+  let announced = false;
+
+  autoUpdater.on("update-available", () => {
+    if (announced) {
+      return;
+    }
+
+    announced = true;
+    setTrayStatus("downloading update...");
+
+    const mainWindow = getMainWindow();
+    mainWindow?.webContents.send(IpcMessages.PROACTIVE_MESSAGE, {
+      message:
+        "A new version of Office Buddies is available. Downloading it in the background...",
+      loop: false,
+    });
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    setTrayStatus("update ready, restart to install");
+  });
+
+  autoUpdater.on("error", () => setTrayStatus());
+  autoUpdater.on("update-not-available", () => setTrayStatus());
 }
 
 /**

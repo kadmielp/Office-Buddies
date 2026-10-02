@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.3] - 2026-10-03
+
+### Added
+
+- Download feedback for automatic updates: the buddy announces that a new version is downloading, and the tray tooltip shows the download and ready-to-restart states.
+
 ## [0.7.2] - 2026-10-03
 
 ### Fixed

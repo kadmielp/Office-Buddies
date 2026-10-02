@@ -153,6 +153,10 @@ export async function createTray() {
   return tray;
 }
 
+export function setTrayStatus(status?: string) {
+  tray?.setToolTip(status ? `Office Buddies - ${status}` : "Office Buddies");
+}
+
 export function refreshTrayMenu() {
   tray?.setContextMenu(buildTrayMenu());
 }

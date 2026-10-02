@@ -1,0 +1,20 @@
+{
+  "name": "office-buddies-film",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "studio": "remotion studio",
+    "still": "remotion still",
+    "render": "remotion render --concurrency=2",
+    "prepare": "node scripts/prepare-assets.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.530",
+    "@remotion/transitions": "^4.0.530",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.530",
+    "typescript": "^7.0.2"
+  }
+}

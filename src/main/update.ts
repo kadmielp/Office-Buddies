@@ -21,11 +21,21 @@ export function setupAutoUpdater() {
 
   if (!disableAutoUpdate) {
     const repo = getUpdateRepo();
+    // Windows reads the Squirrel feed (RELEASES + .nupkg) straight from the
+    // latest GitHub release. The public update service caches release lists,
+    // so it can keep answering 404 for a while after a release is published.
+    const updateSource =
+      process.platform === "win32"
+        ? {
+            type: UpdateSourceType.StaticStorage as const,
+            baseUrl: `https://github.com/${repo}/releases/latest/download`,
+          }
+        : {
+            type: UpdateSourceType.ElectronPublicUpdateService as const,
+            repo,
+          };
     updateElectronApp({
-      updateSource: {
-        type: UpdateSourceType.ElectronPublicUpdateService,
-        repo,
-      },
+      updateSource,
       updateInterval: "1 hour",
       logger: require("electron-log"),
     });

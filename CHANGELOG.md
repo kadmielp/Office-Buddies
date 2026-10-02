@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - `Start Office Buddies automatically when Windows starts` now sticks: the startup entry is written to the Windows Run key (pointing at the updater stub) instead of relying on a read-back that reported it as not launching.
 - The tray icon loads in installed builds (the icon files now ship with the app).
 - The close button on the chat window hides it to the tray and it stays hidden.
-- Windows auto-update: releases now include the `RELEASES` and `.nupkg` files the updater needs, so `Check for Updates` can find new versions.
+- Windows auto-update: releases now include the `RELEASES` and `.nupkg` files the updater needs, so `Check for Updates` can find new versions. On Windows the updater now reads the feed directly from the latest GitHub release instead of the cached public update service.
 
 ### Changed
 

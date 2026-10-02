@@ -25,13 +25,26 @@ let isQuitting = false;
 
 function resolveTrayIconPath() {
   const iconFile = process.platform === "win32" ? "icon.ico" : "icon.png";
-  const basePath = app.isPackaged ? process.resourcesPath : app.getAppPath();
-
-  return path.join(basePath, "assets", iconFile);
+  return app.isPackaged
+    ? path.join(process.resourcesPath, iconFile)
+    : path.join(app.getAppPath(), "assets", iconFile);
 }
 
 async function createTrayIcon() {
-  if (process.platform === "win32" && app.isPackaged) {
+  const image = nativeImage.createFromPath(resolveTrayIconPath());
+
+  if (!image.isEmpty()) {
+    return process.platform === "win32"
+      ? image.resize({ width: 16, height: 16 })
+      : image;
+  }
+
+  getLogger().warn(
+    "Tray icon file missing or unreadable",
+    resolveTrayIconPath(),
+  );
+
+  if (process.platform === "win32") {
     try {
       const executableIcon = await app.getFileIcon(process.execPath, {
         size: "small",
@@ -43,12 +56,6 @@ async function createTrayIcon() {
     } catch (error) {
       getLogger().warn("Failed to load tray icon from executable", error);
     }
-  }
-
-  const image = nativeImage.createFromPath(resolveTrayIconPath());
-
-  if (process.platform === "win32") {
-    return image.resize({ width: 16, height: 16 });
   }
 
   return image;
@@ -106,7 +113,10 @@ function buildTrayMenu() {
       checked: Boolean(settings.startWithWindows),
       enabled: process.platform === "win32" && app.isPackaged,
       click: (menuItem) => {
-        getStateManager().setStateValue("settings.startWithWindows", menuItem.checked);
+        getStateManager().setStateValue(
+          "settings.startWithWindows",
+          menuItem.checked,
+        );
         refreshTrayMenu();
       },
     },

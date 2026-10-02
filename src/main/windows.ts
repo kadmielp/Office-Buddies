@@ -13,7 +13,11 @@ import { getStateManager } from "./state";
 import { getDebugManager } from "./debug";
 import { popupAppMenu } from "./menu";
 import { runBuddyAction } from "./buddy-actions";
-import { isTrayQuitInProgress, refreshTrayMenu, shouldMinimizeToTray } from "./tray";
+import {
+  isTrayQuitInProgress,
+  refreshTrayMenu,
+  shouldMinimizeToTray,
+} from "./tray";
 
 let mainWindow: BrowserWindow | undefined;
 const allowedMinimizeWindows = new WeakSet<BrowserWindow>();
@@ -61,7 +65,13 @@ function shouldProtectWindowFromMinimize(window: BrowserWindow) {
 }
 
 function reassertWindowAlwaysOnTop(window: BrowserWindow) {
-  if (window.isDestroyed() || !shouldProtectWindowFromMinimize(window)) {
+  // A window hidden on purpose (the X button sends it to the tray) must stay
+  // hidden: moving it to the top on Windows would show it again.
+  if (
+    window.isDestroyed() ||
+    !window.isVisible() ||
+    !shouldProtectWindowFromMinimize(window)
+  ) {
     return;
   }
 
@@ -75,10 +85,7 @@ function reassertWindowAlwaysOnTop(window: BrowserWindow) {
   window.moveTop();
 }
 
-function scheduleWindowTopmostReassertion(
-  window: BrowserWindow,
-  delayMs = 0,
-) {
+function scheduleWindowTopmostReassertion(window: BrowserWindow, delayMs = 0) {
   const existingTimer = topmostReassertionTimers.get(window);
   if (existingTimer) {
     clearTimeout(existingTimer);

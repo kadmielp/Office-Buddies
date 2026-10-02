@@ -1,74 +1,62 @@
+import { execFileSync } from "child_process";
 import path from "path";
 
 import { app } from "electron";
 
 import { getLogger } from "./logger";
 
-type LoginItemSettings = Parameters<typeof app.setLoginItemSettings>[0];
-type LoginItemQuery = Pick<LoginItemSettings, "path" | "args">;
-type LaunchItem = NonNullable<
-  ReturnType<typeof app.getLoginItemSettings>["launchItems"]
->[number];
+const RUN_KEY = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+const APPROVED_KEY =
+  "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run";
+const VALUE_NAME = "OfficeBuddies";
 
-function getWindowsStartupQuery(): LoginItemQuery {
-  if (!isWindowsStartupSupported()) {
-    return {};
-  }
-
+// With Squirrel installs the running exe lives in a versioned `app-x.y.z`
+// folder that changes on every update. The stub one level up always launches
+// the latest version, so that is what the startup entry must point at.
+function getStartupExePath(): string {
   const appFolder = path.dirname(process.execPath);
   const exeName = path.basename(process.execPath);
-  const stubLauncher = path.resolve(appFolder, "..", exeName);
 
-  return {
-    path: stubLauncher,
-    args: [],
-  };
+  return path.resolve(appFolder, "..", exeName);
 }
 
-function getWindowsStartupSettings(openAtLogin: boolean): LoginItemSettings {
-  const query = getWindowsStartupQuery();
-
-  return {
-    ...query,
-    openAtLogin,
-    ...(openAtLogin ? { enabled: true } : {}),
-  };
+function reg(args: string[]): string {
+  return execFileSync("reg", args, {
+    encoding: "utf8",
+    windowsHide: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 }
 
-function normalizePath(value: string | undefined): string {
-  return (value || "").trim().toLowerCase();
+function readRegistryValue(key: string, name: string): string | null {
+  try {
+    const output = reg(["query", key, "/v", name]);
+    const line = output
+      .split(/\r?\n/)
+      .find((entry) => entry.trim().startsWith(name));
+
+    if (!line) {
+      return null;
+    }
+
+    const match = line.trim().match(/^\S+\s+REG_\w+\s+(.*)$/);
+    return match ? match[1].trim() : null;
+  } catch {
+    // `reg query` exits non-zero when the value does not exist.
+    return null;
+  }
 }
 
-function normalizeArgs(value: string[] | undefined): string[] {
-  return (value || []).map((arg) => arg.trim());
-}
+// Task Manager's Startup tab records "disabled" as a binary value that
+// starts with an odd byte (e.g. 03 00 00 00 ...).
+function isDisabledInTaskManager(): boolean {
+  const data = readRegistryValue(APPROVED_KEY, VALUE_NAME);
 
-function argsMatch(left: string[] | undefined, right: string[] | undefined) {
-  const normalizedLeft = normalizeArgs(left);
-  const normalizedRight = normalizeArgs(right);
-
-  if (normalizedLeft.length !== normalizedRight.length) {
+  if (!data) {
     return false;
   }
 
-  return normalizedLeft.every((arg, index) => arg === normalizedRight[index]);
-}
-
-function getMatchingLaunchItem(
-  launchItems: LaunchItem[] | undefined,
-  query: LoginItemQuery,
-): LaunchItem | undefined {
-  if (!launchItems?.length || !query.path) {
-    return undefined;
-  }
-
-  const normalizedPath = normalizePath(query.path);
-
-  return launchItems.find(
-    (launchItem) =>
-      normalizePath(launchItem.path) === normalizedPath &&
-      argsMatch(launchItem.args, query.args),
-  );
+  return /^0*[13579bdf]/i.test(data.replace(/^0x/i, "").slice(0, 2));
 }
 
 export function getWindowsStartupEnabled(): boolean {
@@ -77,26 +65,18 @@ export function getWindowsStartupEnabled(): boolean {
   }
 
   try {
-    const query = getWindowsStartupQuery();
-    const loginItemSettings = app.getLoginItemSettings(query);
-    const matchingLaunchItem = getMatchingLaunchItem(
-      loginItemSettings.launchItems,
-      query,
-    );
+    const command = readRegistryValue(RUN_KEY, VALUE_NAME);
 
-    if (!loginItemSettings.openAtLogin) {
+    if (!command) {
       return false;
     }
 
-    if (matchingLaunchItem) {
-      return matchingLaunchItem.enabled;
-    }
+    const registered = command.replace(/^"|"$/g, "").toLowerCase();
 
-    if (typeof loginItemSettings.executableWillLaunchAtLogin === "boolean") {
-      return loginItemSettings.executableWillLaunchAtLogin;
-    }
-
-    return loginItemSettings.openAtLogin;
+    return (
+      registered === getStartupExePath().toLowerCase() &&
+      !isDisabledInTaskManager()
+    );
   } catch (error) {
     getLogger().error("Failed to read Windows startup setting", error);
     return false;
@@ -113,10 +93,35 @@ export function syncWindowsStartupSetting(
   }
 
   try {
-    app.setLoginItemSettings(getWindowsStartupSettings(openAtLogin));
+    if (openAtLogin) {
+      reg([
+        "add",
+        RUN_KEY,
+        "/v",
+        VALUE_NAME,
+        "/t",
+        "REG_SZ",
+        "/d",
+        `"${getStartupExePath()}"`,
+        "/f",
+      ]);
+
+      // Clear a leftover "disabled" flag from Task Manager's Startup tab.
+      try {
+        reg(["delete", APPROVED_KEY, "/v", VALUE_NAME, "/f"]);
+      } catch {
+        // Nothing to clear.
+      }
+    } else {
+      try {
+        reg(["delete", RUN_KEY, "/v", VALUE_NAME, "/f"]);
+      } catch {
+        // Already removed.
+      }
+    }
   } catch (error) {
     getLogger().error("Failed to update Windows startup setting", error);
-    return false;
+    return getWindowsStartupEnabled();
   }
 
   const actualValue = getWindowsStartupEnabled();

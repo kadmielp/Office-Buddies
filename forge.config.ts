@@ -226,6 +226,10 @@ const config: ForgeConfig = {
       : undefined,
     windowsSign: FLAGS.IS_CODESIGNING_ENABLED ? windowsSign : undefined,
     icon: path.resolve(__dirname, "assets/icon"),
+    extraResource: [
+      path.resolve(__dirname, "assets/icon.ico"),
+      path.resolve(__dirname, "assets/icon.png"),
+    ],
     junk: true,
     overwrite: true,
     prune: true,

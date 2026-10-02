@@ -123,3 +123,5 @@ jobs:
             out/**/*setup*.exe
             out/**/*.rpm
             out/**/*.zip
+            out/**/RELEASES
+            out/**/*.nupkg

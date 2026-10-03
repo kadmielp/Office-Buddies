@@ -42,7 +42,7 @@ function toChatHistoryMessages(
   history: MessageRecord[],
   options?: { includeImages?: boolean },
 ) {
-  return history
+  const messages = history
     .filter((msg) => !!msg.content || (msg.imageDataUrls?.length || 0) > 0)
     .map((msg) => {
       const role = msg.sender === "clippy" ? "assistant" : "user";
@@ -70,6 +70,31 @@ function toChatHistoryMessages(
         content: msg.content || "",
       };
     });
+
+  // Strict chat templates (Gemma, Mistral, ...) reject a leading assistant turn
+  // (the welcome message) and consecutive turns from the same role.
+  const alternating: typeof messages = [];
+  for (const message of messages) {
+    const last = alternating[alternating.length - 1];
+
+    if (!last && message.role === "assistant") {
+      continue;
+    }
+
+    if (
+      last &&
+      last.role === message.role &&
+      typeof last.content === "string" &&
+      typeof message.content === "string"
+    ) {
+      last.content = `${last.content}\n\n${message.content}`;
+      continue;
+    }
+
+    alternating.push({ ...message });
+  }
+
+  return alternating;
 }
 
 function toGeminiHistory(history: MessageRecord[]) {

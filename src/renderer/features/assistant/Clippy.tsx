@@ -192,6 +192,7 @@ export function Clippy() {
   const copyFeedbackTimeoutRef = useRef<number | undefined>(undefined);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const activeAnimationRef = useRef<string>("Default");
+  const isCuePlayingRef = useRef(false);
   const hasPlayedWelcomeRef = useRef<boolean>(false);
   const idleStartedAtRef = useRef<number | null>(null);
   const wasBuddySpeechLoadingRef = useRef<boolean>(false);
@@ -260,7 +261,8 @@ export function Clippy() {
     isAnyModelDownloading || isStartingNewChat;
   const shouldUseBuddyProcessingAnimation = isBuddyThinking;
   const miniChatAnimationPhase =
-    isMiniChatOpen && (status === "thinking" || status === "responding")
+    (isMiniChatOpen || isChatWindowOpen) &&
+    (status === "thinking" || status === "responding")
       ? status
       : null;
   const shouldUseProcessingAnimation =
@@ -496,12 +498,14 @@ export function Clippy() {
       log("Playing animation", { key, agent: agentPack.name });
       clearDefaultTimeout();
       let isCompleted = false;
+      isCuePlayingRef.current = true;
       const finish = () => {
         if (isCompleted) {
           return;
         }
 
         isCompleted = true;
+        isCuePlayingRef.current = false;
         clearDefaultTimeout();
         runAnimation("Default");
         onComplete?.();
@@ -1230,7 +1234,10 @@ export function Clippy() {
     return () => {
       clearDefaultTimeout();
       clearIdleTimeout();
-      clearFrameTimeout();
+      // A status change (e.g. a model reload) must not cut a playing cue short.
+      if (!isCuePlayingRef.current) {
+        clearFrameTimeout();
+      }
     };
   }, [
     agentPack,
@@ -1247,7 +1254,13 @@ export function Clippy() {
   ]);
 
   useEffect(() => {
-    if (!isSpriteReady || manualAnimationKey || isAgentSwitchAnimating) {
+    // A queued cue (e.g. "Save") takes over until it finishes, then the loop resumes.
+    if (
+      !isSpriteReady ||
+      manualAnimationKey ||
+      isAgentSwitchAnimating ||
+      (animationKey && !isBuddyThinking)
+    ) {
       return;
     }
 
@@ -1290,7 +1303,9 @@ export function Clippy() {
     };
   }, [
     agentPack.animations,
+    animationKey,
     isAgentSwitchAnimating,
+    isBuddyThinking,
     isSpriteReady,
     manualAnimationKey,
     miniChatAnimationPhase,

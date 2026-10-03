@@ -56,8 +56,11 @@ tools\animation-studio\run.cmd 4300
   - zoom controls
 - Right panel (`Frames` tab):
   - frame list
-  - edit fields (`Duration`, `Sound`, `Exit Branch`, `Branch Frame Index`, `Weight`, `Images`)
+  - edit fields (`Duration`, `Sound`, `Images`) and the `What happens after this frame` table (branches, weights, exit)
   - frame actions (`Add`, `Duplicate`, `Remove`, `Up/Down`, etc.)
+- Right panel (`Scenarios` tab):
+  - every way the animation can play, with its chance, duration and frame path
+  - warnings for broken or never-played branches
 - Right panel (`Sound Library` tab):
   - play assistant sounds
   - assign selected sound to frame
@@ -70,16 +73,16 @@ This is the right-side editor in the `Frames` tab.
 
 Each line is a compact summary of one frame:
 
-`000 | 100ms | #40 w:60@19|40@25 sound:Greet`
+`000 | 100ms | #40 →19 60%, 25 40% sound:Greet`
 
 Meaning:
 
 - `000`: frame index in the current animation timeline
 - `100ms`: frame duration
 - `#40`: primary sprite cell index from `map.png`
-- `w:60@19|40@25`: weighted branch targets (`weight@frameIndex`)
+- `->19 60%, 25 40%`: where the animation goes next and with what chance (only shown when the frame branches or has an exit)
 - `sound:Greet`: sound id assigned to this frame
-- `->34` (when present): `exitBranch` fallback target
+- `✗unused`: no way to reach this frame from frame 0
 
 ### `Duration (ms)`
 
@@ -95,27 +98,20 @@ Meaning:
 - Empty/`(none)` removes sound from the frame.
 - Effect: sets or removes `frame.sound`.
 
-### `Exit Branch`
+### `What happens after this frame`
 
-- What it is: fallback frame index to jump to.
-- Valid values: whole number `>= 0`.
-- Use it when you want a deterministic fallback/continuation path.
-- Effect: sets or removes `frame.exitBranch`.
+One row per possible next step. Chances are fixed: they only change when you edit this table.
 
-### `Branch Frame Index`
+| Column | Meaning |
+| --- | --- |
+| `Go to frame` | Frame the animation jumps to. Empty on the last row means "next frame" (or the end on the last frame). |
+| `Weight` | Percent chance for that branch (whole number 0-100). |
+| `Chance` | What the branch really gets after clipping at 100%. |
 
-- What it is: branch target frame index for the active editable branch slot.
-- Valid values: whole number `>= 0`.
-- Must be set together with `Weight (%)`.
-- Effect: updates `frame.branching.branches[i].frameIndex`.
-
-### `Weight (%)`
-
-- What it is: relative weight for that branch target.
-- Valid values: whole number from `0` to `100`.
-- Must be set together with `Branch Frame Index`.
-- Effect: updates `frame.branching.branches[i].weight`.
-- Note: branch playback uses positive weights (`> 0`). A saved `0` weight is effectively ignored at runtime.
+- Branch rows edit `frame.branching.branches[i]`; use `Add branch` / `✘` to add or remove them.
+- The last row ("the rest") gets whatever the branches leave over: `100 - sum of weights`. Its frame edits `frame.exitBranch`.
+- A target outside the animation ends the animation (row shown in red).
+- Weights above 100% in total are ignored (row shown in yellow, summary in red).
 
 ### `Images (x,y pairs, one per line)`
 
@@ -136,9 +132,7 @@ Meaning:
 
 - `Apply` writes edits to the selected frame and saves to disk.
 - In numeric fields, pressing `Enter` also applies.
-- `Branch Frame Index` and `Weight` rules:
-  - set both to create/update a branch
-  - clear both to remove the branch entry
+- Branch table edits apply immediately and can be undone.
 
 ## Tutorial 1: Edit a Basic Animation
 
@@ -163,116 +157,36 @@ Meaning:
 3. Click `Play` to test.
 4. Click `Apply`.
 
-## Tutorial 4: Branching and Path Preview
+## Tutorial 4: Branching and Scenarios
 
-1. Select a frame that branches.
-2. Set `Branch Frame Index` and `Weight (%)`.
-3. Optionally set `Exit Branch`.
-4. Click `Apply`.
-5. Use `<` `>` under `Animation Preview` to pick which branch path to preview.
-6. Preview restarts from frame `0` when path changes.
+1. Select a frame and look at `What happens after this frame`.
+2. Click `Add branch`, pick the target frame and a weight.
+3. Check the summary line: `Branches 95% + 5% for the rest = 100%`.
+4. Open the `Scenarios` tab to see every way the whole animation can play.
+5. Click a scenario to preview exactly that path, or `Play random` to play it like the app does.
 
-## Weight Semantics (Important)
+## How branching works
 
-Think of branch weights as **relative shares**, not strict percentages that must sum to 100.
+The app rolls once per frame, using the same rules as the studio shows:
 
-- A branch is considered valid for weighted playback when:
-  - `frameIndex` is a valid frame in the current animation
-  - `weight` is a number greater than `0`
-- Studio input validation allows `weight` between `0` and `100` (whole numbers).
-- During playback, the tool computes a total of all positive branch weights and rolls within that total.
+1. Branches are checked in order against a running total of their weights.
+2. If none is hit, the frame goes to `exitBranch`; without it, to the next frame.
+3. A target past the last frame (or below 0) ends the animation.
 
 Examples:
 
-- `20` and `80` behaves like a classic 20/80 split.
-- `10` and `10` behaves exactly like `50/50`.
-- `100` and `100` also behaves like `50/50`.
-- `5`, `15`, `30` behaves like `10%`, `30%`, `60%` (same ratio).
+- One branch `95 -> frame 1` on frame 1: the frame repeats (average 20 plays), then falls to the next frame (5%).
+- Branches `40 -> 19` and `60 -> 25`: nothing is left over, so the exit is never used.
+- Branches `20 -> 19` and `30 -> 25`: the remaining 50% goes to the exit or next frame.
+- Weights `100` and `100`: only the first is used; the second is clipped.
 
-### If weights do not sum to 100
+## Reading the Scenarios tab
 
-That is fine. The tool normalizes by total weight automatically.
-
-### Weight `0` behavior
-
-- A `0` weight can still be saved in data.
-- But it is ignored by weighted playback and path options (because only `weight > 0` is considered).
-- In practice, use `0` only temporarily while editing; prefer removing branch entries you do not want.
-
-### Out-of-range branch targets
-
-- `Branch Frame Index` only validates as `>= 0` at edit time.
-- If target frame is outside current animation length, it is ignored during preview playback.
-
-## Branching Model: `exitBranch` vs `branch frame index`
-
-`exitBranch` and `branching.branches[]` are different mechanisms:
-
-### `branching.branches[].frameIndex` (+ `weight`)
-
-- Represents weighted branch targets.
-- Requires:
-  - `frameIndex`: destination frame in current animation timeline
-  - `weight`: probability percentage for that branch
-- If a frame has multiple branches, each branch can have its own weight.
-
-Example:
-
-```js
-branching: {
-  branches: [
-    { frameIndex: 19, weight: 40 },
-    { frameIndex: 25, weight: 60 },
-  ];
-}
-```
-
-Meaning:
-
-- 40% chance to jump to frame `19`
-- 60% chance to jump to frame `25`
-
-### `exitBranch`
-
-- Fallback jump target when branch conditions/probabilities do not select a branch.
-- Also a timeline frame index in the same animation.
-
-Example:
-
-```js
-exitBranch: 34;
-```
-
-Meaning:
-
-- if no weighted branch is chosen, jump to frame `34`
-
-## Practical Difference
-
-- Use `branch frame index + weight` to define one or more probabilistic paths.
-- Use `exitBranch` as a deterministic fallback/continuation target.
-
-In Studio:
-
-- `Branch Frame Index` + `Weight` edits a branch entry.
-- `Exit Branch` edits fallback jump.
-- Clearing both `Branch Frame Index` and `Weight` removes that branch entry.
-
-## Preview Path Selector vs Weighted Playback
-
-There are two different behaviors to know:
-
-- Path selector (`<` `>`):
-  - chooses a specific available path for preview
-  - useful for deterministic visual inspection of a branch path
-- Weighted playback:
-  - only happens when no explicit path choice is forcing a specific option
-  - uses positive weights to pick a branch probabilistically
-
-Practical tip:
-
-- Use path selector to validate where each path goes.
-- Then run repeated previews/reloads to validate your intended overall branch frequency.
+- `Chance` is measured from frame 0, so every scenario's chances add up to 100% and do not depend on what you have selected.
+- `Frames played` lists the path. `2–35` is a run of consecutive frames, `1 ⟲×20` is a frame that jumps to itself (about 20 plays in a row), `↻ 5` means the path goes back to frame 5 and can repeat from there, and `end` means the animation finishes.
+- Frames that appear in no scenario are marked `✗unused` in the frame list.
+- The preview overlay shows `Reached: X%` (chance a play reaches that frame) and, while playing, `took Y%` (chance of the jump that was just taken).
+- `Save` warns if a branch points outside the animation, weights exceed 100%, or a group of frames can never reach the end.
 
 ## Save Behavior
 
@@ -285,7 +199,7 @@ Practical tip:
 
 1. Make a small change.
 2. `Apply`.
-3. Confirm frame list text reflects the change (`w:<weight>@<frameIndex>`).
+3. Confirm the frame list and `Scenarios` tab reflect the change.
 4. Re-load assistant once to confirm behavior.
 5. Repeat.
 
@@ -299,6 +213,6 @@ Practical tip:
 
 ### Branch edits not behaving as expected
 
-- Ensure both `Branch Frame Index` and `Weight` are set.
-- If you want to remove a branch, clear both fields and apply.
-- Use preview arrows to test alternate path playback.
+- Check the summary under the branch table: it must read `= 100%`.
+- Red rows point to a frame that does not exist; yellow rows have weight that is clipped.
+- Open the `Scenarios` tab for warnings such as frames that are never played.

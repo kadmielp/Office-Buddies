@@ -216,21 +216,6 @@ textarea {
   box-sizing: border-box;
 }
 
-.branch-selector {
-  align-items: center;
-  gap: 6px;
-}
-
-.branch-selector button {
-  min-width: 26px;
-  padding: 0;
-}
-
-#branchPositionText {
-  min-width: 88px;
-  text-align: center;
-}
-
 .sound-browser {
   display: flex;
   flex-direction: column;
@@ -343,7 +328,6 @@ textarea {
 }
 
 #previewFrameText,
-#previewProbabilityText,
 #framePreviewText {
   position: static;
   min-width: 62px;
@@ -387,16 +371,34 @@ textarea {
   margin: 0;
 }
 
-.branch-selector-under-preview {
+.branch-selector {
   display: grid;
-  grid-template-columns: 26px auto 26px;
-  justify-content: center;
+  grid-template-columns: 26px minmax(0, 1fr) 26px;
   align-items: center;
   gap: 6px;
 }
 
-.branch-selector-under-preview > * {
+.branch-selector > * {
   margin: 0;
+}
+
+.branch-selector button {
+  min-width: 26px;
+  padding: 0;
+}
+
+#scenarioPositionText {
+  text-align: center;
+  font-size: 11px;
+}
+
+.scenario-path-text {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.2;
+  max-height: 3.6em;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .tab-content {
@@ -427,6 +429,173 @@ menu[role="tablist"] > button[aria-selected="true"] {
   text-shadow: 1px 1px #222;
   position: relative;
   top: 1px;
+}
+
+.outcomes-panel {
+  margin: 0;
+  padding: 6px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.outcomes-table {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.outcome-row {
+  display: grid;
+  grid-template-columns: 52px 52px minmax(0, 1fr) 24px;
+  align-items: center;
+  min-height: 24px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.outcome-row input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.outcome-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.outcome-row button {
+  min-width: 0;
+  width: 22px;
+  padding: 0;
+}
+
+.outcome-head {
+  font-size: 11px;
+  color: #404040;
+}
+
+.outcome-rest {
+  font-style: italic;
+  font-size: 11px;
+}
+
+.outcome-fallback {
+  border-top: 1px dashed #808080;
+  padding-top: 3px;
+}
+
+.outcome-bad input:first-child {
+  background: #ffd0d0;
+}
+
+.outcome-clipped input:nth-child(2) {
+  background: #fff0b0;
+}
+
+.chance {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.chance-bar {
+  flex: 1 1 auto;
+  height: 8px;
+  min-width: 14px;
+  background: #fff;
+  border: 1px solid #808080;
+  box-sizing: border-box;
+}
+
+.chance-fill {
+  height: 100%;
+  background: #0a246a;
+}
+
+.chance span {
+  font-size: 11px;
+  min-width: 34px;
+  text-align: right;
+}
+
+.outcomes-summary {
+  font-size: 11px;
+  min-height: 2.4em;
+}
+
+.outcomes-error,
+.scenario-error {
+  color: #a00000;
+}
+
+.scenario-warn {
+  color: #7a5a00;
+}
+
+.scenarios-panel {
+  min-width: 0;
+}
+
+.scenarios-header,
+.scenarios-hint {
+  font-size: 11px;
+}
+
+.scenarios-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+}
+
+.scenario-problem {
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.scenarios-list {
+  max-height: 560px;
+  overflow: auto;
+  background: #fff;
+  margin-top: 6px;
+}
+
+.scenario-row {
+  display: grid;
+  grid-template-columns: 56px 40px minmax(0, 1fr);
+  gap: 6px;
+  padding: 2px 4px;
+  font-size: 11px;
+  cursor: pointer;
+  align-items: start;
+}
+
+.scenario-row > div:last-child {
+  overflow-wrap: anywhere;
+}
+
+.scenario-row:hover {
+  background: #e8e8ff;
+}
+
+.scenario-row.active {
+  background: #0a246a;
+  color: #fff;
+}
+
+.scenario-head {
+  cursor: default;
+  font-weight: bold;
+  background: #c0c0c0;
+}
+
+.scenario-head:hover {
+  background: #c0c0c0;
 }
 
 @media (max-width: 1300px) {

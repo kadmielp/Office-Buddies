@@ -40,7 +40,6 @@
                 <div class="animation-preview-wrap sunken-panel">
                   <div class="animation-preview-overlay">
                     <span id="previewFrameText">Frame: -</span>
-                    <span id="previewProbabilityText">Prob: -</span>
                   </div>
                   <canvas id="animationPreviewCanvas"></canvas>
                 </div>
@@ -56,11 +55,12 @@
                     Sound: Off
                   </button>
                 </div>
-                <div class="branch-selector branch-selector-under-preview">
-                  <button id="prevBranchBtn" type="button">◀</button>
-                  <span id="branchPositionText">Branch 1/1</span>
-                  <button id="nextBranchBtn" type="button">▶</button>
+                <div class="branch-selector">
+                  <button id="prevScenarioBtn" type="button" title="Previous path">◀</button>
+                  <span id="scenarioPositionText">Random</span>
+                  <button id="nextScenarioBtn" type="button" title="Next path">▶</button>
                 </div>
+                <div id="scenarioPathText" class="scenario-path-text"></div>
               </fieldset>
             </div>
           </fieldset>
@@ -110,6 +110,14 @@
               >
                 ♫ Sound Library
               </button>
+              <button
+                id="scenariosTabBtn"
+                role="tab"
+                aria-selected="false"
+                aria-controls="scenariosTabContent"
+              >
+                ⑂ Scenarios
+              </button>
             </menu>
 
             <fieldset
@@ -144,38 +152,12 @@
                     </div>
                   </div>
 
-                  <div class="frame-input-grid">
-                    <div class="frame-input-field">
-                      <label for="exitBranchInput">Exit Branch</label>
-                      <input
-                        id="exitBranchInput"
-                        type="number"
-                        min="0"
-                        step="1"
-                      />
-                    </div>
-
-                    <div class="frame-input-field">
-                      <label for="branchFrameIndexInput"
-                        >Branch Frame Index</label
-                      >
-                      <input
-                        id="branchFrameIndexInput"
-                        type="number"
-                        min="0"
-                        step="1"
-                      />
-                    </div>
-                  </div>
-
-                  <label for="weightInput">Weight (%)</label>
-                  <input
-                    id="weightInput"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="1"
-                  />
+                  <fieldset class="outcomes-panel">
+                    <legend>What happens after this frame</legend>
+                    <div id="outcomesTable" class="outcomes-table"></div>
+                    <div id="outcomesSummary" class="outcomes-summary"></div>
+                    <button id="addBranchBtn" type="button">⊕ Add branch</button>
+                  </fieldset>
 
                   <label for="imagesInput"
                     >Images (#index or x,y, one per line)</label
@@ -190,7 +172,7 @@
                     <button id="selectAllFramesBtn">❖ Select All</button>
                     <button id="invertFramesBtn">↕ Invert Selected</button>
                     <button id="duplicateFrameBtn">🗐 Duplicate</button>
-                    <button id="clearBranchFieldsBtn">∅ Clear Branch</button>
+                    <button id="clearBranchFieldsBtn">∅ Clear Branches</button>
                   </div>
 
                   <div class="animation-preview-wrap frame-preview-wrap sunken-panel">
@@ -217,6 +199,19 @@
                 <button id="useLibrarySoundBtn">Use In Frame</button>
                 <span id="selectedLibrarySoundText">Selected: (none)</span>
               </div>
+            </fieldset>
+
+            <fieldset id="scenariosTabContent" class="scenarios-panel tab-content">
+              <legend>Every way this animation can play</legend>
+              <div id="scenariosHeader" class="scenarios-header"></div>
+              <div id="scenariosWarnings" class="scenarios-warnings"></div>
+              <div class="field-row wrap">
+                <button id="playRandomBtn" type="button">▶ Play random</button>
+                <span class="scenarios-hint"
+                  >Click a row to play that exact path</span
+                >
+              </div>
+              <div id="scenariosList" class="scenarios-list sunken-panel"></div>
             </fieldset>
           </section>
         </section>

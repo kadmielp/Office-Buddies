@@ -18,9 +18,10 @@
   historyStack: [],
   redoStack: [],
   copiedFrames: [],
+  copiedMeta: null,
   lastSavedDefinitionJson: null,
   previewSoundEnabled: false,
-  previewPathChoice: 0,
+  previewScenarioIndex: null,
   sequenceCaptureEnabled: false,
 };
 
@@ -35,7 +36,6 @@ const elements = {
   toggleAnimationPlayBtn: document.getElementById("toggleAnimationPlayBtn"),
   togglePreviewSoundBtn: document.getElementById("togglePreviewSoundBtn"),
   previewFrameText: document.getElementById("previewFrameText"),
-  previewProbabilityText: document.getElementById("previewProbabilityText"),
   framePreviewCanvas: document.getElementById("framePreviewCanvas"),
   framePreviewText: document.getElementById("framePreviewText"),
   framesTabBtn: document.getElementById("framesTabBtn"),
@@ -67,12 +67,19 @@ const elements = {
   durationInput: document.getElementById("durationInput"),
   soundSelect: document.getElementById("soundSelect"),
   playFrameSoundBtn: document.getElementById("playFrameSoundBtn"),
-  exitBranchInput: document.getElementById("exitBranchInput"),
-  prevBranchBtn: document.getElementById("prevBranchBtn"),
-  nextBranchBtn: document.getElementById("nextBranchBtn"),
-  branchPositionText: document.getElementById("branchPositionText"),
-  branchFrameIndexInput: document.getElementById("branchFrameIndexInput"),
-  weightInput: document.getElementById("weightInput"),
+  outcomesTable: document.getElementById("outcomesTable"),
+  outcomesSummary: document.getElementById("outcomesSummary"),
+  addBranchBtn: document.getElementById("addBranchBtn"),
+  scenariosTabBtn: document.getElementById("scenariosTabBtn"),
+  scenariosTabContent: document.getElementById("scenariosTabContent"),
+  scenariosHeader: document.getElementById("scenariosHeader"),
+  scenariosWarnings: document.getElementById("scenariosWarnings"),
+  scenariosList: document.getElementById("scenariosList"),
+  playRandomBtn: document.getElementById("playRandomBtn"),
+  prevScenarioBtn: document.getElementById("prevScenarioBtn"),
+  nextScenarioBtn: document.getElementById("nextScenarioBtn"),
+  scenarioPositionText: document.getElementById("scenarioPositionText"),
+  scenarioPathText: document.getElementById("scenarioPathText"),
   imagesInput: document.getElementById("imagesInput"),
   addFrameBtn: document.getElementById("addFrameBtn"),
   duplicateFrameBtn: document.getElementById("duplicateFrameBtn"),
@@ -94,18 +101,21 @@ function setStatus(text) {
 
 function setEditorTab(tab) {
   state.activeTab = tab;
-  const showFrames = tab === "frames";
+  const tabs = {
+    frames: [elements.framesTabBtn, elements.framesTabContent],
+    sounds: [elements.soundsTabBtn, elements.soundsTabContent],
+    scenarios: [elements.scenariosTabBtn, elements.scenariosTabContent],
+  };
 
-  elements.framesTabBtn.setAttribute(
-    "aria-selected",
-    showFrames ? "true" : "false",
-  );
-  elements.soundsTabBtn.setAttribute(
-    "aria-selected",
-    showFrames ? "false" : "true",
-  );
-  elements.framesTabContent.classList.toggle("active-tab", showFrames);
-  elements.soundsTabContent.classList.toggle("active-tab", !showFrames);
+  for (const [name, [button, content]] of Object.entries(tabs)) {
+    const active = name === tab;
+    button.setAttribute("aria-selected", active ? "true" : "false");
+    content.classList.toggle("active-tab", active);
+  }
+
+  if (tab === "scenarios") {
+    renderScenarios();
+  }
 }
 
 function updatePreviewSoundToggle() {
@@ -180,244 +190,795 @@ function getCurrentFrames() {
   return animation.frames;
 }
 
-function getPreviewPathOptions(frameIndex) {
-  const frames = getCurrentFrames();
-  if (!frames.length || frameIndex < 0 || frameIndex >= frames.length) {
-    return [];
+const END = -1;
+const MAX_SCENARIOS = 200;
+const HOLD_LIMIT_PLAYS = 1000;
+
+function frameDurationMs(frame) {
+  const duration = Number(frame?.duration);
+  return Number.isFinite(duration) && duration > 0 ? duration : 100;
+}
+
+// Everything that can happen after `frameIndex`, mirroring the runtime
+// (getNextFrameIndex in Clippy.tsx): branches roll in order against a
+// cumulative weight; whatever is left over (100 - sum) takes exitBranch,
+// or falls through to the next frame. A target outside the animation ends it.
+function computeFrameOutcomes(frameIndex, frames = getCurrentFrames()) {
+  const frame = frames[frameIndex];
+  if (!frame) {
+    return { outcomes: [], branchTotal: 0, remainder: 0, overflow: false };
   }
 
-  const frame = frames[frameIndex] || {};
-  const options = [];
-  const seen = new Set();
-
-  const pushOption = (targetIndex, kind, branchIndex = null) => {
-    if (
-      !Number.isInteger(targetIndex) ||
-      targetIndex < 0 ||
-      targetIndex >= frames.length
-    ) {
-      return;
+  const resolveTarget = (raw) => {
+    const target = Number(raw);
+    if (!Number.isInteger(target)) {
+      return { target: END, valid: false };
     }
-    const key = `${kind}:${targetIndex}:${branchIndex ?? ""}`;
-    if (seen.has(key)) {
-      return;
+    if (target < 0 || target >= frames.length) {
+      return { target: END, valid: false, raw: target };
     }
-    seen.add(key);
-    options.push({ frameIndex: targetIndex, kind, branchIndex });
+    return { target, valid: true, raw: target };
   };
 
   const branches = Array.isArray(frame?.branching?.branches)
     ? frame.branching.branches
     : [];
+  const outcomes = [];
   let cumulative = 0;
-  for (let i = 0; i < branches.length; i += 1) {
-    const branch = branches[i];
-    const target = Number(branch?.frameIndex);
+  branches.forEach((branch, branchIndex) => {
     const weight = Number(branch?.weight);
-    if (!Number.isInteger(target) || !Number.isFinite(weight) || weight <= 0) {
-      continue;
-    }
-
-    const nextCumulative = cumulative + weight;
-    const effectiveWeight = Math.max(
-      0,
-      Math.min(100, nextCumulative) - Math.min(100, cumulative),
-    );
-    if (effectiveWeight > 0) {
-      pushOption(target, "branch", i);
-    }
-    cumulative = nextCumulative;
-  }
-
-  const fallbackWeight = Math.max(0, 100 - Math.min(100, cumulative));
-  if (fallbackWeight > 0) {
-    if (Number.isInteger(frame.exitBranch)) {
-      pushOption(frame.exitBranch, "exit");
-    } else if (frames.length > 0) {
-      pushOption((frameIndex + 1) % frames.length, "next");
-    }
-  }
-
-  return options;
-}
-
-function getPreviewPathProbability(frameIndex, optionIndex = null) {
-  const frames = getCurrentFrames();
-  if (!frames.length || frameIndex < 0 || frameIndex >= frames.length) {
-    return null;
-  }
-
-  const frame = frames[frameIndex] || {};
-  const options = getPreviewPathOptions(frameIndex);
-  if (!options.length) {
-    return null;
-  }
-
-  const choice = Number.isInteger(optionIndex)
-    ? optionIndex
-    : Number(state.previewPathChoice);
-  const boundedChoice =
-    Number.isInteger(choice) && choice >= 0 && choice < options.length ? choice : 0;
-  const selectedOption = options[boundedChoice];
-  if (!selectedOption) {
-    return null;
-  }
-
-  const branches = Array.isArray(frame?.branching?.branches)
-    ? frame.branching.branches
-    : [];
-  const weightedBranches = branches
-    .map((branch, branchIndex) => ({
+    const safeWeight = Number.isFinite(weight) && weight > 0 ? weight : 0;
+    const before = Math.min(100, cumulative);
+    cumulative += safeWeight;
+    const effective = Math.min(100, cumulative) - before;
+    const resolved = resolveTarget(branch?.frameIndex);
+    outcomes.push({
+      kind: "branch",
       branchIndex,
-      frameIndex: Number(branch?.frameIndex),
-      weight: Number(branch?.weight),
-    }))
-    .filter(
-      (branch) =>
-        Number.isInteger(branch.frameIndex) &&
-        branch.frameIndex >= 0 &&
-        branch.frameIndex < frames.length &&
-        Number.isFinite(branch.weight) &&
-        branch.weight > 0,
-    );
+      weight: safeWeight,
+      effective,
+      clipped: effective < safeWeight,
+      ...resolved,
+    });
+  });
 
-  let cumulative = 0;
-  for (const branch of weightedBranches) {
-    const nextCumulative = cumulative + branch.weight;
-    const normalizedWeight = Math.max(
-      0,
-      Math.min(100, nextCumulative) - Math.min(100, cumulative),
-    );
-    if (
-      selectedOption.kind === "branch" &&
-      selectedOption.branchIndex === branch.branchIndex
-    ) {
-      return normalizedWeight;
-    }
-    cumulative = nextCumulative;
+  const remainder = Math.max(0, 100 - Math.min(100, cumulative));
+  let fallback;
+  if (Number.isInteger(frame.exitBranch)) {
+    fallback = { kind: "exit", ...resolveTarget(frame.exitBranch) };
+  } else {
+    const next = frameIndex + 1;
+    fallback =
+      next < frames.length
+        ? { kind: "next", target: next, valid: true, raw: next }
+        : { kind: "next", target: END, valid: true, raw: next };
   }
+  outcomes.push({
+    ...fallback,
+    branchIndex: null,
+    weight: remainder,
+    effective: remainder,
+    clipped: false,
+  });
 
-  const fallbackWeight = Math.max(0, 100 - Math.min(100, cumulative));
-  if (
-    (selectedOption.kind === "exit" || selectedOption.kind === "next") &&
-    fallbackWeight > 0
-  ) {
-    return fallbackWeight;
-  }
-
-  return 0;
+  return {
+    outcomes,
+    branchTotal: cumulative,
+    remainder,
+    overflow: cumulative > 100,
+  };
 }
 
-function getPreviewPathTargetFrameIndex(frameIndex, optionIndex = null) {
-  const frames = getCurrentFrames();
+// Walk every possible playthrough from frame 0. A scenario ends when the
+// animation ends or when it jumps back to a frame it already played (a loop),
+// so the probabilities of all scenarios add up to 100%.
+function enumerateScenarios(frames = getCurrentFrames()) {
+  const scenarios = [];
+  let truncated = false;
   if (!frames.length) {
-    return -1;
+    return { scenarios, truncated, reachable: new Set(), reach: new Map() };
   }
 
-  const options = getPreviewPathOptions(frameIndex);
-  if (!options.length) {
-    return (frameIndex + 1) % frames.length;
-  }
-
-  const choice = Number.isInteger(optionIndex)
-    ? optionIndex
-    : Number(state.previewPathChoice);
-  const boundedChoice =
-    Number.isInteger(choice) && choice >= 0 && choice < options.length ? choice : 0;
-  return options[boundedChoice]?.frameIndex ?? -1;
-}
-
-function getDisplayedPreviewProbability(currentFrameIndex) {
-  const frames = getCurrentFrames();
-  if (!frames.length || currentFrameIndex < 0 || currentFrameIndex >= frames.length) {
-    return null;
-  }
-
-  const startIndex =
-    Number.isInteger(state.previewStartFrameIndex) &&
-    state.previewStartFrameIndex >= 0 &&
-    state.previewStartFrameIndex < frames.length
-      ? state.previewStartFrameIndex
-      : currentFrameIndex;
-
-  let cursor = startIndex;
-  let cumulativeProbability = 100;
-  const visited = new Set();
-
-  while (!visited.has(cursor)) {
-    visited.add(cursor);
-
-    const localProbability = getPreviewPathProbability(cursor);
-    if (Number.isFinite(localProbability)) {
-      cumulativeProbability = (cumulativeProbability * localProbability) / 100;
+  const holds = new Map();
+  const visit = (path, probability) => {
+    if (scenarios.length >= MAX_SCENARIOS) {
+      truncated = true;
+      return;
     }
+    const current = path[path.length - 1];
+    const { outcomes } = computeFrameOutcomes(current, frames);
 
-    if (cursor === currentFrameIndex) {
-      return Math.round(cumulativeProbability * 100) / 100;
-    }
-
-    const nextFrameIndex = getPreviewPathTargetFrameIndex(cursor);
-    if (
-      !Number.isInteger(nextFrameIndex) ||
-      nextFrameIndex < 0 ||
-      nextFrameIndex >= frames.length
-    ) {
-      break;
-    }
-
-    cursor = nextFrameIndex;
-  }
-
-  return null;
-}
-
-function getAnimationPathChoiceCount() {
-  const count = getPreviewPathOptions(state.selectedFrameIndex).length;
-  return Math.max(1, count);
-}
-
-function getActiveEditableBranchIndex() {
-  const frame = getCurrentFrames()[state.selectedFrameIndex];
-  const branches = Array.isArray(frame?.branching?.branches)
-    ? frame.branching.branches
-    : [];
-  const options = getPreviewPathOptions(state.selectedFrameIndex);
-  const choice = Number(state.previewPathChoice);
-  if (Number.isInteger(choice) && choice >= 0 && choice < options.length) {
-    const selectedOption = options[choice];
-    if (
-      selectedOption?.kind === "branch" &&
-      Number.isInteger(selectedOption.branchIndex)
-    ) {
-      return Math.max(
-        0,
-        Math.min(selectedOption.branchIndex, branches.length - 1),
+    // Merge outcomes that lead to the same place.
+    const byTarget = new Map();
+    for (const outcome of outcomes) {
+      if (outcome.effective <= 0) {
+        continue;
+      }
+      byTarget.set(
+        outcome.target,
+        (byTarget.get(outcome.target) || 0) + outcome.effective,
       );
     }
 
-    if (selectedOption?.kind === "exit" || selectedOption?.kind === "next") {
-      return branches.length;
+    // A frame that jumps back to itself just holds the pose for a while.
+    // Treat it as a repeat count instead of a separate scenario: the chance of
+    // eventually leaving is spread over the other outcomes.
+    const selfChance = byTarget.get(current) || 0;
+    byTarget.delete(current);
+    const leaveChance = 100 - selfChance;
+    const previousHold = holds.get(current);
+    if (selfChance > 0 && leaveChance > 0) {
+      holds.set(current, Math.min(HOLD_LIMIT_PLAYS, 100 / leaveChance));
+    }
+
+    if (selfChance >= 100 || (selfChance > 0 && byTarget.size === 0)) {
+      scenarios.push({
+        path: path.slice(),
+        probability,
+        end: "loop",
+        loopTo: current,
+        holds: new Map(holds),
+      });
+    } else {
+      for (const [target, effective] of byTarget) {
+        const scaled = selfChance > 0 ? (effective * 100) / leaveChance : effective;
+        const chance = (probability * scaled) / 100;
+        if (target === END) {
+          scenarios.push({
+            path: path.slice(),
+            probability: chance,
+            end: "end",
+            holds: new Map(holds),
+          });
+        } else if (path.includes(target)) {
+          scenarios.push({
+            path: path.slice(),
+            probability: chance,
+            end: "loop",
+            loopTo: target,
+            holds: new Map(holds),
+          });
+        } else {
+          path.push(target);
+          visit(path, chance);
+          path.pop();
+        }
+      }
+    }
+
+    if (previousHold === undefined) {
+      holds.delete(current);
+    } else {
+      holds.set(current, previousHold);
+    }
+  };
+  visit([0], 100);
+
+  const reachable = new Set();
+  const reach = new Map();
+  for (const scenario of scenarios) {
+    for (const index of scenario.path) {
+      reachable.add(index);
+      reach.set(index, (reach.get(index) || 0) + scenario.probability);
     }
   }
 
-  return 0;
+  scenarios.sort((a, b) => b.probability - a.probability);
+  return { scenarios, truncated, reachable, reach };
 }
 
-function renderPreviewPathSelector() {
-  const count = getAnimationPathChoiceCount();
+function formatPercent(value) {
+  if (!Number.isFinite(value)) {
+    return "-";
+  }
+  const rounded = Math.round(value * 100) / 100;
+  return `${rounded}%`;
+}
 
-  let choice = Number(state.previewPathChoice);
-  if (!Number.isInteger(choice) || choice < 0 || choice >= count) {
-    choice = 0;
-    state.previewPathChoice = 0;
+function formatFramePath(path, loopTo = null, holds = null) {
+  const tokens = [];
+  let i = 0;
+  while (i < path.length) {
+    const hold = holds?.get(path[i]);
+    if (hold) {
+      tokens.push(`${path[i]} ⟲×${Math.round(hold)}`);
+      i += 1;
+      continue;
+    }
+    let j = i;
+    while (
+      j + 1 < path.length &&
+      path[j + 1] === path[j] + 1 &&
+      !holds?.get(path[j + 1])
+    ) {
+      j += 1;
+    }
+    tokens.push(j - i >= 2 ? `${path[i]}–${path[j]}` : path.slice(i, j + 1).join(" → "));
+    i = j + 1;
+  }
+  let text = tokens.join(" → ");
+  if (loopTo !== null) {
+    text += ` ↻ ${loopTo}`;
+  }
+  return text;
+}
+
+function validateAnimation(frames = getCurrentFrames()) {
+  const problems = [];
+  if (!frames.length) {
+    return problems;
   }
 
-  elements.branchPositionText.textContent = `Branch ${choice + 1}/${count}`;
-  elements.prevBranchBtn.disabled = count <= 1;
-  elements.nextBranchBtn.disabled = count <= 1;
-  elements.prevBranchBtn.style.visibility = "visible";
-  elements.nextBranchBtn.style.visibility = "visible";
+  frames.forEach((frame, index) => {
+    const { outcomes, branchTotal, overflow } = computeFrameOutcomes(index, frames);
+    outcomes.forEach((outcome) => {
+      if (outcome.kind !== "next" && !outcome.valid) {
+        problems.push({
+          level: "error",
+          frame: index,
+          text: `Frame ${index}: jumps to ${outcome.raw ?? "nothing"}, which does not exist (the animation just ends).`,
+        });
+      }
+    });
+    if (overflow) {
+      problems.push({
+        level: "error",
+        frame: index,
+        text: `Frame ${index}: weights add up to ${branchTotal}%. Anything above 100% is ignored.`,
+      });
+    }
+  });
+
+  const { reachable } = enumerateScenarios(frames);
+  const unreachable = frames
+    .map((_, index) => index)
+    .filter((index) => !reachable.has(index));
+  if (unreachable.length) {
+    problems.push({
+      level: "warn",
+      frame: unreachable[0],
+      text: `Never played: ${formatFramePath(unreachable).replaceAll(" → ", ", ")}.`,
+    });
+  }
+
+  // Can the animation always finish? Find frames that cannot reach the end.
+  const canEnd = new Set();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    frames.forEach((_, index) => {
+      if (canEnd.has(index)) {
+        return;
+      }
+      const { outcomes } = computeFrameOutcomes(index, frames);
+      if (
+        outcomes.some(
+          (o) => o.effective > 0 && (o.target === END || canEnd.has(o.target)),
+        )
+      ) {
+        canEnd.add(index);
+        changed = true;
+      }
+    });
+  }
+  const stuck = [...reachable].filter((index) => !canEnd.has(index));
+  if (stuck.length) {
+    problems.push({
+      level: "error",
+      frame: stuck[0],
+      text: `Frames ${formatFramePath(stuck.sort((a, b) => a - b)).replaceAll(" → ", ", ")} loop forever: no branch leads to the end.`,
+    });
+  }
+
+  return problems;
 }
+
+function validateAnimationsForSave() {
+  const lines = [];
+  for (const [name, animation] of Object.entries(getAnimationsObject())) {
+    const frames = Array.isArray(animation?.frames) ? animation.frames : [];
+    for (const problem of validateAnimation(frames)) {
+      if (problem.level === "error") {
+        lines.push(`${name}: ${problem.text}`);
+      }
+    }
+  }
+  return lines;
+}
+
+let analysisCache = null;
+
+function getAnalysis() {
+  const frames = getCurrentFrames();
+  if (!analysisCache || analysisCache.frames !== frames) {
+    analysisCache = { frames, ...enumerateScenarios(frames) };
+  }
+  return analysisCache;
+}
+
+function invalidateAnalysis() {
+  analysisCache = null;
+}
+
+function renderOutcomes() {
+  const table = elements.outcomesTable;
+  const summary = elements.outcomesSummary;
+  table.innerHTML = "";
+  summary.textContent = "";
+  summary.className = "outcomes-summary";
+
+  const frames = getCurrentFrames();
+  const frameIndex = state.selectedFrameIndex;
+  const frame = frames[frameIndex];
+  elements.addBranchBtn.disabled = !frame;
+  if (!frame) {
+    return;
+  }
+
+  const { outcomes, branchTotal, remainder, overflow } = computeFrameOutcomes(
+    frameIndex,
+    frames,
+  );
+
+  const addCell = (row, child, className) => {
+    const cell = document.createElement("div");
+    if (className) {
+      cell.className = className;
+    }
+    if (typeof child === "string") {
+      cell.textContent = child;
+    } else if (child) {
+      cell.appendChild(child);
+    }
+    row.appendChild(cell);
+    return cell;
+  };
+
+  const header = document.createElement("div");
+  header.className = "outcome-row outcome-head";
+  addCell(header, "Go to frame");
+  addCell(header, "Weight");
+  addCell(header, "Chance");
+  addCell(header, "");
+  table.appendChild(header);
+
+  const makeNumberInput = (value, placeholder, onChange, title) => {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = "0";
+    input.step = "1";
+    input.value = value;
+    input.placeholder = placeholder;
+    input.title = title;
+    input.addEventListener("change", () => onChange(input.value.trim()));
+    return input;
+  };
+
+  const makeChance = (outcome) => {
+    const wrap = document.createElement("div");
+    wrap.className = "chance";
+    const bar = document.createElement("div");
+    bar.className = "chance-bar";
+    const fill = document.createElement("div");
+    fill.className = "chance-fill";
+    fill.style.width = `${Math.max(0, Math.min(100, outcome.effective))}%`;
+    bar.appendChild(fill);
+    const label = document.createElement("span");
+    label.textContent = formatPercent(outcome.effective);
+    wrap.append(bar, label);
+    return wrap;
+  };
+
+  const hasBranchRows = outcomes.some((outcome) => outcome.kind === "branch");
+  let ghostAdded = hasBranchRows;
+
+  // With no branches, show an empty branch row so the panel keeps its size.
+  // Filling in both fields creates the branch.
+  const addGhostRow = () => {
+    const ghost = document.createElement("div");
+    ghost.className = "outcome-row";
+    const frameInput = makeNumberInput("", "", () => {}, "Frame to jump to");
+    const weightInput = makeNumberInput("", "", () => {}, "Weight in percent");
+    const create = () => {
+      const target = frameInput.value.trim();
+      const weight = weightInput.value.trim();
+      if (target === "" || weight === "") {
+        return;
+      }
+      createBranch(frameIndex, target, weight);
+    };
+    frameInput.addEventListener("change", create);
+    weightInput.addEventListener("change", create);
+    addCell(ghost, frameInput);
+    addCell(ghost, weightInput);
+    addCell(
+      ghost,
+      makeChance({ effective: 0 }),
+    );
+    addCell(ghost, "");
+    table.appendChild(ghost);
+  };
+
+  outcomes.forEach((outcome) => {
+    if (!ghostAdded && outcome.kind !== "branch") {
+      addGhostRow();
+      ghostAdded = true;
+    }
+    const row = document.createElement("div");
+    row.className = "outcome-row";
+    if (outcome.kind !== "branch") {
+      row.classList.add("outcome-fallback");
+    }
+    if (!outcome.valid && outcome.kind !== "next") {
+      row.classList.add("outcome-bad");
+    }
+    if (outcome.clipped) {
+      row.classList.add("outcome-clipped");
+    }
+
+    if (outcome.kind === "branch") {
+      addCell(
+        row,
+        makeNumberInput(
+          Number.isInteger(outcome.raw) ? String(outcome.raw) : "",
+          "frame",
+          (value) =>
+            editBranch(frameIndex, outcome.branchIndex, "frameIndex", value),
+          "Frame to jump to",
+        ),
+      );
+      addCell(
+        row,
+        makeNumberInput(
+          String(outcome.weight),
+          "0-100",
+          (value) =>
+            editBranch(frameIndex, outcome.branchIndex, "weight", value),
+          "Weight in percent",
+        ),
+      );
+    } else {
+      addCell(
+        row,
+        makeNumberInput(
+          outcome.kind === "exit" ? String(outcome.raw) : "",
+          "",
+          (value) => editExitBranch(frameIndex, value),
+          "Where the rest of the chance goes. Empty = next frame, or the end on the last frame.",
+        ),
+      );
+      addCell(row, outcome.kind === "exit" ? "the rest" : "the rest", "outcome-rest");
+    }
+
+    addCell(row, makeChance(outcome));
+
+    const actions = document.createElement("div");
+    actions.className = "outcome-actions";
+    if (outcome.kind === "branch") {
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "✘";
+      remove.title = "Remove this branch";
+      remove.addEventListener("click", () =>
+        removeBranch(frameIndex, outcome.branchIndex),
+      );
+      actions.appendChild(remove);
+    }
+    addCell(row, actions);
+
+    table.appendChild(row);
+  });
+
+  const restLabel =
+    remainder > 0 ? ` + ${formatPercent(remainder)} for the rest` : "";
+  if (overflow) {
+    summary.classList.add("outcomes-error");
+    summary.textContent = `Weights add up to ${branchTotal}%, more than 100%. The extra is ignored.`;
+  } else if (!frame.branching?.branches?.length) {
+    summary.textContent = Number.isInteger(frame.exitBranch)
+      ? `No branches: always goes to frame ${frame.exitBranch}.`
+      : "No branches: plays the next frame.";
+  } else {
+    summary.textContent = `Branches ${formatPercent(branchTotal)}${restLabel} = 100%`;
+  }
+}
+
+function ensureBranches(frame) {
+  if (!frame.branching || typeof frame.branching !== "object") {
+    frame.branching = {};
+  }
+  if (!Array.isArray(frame.branching.branches)) {
+    frame.branching.branches = [];
+  }
+  return frame.branching.branches;
+}
+
+function runBranchEdit(label, mutate) {
+  pushHistorySnapshot();
+  try {
+    mutate();
+  } catch (error) {
+    state.historyStack.pop();
+    updateToolbarButtons();
+    setStatus(error.message);
+    renderOutcomes();
+    return;
+  }
+  renderFrameList();
+  setStatus(label);
+}
+
+function editBranch(frameIndex, branchIndex, field, rawValue) {
+  const frame = getCurrentFrames()[frameIndex];
+  if (!frame) {
+    return;
+  }
+  runBranchEdit(`Updated branch ${branchIndex + 1} of frame ${frameIndex}`, () => {
+    const branch = ensureBranches(frame)[branchIndex];
+    if (!branch) {
+      return;
+    }
+    const value = Number(rawValue);
+    if (rawValue === "" || !Number.isInteger(value) || value < 0) {
+      throw new Error(
+        field === "weight"
+          ? "Weight must be a whole number between 0 and 100"
+          : "Frame must be a whole number >= 0",
+      );
+    }
+    if (field === "weight" && value > 100) {
+      throw new Error("Weight must be a whole number between 0 and 100");
+    }
+    branch[field] = value;
+  });
+}
+
+function editExitBranch(frameIndex, rawValue) {
+  const frame = getCurrentFrames()[frameIndex];
+  if (!frame) {
+    return;
+  }
+  runBranchEdit(`Updated exit of frame ${frameIndex}`, () => {
+    if (rawValue === "") {
+      delete frame.exitBranch;
+      return;
+    }
+    const value = Number(rawValue);
+    if (!Number.isInteger(value) || value < 0) {
+      throw new Error("Exit frame must be a whole number >= 0");
+    }
+    frame.exitBranch = value;
+  });
+}
+
+function removeBranch(frameIndex, branchIndex) {
+  const frame = getCurrentFrames()[frameIndex];
+  if (!frame) {
+    return;
+  }
+  runBranchEdit(`Removed branch from frame ${frameIndex}`, () => {
+    const branches = ensureBranches(frame);
+    branches.splice(branchIndex, 1);
+    if (!branches.length) {
+      delete frame.branching;
+    }
+  });
+}
+
+function createBranch(frameIndex, rawTarget, rawWeight) {
+  const frame = getCurrentFrames()[frameIndex];
+  if (!frame) {
+    return;
+  }
+  runBranchEdit(`Added branch to frame ${frameIndex}`, () => {
+    const target = Number(rawTarget);
+    const weight = Number(rawWeight);
+    if (!Number.isInteger(target) || target < 0) {
+      throw new Error("Frame must be a whole number >= 0");
+    }
+    if (!Number.isInteger(weight) || weight < 0 || weight > 100) {
+      throw new Error("Weight must be a whole number between 0 and 100");
+    }
+    ensureBranches(frame).push({ frameIndex: target, weight });
+  });
+}
+
+function addBranch() {
+  const frames = getCurrentFrames();
+  const frameIndex = state.selectedFrameIndex;
+  const frame = frames[frameIndex];
+  if (!frame) {
+    return;
+  }
+  runBranchEdit(`Added branch to frame ${frameIndex}`, () => {
+    const branches = ensureBranches(frame);
+    const { remainder } = computeFrameOutcomes(frameIndex, frames);
+    branches.push({
+      frameIndex: Math.min(frameIndex + 1, Math.max(0, frames.length - 1)),
+      weight: Math.round(remainder > 0 ? remainder / 2 : 0),
+    });
+  });
+}
+
+function scenarioPlayPath(scenario) {
+  const last = scenario.path[scenario.path.length - 1];
+  const basePath =
+    scenario.end === "loop" && scenario.loopTo !== last
+      ? [...scenario.path, scenario.loopTo]
+      : scenario.path;
+  return basePath.flatMap((i) =>
+    Array(Math.max(1, Math.round(scenario.holds?.get(i) || 1))).fill(i),
+  );
+}
+
+function updateScenarioSelector() {
+  const { scenarios, truncated } = getAnalysis();
+  const count = scenarios.length;
+  const index = state.previewScenarioIndex;
+  const valid = Number.isInteger(index) && index >= 0 && index < count;
+  if (!valid) {
+    state.previewScenarioIndex = null;
+  }
+  elements.prevScenarioBtn.disabled = count === 0;
+  elements.nextScenarioBtn.disabled = count === 0;
+
+  if (!valid) {
+    elements.scenarioPositionText.textContent = count
+      ? `Random (${count}${truncated ? "+" : ""} paths)`
+      : "No paths";
+    elements.scenarioPathText.textContent = "";
+    elements.scenarioPathText.title = "";
+  } else {
+    const scenario = scenarios[index];
+    elements.scenarioPositionText.textContent = `Path ${index + 1}/${count} · ${formatPercent(scenario.probability)}`;
+    const isLoop = scenario.end === "loop";
+    const text =
+      formatFramePath(
+        scenario.path,
+        isLoop && scenario.loopTo !== scenario.path[scenario.path.length - 1]
+          ? scenario.loopTo
+          : null,
+        scenario.holds,
+      ) + (isLoop ? "" : " → end");
+    elements.scenarioPathText.textContent = text;
+    elements.scenarioPathText.title = text;
+  }
+
+  for (const row of elements.scenariosList.querySelectorAll(".scenario-row")) {
+    row.classList.toggle(
+      "active",
+      valid && Number(row.dataset.scenarioIndex) === index,
+    );
+  }
+}
+
+function playScenario(index) {
+  const { scenarios } = getAnalysis();
+  if (!scenarios.length) {
+    return;
+  }
+  const wrapped = ((index % scenarios.length) + scenarios.length) % scenarios.length;
+  state.previewScenarioIndex = wrapped;
+  playAnimationPreview({ forcedPath: scenarioPlayPath(scenarios[wrapped]) });
+  updateScenarioSelector();
+}
+
+function stepScenario(direction) {
+  const current = state.previewScenarioIndex;
+  const { scenarios } = getAnalysis();
+  if (!scenarios.length) {
+    return;
+  }
+  if (!Number.isInteger(current)) {
+    playScenario(direction > 0 ? 0 : scenarios.length - 1);
+  } else {
+    playScenario(current + direction);
+  }
+}
+
+function selectFrameForEditing(index) {
+  const frames = getCurrentFrames();
+  if (!Number.isInteger(index) || index < 0 || index >= frames.length) {
+    return;
+  }
+  state.selectedFrameIndex = index;
+  state.selectedFrameIndices = [index];
+  setEditorTab("frames");
+  renderFrameList();
+}
+
+function renderScenarios() {
+  const header = elements.scenariosHeader;
+  const warnings = elements.scenariosWarnings;
+  const list = elements.scenariosList;
+  header.textContent = "";
+  warnings.innerHTML = "";
+  list.innerHTML = "";
+
+  const frames = getCurrentFrames();
+  if (!frames.length) {
+    header.textContent = "This animation has no frames.";
+    return;
+  }
+
+  const { scenarios, truncated, reachable } = getAnalysis();
+  const count = scenarios.length;
+  header.textContent =
+    `${count}${truncated ? "+" : ""} scenario${count === 1 ? "" : "s"}, ` +
+    `${reachable.size} of ${frames.length} frames can be played. ` +
+    "Chances are measured from frame 0 and add up to 100%. " +
+    "⟲×N means the frame repeats about N times in a row (it jumps to itself). " +
+    "↻ means the path jumps back to a frame already played and may repeat.";
+
+  for (const problem of validateAnimation(frames)) {
+    const line = document.createElement("div");
+    line.className = `scenario-problem scenario-${problem.level}`;
+    line.textContent = `${problem.level === "error" ? "✘" : "⚠"} ${problem.text}`;
+    line.title = "Click to select the frame";
+    line.addEventListener("click", () => selectFrameForEditing(problem.frame));
+    warnings.appendChild(line);
+  }
+
+  const table = document.createElement("div");
+  table.className = "scenario-table";
+  const head = document.createElement("div");
+  head.className = "scenario-row scenario-head";
+  for (const label of ["Chance", "Time", "Frames played"]) {
+    const cell = document.createElement("div");
+    cell.textContent = label;
+    head.appendChild(cell);
+  }
+  table.appendChild(head);
+
+  scenarios.forEach((scenario) => {
+    const row = document.createElement("div");
+    row.className = "scenario-row";
+    const seconds =
+      scenario.path.reduce(
+        (sum, i) =>
+          sum + frameDurationMs(frames[i]) * (scenario.holds?.get(i) || 1),
+        0,
+      ) / 1000;
+    const isLoop = scenario.end === "loop";
+    const cells = [
+      formatPercent(scenario.probability),
+      `${Math.round(seconds * 10) / 10}s${isLoop ? "+" : ""}`,
+      formatFramePath(
+        scenario.path,
+        isLoop && scenario.loopTo !== scenario.path[scenario.path.length - 1]
+          ? scenario.loopTo
+          : null,
+        scenario.holds,
+      ) +
+        (isLoop && scenario.loopTo === scenario.path[scenario.path.length - 1]
+          ? " ↻ forever"
+          : "") +
+        (isLoop ? "" : " → end"),
+    ];
+    for (const text of cells) {
+      const cell = document.createElement("div");
+      cell.textContent = text;
+      row.appendChild(cell);
+    }
+    row.title = isLoop
+      ? `Goes back to frame ${scenario.loopTo} and can repeat from there. Click to play.`
+      : "Click to play this path";
+    row.dataset.scenarioIndex = String(scenarios.indexOf(scenario));
+    row.addEventListener("click", () => {
+      playScenario(Number(row.dataset.scenarioIndex));
+    });
+    table.appendChild(row);
+  });
+  if (truncated) {
+    const more = document.createElement("div");
+    more.className = "scenario-problem scenario-warn";
+    more.textContent = `⚠ Showing the ${MAX_SCENARIOS} most likely scenarios only.`;
+    table.appendChild(more);
+  }
+  list.appendChild(table);
+  updateScenarioSelector();
+}
+
 
 function getFrameImageCoordsList(frame) {
   if (!frame || !Array.isArray(frame.images) || !state.payload) {
@@ -507,7 +1068,6 @@ function renderAnimationPreview(frameIndex = 0) {
 
   if (bounded < 0) {
     elements.previewFrameText.textContent = "Frame: -";
-    elements.previewProbabilityText.textContent = "Prob: -";
     return;
   }
 
@@ -517,10 +1077,6 @@ function renderAnimationPreview(frameIndex = 0) {
   }
 
   elements.previewFrameText.textContent = `Frame: ${bounded}`;
-  const probability = getDisplayedPreviewProbability(bounded);
-  elements.previewProbabilityText.textContent = Number.isFinite(probability)
-    ? `Prob: ${probability}%`
-    : "Prob: -";
 }
 
 function playAnimationPreview(options = {}) {
@@ -531,61 +1087,39 @@ function playAnimationPreview(options = {}) {
     return;
   }
 
+  const forcedPath = Array.isArray(options.forcedPath) ? options.forcedPath : null;
+  if (!forcedPath) {
+    state.previewScenarioIndex = null;
+  }
   const requestedStart = Number(options.startIndex);
-  const startIndex = Number.isInteger(requestedStart)
-    ? Math.max(0, Math.min(requestedStart, frames.length - 1))
-    : Math.max(0, Math.min(state.previewFrameIndex, frames.length - 1));
+  const startIndex = forcedPath
+    ? forcedPath[0]
+    : Number.isInteger(requestedStart)
+      ? Math.max(0, Math.min(requestedStart, frames.length - 1))
+      : Math.max(0, Math.min(state.previewFrameIndex, frames.length - 1));
 
   stopAnimationPreview();
   state.previewStartFrameIndex = startIndex;
+  updateScenarioSelector();
   let cursor = startIndex;
+  let step = 0;
 
-  const getNextFrameIndex = (currentIndex) => {
-    const pathOptions = getPreviewPathOptions(currentIndex);
-    if (pathOptions.length > 1) {
-      const choice = Number(state.previewPathChoice);
-      const boundedChoice = Number.isInteger(choice)
-        ? Math.max(0, Math.min(choice, pathOptions.length - 1))
-        : 0;
-      return pathOptions[boundedChoice].frameIndex;
-    }
-
-    const frame = frames[currentIndex] || {};
-    const branches = Array.isArray(frame?.branching?.branches)
-      ? frame.branching.branches
-      : [];
-    const weightedBranches = branches
-      .map((branch) => ({
-        frameIndex: Number(branch?.frameIndex),
-        weight: Number(branch?.weight),
-      }))
-      .filter(
-        (branch) =>
-          Number.isInteger(branch.frameIndex) &&
-          branch.frameIndex >= 0 &&
-          branch.frameIndex < frames.length &&
-          Number.isFinite(branch.weight) &&
-          branch.weight > 0,
-      );
-
-    if (weightedBranches.length) {
-      const roll = Math.random() * 100;
-      let cumulative = 0;
-      for (const branch of weightedBranches) {
-        cumulative += branch.weight;
-        if (roll < cumulative) {
-          return branch.frameIndex;
-        }
+  // Roll the same dice as the runtime. Returns { target, chance }.
+  const rollNext = (currentIndex) => {
+    const { outcomes } = computeFrameOutcomes(currentIndex, frames);
+    const roll = Math.random() * 100;
+    let cumulative = 0;
+    for (const outcome of outcomes) {
+      if (outcome.effective <= 0) {
+        continue;
+      }
+      cumulative += outcome.effective;
+      if (roll < cumulative) {
+        return { target: outcome.target, chance: outcome.effective };
       }
     }
-
-    if (Number.isInteger(frame.exitBranch)) {
-      if (frame.exitBranch >= 0 && frame.exitBranch < frames.length) {
-        return frame.exitBranch;
-      }
-      return 0;
-    }
-    return (currentIndex + 1) % frames.length;
+    const last = outcomes[outcomes.length - 1];
+    return { target: last ? last.target : END, chance: last?.effective ?? 100 };
   };
 
   const tick = () => {
@@ -594,13 +1128,29 @@ function playAnimationPreview(options = {}) {
     if (state.previewSoundEnabled && frame.sound) {
       playSoundById(String(frame.sound), { silent: true }).catch(() => {});
     }
-    let duration = Number(frame.duration);
-    if (!Number.isFinite(duration) || duration <= 0) {
-      duration = 100;
+    const duration = frameDurationMs(frame);
+
+    let next;
+    if (forcedPath) {
+      step += 1;
+      next = step < forcedPath.length ? forcedPath[step] : END;
+    } else {
+      const rolled = rollNext(cursor);
+      next = rolled.target;
     }
 
-    cursor = getNextFrameIndex(cursor);
-    state.previewTimer = setTimeout(tick, duration);
+    if (next === END) {
+      // The runtime ends the animation here. The preview waits out the last
+      // frame, then starts over (the same path, or a fresh random roll).
+      state.previewTimer = setTimeout(() => {
+        cursor = startIndex;
+        step = 0;
+          tick();
+      }, duration);
+    } else {
+      cursor = next;
+      state.previewTimer = setTimeout(tick, duration);
+    }
     updatePreviewPlayToggle();
   };
 
@@ -632,25 +1182,9 @@ function hasPendingFrameEditorChanges() {
     return false;
   }
 
-  const branches = Array.isArray(frame?.branching?.branches)
-    ? frame.branching.branches
-    : [];
-  const editableBranchIndex = getActiveEditableBranchIndex();
-  const activeBranch = branches[editableBranchIndex] || null;
-
   return (
     elements.durationInput.value !== String(Number(frame.duration ?? 0)) ||
     elements.soundSelect.value !== (frame.sound ? String(frame.sound) : "") ||
-    elements.exitBranchInput.value !==
-      (Number.isInteger(frame.exitBranch) ? String(frame.exitBranch) : "") ||
-    elements.branchFrameIndexInput.value !==
-      (Number.isInteger(activeBranch?.frameIndex)
-        ? String(activeBranch.frameIndex)
-        : "") ||
-    elements.weightInput.value !==
-      (Number.isFinite(Number(activeBranch?.weight))
-        ? String(Number(activeBranch.weight))
-        : "") ||
     elements.imagesInput.value !== formatImages(frame.images)
   );
 }
@@ -722,7 +1256,6 @@ function restoreSnapshot(snapshot) {
     Number(snapshot.previewFrameIndex) || 0,
   );
   state.previewStartFrameIndex = state.previewFrameIndex;
-  state.previewPathChoice = 0;
 
   renderAnimationList();
   renderFrameList();
@@ -921,31 +1454,34 @@ function describeFrame(frame, index) {
   const duration = Number(frame?.duration ?? 0);
   const imageCell = frameToCell(frame);
   const sound = frame?.sound ? ` sound:${frame.sound}` : "";
-  const branch = Number.isInteger(frame?.exitBranch)
-    ? ` ->${frame.exitBranch}`
-    : "";
-  const branches = Array.isArray(frame?.branching?.branches)
-    ? frame.branching.branches
-    : [];
-  const branchLabels = branches
-    .map((item) => ({
-      frameIndex: Number(item?.frameIndex),
-      weight: Number(item?.weight),
-    }))
-    .filter(
-      (item) =>
-        Number.isInteger(item.frameIndex) &&
-        item.frameIndex >= 0 &&
-        Number.isFinite(item.weight) &&
-        item.weight > 0,
-    )
-    .map((item) => `${item.weight}@${item.frameIndex}`);
-  const weighted = branchLabels.length ? ` w:${branchLabels.join("|")}` : "";
   const img = imageCell ? ` #${imageCell.index}` : " n/a";
-  return `${index.toString().padStart(3, "0")} | ${duration}ms | ${img}${branch}${weighted}${sound}`;
+
+  let flow = "";
+  const hasBranching =
+    Number.isInteger(frame?.exitBranch) ||
+    (Array.isArray(frame?.branching?.branches) && frame.branching.branches.length > 0);
+  if (hasBranching) {
+    const { outcomes } = computeFrameOutcomes(index);
+    const merged = new Map();
+    for (const outcome of outcomes) {
+      if (outcome.effective > 0) {
+        merged.set(outcome.target, (merged.get(outcome.target) || 0) + outcome.effective);
+      }
+    }
+    const parts = [...merged].map(
+      ([target, chance]) =>
+        `${target === END ? "end" : target}${merged.size > 1 ? ` ${formatPercent(chance)}` : ""}`,
+    );
+    flow = ` →${parts.join(", ")}`;
+  }
+
+  const unreachable = getAnalysis().reachable.has(index) ? "" : " ✗unused";
+  return `${index.toString().padStart(3, "0")} | ${duration}ms | ${img}${flow}${sound}${unreachable}`;
 }
 
 function renderFrameList() {
+  invalidateAnalysis();
+  state.previewScenarioIndex = null;
   const list = elements.frameList;
   list.innerHTML = "";
 
@@ -977,10 +1513,13 @@ function renderFrameList() {
   });
 
   renderFrameEditor();
-  renderPreviewPathSelector();
   drawMap();
   renderSelectedFramePreview();
   renderAnimationPreview(state.previewFrameIndex);
+  if (state.activeTab === "scenarios") {
+    renderScenarios();
+  }
+  updateScenarioSelector();
 }
 
 function formatImages(images) {
@@ -1009,35 +1548,16 @@ function renderFrameEditor() {
   if (!frame) {
     elements.durationInput.value = "";
     elements.soundSelect.value = "";
-    elements.exitBranchInput.value = "";
-    elements.branchFrameIndexInput.value = "";
-    elements.weightInput.value = "";
     elements.imagesInput.value = "";
-    renderPreviewPathSelector();
+    renderOutcomes();
     updateToolbarButtons();
     return;
   }
 
   elements.durationInput.value = Number(frame.duration ?? 0);
   elements.soundSelect.value = frame.sound ? String(frame.sound) : "";
-  elements.exitBranchInput.value = Number.isInteger(frame.exitBranch)
-    ? String(frame.exitBranch)
-    : "";
-  const branches = Array.isArray(frame?.branching?.branches)
-    ? frame.branching.branches
-    : [];
-  const editableBranchIndex = getActiveEditableBranchIndex();
-  const activeBranch = branches[editableBranchIndex] || null;
-  elements.branchFrameIndexInput.value = Number.isInteger(
-    activeBranch?.frameIndex,
-  )
-    ? String(activeBranch.frameIndex)
-    : "";
-  elements.weightInput.value = Number.isFinite(Number(activeBranch?.weight))
-    ? String(Number(activeBranch.weight))
-    : "";
   elements.imagesInput.value = formatImages(frame.images);
-  renderPreviewPathSelector();
+  renderOutcomes();
   updateToolbarButtons();
 }
 
@@ -1096,7 +1616,106 @@ function getSelectedFrameIndices() {
   return [];
 }
 
-function copySelectedFramesToClipboard() {
+// Rewrite every frame jump (exit + branches) with mapIndex(oldIndex), which
+// returns the new index or null to drop the jump. Returns how many were dropped.
+function remapFrameRefs(frame, mapIndex) {
+  let dropped = 0;
+  if (Number.isInteger(frame.exitBranch)) {
+    const mapped = mapIndex(frame.exitBranch);
+    if (mapped === null) {
+      delete frame.exitBranch;
+      dropped += 1;
+    } else {
+      frame.exitBranch = mapped;
+    }
+  }
+
+  const branches = frame.branching?.branches;
+  if (Array.isArray(branches)) {
+    frame.branching.branches = branches.filter((branch) => {
+      const mapped = Number.isInteger(branch?.frameIndex)
+        ? mapIndex(branch.frameIndex)
+        : null;
+      if (mapped === null) {
+        dropped += 1;
+        return false;
+      }
+      branch.frameIndex = mapped;
+      return true;
+    });
+    if (!frame.branching.branches.length) {
+      delete frame.branching;
+    }
+  }
+  return dropped;
+}
+
+// Structural edits below keep every jump pointing at the same frame it did
+// before, so editing the timeline does not silently rewire the branches.
+function insertFramesKeepingLinks(frames, at, newFrames) {
+  const count = newFrames.length;
+  const shift = (old) => (old >= at ? old + count : old);
+  frames.forEach((frame) => remapFrameRefs(frame, shift));
+  newFrames.forEach((frame) => remapFrameRefs(frame, shift));
+  frames.splice(at, 0, ...newFrames);
+}
+
+// `indices` must be sorted ascending. Jumps to a removed frame are dropped
+// (there is nothing left to jump to). Returns how many were dropped.
+function removeFramesKeepingLinks(frames, indices) {
+  const removed = new Set(indices);
+  let dropped = 0;
+  frames.forEach((frame, i) => {
+    if (removed.has(i)) {
+      return;
+    }
+    dropped += remapFrameRefs(frame, (old) => {
+      if (removed.has(old)) {
+        return null;
+      }
+      return old - indices.filter((index) => index < old).length;
+    });
+  });
+  for (const index of [...indices].reverse()) {
+    frames.splice(index, 1);
+  }
+  return dropped;
+}
+
+// Call after reordering `frames` in place; `before` is frames.slice() taken
+// before the reorder.
+function relinkAfterReorder(frames, before) {
+  const newIndex = new Map(before.map((frame, i) => [i, frames.indexOf(frame)]));
+  frames.forEach((frame) => remapFrameRefs(frame, (old) => newIndex.get(old) ?? null));
+}
+
+function deleteSelectedFrames() {
+  const frames = getCurrentFrames();
+  const selected = getSelectedFrameIndices();
+  if (!selected.length) {
+    return;
+  }
+
+  pushHistorySnapshot();
+  const dropped = removeFramesKeepingLinks(frames, selected);
+
+  if (frames.length === 0) {
+    state.selectedFrameIndex = -1;
+    state.selectedFrameIndices = [];
+  } else {
+    const nextIndex = Math.max(0, Math.min(selected[0], frames.length - 1));
+    state.selectedFrameIndex = nextIndex;
+    state.selectedFrameIndices = [nextIndex];
+  }
+
+  renderFrameList();
+  setStatus(
+    `Removed ${selected.length} frame(s)` +
+      (dropped ? `. ${dropped} jump(s) to them were removed` : ""),
+  );
+}
+
+function copySelectedFramesToClipboard(options = {}) {
   const frames = getCurrentFrames();
   const selected = getSelectedFrameIndices();
   if (!selected.length) {
@@ -1105,7 +1724,37 @@ function copySelectedFramesToClipboard() {
   }
 
   state.copiedFrames = selected.map((index) => deepClone(frames[index]));
-  setStatus(`Copied ${state.copiedFrames.length} frame(s)`);
+  state.copiedMeta = {
+    indices: selected,
+    source: `${state.currentAgent}/${state.selectedAnimation}`,
+    cut: Boolean(options.cut),
+  };
+  if (!options.silent) {
+    setStatus(`Copied ${state.copiedFrames.length} frame(s)`);
+  }
+  return true;
+}
+
+function cutSelectedFramesToClipboard() {
+  const frames = getCurrentFrames();
+  const selected = getSelectedFrameIndices();
+  if (!selected.length) {
+    setStatus("Select at least 1 frame to cut");
+    return false;
+  }
+
+  copySelectedFramesToClipboard({ cut: true, silent: true });
+
+  pushHistorySnapshot();
+  removeFramesKeepingLinks(frames, selected);
+
+  const next = frames.length
+    ? Math.max(0, Math.min(selected[0], frames.length - 1))
+    : -1;
+  state.selectedFrameIndex = next;
+  state.selectedFrameIndices = next >= 0 ? [next] : [];
+  renderFrameList();
+  setStatus(`Cut ${selected.length} frame(s). Paste them with Ctrl+V`);
   return true;
 }
 
@@ -1127,12 +1776,41 @@ function pasteCopiedFramesFromClipboard() {
     ? selected[selected.length - 1] + 1
     : frames.length;
   const clones = state.copiedFrames.map((frame) => deepClone(frame));
+  const meta = state.copiedMeta || { indices: [], source: "", cut: false };
+  const count = clones.length;
+
+  // Inserting shifts the frames after the insert point.
+  const shift = (old) => (old >= insertAt ? old + count : old);
+  for (const frame of frames) {
+    remapFrameRefs(frame, shift);
+  }
+
+  // Jumps between the pasted frames follow them to their new place. Jumps to
+  // frames that were not copied only make sense in the animation they came
+  // from (and not after a cut), otherwise they are removed.
+  const sameAnimation =
+    !meta.cut && meta.source === `${state.currentAgent}/${state.selectedAnimation}`;
+  let dropped = 0;
+  for (const clone of clones) {
+    dropped += remapFrameRefs(clone, (old) => {
+      const position = meta.indices.indexOf(old);
+      if (position >= 0) {
+        return insertAt + position;
+      }
+      return sameAnimation && old < frames.length ? shift(old) : null;
+    });
+  }
   frames.splice(insertAt, 0, ...clones);
 
   state.selectedFrameIndices = clones.map((_, i) => insertAt + i);
   state.selectedFrameIndex = state.selectedFrameIndices[0] ?? -1;
   renderFrameList();
-  setStatus(`Pasted ${clones.length} frame(s)`);
+  setStatus(
+    `Pasted ${count} frame(s)` +
+      (dropped
+        ? `. ${dropped} jump(s) to frames that were not copied were removed`
+        : ""),
+  );
   return true;
 }
 
@@ -1157,23 +1835,12 @@ function shouldHandleFrameClipboardShortcut() {
   return Boolean(state.selectedAnimation);
 }
 
-function clearFrameBranchFields(frame, editableBranchIndex) {
+function clearFrameBranchFields(frame) {
   if (!frame || typeof frame !== "object") {
     return;
   }
-
   delete frame.exitBranch;
-
-  if (
-    frame.branching &&
-    Array.isArray(frame.branching.branches) &&
-    frame.branching.branches.length > editableBranchIndex
-  ) {
-    frame.branching.branches.splice(editableBranchIndex, 1);
-    if (frame.branching.branches.length === 0) {
-      delete frame.branching;
-    }
-  }
+  delete frame.branching;
 }
 
 function applyFrameEditor(options = {}) {
@@ -1196,62 +1863,6 @@ function applyFrameEditor(options = {}) {
     frame.sound = sound;
   } else {
     delete frame.sound;
-  }
-
-  const exitBranchRaw = elements.exitBranchInput.value.trim();
-  if (exitBranchRaw) {
-    const exitBranch = Number(exitBranchRaw);
-    if (!Number.isInteger(exitBranch) || exitBranch < 0) {
-      throw new Error("Exit Branch must be a whole number >= 0");
-    }
-    frame.exitBranch = exitBranch;
-  } else {
-    delete frame.exitBranch;
-  }
-
-  const branchFrameIndexRaw = elements.branchFrameIndexInput.value.trim();
-  const weightRaw = elements.weightInput.value.trim();
-  const hasBranchFrameIndex = branchFrameIndexRaw.length > 0;
-  const hasWeight = weightRaw.length > 0;
-  const editableBranchIndex = getActiveEditableBranchIndex();
-
-  if (!hasBranchFrameIndex && !hasWeight) {
-    clearFrameBranchFields(frame, editableBranchIndex);
-  } else {
-    if (!hasBranchFrameIndex || !hasWeight) {
-      throw new Error(
-        "Set both Branch Frame Index and Weight, or clear both to remove branch",
-      );
-    }
-
-    const branchFrameIndex = Number(branchFrameIndexRaw);
-    if (!Number.isInteger(branchFrameIndex) || branchFrameIndex < 0) {
-      throw new Error("Branch Frame Index must be a whole number >= 0");
-    }
-
-    const weight = Number(weightRaw);
-    if (!Number.isInteger(weight) || weight < 0 || weight > 100) {
-      throw new Error("Weight must be a whole number between 0 and 100");
-    }
-
-    if (!frame.branching || typeof frame.branching !== "object") {
-      frame.branching = {};
-    }
-    if (!Array.isArray(frame.branching.branches)) {
-      frame.branching.branches = [];
-    }
-    while (frame.branching.branches.length <= editableBranchIndex) {
-      frame.branching.branches.push({});
-    }
-    if (
-      !frame.branching.branches[editableBranchIndex] ||
-      typeof frame.branching.branches[editableBranchIndex] !== "object"
-    ) {
-      frame.branching.branches[editableBranchIndex] = {};
-    }
-
-    frame.branching.branches[editableBranchIndex].frameIndex = branchFrameIndex;
-    frame.branching.branches[editableBranchIndex].weight = weight;
   }
 
   frame.images = parseImages(elements.imagesInput.value);
@@ -1286,7 +1897,6 @@ function selectAnimation(name) {
   const wasPlaying = Boolean(state.previewTimer);
   const previousPreviewFrameIndex = state.previewFrameIndex;
   stopAnimationPreview();
-  state.previewPathChoice = 0;
   state.previewStartFrameIndex = previousPreviewFrameIndex;
   state.selectedAnimation = name;
   state.selectedFrameIndex = 0;
@@ -1311,7 +1921,6 @@ async function loadAgent(name) {
   state.selectedAnimation = animationNames().at(0) || null;
   state.selectedFrameIndex = 0;
   state.selectedFrameIndices = [0];
-  state.previewPathChoice = 0;
   state.previewStartFrameIndex = 0;
   state.sequenceCaptureEnabled = false;
   state.selectedCell = null;
@@ -1372,6 +1981,20 @@ async function saveAgent(options = {}) {
   } catch (error) {
     setStatus(error.message);
     return;
+  }
+
+  const branchErrors = validateAnimationsForSave();
+  if (branchErrors.length) {
+    const listing = branchErrors.slice(0, 8).join(String.fromCharCode(10));
+    const question = [
+      "Some animations have branching problems:",
+      listing,
+      "Save anyway?",
+    ].join(String.fromCharCode(10, 10));
+    if (!window.confirm(question)) {
+      setStatus("Save cancelled: fix the branching problems first");
+      return;
+    }
   }
 
   setStatus("Saving...");
@@ -1500,6 +2123,10 @@ function bindEvents() {
 
   elements.soundsTabBtn.addEventListener("click", () => {
     setEditorTab("sounds");
+  });
+
+  elements.scenariosTabBtn.addEventListener("click", () => {
+    setEditorTab("scenarios");
   });
 
   elements.togglePreviewSoundBtn.addEventListener("click", () => {
@@ -1733,12 +2360,6 @@ function bindEvents() {
 
   elements.durationInput.addEventListener("change", applyFrameEditorChange);
   elements.soundSelect.addEventListener("change", applyFrameEditorChange);
-  elements.exitBranchInput.addEventListener("change", applyFrameEditorChange);
-  elements.branchFrameIndexInput.addEventListener(
-    "change",
-    applyFrameEditorChange,
-  );
-  elements.weightInput.addEventListener("change", applyFrameEditorChange);
   elements.imagesInput.addEventListener("change", applyFrameEditorChange);
 
   const updateSaveButtonState = () => {
@@ -1748,43 +2369,13 @@ function bindEvents() {
   elements.durationInput.addEventListener("input", updateSaveButtonState);
   elements.soundSelect.addEventListener("input", updateSaveButtonState);
   elements.soundSelect.addEventListener("change", updateSaveButtonState);
-  elements.exitBranchInput.addEventListener("input", updateSaveButtonState);
-  elements.branchFrameIndexInput.addEventListener("input", updateSaveButtonState);
-  elements.weightInput.addEventListener("input", updateSaveButtonState);
   elements.imagesInput.addEventListener("input", updateSaveButtonState);
 
-  elements.prevBranchBtn.addEventListener("click", () => {
-    const count = getAnimationPathChoiceCount();
-    if (count <= 1) {
-      return;
-    }
-    const wasPlaying = Boolean(state.previewTimer);
-    const current = Number(state.previewPathChoice);
-    const currentIndex = Number.isInteger(current) ? current : 0;
-    state.previewPathChoice = (currentIndex - 1 + count) % count;
-    renderFrameEditor();
-    if (wasPlaying) {
-      playAnimationPreview({ startIndex: state.selectedFrameIndex });
-    } else {
-      renderAnimationPreview(state.selectedFrameIndex);
-    }
-  });
-
-  elements.nextBranchBtn.addEventListener("click", () => {
-    const count = getAnimationPathChoiceCount();
-    if (count <= 1) {
-      return;
-    }
-    const wasPlaying = Boolean(state.previewTimer);
-    const current = Number(state.previewPathChoice);
-    const currentIndex = Number.isInteger(current) ? current : 0;
-    state.previewPathChoice = (currentIndex + 1) % count;
-    renderFrameEditor();
-    if (wasPlaying) {
-      playAnimationPreview({ startIndex: state.selectedFrameIndex });
-    } else {
-      renderAnimationPreview(state.selectedFrameIndex);
-    }
+  elements.addBranchBtn.addEventListener("click", addBranch);
+  elements.prevScenarioBtn.addEventListener("click", () => stepScenario(-1));
+  elements.nextScenarioBtn.addEventListener("click", () => stepScenario(1));
+  elements.playRandomBtn.addEventListener("click", () => {
+    playAnimationPreview({ startIndex: 0 });
   });
 
   elements.addFrameBtn.addEventListener("click", () => {
@@ -1794,7 +2385,7 @@ function bindEvents() {
       state.selectedFrameIndex >= 0
         ? state.selectedFrameIndex + 1
         : frames.length;
-    frames.splice(insertAt, 0, createFrameFromSelectedCell());
+    insertFramesKeepingLinks(frames, insertAt, [createFrameFromSelectedCell()]);
     state.selectedFrameIndex = insertAt;
     state.selectedFrameIndices = [insertAt];
     renderFrameList();
@@ -1825,7 +2416,7 @@ function bindEvents() {
 
     const clones = selected.map((index) => deepClone(frames[index]));
     const insertAt = selected[selected.length - 1] + 1;
-    frames.splice(insertAt, 0, ...clones);
+    insertFramesKeepingLinks(frames, insertAt, clones);
 
     state.selectedFrameIndices = clones.map((_, i) => insertAt + i);
     state.selectedFrameIndex = state.selectedFrameIndices[0];
@@ -1833,79 +2424,14 @@ function bindEvents() {
     setStatus(`Duplicated ${clones.length} frame(s)`);
   });
 
-  elements.removeFrameBtn.addEventListener("click", () => {
-    const frames = getCurrentFrames();
-    const selected = Array.from(
-      new Set(
-        (state.selectedFrameIndices || []).filter(
-          (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
-        ),
-      ),
-    ).sort((a, b) => b - a);
-
-    if (!selected.length) {
-      return;
-    }
-
-    pushHistorySnapshot();
-    for (const index of selected) {
-      frames.splice(index, 1);
-    }
-
-    if (frames.length === 0) {
-      state.selectedFrameIndex = -1;
-      state.selectedFrameIndices = [];
-    } else {
-      const nextIndex = Math.max(
-        0,
-        Math.min(selected[selected.length - 1], frames.length - 1),
-      );
-      state.selectedFrameIndex = nextIndex;
-      state.selectedFrameIndices = [nextIndex];
-    }
-
-    renderFrameList();
-    setStatus(`Removed ${selected.length} frame(s)`);
-  });
+  elements.removeFrameBtn.addEventListener("click", deleteSelectedFrames);
 
   elements.frameList.addEventListener("keydown", (event) => {
     if (event.key !== "Delete") {
       return;
     }
     event.preventDefault();
-
-    const frames = getCurrentFrames();
-    const selected = Array.from(
-      new Set(
-        (state.selectedFrameIndices || []).filter(
-          (i) => Number.isInteger(i) && i >= 0 && i < frames.length,
-        ),
-      ),
-    ).sort((a, b) => b - a);
-
-    if (!selected.length) {
-      return;
-    }
-
-    pushHistorySnapshot();
-    for (const index of selected) {
-      frames.splice(index, 1);
-    }
-
-    if (frames.length === 0) {
-      state.selectedFrameIndex = -1;
-      state.selectedFrameIndices = [];
-    } else {
-      const nextIndex = Math.max(
-        0,
-        Math.min(selected[selected.length - 1], frames.length - 1),
-      );
-      state.selectedFrameIndex = nextIndex;
-      state.selectedFrameIndices = [nextIndex];
-    }
-
-    renderFrameList();
-    setStatus(`Removed ${selected.length} frame(s)`);
+    deleteSelectedFrames();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -1924,6 +2450,12 @@ function bindEvents() {
       return;
     }
 
+    if (key === "x") {
+      event.preventDefault();
+      cutSelectedFramesToClipboard();
+      return;
+    }
+
     if (key === "v") {
       event.preventDefault();
       pasteCopiedFramesFromClipboard();
@@ -1938,9 +2470,11 @@ function bindEvents() {
     }
 
     pushHistorySnapshot();
+    const before = frames.slice();
     selected.forEach((index) => {
       [frames[index - 1], frames[index]] = [frames[index], frames[index - 1]];
     });
+    relinkAfterReorder(frames, before);
     state.selectedFrameIndices = selected.map((index) => index - 1);
     state.selectedFrameIndex = state.selectedFrameIndices[0];
     renderFrameList();
@@ -1955,9 +2489,11 @@ function bindEvents() {
     }
 
     pushHistorySnapshot();
+    const before = frames.slice();
     [...selected].reverse().forEach((index) => {
       [frames[index], frames[index + 1]] = [frames[index + 1], frames[index]];
     });
+    relinkAfterReorder(frames, before);
     state.selectedFrameIndices = selected.map((index) => index + 1);
     state.selectedFrameIndex = state.selectedFrameIndices[0];
     renderFrameList();
@@ -2003,10 +2539,12 @@ function bindEvents() {
     }
 
     pushHistorySnapshot();
+    const before = frames.slice();
     const reversedValues = selected.map((i) => frames[i]).reverse();
     selected.forEach((frameIndex, i) => {
       frames[frameIndex] = reversedValues[i];
     });
+    relinkAfterReorder(frames, before);
 
     state.selectedFrameIndices = selected;
     state.selectedFrameIndex = selected[0];
@@ -2023,13 +2561,12 @@ function bindEvents() {
     }
 
     pushHistorySnapshot();
-    const editableBranchIndex = getActiveEditableBranchIndex();
     selected.forEach((index) => {
-      clearFrameBranchFields(frames[index], editableBranchIndex);
+      clearFrameBranchFields(frames[index]);
     });
 
     renderFrameList();
-    setStatus(`Cleared branch fields for ${selected.length} frame(s) in session`);
+    setStatus(`Cleared branches for ${selected.length} frame(s) in session`);
   });
 
   elements.replaceImageBtn.addEventListener("click", () => {

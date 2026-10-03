@@ -42,11 +42,12 @@ node tools/animation-studio/server.js
 - Lets you edit animations and frames:
   - add/remove/duplicate/reorder frames
   - multi-select frames and invert selected order
-  - edit `duration`, `sound`, `exitBranch`, branch `frameIndex`/`weight`, and `images`
+  - edit `duration`, `sound`, `images`, and the branches (`exitBranch`, branch `frameIndex`/`weight`) in the branch table
   - pick sprite cells directly from the map
 - Includes `Seq Add` map mode to append multiple frames by clicking map cells in order
 - Includes a dedicated assistant-specific `Sound Library` tab with per-sound play buttons
-- Includes a looping animation preview with manual branch-path selector (`<` / `>`)
+- Shows a branch table per frame (weight, target, chance, the rest) and a `Scenarios` tab listing every way an animation can play with its chance
+- Includes a looping animation preview that rolls branches like the app does, or plays a chosen scenario
 - Saves back to `assets/agents/<Agent>/agent.js`
 
 ## Quick usage
@@ -58,7 +59,7 @@ node tools/animation-studio/server.js
 5. Click a cell in `Map Frame Picker`, then use:
    - `Replace Selected Image` to replace the first image in that frame, or
    - `Append Frame` / `Add` to create new frames.
-6. Edit `Duration (ms)`, `Sound`, `Exit Branch`, and `Images`.
+6. Edit `Duration (ms)`, `Sound`, `Images`, and the branch table.
 7. Click `Apply` to apply frame edits.
 8. Click `Save agent.js` to persist to disk.
 

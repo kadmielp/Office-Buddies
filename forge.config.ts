@@ -214,8 +214,11 @@ const config: ForgeConfig = {
     extraResource: [
       path.resolve(__dirname, "assets/icon.ico"),
       path.resolve(__dirname, "assets/icon.png"),
-      // Prebuilt llama.cpp runtimes (cpu / vulkan / cuda), see `npm run prepare:llama`
-      path.resolve(__dirname, "resources/local_gguf"),
+      // Prebuilt llama.cpp runtimes (cpu / vulkan / cuda), see `npm run prepare:llama`.
+      // Only prepared on Windows; other platforms package without them.
+      ...(fs.existsSync(path.resolve(__dirname, "resources/local_gguf"))
+        ? [path.resolve(__dirname, "resources/local_gguf")]
+        : []),
     ],
     junk: true,
     overwrite: true,

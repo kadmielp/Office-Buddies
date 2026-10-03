@@ -16566,7 +16566,7 @@ clippy.ready("F1", {
         }
       ]
     },
-    RestPose: {
+    Idle2: {
       frames: [
         {
           duration: 100,

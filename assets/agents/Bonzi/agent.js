@@ -106,6 +106,79 @@ clippy.ready("Bonzi", {
               0
             ]
           ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              1760
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              1760
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              1760
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              1920
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -222,7 +295,7 @@ clippy.ready("Bonzi", {
         }
       ]
     },
-    GoodBye: {
+    Goodbye: {
       frames: [
         {
           duration: 100,
@@ -2824,13 +2897,56 @@ clippy.ready("Bonzi", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 12
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              2400,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -3385,20 +3501,7 @@ clippy.ready("Bonzi", {
         }
       ]
     },
-    DoMagic1: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    DoMagic2: {
+    DoMagic: {
       frames: [
         {
           duration: 100,
@@ -3662,6 +3765,97 @@ clippy.ready("Bonzi", {
               1760
             ]
           ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              1760
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1600,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1800,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2000,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2200,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              2400
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -3818,13 +4012,47 @@ clippy.ready("Bonzi", {
             branches: [
               {
                 frameIndex: 4,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 11
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              0,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              2080
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -4504,96 +4732,12 @@ clippy.ready("Bonzi", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
-        }
-      ],
-      useExitBranching: true
-    },
-    LookDownReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              800,
-              800
-            ]
-          ]
+          },
+          exitBranch: 12
         },
-        {
-          duration: 100,
-          images: [
-            [
-              600,
-              800
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              400,
-              800
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookUpReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              2080
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              200,
-              2080
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              400,
-              2080
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookLeftReturn: {
-      frames: [
         {
           duration: 100,
           images: [
@@ -4639,9 +4783,10 @@ clippy.ready("Bonzi", {
             ]
           ]
         }
-      ]
+      ],
+      useExitBranching: true
     },
-    Greet: {
+    Greeting: {
       frames: [
         {
           duration: 100,
@@ -4826,7 +4971,7 @@ clippy.ready("Bonzi", {
       ],
       useExitBranching: true
     },
-    Hearing_1: {
+    Hearing: {
       frames: [
         {
           duration: 100,
@@ -4997,19 +5142,6 @@ clippy.ready("Bonzi", {
         }
       ]
     },
-    Hearing_2: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
     GestureRight: {
       frames: [
         {
@@ -5078,7 +5210,7 @@ clippy.ready("Bonzi", {
       ],
       useExitBranching: true
     },
-    Think: {
+    Thinking: {
       frames: [
         {
           duration: 100,
@@ -5212,169 +5344,6 @@ clippy.ready("Bonzi", {
     },
     Write: {
       frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    MoveRightReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2600,
-              1760
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1600,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1800,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2000,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2200,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2400,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2600,
-              2400
-            ]
-          ],
-          sound: "5"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2800,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3000,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    MoveUpReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              3200,
-              2400
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              2560
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              200,
-              2560
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              400,
-              2560
-            ]
-          ],
-          sound: "5"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              600,
-              2560
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              800,
-              2560
-            ]
-          ]
-        },
         {
           duration: 100,
           images: [
@@ -6184,10 +6153,11 @@ clippy.ready("Bonzi", {
             branches: [
               {
                 frameIndex: 8,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 31
         },
         {
           duration: 100,
@@ -6316,6 +6286,61 @@ clippy.ready("Bonzi", {
             [
               0,
               2880
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2400,
+              2880
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              2720
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3000,
+              2720
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2800,
+              2720
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2600,
+              2720
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
             ]
           ]
         }
@@ -6483,13 +6508,47 @@ clippy.ready("Bonzi", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 12
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              800,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              800
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -6615,191 +6674,6 @@ clippy.ready("Bonzi", {
         }
       ],
       useExitBranching: true
-    },
-    LookRightReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2400,
-              800
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2200,
-              800
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2000,
-              800
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1800,
-              800
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    MoveDownReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2400,
-              2880
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3200,
-              2720
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3000,
-              2720
-            ]
-          ],
-          sound: "5"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2800,
-              2720
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2600,
-              2720
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    MoveLeftReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2800,
-              1760
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3000,
-              1760
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3200,
-              1760
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              200,
-              1920
-            ]
-          ],
-          sound: "5"
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              400,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              600,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
     },
     GestureDown: {
       frames: [
@@ -6936,7 +6810,7 @@ clippy.ready("Bonzi", {
         }
       ]
     },
-    RestPose: {
+    Idle4: {
       frames: [
         {
           duration: 100,
@@ -7125,6 +6999,70 @@ clippy.ready("Bonzi", {
             [
               0,
               2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              3200,
+              2400
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              200,
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              400,
+              2560
+            ]
+          ],
+          sound: "5"
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              600,
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              800,
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
             ]
           ]
         }

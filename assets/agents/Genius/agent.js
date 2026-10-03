@@ -427,10 +427,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 36
         },
         {
           duration: 130,
@@ -1656,18 +1657,19 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 4,
-                weight: 89
+                weight: 71
               },
               {
                 frameIndex: 3,
-                weight: 10
+                weight: 8
               },
               {
                 frameIndex: 2,
                 weight: 1
               }
             ]
-          }
+          },
+          exitBranch: 6
         },
         {
           duration: 350,
@@ -3772,10 +3774,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 11,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 29
         },
         {
           duration: 100,
@@ -5520,10 +5523,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 36
         },
         {
           duration: 130,
@@ -7679,10 +7683,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 36
         },
         {
           duration: 130,
@@ -8498,7 +8503,7 @@ clippy.ready("Genius", {
         }
       ]
     },
-    Hearing_1: {
+    Hearing: {
       frames: [
         {
           duration: 100,
@@ -8613,14 +8618,15 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 60
+                weight: 48
               },
               {
                 frameIndex: 4,
-                weight: 40
+                weight: 32
               }
             ]
-          }
+          },
+          exitBranch: 6
         },
         {
           duration: 100,
@@ -10855,10 +10861,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 29,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 51
         },
         {
           duration: 80,
@@ -11295,10 +11302,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 6,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 15
         },
         {
           duration: 100,
@@ -11876,10 +11884,11 @@ clippy.ready("Genius", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 36
         },
         {
           duration: 130,
@@ -14918,7 +14927,7 @@ clippy.ready("Genius", {
         }
       ]
     },
-    RestPose: {
+    Idle2: {
       frames: [
         {
           duration: 100,

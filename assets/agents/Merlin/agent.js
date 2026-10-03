@@ -1055,10 +1055,11 @@ clippy.ready("Merlin", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 13
         },
         {
           duration: 1000,
@@ -1111,10 +1112,20 @@ clippy.ready("Merlin", {
             branches: [
               {
                 frameIndex: 5,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 13
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ],
       useExitBranching: true
@@ -2067,10 +2078,11 @@ clippy.ready("Merlin", {
             branches: [
               {
                 frameIndex: 16,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 23
         },
         {
           duration: 50,
@@ -4278,46 +4290,6 @@ clippy.ready("Merlin", {
       ],
       useExitBranching: true
     },
-    LookLeftReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              256,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
     GestureUp: {
       frames: [
         {
@@ -5163,10 +5135,11 @@ clippy.ready("Merlin", {
             branches: [
               {
                 frameIndex: 18,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 24
         },
         {
           duration: 100,
@@ -5327,10 +5300,109 @@ clippy.ready("Merlin", {
               1280,
               1792
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 9
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              1792
+            ],
+            [
+              256,
+              2304
+            ]
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              1280,
+              1792
+            ],
+            [
+              384,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              1792
+            ],
+            [
+              256,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 4000,
+          images: [
+            [
+              1280,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -5893,10 +5965,11 @@ clippy.ready("Merlin", {
             branches: [
               {
                 frameIndex: 8,
-                weight: 100
+                weight: 80
               }
             ]
-          }
+          },
+          exitBranch: 27
         },
         {
           duration: 100,
@@ -6157,105 +6230,6 @@ clippy.ready("Merlin", {
         }
       ],
       useExitBranching: true
-    },
-    LookRightBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1792
-            ],
-            [
-              256,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1792
-            ],
-            [
-              384,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1792
-            ],
-            [
-              256,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 4000,
-          images: [
-            [
-              1280,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1792
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 8,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
     },
     Searching: {
       frames: [
@@ -6605,79 +6579,98 @@ clippy.ready("Merlin", {
               128,
               1280
             ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
-    LookDownReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              512
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
             ]
-          ]
+          },
+          exitBranch: 9
         },
         {
           duration: 100,
           images: [
             [
-              1920,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookUpReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
+              128,
+              1280
+            ],
             [
               2176,
-              2048
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1280
+            ],
+            [
+              2304,
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1280
+            ],
+            [
+              2176,
+              2560
+            ]
+          ]
+        },
+        {
+          duration: 4000,
+          images: [
+            [
+              128,
+              1280
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1280
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1280
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              256,
+              1280
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              384,
+              1280
             ]
           ]
         },
@@ -6856,7 +6849,7 @@ clippy.ready("Merlin", {
         }
       ]
     },
-    Greet: {
+    Idle3: {
       frames: [
         {
           duration: 100,
@@ -6866,367 +6859,6 @@ clippy.ready("Merlin", {
               0
             ]
           ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              384,
-              2176
-            ]
-          ],
-          sound: "3"
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              512,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              640,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              768,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              896,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              1152,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 400,
-          images: [
-            [
-              1280,
-              2176
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 12,
-                weight: 50
-              }
-            ]
-          }
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              1280,
-              2176
-            ],
-            [
-              1408,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              2176
-            ],
-            [
-              1536,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              1280,
-              2176
-            ],
-            [
-              1408,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              2176
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 14,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              2176
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ],
-      useExitBranching: true
-    },
-    RestPose: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookDownBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              512
-            ],
-            [
-              0,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              512
-            ],
-            [
-              128,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              512
-            ],
-            [
-              0,
-              2304
-            ]
-          ]
-        },
-        {
-          duration: 4000,
-          images: [
-            [
-              2048,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              512
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 8,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
-    LookUpBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              2048
-            ],
-            [
-              2304,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              2048
-            ],
-            [
-              2432,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              2048
-            ],
-            [
-              2304,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 4000,
-          images: [
-            [
-              1920,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              2048
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 8,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2176,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
         }
       ]
     },
@@ -7363,46 +6995,6 @@ clippy.ready("Merlin", {
             [
               1536,
               2304
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookRightReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              1792
             ]
           ]
         },
@@ -7659,10 +7251,109 @@ clippy.ready("Merlin", {
               2048,
               512
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 9
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              512
+            ],
+            [
+              0,
+              2304
+            ]
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              2048,
+              512
+            ],
+            [
+              128,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              512
+            ],
+            [
+              0,
+              2304
+            ]
+          ]
+        },
+        {
+          duration: 4000,
+          images: [
+            [
+              2048,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1792,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -8113,10 +7804,109 @@ clippy.ready("Merlin", {
               1920,
               2048
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 9
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              2048
+            ],
+            [
+              2304,
+              2048
+            ]
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              1920,
+              2048
+            ],
+            [
+              2432,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              2048
+            ],
+            [
+              2304,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 4000,
+          images: [
+            [
+              1920,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2176,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -8421,105 +8211,6 @@ clippy.ready("Merlin", {
       ],
       useExitBranching: true
     },
-    LookLeftBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1280
-            ],
-            [
-              2176,
-              2560
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1280
-            ],
-            [
-              2304,
-              2560
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1280
-            ],
-            [
-              2176,
-              2560
-            ]
-          ]
-        },
-        {
-          duration: 4000,
-          images: [
-            [
-              128,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1280
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 8,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              256,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              384,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
     Goodbye: {
       frames: [
         {
@@ -8687,7 +8378,15 @@ clippy.ready("Merlin", {
               1024,
               256
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 14,
+                weight: 50
+              }
+            ]
+          }
         },
         {
           duration: 100,
@@ -8805,7 +8504,166 @@ clippy.ready("Merlin", {
               0
             ]
           ],
-          sound: "10"
+          sound: "10",
+          exitBranch: 28
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              384,
+              2176
+            ]
+          ],
+          sound: "3"
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              512,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              640,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              768,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              896,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              1152,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 400,
+          images: [
+            [
+              1280,
+              2176
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 26,
+                weight: 50
+              }
+            ]
+          }
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              1280,
+              2176
+            ],
+            [
+              1408,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              2176
+            ],
+            [
+              1536,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 50,
+          images: [
+            [
+              1280,
+              2176
+            ],
+            [
+              1408,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              2176
+            ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 28,
+                weight: 100
+              }
+            ]
+          }
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              384,
+              2176
+            ]
+          ]
+        },
+        {
+          duration: 0
         }
       ]
     }

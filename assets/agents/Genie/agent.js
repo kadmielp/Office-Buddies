@@ -2447,10 +2447,133 @@ clippy.ready("Genie", {
               1920,
               1024
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 15,
+                weight: 50
+              }
+            ]
+          },
+          exitBranch: 23
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              1024
+            ]
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              1920,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1792,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2048,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1792,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1664,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1536,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              1024
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -3252,37 +3375,6 @@ clippy.ready("Genie", {
             [
               1792,
               1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookLeftReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2560,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              1408
             ]
           ]
         },
@@ -4814,6 +4906,90 @@ clippy.ready("Genie", {
               128,
               1792
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 8
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1792
+            ],
+            [
+              1408,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 300,
+          images: [
+            [
+              128,
+              1792
+            ],
+            [
+              1536,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1792
+            ],
+            [
+              1408,
+              2048
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              128,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              1792
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1920,
+              1408
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
           ]
         }
       ]
@@ -4960,129 +5136,6 @@ clippy.ready("Genie", {
         }
       ],
       useExitBranching: true
-    },
-    GetAttentionContinued: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2048,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1792,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1024
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 12,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
     },
     Writing: {
       frames: [
@@ -5586,96 +5639,6 @@ clippy.ready("Genie", {
       ],
       useExitBranching: true
     },
-    LookRightBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1792
-            ],
-            [
-              1408,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              128,
-              1792
-            ],
-            [
-              1536,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1792
-            ],
-            [
-              1408,
-              2048
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              128,
-              1792
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
     Uncertain: {
       frames: [
         {
@@ -5791,21 +5754,40 @@ clippy.ready("Genie", {
               2560,
               1280
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 3,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 7
         },
-        {
-          duration: 0
-        }
-      ]
-    },
-    LookDownReturn: {
-      frames: [
         {
           duration: 100,
           images: [
             [
               1280,
-              512
+              2432
+            ],
+            [
+              1152,
+              2432
+            ]
+          ]
+        },
+        {
+          duration: 300,
+          images: [
+            [
+              1280,
+              2432
+            ],
+            [
+              1408,
+              2432
             ]
           ]
         },
@@ -5813,8 +5795,30 @@ clippy.ready("Genie", {
           duration: 100,
           images: [
             [
+              1280,
+              2432
+            ],
+            [
               1152,
-              512
+              2432
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              2432
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              2560,
+              1280
             ]
           ]
         },
@@ -5823,29 +5827,7 @@ clippy.ready("Genie", {
           images: [
             [
               0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookUpReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              1920
+              1408
             ]
           ]
         },
@@ -5997,7 +5979,7 @@ clippy.ready("Genie", {
       ],
       useExitBranching: true
     },
-    Greet: {
+    Greeting: {
       frames: [
         {
           duration: 80,
@@ -6245,235 +6227,6 @@ clippy.ready("Genie", {
         }
       ]
     },
-    GetAttentionReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1664,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1536,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              1024
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookDownBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              512
-            ],
-            [
-              896,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              512
-            ],
-            [
-              1024,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              512
-            ],
-            [
-              896,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              512
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              512
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
-    LookUpBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ],
-            [
-              1280,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ],
-            [
-              1536,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ],
-            [
-              1280,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1408,
-              1920
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1024,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1152,
-              1920
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
-    },
     Blink: {
       frames: [
         {
@@ -6621,37 +6374,6 @@ clippy.ready("Genie", {
         },
         {
           duration: 50,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    LookRightReturn: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              1792
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1920,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
           images: [
             [
               0,
@@ -6929,10 +6651,91 @@ clippy.ready("Genie", {
               1408,
               512
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 8
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              512
+            ],
+            [
+              896,
+              1280
+            ]
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              1408,
+              512
+            ],
+            [
+              1024,
+              1280
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              512
+            ],
+            [
+              896,
+              1280
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1280,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              512
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -7023,10 +6826,91 @@ clippy.ready("Genie", {
               1408,
               1920
             ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 4,
+                weight: 40
+              }
+            ]
+          },
+          exitBranch: 8
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              1920
+            ],
+            [
+              1280,
+              1920
+            ]
           ]
         },
         {
-          duration: 0
+          duration: 100,
+          images: [
+            [
+              1408,
+              1920
+            ],
+            [
+              1536,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              1920
+            ],
+            [
+              1280,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1408,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1024,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              1152,
+              1920
+            ]
+          ]
+        },
+        {
+          duration: 100,
+          images: [
+            [
+              0,
+              0
+            ]
+          ]
         }
       ]
     },
@@ -7619,96 +7503,6 @@ clippy.ready("Genie", {
         }
       ],
       useExitBranching: true
-    },
-    LookLeftBlink: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              2432
-            ],
-            [
-              1152,
-              2432
-            ]
-          ]
-        },
-        {
-          duration: 300,
-          images: [
-            [
-              1280,
-              2432
-            ],
-            [
-              1408,
-              2432
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              2432
-            ],
-            [
-              1152,
-              2432
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1280,
-              2432
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 100
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2560,
-              1280
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              1408
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        },
-        {
-          duration: 0
-        }
-      ]
     }
   }
 });

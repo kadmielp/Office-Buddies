@@ -5320,7 +5320,7 @@ clippy.ready("Clippy", {
         }
       ]
     },
-    GoodBye: {
+    Goodbye: {
       frames: [
         {
           duration: 100,
@@ -11073,7 +11073,7 @@ clippy.ready("Clippy", {
         }
       ]
     },
-    RestPose: {
+    Idle1: {
       frames: [
         {
           duration: 100,

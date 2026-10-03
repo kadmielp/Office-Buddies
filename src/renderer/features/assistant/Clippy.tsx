@@ -6,7 +6,6 @@ import {
   getChatAnimationKeys,
   getAnimationDuration,
   getIdleAnimationKeys,
-  getDeepIdleAnimationKeys,
   isDisallowedChatAnimationKey,
   AgentAnimation,
   AgentFrame,
@@ -31,8 +30,12 @@ import type {
   AgentQueueItem,
 } from "../../../shared/agent-events";
 
-const WAIT_TIME = 60000;
-const DEEP_IDLE_WAIT_TIME = 5 * 60 * 1000;
+const MIN_IDLE_WAIT_TIME = 15000;
+const MAX_IDLE_WAIT_TIME = 40000;
+
+const getRandomIdleWaitTime = () =>
+  MIN_IDLE_WAIT_TIME +
+  Math.random() * (MAX_IDLE_WAIT_TIME - MIN_IDLE_WAIT_TIME);
 const WINDOW_PADDING_WIDTH = 1;
 const WINDOW_PADDING_HEIGHT = 7;
 const SPEECH_BUBBLE_PADDING_WIDTH = 220;
@@ -194,7 +197,6 @@ export function Clippy() {
   const activeAnimationRef = useRef<string>("Default");
   const isCuePlayingRef = useRef(false);
   const hasPlayedWelcomeRef = useRef<boolean>(false);
-  const idleStartedAtRef = useRef<number | null>(null);
   const wasBuddySpeechLoadingRef = useRef<boolean>(false);
 
   const [isSpriteReady, setIsSpriteReady] = useState(false);
@@ -1192,17 +1194,7 @@ export function Clippy() {
         return;
       }
 
-      if (idleStartedAtRef.current === null) {
-        idleStartedAtRef.current = Date.now();
-      }
-
-      const deepIdleAnimationKeys = getDeepIdleAnimationKeys(agentPack);
-      const hasReachedDeepIdleWindow =
-        Date.now() - idleStartedAtRef.current >= DEEP_IDLE_WAIT_TIME;
-      const idleAnimationKeys =
-        hasReachedDeepIdleWindow && deepIdleAnimationKeys.length > 0
-          ? deepIdleAnimationKeys
-          : getIdleAnimationKeys(agentPack);
+      const idleAnimationKeys = getIdleAnimationKeys(agentPack);
 
       if (idleAnimationKeys.length === 0) {
         return;
@@ -1215,21 +1207,16 @@ export function Clippy() {
         runAnimation("Default");
         idleTimeoutRef.current = window.setTimeout(
           playRandomIdleAnimation,
-          WAIT_TIME,
+          getRandomIdleWaitTime(),
         );
       });
     };
 
     if (status === "idle") {
-      if (idleStartedAtRef.current === null) {
-        idleStartedAtRef.current = Date.now();
-      }
       idleTimeoutRef.current = window.setTimeout(
         playRandomIdleAnimation,
-        WAIT_TIME,
+        getRandomIdleWaitTime(),
       );
-    } else {
-      idleStartedAtRef.current = null;
     }
 
     return () => {

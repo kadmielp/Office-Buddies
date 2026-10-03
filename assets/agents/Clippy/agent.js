@@ -1909,15 +1909,7 @@ clippy.ready("Clippy", {
               2232,
               372
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 61,
-                weight: 95
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -1926,23 +1918,7 @@ clippy.ready("Clippy", {
               2356,
               372
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 61,
-                weight: 25
-              },
-              {
-                frameIndex: 67,
-                weight: 25
-              },
-              {
-                frameIndex: 65,
-                weight: 25
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -1951,15 +1927,7 @@ clippy.ready("Clippy", {
               2480,
               372
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 63,
-                weight: 95
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -2035,15 +2003,7 @@ clippy.ready("Clippy", {
               2852,
               372
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 67,
-                weight: 95
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -2052,23 +2012,7 @@ clippy.ready("Clippy", {
               2604,
               372
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 65,
-                weight: 25
-              },
-              {
-                frameIndex: 67,
-                weight: 25
-              },
-              {
-                frameIndex: 63,
-                weight: 25
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -2120,431 +2064,6 @@ clippy.ready("Clippy", {
             [
               124,
               465
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ]
-        }
-      ]
-    },
-    IdleAtom: {
-      frames: [
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              0
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 44,
-                weight: 97
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              124,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              248,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              372,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              496,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              620,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              744,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              868,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              992,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1116,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1240,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1364,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1488,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1612,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1736,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1860,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              1984,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2108,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2232,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2356,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2480,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2604,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2728,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2852,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              2976,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3100,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              3224,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              0,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              124,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              248,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              372,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              496,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              620,
-              186
-            ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 21,
-                weight: 95
-              }
-            ]
-          }
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              744,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              868,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              992,
-              186
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              992,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              868,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              744,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              620,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              496,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              372,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              248,
-              93
-            ]
-          ]
-        },
-        {
-          duration: 100,
-          images: [
-            [
-              124,
-              93
             ]
           ]
         },
@@ -4474,7 +3993,7 @@ clippy.ready("Clippy", {
         }
       ]
     },
-    Idle1_1: {
+    Idle: {
       frames: [
         {
           duration: 100,
@@ -4483,15 +4002,7 @@ clippy.ready("Clippy", {
               0,
               0
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 37,
-                weight: 20
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4500,15 +4011,7 @@ clippy.ready("Clippy", {
               2108,
               744
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 1,
-                weight: 95
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4535,15 +4038,7 @@ clippy.ready("Clippy", {
               2480,
               744
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 4,
-                weight: 95
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4552,23 +4047,7 @@ clippy.ready("Clippy", {
               2604,
               744
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 9,
-                weight: 25
-              },
-              {
-                frameIndex: 12,
-                weight: 25
-              },
-              {
-                frameIndex: 15,
-                weight: 25
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4586,19 +4065,7 @@ clippy.ready("Clippy", {
               2852,
               744
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 94
-              },
-              {
-                frameIndex: 5,
-                weight: 3
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4625,23 +4092,7 @@ clippy.ready("Clippy", {
               3224,
               744
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 10,
-                weight: 94
-              },
-              {
-                frameIndex: 8,
-                weight: 2
-              },
-              {
-                frameIndex: 5,
-                weight: 2
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4668,23 +4119,7 @@ clippy.ready("Clippy", {
               248,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 13,
-                weight: 93
-              },
-              {
-                frameIndex: 11,
-                weight: 3
-              },
-              {
-                frameIndex: 5,
-                weight: 2
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4711,15 +4146,7 @@ clippy.ready("Clippy", {
               620,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 16,
-                weight: 95
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4729,11 +4156,12 @@ clippy.ready("Clippy", {
               837
             ]
           ],
+          exitBranch: 18,
           branching: {
             branches: [
               {
                 frameIndex: 36,
-                weight: 90
+                weight: 50
               }
             ]
           }
@@ -4781,19 +4209,7 @@ clippy.ready("Clippy", {
               1364,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 22,
-                weight: 94
-              },
-              {
-                frameIndex: 23,
-                weight: 3
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4802,23 +4218,7 @@ clippy.ready("Clippy", {
               1488,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 24,
-                weight: 25
-              },
-              {
-                frameIndex: 27,
-                weight: 25
-              },
-              {
-                frameIndex: 30,
-                weight: 25
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4836,19 +4236,7 @@ clippy.ready("Clippy", {
               1736,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 25,
-                weight: 94
-              },
-              {
-                frameIndex: 23,
-                weight: 3
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4875,19 +4263,7 @@ clippy.ready("Clippy", {
               2108,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 28,
-                weight: 94
-              },
-              {
-                frameIndex: 23,
-                weight: 3
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4914,19 +4290,7 @@ clippy.ready("Clippy", {
               2480,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 31,
-                weight: 94
-              },
-              {
-                frameIndex: 23,
-                weight: 3
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -4953,15 +4317,7 @@ clippy.ready("Clippy", {
               2852,
               837
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 34,
-                weight: 80
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -6396,15 +5752,7 @@ clippy.ready("Clippy", {
               1984,
               2418
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 18,
-                weight: 85
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -6485,15 +5833,7 @@ clippy.ready("Clippy", {
               3100,
               2418
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 6,
-                weight: 80
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -6547,15 +5887,7 @@ clippy.ready("Clippy", {
               496,
               2511
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 12,
-                weight: 80
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 100,
@@ -7866,15 +7198,7 @@ clippy.ready("Clippy", {
               124,
               3069
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 7,
-                weight: 3
-              }
-            ]
-          }
+          ]
         },
         {
           duration: 150,
@@ -7883,28 +7207,25 @@ clippy.ready("Clippy", {
               248,
               3069
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 6,
-                weight: 98
-              },
-              {
-                frameIndex: 5,
-                weight: 2
-              }
-            ]
-          }
+          ]
         },
         {
-          duration: 100,
+          duration: 1000,
           images: [
             [
               372,
               3069
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 5,
+                weight: 70
+              }
+            ]
+          },
+          exitBranch: 8
         },
         {
           duration: 100,
@@ -8633,16 +7954,7 @@ clippy.ready("Clippy", {
               1612,
               1953
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 53,
-                weight: 50
-              }
-            ]
-          },
-          exitBranch: 37
+          ]
         },
         {
           duration: 100,
@@ -8868,16 +8180,7 @@ clippy.ready("Clippy", {
               1364,
               2046
             ]
-          ],
-          branching: {
-            branches: [
-              {
-                frameIndex: 39,
-                weight: 60
-              }
-            ]
-          },
-          exitBranch: 52
+          ]
         },
         {
           duration: 100,
@@ -8886,7 +8189,16 @@ clippy.ready("Clippy", {
               1488,
               2046
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 30,
+                weight: 65
+              }
+            ]
+          },
+          exitBranch: 53
         },
         {
           duration: 100,
@@ -8913,7 +8225,16 @@ clippy.ready("Clippy", {
               1860,
               2046
             ]
-          ]
+          ],
+          exitBranch: 56,
+          branching: {
+            branches: [
+              {
+                frameIndex: 40,
+                weight: 70
+              }
+            ]
+          }
         },
         {
           duration: 100,
@@ -9311,18 +8632,11 @@ clippy.ready("Clippy", {
             branches: [
               {
                 frameIndex: 27,
-                weight: 90
-              },
-              {
-                frameIndex: 46,
-                weight: 5
-              },
-              {
-                frameIndex: 52,
-                weight: 5
+                weight: 60
               }
             ]
-          }
+          },
+          exitBranch: 38
         },
         {
           duration: 100,
@@ -9538,7 +8852,16 @@ clippy.ready("Clippy", {
               3224,
               2232
             ]
-          ]
+          ],
+          branching: {
+            branches: [
+              {
+                frameIndex: 46,
+                weight: 60
+              }
+            ]
+          },
+          exitBranch: 62
         },
         {
           duration: 100,

@@ -30,8 +30,8 @@ export const SettingsAbout: React.FC = () => {
         <legend>Version</legend>
         <p>
           Office Buddies <code>{versions.clippy || "Unknown"}</code> (with
-          Electron <code>{versions.electron || "Unknown"}</code> and
-          Node-llama-cpp: <code>{versions.nodeLlamaCpp || "Unknown"})</code>
+          Electron <code>{versions.electron || "Unknown"}</code> and llama.cpp{" "}
+          <code>{versions.llamaCpp || "Unknown"}</code>)
         </p>
       </fieldset>
       <p>
@@ -63,13 +63,9 @@ export const SettingsAbout: React.FC = () => {
         <a href="https://electronjs.org/" target="_blank">
           Electron
         </a>
-        ,{" "}
-        <a href="https://github.com/electron/llm" target="_blank">
-          @electron/llm
-        </a>
         , and{" "}
-        <a href="https://github.com/withcatai/node-llama-cpp" target="_blank">
-          node-llama-cpp
+        <a href="https://github.com/ggml-org/llama.cpp" target="_blank">
+          llama.cpp
         </a>
         . The Windows 98 visual language was shaped by{" "}
         <a href="https://github.com/jdan" target="_blank">

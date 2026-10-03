@@ -5,7 +5,8 @@
   "description": "Office Buddies",
   "main": ".vite/build/main.js",
   "scripts": {
-    "start": "cross-env NODE_LLAMA_CPP_GPU=auto electron-forge start",
+    "start": "electron-forge start",
+    "prepare:llama": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-llama-runtimes.ps1",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -51,7 +52,6 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
-    "@electron/llm": "^1.1.1",
     "98.css": "^0.1.21",
     "date-fns": "^4.1.0",
     "electron-context-menu": "^4.0.5",

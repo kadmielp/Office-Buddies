@@ -15,7 +15,7 @@ export async function getClippyDebugInfo(): Promise<ClippyDebugInfo> {
     platform: process.platform,
     arch: process.arch,
     versions: process.versions,
-    llamaBinaries: await getNodeLlamaBinaries(),
+    llamaBinaries: getLlamaRuntimes(),
     llamaBinaryFiles: {},
     checks: await getDebugChecks(),
     gpu: await app.getGPUInfo("complete"),
@@ -44,16 +44,16 @@ async function getDebugChecks(): Promise<Record<string, boolean | string>> {
     check: () => Promise<boolean> | boolean;
   }> = [
     {
-      name: "can-require-node-llama-cpp",
-      check: async () => !!(await import("node-llama-cpp")),
+      name: "can-see-llama-runtimes-folder",
+      check: () => fs.existsSync(getLlamaRuntimesPath()),
     },
     {
-      name: "can-see-node-modules-folder",
-      check: () => !!getNodeModulesPath(),
+      name: "can-see-llama-runtimes",
+      check: () => getLlamaRuntimes().length > 0,
     },
     {
-      name: "can-see-node-llama-binaries",
-      check: async () => (await getNodeLlamaBinaries()).length > 0,
+      name: "can-see-cpu-llama-runtime",
+      check: () => getLlamaRuntimes().includes("cpu"),
     },
   ];
 
@@ -71,60 +71,42 @@ async function getDebugChecks(): Promise<Record<string, boolean | string>> {
 }
 
 /**
- * Returns the folders inside the @node-llama-cpp directory
- *
- * @returns {Promise<Array<string>>} An array of folder names inside the @node-llama-cpp directory
+ * Folder holding the bundled llama.cpp runtimes (cpu / vulkan / cuda)
  */
-async function getNodeLlamaBinaries(): Promise<Array<string>> {
-  const folders: Array<string> = [];
-
-  try {
-    const nodeModulesPath = getNodeModulesPath();
-    const llamaCppPath = path.join(nodeModulesPath, "@node-llama-cpp");
-
-    if (!fs.existsSync(llamaCppPath)) {
-      throw new Error(`@node-llama-cpp directory not found at ${llamaCppPath}`);
-    }
-
-    for (const entry of await fs.promises.readdir(llamaCppPath)) {
-      const entryPath = path.join(llamaCppPath, entry);
-      if (fs.statSync(entryPath).isDirectory()) {
-        folders.push(entry);
-      }
-    }
-
-    return folders;
-  } catch (error) {
-    getLogger().warn("Error reading @node-llama-cpp directory:", error);
-  }
-
-  return folders;
+function getLlamaRuntimesPath(): string {
+  return app.isPackaged
+    ? path.join(process.resourcesPath, "local_gguf")
+    : path.join(app.getAppPath(), "resources", "local_gguf");
 }
 
 /**
- * Returns the files inside the llama binary directory
- *
- * @param {string} llamaBinary - The name of the llama binary
- * @returns {Promise<NestedRecord<number>>} An object representing the files and their sizes
+ * Returns the bundled llama.cpp runtimes that contain a llama-server binary
+ */
+function getLlamaRuntimes(): Array<string> {
+  const root = getLlamaRuntimesPath();
+
+  try {
+    return fs
+      .readdirSync(root)
+      .filter((entry) =>
+        fs.existsSync(path.join(root, entry, "llama-server.exe")),
+      );
+  } catch (error) {
+    getLogger().warn("Error reading llama runtimes directory:", error);
+    return [];
+  }
+}
+
+/**
+ * Returns the files inside a llama runtime directory
  */
 async function getLlamaBinaryFiles(
   llamaBinary: string,
 ): Promise<NestedRecord<number>> {
   try {
-    const nodeModulesPath = getNodeModulesPath();
-    const llamaBinaryPath = path.join(
-      nodeModulesPath,
-      "@node-llama-cpp",
-      llamaBinary,
-    );
-
-    if (!fs.existsSync(llamaBinaryPath)) {
-      throw new Error(`Llama binary directory not found at ${llamaBinaryPath}`);
-    }
-
-    return readDirectory(llamaBinaryPath);
+    return await readDirectory(path.join(getLlamaRuntimesPath(), llamaBinary));
   } catch (error) {
-    getLogger().warn("Error reading llama binary directory:", error);
+    getLogger().warn("Error reading llama runtime directory:", error);
 
     return {
       error: -1,

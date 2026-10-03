@@ -70,7 +70,7 @@ To run from source instead, see [Development](#development).
 ## Core Features
 
 - Multiple classic assistants, each with their own animation set and sounds.
-- Local-first chat with GGUF models through llama.cpp / `node-llama-cpp`.
+- Local-first chat with GGUF models through a bundled llama.cpp server (CPU, Vulkan and CUDA runtimes, with automatic GPU-to-CPU fallback).
 - Optional remote providers: OpenAI, Google, Maritaca, OpenClaw 🦞, and Hermes.
 - Receive notifications from your OpenClaw 🦞 ([Learn more](docs/tutorials/openclaw-officebuddies-tailscale.md)).
 - Coding agent notifications: Claude Code and Codex tell your buddy when they need you or have finished, and you can answer their questions and approve permissions from the balloon ([details below](#coding-agent-notifications)).
@@ -123,7 +123,7 @@ When text is selected, Office Buddies can respond in a classic speech balloon fl
 
 Configure providers in `Settings > Model`.
 
-- `Local (GGUF)`: runs on your machine via `@electron/llm` and `node-llama-cpp`.
+- `Local (GGUF)`: runs on your machine via the bundled llama.cpp `llama-server` (run `npm run prepare:llama` once before `npm start` / `npm run make`).
 - `OpenAI`: API key + hosted model selection.
 - `Google`: API key + hosted model selection.
 - `Maritaca`: API key + hosted model selection.
@@ -273,5 +273,5 @@ Special thanks to:
 - [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) (© Microsoft Corporation, MIT License) for the Win11 theme icons.
 - [Alex Meub's Windows 98 Icons](https://win98icons.alexmeub.com/) as the source for some icons used in this project.
 - [Pooya Parsa (@pi0)](https://github.com/pi0) and contributors who helped preserve/extract assistant animation data.
-- [node-llama-cpp](https://github.com/withcatai/node-llama-cpp) for making local inference practical in Node/Electron.
+- [llama.cpp](https://github.com/ggml-org/llama.cpp) for making local inference practical on any hardware.
 

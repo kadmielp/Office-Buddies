@@ -1,6 +1,6 @@
 import { app } from "electron";
 import { Versions } from "../../types/interfaces";
-import { getPackageJson } from "./getPackage";
+import { LLAMA_CPP_RELEASE } from "../../shared/local-llm";
 
 /**
  * Get the versions of the application
@@ -11,14 +11,8 @@ export async function getVersions(): Promise<Versions> {
   const versions = {
     ...process.versions,
     clippy: app.getVersion(),
-    nodeLlamaCpp: await readPackageVersion("node-llama-cpp"),
+    llamaCpp: LLAMA_CPP_RELEASE,
   } as Versions;
 
   return versions;
-}
-
-async function readPackageVersion(packageName: string): Promise<string | null> {
-  const packageJson = await getPackageJson(packageName);
-
-  return packageJson?.version || null;
 }

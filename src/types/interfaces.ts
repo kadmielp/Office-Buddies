@@ -75,7 +75,7 @@ export type ChatRecordsState = Record<string, ChatRecord>;
 export interface Versions extends NodeJS.ProcessVersions {
   clippy: string;
   electron: string;
-  nodeLlamaCpp: string;
+  llamaCpp: string;
   chromium: string;
 }
 

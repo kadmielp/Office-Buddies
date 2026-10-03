@@ -1,4 +1,5 @@
 import { ModelState } from "./models";
+import { DEFAULT_LOCAL_CONTEXT_SIZE, LocalBackend } from "./local-llm";
 
 export type DefaultFont =
   | "Pixelated MS Sans Serif"
@@ -62,6 +63,8 @@ export interface IntegrationTestResult {
 export interface SettingsState {
   aiProvider?: AiProvider;
   selectedModel?: string;
+  localBackend?: LocalBackend;
+  localContextSize?: number;
   remoteModel?: string;
   remoteMaxTokens?: number;
   openAiApiKey?: string;
@@ -143,6 +146,8 @@ ${ANIMATION_PROMPT}`;
 
 export const DEFAULT_SETTINGS: SettingsState = {
   aiProvider: "local",
+  localBackend: "auto",
+  localContextSize: DEFAULT_LOCAL_CONTEXT_SIZE,
   clippyAlwaysOnTop: true,
   chatAlwaysOnTop: true,
   alwaysOpenChat: true,

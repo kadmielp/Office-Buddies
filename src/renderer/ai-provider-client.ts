@@ -1,8 +1,4 @@
-import type {
-  LanguageModelCreateOptions,
-  LanguageModelPrompt,
-} from "@electron/llm";
-import { clippyApi, electronAi } from "./clippyApi";
+import { clippyApi } from "./clippyApi";
 import { Message } from "./features/chat/Message";
 import { ModelState } from "../shared/models";
 import {
@@ -11,6 +7,7 @@ import {
   isHarnessProvider,
 } from "../shared/agent-harness";
 import { SettingsState } from "../shared/shared-state";
+import type { LocalLlmStatus } from "../shared/local-llm";
 
 type ProviderName = NonNullable<SettingsState["aiProvider"]>;
 
@@ -19,66 +16,45 @@ type ProviderReadiness = {
   reason?: string;
 };
 
-const remoteAbortControllers = new Map<string, AbortController>();
-let localSessionOperation: Promise<void> = Promise.resolve();
-const LOCAL_SYSTEM_PROMPT_FALLBACK = "You are a helpful assistant.";
+// Kept from the previous engine so callers can describe a session the same way.
+export type LanguageModelPrompt = {
+  role: "user" | "assistant";
+  type: "text";
+  content: string;
+};
 
-function queueLocalSessionOperation(operation: () => Promise<void>) {
+export type LanguageModelCreateOptions = {
+  modelAlias?: string;
+  systemPrompt?: string;
+  topK?: number;
+  temperature?: number;
+  initialPrompts?: LanguageModelPrompt[];
+};
+
+const remoteAbortControllers = new Map<string, AbortController>();
+let localSessionOperation: Promise<unknown> = Promise.resolve();
+
+function queueLocalSessionOperation<T>(operation: () => Promise<T>) {
   const nextOperation = localSessionOperation.then(operation, operation);
   localSessionOperation = nextOperation.catch(() => {});
   return nextOperation;
 }
 
-function isStoppedSessionError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  return /Unexpected message type:\s*stopped/i.test(error.message);
-}
-
-function buildLocalTurnInput(systemPrompt: string, input: string): string {
-  const prompt = systemPrompt.trim() || LOCAL_SYSTEM_PROMPT_FALLBACK;
-  const userInput = input.trim();
-
-  return [
-    "System instructions (highest priority):",
-    prompt,
-    "",
-    "User message:",
-    userInput,
-    "",
-    "Assistant response rules:",
-    "- Obey the system instructions above.",
-    "- Reply to the user message directly.",
-    "- Respond in the same language used in the user's latest message.",
-    "- Never leave the response empty.",
-    "- If you output an animation key, always include normal text after it.",
-  ].join("\n");
-}
-
+/**
+ * Loads the local model into the bundled llama.cpp server. Resolves with the
+ * runtime in use (and why it fell back to the CPU, if it did).
+ */
 export async function createProviderSession(
   settings: SettingsState,
-  options: LanguageModelCreateOptions,
-) {
+  _options?: LanguageModelCreateOptions,
+): Promise<LocalLlmStatus | undefined> {
   if ((settings.aiProvider || "local") !== "local") {
-    return;
+    // A remote provider is selected: release the local model's memory.
+    void clippyApi.stopLocalModel().catch(() => {});
+    return undefined;
   }
 
-  await queueLocalSessionOperation(async () => {
-    try {
-      await electronAi.create(options);
-      return;
-    } catch (error) {
-      if (!isStoppedSessionError(error)) {
-        throw error;
-      }
-
-      // Recovery path for transient renderer/main session desync.
-      await electronAi.destroy().catch(() => {});
-      await electronAi.create(options);
-    }
-  });
+  return queueLocalSessionOperation(() => clippyApi.startLocalModel());
 }
 
 export async function destroyProviderSession(settings: SettingsState) {
@@ -86,18 +62,16 @@ export async function destroyProviderSession(settings: SettingsState) {
     return;
   }
 
-  await queueLocalSessionOperation(async () => {
-    await electronAi.destroy();
-  });
+  // The server is stateless (history is sent with every request), so a new
+  // chat keeps the loaded model; it is stopped when the provider/model changes
+  // or the app quits.
 }
 
 export function abortProviderRequest(
-  settings: SettingsState,
+  _settings: SettingsState,
   requestUUID: string,
 ) {
-  if ((settings.aiProvider || "local") === "local") {
-    return electronAi.abortRequest(requestUUID);
-  }
+  clippyApi.abortRemoteProvider(requestUUID);
 
   const controller = remoteAbortControllers.get(requestUUID);
   controller?.abort();
@@ -161,24 +135,15 @@ export async function* promptStreamingWithProvider(args: {
 }): AsyncGenerator<string> {
   const provider = (args.settings.aiProvider || "local") as ProviderName;
 
-  if (provider === "local") {
-    const localInput = buildLocalTurnInput(args.systemPrompt, args.input);
-    const stream = await electronAi.promptStreaming(localInput, {
-      requestUUID: args.requestUUID,
-    });
-
-    for await (const chunk of stream) {
-      yield chunk;
-    }
-
-    return;
-  }
-
   const controller = new AbortController();
   remoteAbortControllers.set(args.requestUUID, controller);
 
   try {
-    if (provider === "openai" || isHarnessProvider(provider)) {
+    if (
+      provider === "local" ||
+      provider === "openai" ||
+      isHarnessProvider(provider)
+    ) {
       const chunks: string[] = [];
       let isDone = false;
       let error: string | null = null;

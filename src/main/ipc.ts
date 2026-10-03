@@ -27,10 +27,12 @@ import { getClippyDebugInfo } from "./debug-clippy";
 import { getDebugManager } from "./debug";
 import {
   fetchRemoteProviderModels,
+  loadLocalModel,
   promptRemoteProvider,
   promptStreamingRemoteProvider,
 } from "./remote-ai";
 import { runBuddyAction } from "./buddy-actions";
+import { getLocalLlmStatus, stopLocalLlm } from "./local-llm";
 import { BuddyAction } from "../types/interfaces";
 import {
   getAvailableKnowledgeSources,
@@ -239,7 +241,13 @@ export function setupIpcListeners() {
     async (
       _,
       payload: {
-        provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
+        provider:
+          | "local"
+          | "openai"
+          | "gemini"
+          | "maritaca"
+          | "openclaw"
+          | "hermes";
         systemPrompt: string;
         history: ChatWithMessages["messages"];
       },
@@ -252,23 +260,45 @@ export function setupIpcListeners() {
       }),
   );
 
+  ipcMain.handle(IpcMessages.LOCAL_LLM_START, () =>
+    loadLocalModel(getStateManager().getSettings()),
+  );
+  ipcMain.handle(IpcMessages.LOCAL_LLM_STOP, () => stopLocalLlm());
+  ipcMain.handle(IpcMessages.LOCAL_LLM_STATUS, () => getLocalLlmStatus());
+
+  const promptAbortControllers = new Map<string, AbortController>();
+  ipcMain.on(IpcMessages.AI_ABORT, (_, requestUUID: string) => {
+    promptAbortControllers.get(requestUUID)?.abort();
+    promptAbortControllers.delete(requestUUID);
+  });
+
   ipcMain.on(
     "clippy_ai_prompt_streaming",
     async (
       event,
       payload: {
-        provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
+        provider:
+          | "local"
+          | "openai"
+          | "gemini"
+          | "maritaca"
+          | "openclaw"
+          | "hermes";
         systemPrompt: string;
         history: ChatWithMessages["messages"];
         requestUUID: string;
       },
     ) => {
+      const controller = new AbortController();
+      promptAbortControllers.set(payload.requestUUID, controller);
+
       try {
         const stream = promptStreamingRemoteProvider({
           provider: payload.provider as any,
           settings: getStateManager().getSettings(),
           systemPrompt: payload.systemPrompt,
           history: payload.history,
+          signal: controller.signal,
         });
 
         for await (const chunk of stream) {
@@ -279,9 +309,16 @@ export function setupIpcListeners() {
 
         event.reply(`clippy_ai_prompt_done_${payload.requestUUID}`);
       } catch (error) {
-        event.reply(`clippy_ai_prompt_error_${payload.requestUUID}`, {
-          error: error instanceof Error ? error.message : String(error),
-        });
+        if (controller.signal.aborted) {
+          // Aborted by the user: end the stream cleanly with what we have.
+          event.reply(`clippy_ai_prompt_done_${payload.requestUUID}`);
+        } else {
+          event.reply(`clippy_ai_prompt_error_${payload.requestUUID}`, {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } finally {
+        promptAbortControllers.delete(payload.requestUUID);
       }
     },
   );
@@ -339,11 +376,14 @@ export function setupIpcListeners() {
     startProactiveServer();
     return info;
   });
-  ipcMain.handle(IpcMessages.AGENT_HOOKS_UNINSTALL, (_, source: AgentSource) => {
-    const info = uninstallAgentHooks(assertAgentSource(source));
-    startProactiveServer();
-    return info;
-  });
+  ipcMain.handle(
+    IpcMessages.AGENT_HOOKS_UNINSTALL,
+    (_, source: AgentSource) => {
+      const info = uninstallAgentHooks(assertAgentSource(source));
+      startProactiveServer();
+      return info;
+    },
+  );
 
   // Proactive
   ipcMain.handle(

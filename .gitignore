@@ -94,3 +94,6 @@ out/
 
 trusted-signing-metadata.json
 Microsoft.Trusted.Signing.Client
+
+# Prebuilt llama.cpp runtimes (npm run prepare:llama)
+/resources/local_gguf/

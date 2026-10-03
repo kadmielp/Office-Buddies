@@ -16,6 +16,11 @@ import { fetchProviderModels } from "../../ai-provider-client";
 import { useChat } from "../../contexts/ChatContext";
 import { Checkbox } from "../../ui/Checkbox";
 import { getThemeIcons } from "../../theme/theme";
+import {
+  LOCAL_CONTEXT_SIZES,
+  LocalBackend,
+  LocalLlmStatus,
+} from "../../../shared/local-llm";
 
 function filterRemoteModelsByProvider(
   provider: AiProvider,
@@ -40,6 +45,30 @@ export const SettingsModel: React.FC = () => {
   const [remoteModelOptions, setRemoteModelOptions] = useState<string[]>([]);
   const [isLoadingRemoteModels, setIsLoadingRemoteModels] = useState(false);
   const [remoteModelsError, setRemoteModelsError] = useState<string>("");
+  const [localStatus, setLocalStatus] = useState<LocalLlmStatus>({
+    ready: false,
+  });
+
+  useEffect(() => {
+    if (selectedProvider !== "local") {
+      return;
+    }
+
+    let cancelled = false;
+    const refresh = () =>
+      clippyApi
+        .getLocalModelStatus()
+        .then((status) => !cancelled && setLocalStatus(status))
+        .catch(() => {});
+
+    void refresh();
+    const timer = window.setInterval(refresh, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [selectedProvider]);
 
   const columns: Array<Column> = [
     { key: "default", header: "Loaded", width: 50 },
@@ -103,6 +132,10 @@ export const SettingsModel: React.FC = () => {
   const handleMakeDefault = async () => {
     if (selectedModel) {
       clippyApi.setState("settings.selectedModel", selectedModel.name);
+      setAnimationKey("");
+      window.setTimeout(() => {
+        setAnimationKey("Save");
+      }, 0);
     }
   };
 
@@ -393,6 +426,57 @@ export const SettingsModel: React.FC = () => {
           chat will be sent to the configured provider instead of local GGUF
           models.
         </p>
+      )}
+
+      {selectedProvider === "local" && (
+        <fieldset style={{ marginBottom: "16px" }}>
+          <legend>Local engine (llama.cpp)</legend>
+          <div className="field-row">
+            <label htmlFor="localBackend">Runtime</label>
+            <select
+              id="localBackend"
+              value={settings.localBackend || "auto"}
+              onChange={(e) =>
+                clippyApi.setState("settings.localBackend", e.target.value)
+              }
+            >
+              <option value={"auto" as LocalBackend}>
+                Automatic (GPU if available)
+              </option>
+              <option value={"cuda" as LocalBackend}>NVIDIA (CUDA)</option>
+              <option value={"vulkan" as LocalBackend}>
+                GPU (Vulkan: AMD / Intel / NVIDIA)
+              </option>
+              <option value={"cpu" as LocalBackend}>CPU only</option>
+            </select>
+          </div>
+          <div className="field-row">
+            <label htmlFor="localContextSize">Context window</label>
+            <select
+              id="localContextSize"
+              value={settings.localContextSize || 8192}
+              onChange={(e) =>
+                clippyApi.setState(
+                  "settings.localContextSize",
+                  Number(e.target.value),
+                )
+              }
+            >
+              {LOCAL_CONTEXT_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size.toLocaleString()} tokens
+                </option>
+              ))}
+            </select>
+          </div>
+          <p style={{ marginBottom: 0 }}>
+            {localStatus.ready
+              ? `Running ${localStatus.model} on ${localStatus.backend === "cpu" ? "the CPU" : `the GPU (${localStatus.backend})`}.`
+              : "No model is running yet."}{" "}
+            If the GPU runs out of memory, Office Buddies switches to the CPU
+            automatically.
+          </p>
+        </fieldset>
       )}
 
       {selectedProvider === "local" ? (

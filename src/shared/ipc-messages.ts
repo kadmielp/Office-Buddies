@@ -59,6 +59,10 @@ export const IpcMessages = {
   CHAT_NEW_CHAT: "clippy_chat_new_chat",
   AI_FETCH_MODELS: "clippy_ai_fetch_models",
   AI_PROMPT: "clippy_ai_prompt",
+  AI_ABORT: "clippy_ai_abort",
+  LOCAL_LLM_START: "clippy_local_llm_start",
+  LOCAL_LLM_STOP: "clippy_local_llm_stop",
+  LOCAL_LLM_STATUS: "clippy_local_llm_status",
 
   // Clipboard
   CLIPBOARD_WRITE: "clippy_clipboard_write",

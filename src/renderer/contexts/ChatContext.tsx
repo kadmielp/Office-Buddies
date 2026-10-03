@@ -21,12 +21,10 @@ import {
   destroyProviderSession,
   getProviderReadiness,
   initialPromptsFromMessages,
+  type LanguageModelCreateOptions,
+  type LanguageModelPrompt,
 } from "../ai-provider-client";
 
-import type {
-  LanguageModelPrompt,
-  LanguageModelCreateOptions,
-} from "@electron/llm";
 import { SettingsState } from "../../shared/shared-state";
 
 type ClippyNamedStatus =
@@ -225,8 +223,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        await createProviderSession(mainChatSettings, options);
+        const localStatus = await createProviderSession(
+          mainChatSettings,
+          options,
+        );
         setIsModelLoaded(true);
+
+        if (localStatus?.fallbackReason) {
+          addMessage({
+            id: crypto.randomUUID(),
+            content: localStatus.fallbackReason,
+            sender: "clippy",
+            createdAt: Date.now(),
+          });
+        }
       } catch (error) {
         console.error(error);
 
@@ -341,13 +351,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (readiness.ready) {
       loadModel();
     } else if (isModelLoaded) {
-      destroyProviderSession(mainChatSettings)
-        .then(() => {
-          setIsModelLoaded(false);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      // Free the memory held by the local model.
+      clippyApi.stopLocalModel().catch((error) => {
+        console.error(error);
+      });
+      setIsModelLoaded(false);
     }
   }, [
     mainChatSettings,

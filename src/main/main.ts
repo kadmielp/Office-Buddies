@@ -6,14 +6,13 @@ if (shouldQuit) {
 }
 
 import { app, BrowserWindow } from "electron";
-import { loadElectronLlm } from "@electron/llm";
 import { setupIpcListeners } from "./ipc";
 import {
   createMainWindow,
   setupWindowListener,
   showAssistantFromTray,
 } from "./windows";
-import { getModelManager } from "./model-manager";
+import { stopLocalLlm } from "./local-llm";
 import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
 import {
@@ -43,7 +42,6 @@ async function onReady() {
   console.info(`Welcome to Office Buddies v${app.getVersion()}`);
 
   await setupAutoUpdater();
-  await loadLlm();
   setupAppMenu();
   setupIpcListeners();
   setupWindowListener();
@@ -51,17 +49,6 @@ async function onReady() {
   await createTray();
   registerGlobalShortcuts();
   startProactiveServer();
-}
-
-async function loadLlm() {
-  await loadElectronLlm({
-    getModelPath: (modelAlias: string) => {
-      console.info(
-        `Loading model ${modelAlias} from ${getModelManager().getModelByName(modelAlias)?.path}`,
-      );
-      return getModelManager().getModelByName(modelAlias)?.path;
-    },
-  });
 }
 
 app.on("ready", onReady);
@@ -76,6 +63,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("will-quit", () => {
+  stopLocalLlm();
   unregisterGlobalShortcuts();
   destroyTray();
 });

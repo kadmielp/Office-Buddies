@@ -1,4 +1,3 @@
-import { ElectronLlmRenderer } from "@electron/llm";
 import {
   IntegrationConfig,
   IntegrationTestResult,
@@ -19,6 +18,7 @@ import {
   BuddySpeechPayload,
   BuddyAction,
 } from "../types/interfaces";
+import type { LocalLlmStatus } from "../shared/local-llm";
 import { DebugState } from "../shared/debug-state";
 import type {
   AgentHookInfo,
@@ -138,7 +138,13 @@ export type ClippyApi = {
     provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes",
   ) => Promise<string[]>;
   promptRemoteProvider: (payload: {
-    provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
+    provider:
+      | "local"
+      | "openai"
+      | "gemini"
+      | "maritaca"
+      | "openclaw"
+      | "hermes";
     systemPrompt: string;
     history: MessageRecord[];
     requestUUID?: string;
@@ -146,6 +152,11 @@ export type ClippyApi = {
     onDone?: () => void;
     onError?: (error: string) => void;
   }) => Promise<string> | void;
+  abortRemoteProvider: (requestUUID: string) => void;
+  // Local model (bundled llama.cpp)
+  startLocalModel: () => Promise<LocalLlmStatus>;
+  stopLocalModel: () => Promise<void>;
+  getLocalModelStatus: () => Promise<LocalLlmStatus>;
   // Clipboard
   clipboardWrite: (data: Data) => Promise<void>;
   // Proactive
@@ -188,10 +199,8 @@ export type ClippyApi = {
 
 declare global {
   interface Window {
-    electronAi: ElectronLlmRenderer;
     clippy: ClippyApi;
   }
 }
 
 export const clippyApi = window["clippy"];
-export const electronAi = window["electronAi"];

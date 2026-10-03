@@ -165,7 +165,13 @@ const clippyApi: ClippyApi = {
     provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes",
   ) => ipcRenderer.invoke(IpcMessages.AI_FETCH_MODELS, provider),
   promptRemoteProvider: (payload: {
-    provider: "openai" | "gemini" | "maritaca" | "openclaw" | "hermes";
+    provider:
+      | "local"
+      | "openai"
+      | "gemini"
+      | "maritaca"
+      | "openclaw"
+      | "hermes";
     systemPrompt: string;
     history: ChatWithMessages["messages"];
     requestUUID?: string;
@@ -216,6 +222,12 @@ const clippyApi: ClippyApi = {
       return ipcRenderer.invoke(IpcMessages.AI_PROMPT, payload);
     }
   },
+
+  abortRemoteProvider: (requestUUID: string) =>
+    ipcRenderer.send(IpcMessages.AI_ABORT, requestUUID),
+  startLocalModel: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_START),
+  stopLocalModel: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_STOP),
+  getLocalModelStatus: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_STATUS),
 
   // App
   getVersions: () => ipcRenderer.invoke(IpcMessages.APP_GET_VERSIONS),

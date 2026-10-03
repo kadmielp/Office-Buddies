@@ -1,4 +1,7 @@
 import { SettingsState } from "../shared/shared-state";
+import { DEFAULT_LOCAL_CONTEXT_SIZE } from "../shared/local-llm";
+import { getModelManager } from "./model-manager";
+import { getLocalLlmEndpoint, startLocalLlm } from "./local-llm";
 import { MessageRecord } from "../types/interfaces";
 import {
   getHarnessApiKey,
@@ -12,7 +15,12 @@ export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
 export const OPENCLAW_DEFAULT_MODEL = HARNESS_PROVIDERS.openclaw.defaultModel;
 
-type RemoteProvider = "openai" | "gemini" | "maritaca" | HarnessProvider;
+type RemoteProvider =
+  | "local"
+  | "openai"
+  | "gemini"
+  | "maritaca"
+  | HarnessProvider;
 const DEFAULT_REMOTE_MAX_TOKENS = 512;
 const MIN_REMOTE_MAX_TOKENS = 64;
 const MAX_REMOTE_MAX_TOKENS = 8192;
@@ -342,6 +350,8 @@ async function* streamOpenAiCompatible(args: {
   systemPrompt: string;
   history: MessageRecord[];
   includeImages?: boolean;
+  extraBody?: Record<string, unknown>;
+  signal?: AbortSignal;
 }): AsyncGenerator<string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -362,6 +372,7 @@ async function* streamOpenAiCompatible(args: {
     temperature: args.temperature,
     max_tokens: args.maxTokens,
     stream: true,
+    ...args.extraBody,
   };
 
   // OpenClaw specific metadata
@@ -373,6 +384,7 @@ async function* streamOpenAiCompatible(args: {
     method: "POST",
     headers,
     body: JSON.stringify(body),
+    signal: args.signal,
   });
 
   if (!response.ok) {
@@ -415,12 +427,112 @@ async function* streamOpenAiCompatible(args: {
   }
 }
 
+/**
+ * Makes sure the bundled llama-server is running the selected local model and
+ * returns its OpenAI-compatible endpoint. Loads it on demand when needed.
+ */
+export async function ensureLocalModel(settings: SettingsState) {
+  const existing = getLocalLlmEndpoint();
+  if (existing) {
+    return existing;
+  }
+
+  const status = await loadLocalModel(settings);
+  const endpoint = getLocalLlmEndpoint();
+  if (!status.ready || !endpoint) {
+    throw new Error("The local model is not running.");
+  }
+
+  return endpoint;
+}
+
+export function loadLocalModel(settings: SettingsState) {
+  const model = settings.selectedModel
+    ? getModelManager().getModelByName(settings.selectedModel)
+    : undefined;
+
+  if (!model?.path || !model.downloaded) {
+    throw new Error("The selected local model is not downloaded.");
+  }
+
+  return startLocalLlm(
+    model.path,
+    settings.localBackend || "auto",
+    settings.localContextSize || DEFAULT_LOCAL_CONTEXT_SIZE,
+  );
+}
+
+const LOCAL_SYSTEM_SUFFIX = [
+  "",
+  "Assistant response rules:",
+  "- Obey the system instructions above.",
+  "- Reply to the user message directly.",
+  "- Respond in the same language used in the user's latest message.",
+  "- Never leave the response empty.",
+  "- If you output an animation key, always include normal text after it.",
+].join("\n");
+
+// Rough budget: ~3 characters per token, keeping room for the reply.
+const LOCAL_REPLY_TOKEN_RESERVE = 1024;
+
+/**
+ * llama-server rejects prompts that exceed the context window, so drop the
+ * oldest turns until the conversation fits. The newest message is always kept.
+ */
+function prepareLocalPrompt(
+  settings: SettingsState,
+  systemPrompt: string,
+  history: MessageRecord[],
+) {
+  const contextSize = settings.localContextSize || DEFAULT_LOCAL_CONTEXT_SIZE;
+  const system = `${systemPrompt.trim() || "You are a helpful assistant."}\n${LOCAL_SYSTEM_SUFFIX}`;
+  let budget =
+    Math.max(512, contextSize - LOCAL_REPLY_TOKEN_RESERVE) * 3 - system.length;
+
+  const kept: MessageRecord[] = [];
+  for (let i = history.length - 1; i >= 0; i--) {
+    budget -= (history[i].content || "").length;
+    if (budget < 0 && kept.length > 0) {
+      break;
+    }
+    kept.unshift(history[i]);
+  }
+
+  return { systemPrompt: system, history: kept };
+}
+
+function getLocalSamplingBody(settings: SettingsState) {
+  return settings.topK ? { top_k: settings.topK } : {};
+}
+
 export async function* promptStreamingRemoteProvider(args: {
   provider: RemoteProvider;
   settings: SettingsState;
   systemPrompt: string;
   history: MessageRecord[];
+  signal?: AbortSignal;
 }): AsyncGenerator<string> {
+  if (args.provider === "local") {
+    const endpoint = await ensureLocalModel(args.settings);
+    const prompt = prepareLocalPrompt(
+      args.settings,
+      args.systemPrompt,
+      args.history,
+    );
+    yield* streamOpenAiCompatible({
+      endpoint: endpoint.url,
+      apiKey: endpoint.apiKey,
+      model: "local",
+      temperature: args.settings.temperature,
+      maxTokens: -1,
+      systemPrompt: prompt.systemPrompt,
+      history: prompt.history,
+      extraBody: getLocalSamplingBody(args.settings),
+      signal: args.signal,
+    });
+    return;
+  }
+
   if (args.provider === "openai") {
     yield* streamOpenAiCompatible({
       endpoint: "https://api.openai.com/v1/chat/completions",
@@ -431,6 +543,7 @@ export async function* promptStreamingRemoteProvider(args: {
       systemPrompt: args.systemPrompt,
       history: args.history,
       includeImages: true,
+      signal: args.signal,
     });
     return;
   }
@@ -447,6 +560,7 @@ export async function* promptStreamingRemoteProvider(args: {
       systemPrompt: args.systemPrompt,
       history: args.history,
       includeImages: true,
+      signal: args.signal,
     });
     return;
   }
@@ -462,6 +576,24 @@ export async function promptRemoteProvider(args: {
   systemPrompt: string;
   history: MessageRecord[];
 }): Promise<string> {
+  if (args.provider === "local") {
+    const endpoint = await ensureLocalModel(args.settings);
+    const prompt = prepareLocalPrompt(
+      args.settings,
+      args.systemPrompt,
+      args.history,
+    );
+    return promptOpenAiCompatible({
+      endpoint: endpoint.url,
+      apiKey: endpoint.apiKey,
+      model: "local",
+      temperature: args.settings.temperature,
+      maxTokens: -1,
+      systemPrompt: prompt.systemPrompt,
+      history: prompt.history,
+    });
+  }
+
   if (args.provider === "openai") {
     return promptOpenAiCompatible({
       endpoint: "https://api.openai.com/v1/chat/completions",

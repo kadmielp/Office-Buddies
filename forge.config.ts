@@ -11,7 +11,6 @@ import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
-import { execSync } from "node:child_process";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageJson = require("./package.json");
@@ -45,13 +44,7 @@ const FLAGS = {
   APPLE_SIGNING_IDENTITY: process.env.APPLE_SIGNING_IDENTITY,
 };
 
-const EXTERNAL_DEPENDENCIES = [
-  "@electron/llm",
-  "node-llama-cpp",
-  "@node-llama-cpp/",
-  "electron-log",
-  ...getNodeLlamaBinaryDependenciesToKeep(),
-];
+const EXTERNAL_DEPENDENCIES = ["electron-log"];
 
 const windowsSign: any = {
   signToolPath: FLAGS.SIGNTOOL_PATH,
@@ -60,7 +53,10 @@ const windowsSign: any = {
   hashes: ["sha256"],
 };
 
-const APP_BUNDLE_ID = getAppBundleId(packageJson.name, packageJson.author?.name);
+const APP_BUNDLE_ID = getAppBundleId(
+  packageJson.name,
+  packageJson.author?.name,
+);
 
 setup();
 
@@ -71,13 +67,7 @@ const config: ForgeConfig = {
         await getExternalNestedDependencies(EXTERNAL_DEPENDENCIES),
       );
     },
-    packageAfterPrune: async (
-      _forgeConfig,
-      buildPath,
-      _electronVersion,
-      _platform,
-      arch,
-    ) => {
+    packageAfterPrune: async (_forgeConfig, buildPath) => {
       const getItems = getItemsFromFolder(buildPath) ?? [];
 
       for (const item of getItems) {
@@ -101,14 +91,10 @@ const config: ForgeConfig = {
           }
         }
       }
-
-      await forceInstallNodeLlamaBinaries(buildPath, arch);
     },
   },
   packagerConfig: {
-    asar: {
-      unpack: "**/node_modules/*node-llama-cpp*/**",
-    },
+    asar: true,
     ignore: (file) => {
       const filePath = file.toLowerCase().replace(/\\/g, "/");
       const result = {
@@ -124,7 +110,6 @@ const config: ForgeConfig = {
         "/Microsoft.Trusted.Signing.Client/",
         "/Microsoft.Windows.SDK.BuildTools/",
         "/website/",
-        ...getNodeLlamaBinaryDependenciesToIgnore().map((dep) => `/${dep}/`),
       ];
 
       const extensionsToIgnore = [
@@ -218,10 +203,10 @@ const config: ForgeConfig = {
     osxNotarize: FLAGS.IS_CODESIGNING_ENABLED
       ? FLAGS.APPLE_ID && FLAGS.APPLE_ID_PASSWORD && FLAGS.APPLE_TEAM_ID
         ? {
-          appleId: FLAGS.APPLE_ID,
-          appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
-          teamId: FLAGS.APPLE_TEAM_ID,
-        }
+            appleId: FLAGS.APPLE_ID,
+            appleIdPassword: FLAGS.APPLE_ID_PASSWORD,
+            teamId: FLAGS.APPLE_TEAM_ID,
+          }
         : undefined
       : undefined,
     windowsSign: FLAGS.IS_CODESIGNING_ENABLED ? windowsSign : undefined,
@@ -229,6 +214,8 @@ const config: ForgeConfig = {
     extraResource: [
       path.resolve(__dirname, "assets/icon.ico"),
       path.resolve(__dirname, "assets/icon.png"),
+      // Prebuilt llama.cpp runtimes (cpu / vulkan / cuda), see `npm run prepare:llama`
+      path.resolve(__dirname, "resources/local_gguf"),
     ],
     junk: true,
     overwrite: true,
@@ -302,76 +289,6 @@ export default config;
 /**
  * Helper functions
  */
-
-/**
- * Get the optional dependencies of the node-llama-cpp package, which will
- * be all the binaries that need to be packaged.
- *
- * @returns {Array<string>} The optional dependencies of the node-llama-cpp package
- */
-function getNodeLlamaBinaryDependenciesToKeep(
-  arch: string = getArch(),
-): Array<string> {
-  // "@node-llama-cpp/linux-arm64"
-  // "@node-llama-cpp/linux-armv7l"
-  // "@node-llama-cpp/linux-x64"
-  // "@node-llama-cpp/linux-x64-cuda"
-  // "@node-llama-cpp/linux-x64-vulkan"
-  // "@node-llama-cpp/mac-arm64-metal"
-  // "@node-llama-cpp/mac-x64"
-  // "@node-llama-cpp/win-arm64"
-  // "@node-llama-cpp/win-x64"
-  // "@node-llama-cpp/win-x64-cuda"
-  // "@node-llama-cpp/win-x64-vulkan"
-  if (process.platform === "darwin") {
-    return arch === "arm64"
-      ? ["@node-llama-cpp/mac-arm64-metal"]
-      : ["@node-llama-cpp/mac-x64"];
-  }
-
-  if (process.platform === "win32") {
-    return arch === "arm64"
-      ? ["@node-llama-cpp/win-arm64"]
-      : [
-          "@node-llama-cpp/win-x64",
-          "@node-llama-cpp/win-x64-cuda",
-          "@node-llama-cpp/win-x64-vulkan",
-        ];
-  }
-
-  if (process.platform === "linux") {
-    return arch === "arm64"
-      ? ["@node-llama-cpp/linux-arm64"]
-      : [
-          "@node-llama-cpp/linux-x64",
-          "@node-llama-cpp/linux-x64-cuda",
-          "@node-llama-cpp/linux-x64-vulkan",
-        ];
-  }
-
-  return [];
-}
-
-/**
- * Get node-llama-cpp binaries we don't want to keep
- */
-function getNodeLlamaBinaryDependenciesToIgnore(): Array<string> {
-  const all = [
-    "@node-llama-cpp/linux-arm64",
-    "@node-llama-cpp/linux-armv7l",
-    "@node-llama-cpp/linux-x64",
-    "@node-llama-cpp/linux-x64-cuda",
-    "@node-llama-cpp/linux-x64-vulkan",
-    "@node-llama-cpp/mac-arm64-metal",
-    "@node-llama-cpp/mac-x64",
-    "@node-llama-cpp/win-arm64",
-    "@node-llama-cpp/win-x64",
-    "@node-llama-cpp/win-x64-cuda",
-    "@node-llama-cpp/win-x64-vulkan",
-  ];
-  const keep = getNodeLlamaBinaryDependenciesToKeep();
-  return all.filter((item) => !keep.includes(item));
-}
 
 function getItemsFromFolder(
   filePath: string,
@@ -500,18 +417,6 @@ function setup() {
   }
 }
 
-function getArch() {
-  // If we're running in CI, we want to use the arch passed in
-  // If someone is passing in a flag, we want to use that, too
-  if (process.env.CI || process.argv.some((s) => s.includes("arch"))) {
-    return process.argv.some((s) => s.includes("--arch=arm64"))
-      ? "arm64"
-      : "x64";
-  }
-
-  return process.arch;
-}
-
 function getAppBundleId(
   packageName: string | undefined,
   authorName: string | undefined,
@@ -523,66 +428,4 @@ function getAppBundleId(
 
 function sanitizeIdentifierPart(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
-}
-
-/**
- * node-llama-cpp binaries have a cpu flag in their package.json, meaning
- * they don't install without a little force.
- *
- * @param buildPath
- */
-async function forceInstallNodeLlamaBinaries(buildPath: string, arch: string) {
-  const nodeLlamaBinaries = getNodeLlamaBinaryDependenciesToKeep(arch);
-  const nodeLlamaBinariesToInstall = nodeLlamaBinaries.filter(
-    (binary) => !fs.existsSync(path.join(buildPath, "node_modules", binary)),
-  );
-
-  console.log(`node-llama-cpp binaries required: ${nodeLlamaBinaries}`);
-  console.log(
-    `node-llama-cpp binaries to install: ${nodeLlamaBinariesToInstall}`,
-  );
-
-  if (nodeLlamaBinariesToInstall.length === 0) {
-    console.log("All node-llama-cpp binaries are already installed");
-    return;
-  }
-
-  // Make a temporary directory to install the binaries
-  const tempDir = path.join(
-    os.tmpdir(),
-    `node-llama-binaries-${crypto.randomUUID().slice(0, 8)}`,
-  );
-  const tempDirNodeLlamaBinaries = path.join(
-    tempDir,
-    "node_modules",
-    "@node-llama-cpp",
-  );
-  const buildPathNodeLlamaBinaries = path.join(
-    buildPath,
-    "node_modules",
-    "@node-llama-cpp",
-  );
-  await fs.promises.mkdir(tempDir, { recursive: true });
-
-  nodeLlamaBinariesToInstall.forEach((binary) => {
-    console.log(`Installing ${binary}...`);
-    execSync(
-      `npm install ${binary} --force --package-lock=false --save=false --ignore-scripts --omit=optional --no-engine-strict`,
-      { cwd: tempDir },
-    );
-  });
-
-  // We'd now expect tempDir/node_modules to contain the binaries
-  // Copy the binaries to the build path
-  fs.readdirSync(tempDirNodeLlamaBinaries).forEach((file) => {
-    const sourcePath = path.join(tempDirNodeLlamaBinaries, file);
-    const destPath = path.join(buildPathNodeLlamaBinaries, file);
-
-    // Copy recursively
-    if (fs.statSync(sourcePath).isDirectory()) {
-      fs.cpSync(sourcePath, destPath, { recursive: true });
-    } else {
-      fs.copyFileSync(sourcePath, destPath);
-    }
-  });
 }

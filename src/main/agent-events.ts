@@ -238,7 +238,16 @@ function settleRequest(id: string, response: AgentEventResponse) {
   pending.respond(response);
 }
 
+const FINISHED_AUTO_DISMISS_MS = 15_000;
+const finishedExpiryTimers = new Map<string, NodeJS.Timeout>();
+
 function removeItem(id: string) {
+  const expiry = finishedExpiryTimers.get(id);
+  if (expiry) {
+    clearTimeout(expiry);
+    finishedExpiryTimers.delete(id);
+  }
+
   if (queue.delete(id)) {
     broadcastQueue();
   }
@@ -264,6 +273,22 @@ function queueItem(item: AgentQueueItem) {
   queue.delete(item.id);
   queue.set(item.id, item);
   getLogger().info(`Agent event queued: ${item.id} (${item.kind})`);
+
+  // "Finished" cards need no answer, so they clear themselves if ignored.
+  const existingTimer = finishedExpiryTimers.get(item.id);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+    finishedExpiryTimers.delete(item.id);
+  }
+  if (item.kind === "finished") {
+    const timer = setTimeout(() => {
+      finishedExpiryTimers.delete(item.id);
+      if (queue.get(item.id) === item) {
+        removeItem(item.id);
+      }
+    }, FINISHED_AUTO_DISMISS_MS);
+    finishedExpiryTimers.set(item.id, timer);
+  }
 
   if (isWaitingOnUser(item.kind)) {
     showMainWindowWithoutFocus();

@@ -41,7 +41,7 @@ const WINDOW_PADDING_HEIGHT = 7;
 const SPEECH_BUBBLE_PADDING_WIDTH = 220;
 const SPEECH_BUBBLE_PADDING_HEIGHT = 340;
 const MINI_CHAT_PADDING_WIDTH = 400;
-const MINI_CHAT_PADDING_HEIGHT = 360;
+const MINI_CHAT_PADDING_HEIGHT = 540;
 
 type MiniChatScreenshot = {
   dataUrl: string;
@@ -186,6 +186,7 @@ export function Clippy() {
   const isAssistantGalleryOpen =
     currentView === "assistant-gallery" && isChatWindowOpen;
 
+  const miniChatLogRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const spriteImageRef = useRef<HTMLImageElement | null>(null);
   const frameTimeoutRef = useRef<number | undefined>(undefined);
@@ -285,6 +286,13 @@ export function Clippy() {
           },
         ]
       : miniChatMessages;
+  const miniChatScrollKey = `${miniChatMessages.length}:${miniChatStreamingContent.length}`;
+  useEffect(() => {
+    const log = miniChatLogRef.current;
+    if (log) {
+      log.scrollTop = log.scrollHeight;
+    }
+  }, [miniChatScrollKey, isMiniChatOpen]);
   const isBalloonBusy =
     isMiniChatOpen || Boolean(buddySpeech) || Boolean(proactiveSpeech);
   // Agent requests never take over the balloon; they wait until it is idle.
@@ -1432,7 +1440,11 @@ export function Clippy() {
             x
           </button>
           {displayedMiniChatMessages.length > 0 && (
-            <div className="buddy-mini-chat-log" aria-live="polite">
+            <div
+              className="buddy-mini-chat-log"
+              aria-live="polite"
+              ref={miniChatLogRef}
+            >
               <>
                 {displayedMiniChatMessages.map((message) => (
                   <div

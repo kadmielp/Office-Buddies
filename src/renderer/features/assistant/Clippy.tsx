@@ -1118,7 +1118,6 @@ export function Clippy() {
 
       const goodbyeAnimationKey = findFirstAnimationKey(agentPack.animations, [
         "Goodbye",
-        "GoodBye",
       ]);
       const targetAgent = switchTargetAgent || selectedAgent;
 

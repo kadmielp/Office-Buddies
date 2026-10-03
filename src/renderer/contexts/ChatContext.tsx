@@ -98,6 +98,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     [settings],
   );
 
+  // Cosmetic settings (e.g. muting sound) must not reload the model.
+  const modelSettingsSignature = useMemo(() => {
+    const {
+      disableSound: _disableSound,
+      clippyAlwaysOnTop: _clippyAlwaysOnTop,
+      chatAlwaysOnTop: _chatAlwaysOnTop,
+      uiDesign: _uiDesign,
+      ...modelSettings
+    } = mainChatSettings;
+    return JSON.stringify(modelSettings);
+  }, [mainChatSettings]);
+
   const getSystemPrompt = useCallback(() => {
     return buildSessionSystemPrompt(
       mainChatSettings,
@@ -357,10 +369,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       });
       setIsModelLoaded(false);
     }
-  }, [
-    mainChatSettings,
-    models,
-  ]);
+  }, [modelSettingsSignature, models]);
 
   // If selectedModel is undefined or not available, set it to the first downloaded model
   useEffect(() => {

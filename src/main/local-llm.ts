@@ -275,11 +275,12 @@ async function launch(args: {
 
 function toStatus(current: Running | null): LocalLlmStatus {
   if (!current?.ready) {
-    return { ready: false };
+    return { ready: false, loading: pendingStart !== null };
   }
 
   return {
     ready: true,
+    loading: pendingStart !== null,
     backend: current.backend,
     model: path.basename(current.modelPath),
     contextSize: current.contextSize,

@@ -111,6 +111,11 @@ export const SettingsAdvanced: React.FC = () => {
             <button
               onClick={() => {
                 clippyApi.setState("settings.disableSound", soundEnabled);
+                if (soundEnabled) {
+                  // Muting: Clippy "hears" it once.
+                  setAnimationKey("");
+                  window.setTimeout(() => setAnimationKey("Hearing"), 0);
+                }
               }}
             >
               {soundEnabled ? "Mute Sound" : "Unmute Sound"}

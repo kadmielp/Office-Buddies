@@ -224,7 +224,9 @@ export function getAnimationKeys(pack: AgentPack): string[] {
 }
 
 export function isDisallowedChatAnimationKey(key: string): boolean {
-  return /^hide/i.test(key);
+  // Idle/DeepIdle clips are played automatically when the buddy is resting;
+  // offering them in chat makes small models invent "[IdleGreeting]"-style keys.
+  return /^(hide|idle|deepidle)/i.test(key);
 }
 
 export function getChatAnimationKeys(agentName?: string): string[] {

@@ -134,7 +134,7 @@ export type DownloadState = {
   state: "progressing" | "completed" | "cancelled" | "interrupted";
 };
 
-export const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the user's request: [LIST OF ANIMATIONS]. Use only one keyword, and only at the very beginning of your response. Always start with one.`;
+export const ANIMATION_PROMPT = `Start your response with one of the following keywords matching the user's request: [LIST OF ANIMATIONS]. Copy the keyword exactly as written, brackets included, and never invent or modify one. Use only one keyword, and only at the very beginning of your response. Always start with one.`;
 export const DEFAULT_SYSTEM_PROMPT = `You are [AGENT_NAME], a helpful local desktop assistant running on the user's computer.
 Personality: [AGENT_PERSONALITY]
 Appearance context: [AGENT_APPEARANCE]

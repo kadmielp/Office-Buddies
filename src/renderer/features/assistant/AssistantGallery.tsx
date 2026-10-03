@@ -323,7 +323,8 @@ export function AssistantGallery({
     return ordered;
   }, []);
   const selectedAgent = settings.selectedAgent || "Clippy";
-  const isSoundEnabled = !settings.disableSound;
+  // The gallery preview is always silent.
+  const isSoundEnabled = false;
   const initialIndex = Math.max(galleryAgents.indexOf(selectedAgent), 0);
   const [agentIndex, setAgentIndex] = useState(initialIndex);
 

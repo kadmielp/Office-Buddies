@@ -491,6 +491,7 @@ export function Clippy() {
 
       if (!agentPack.animations[key]) {
         log("Animation not found", { key, agent: agentPack.name });
+        runAnimation("Default");
         onComplete?.();
         return;
       }
@@ -1281,21 +1282,14 @@ export function Clippy() {
       ) ?? "Default";
     let isCancelled = false;
 
-    const playProcessingLoop = () => {
+    // Play once, then rest on Default until the work finishes.
+    runAnimation(processingAnimationKey, () => {
       if (isCancelled) {
         return;
       }
 
-      runAnimation(processingAnimationKey, () => {
-        if (isCancelled) {
-          return;
-        }
-
-        playProcessingLoop();
-      });
-    };
-
-    playProcessingLoop();
+      runAnimation("Default");
+    });
 
     return () => {
       isCancelled = true;
@@ -1334,20 +1328,13 @@ export function Clippy() {
 
     let isCancelled = false;
 
-    const playLoop = () => {
+    // Play once, then rest on Default.
+    runAnimation(loopKey, () => {
       if (isCancelled) {
         return;
       }
-
-      runAnimation(loopKey, () => {
-        if (isCancelled) {
-          return;
-        }
-        playLoop();
-      });
-    };
-
-    playLoop();
+      runAnimation("Default");
+    });
 
     return () => {
       isCancelled = true;

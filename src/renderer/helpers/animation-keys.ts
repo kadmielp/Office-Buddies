@@ -65,6 +65,17 @@ export function createAnimationResolver(
       const resolved = byNormalized.get(normalizeAnimationToken(candidate));
       if (resolved) return resolved;
     }
+
+    // Models often prefix real keys ("IdleGestureUp" -> "GestureUp").
+    const stripped = normalized.replace(/^(deepidle|idle)/, "");
+    if (stripped && stripped !== normalized) {
+      const direct = byNormalized.get(stripped);
+      if (direct) return direct;
+      for (const candidate of ANIMATION_ALIASES[stripped] ?? []) {
+        const resolved = byNormalized.get(normalizeAnimationToken(candidate));
+        if (resolved) return resolved;
+      }
+    }
     return null;
   };
 }

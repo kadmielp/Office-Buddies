@@ -36,6 +36,28 @@ function filterRemoteModelsByProvider(
   });
 }
 
+function Spinner() {
+  return (
+    <>
+      <style>{"@keyframes ob-spin{to{transform:rotate(360deg)}}"}</style>
+      <span
+        role="status"
+        aria-label="Loading model"
+        style={{
+          display: "inline-block",
+          width: 12,
+          height: 12,
+          verticalAlign: "middle",
+          border: "2px solid currentColor",
+          borderTopColor: "transparent",
+          borderRadius: "50%",
+          animation: "ob-spin 0.8s linear infinite",
+        }}
+      />
+    </>
+  );
+}
+
 export const SettingsModel: React.FC = () => {
   const { models, settings } = useSharedState();
   const { setAnimationKey } = useChat();
@@ -62,7 +84,7 @@ export const SettingsModel: React.FC = () => {
         .catch(() => {});
 
     void refresh();
-    const timer = window.setInterval(refresh, 2000);
+    const timer = window.setInterval(refresh, 1000);
 
     return () => {
       cancelled = true;
@@ -86,7 +108,14 @@ export const SettingsModel: React.FC = () => {
     const model = models?.[modelKey as keyof typeof models];
 
     return {
-      default: model?.name === settings.selectedModel ? "ｘ" : "",
+      default:
+        model?.name !== settings.selectedModel ? (
+          ""
+        ) : selectedProvider === "local" && localStatus.loading ? (
+          <Spinner />
+        ) : (
+          "ｘ"
+        ),
       name: model?.name,
       size: model?.size,
       downloaded: model.downloaded ? "Yes" : "No",
@@ -470,7 +499,11 @@ export const SettingsModel: React.FC = () => {
             </select>
           </div>
           <p style={{ marginBottom: 0 }}>
-            {localStatus.ready
+            {localStatus.loading ? (
+              <>
+                <Spinner /> Loading the model. This can take a moment.
+              </>
+            ) : localStatus.ready
               ? `Running ${localStatus.model} on ${localStatus.backend === "cpu" ? "the CPU" : `the GPU (${localStatus.backend})`}.`
               : "No model is running yet."}{" "}
             If the GPU runs out of memory, Office Buddies switches to the CPU

@@ -5,6 +5,8 @@ export const DEFAULT_LOCAL_CONTEXT_SIZE = 8192;
 
 export type LocalLlmStatus = {
   ready: boolean;
+  // True while a model is starting up (the engine is not usable yet).
+  loading?: boolean;
   backend?: Exclude<LocalBackend, "auto">;
   model?: string;
   contextSize?: number;

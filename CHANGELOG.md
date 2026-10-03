@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-10-03
+
+### Added
+
+- Animation Studio: a Toggle Divider button draws a line above the selected frames so you can separate animation groups. The marker is saved with the frame.
+
+### Changed
+
+- Standardized animation names across agents: `Goodbye`, `Greeting`, `Thinking`, `Hearing` and `DoMagic` replace their variants, and `RestPose` is now an `Idle` clip.
+- Merged split animations into one: `GetAttention`, the `Look*` family, `Move*`, `Read` and `Write` now play their Continued, Blink and Return parts as optional branches of a single animation.
+
+### Fixed
+
+- About 50 animations (including idle clips) looped forever and could freeze the idle cycle. They now have a chance to exit through a wind-down.
+
+
 ## [0.8.1] - 2026-10-03
 
 ### Fixed

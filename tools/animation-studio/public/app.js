@@ -89,6 +89,7 @@ const elements = {
   selectAllFramesBtn: document.getElementById("selectAllFramesBtn"),
   invertFramesBtn: document.getElementById("invertFramesBtn"),
   clearBranchFieldsBtn: document.getElementById("clearBranchFieldsBtn"),
+  toggleDividerBtn: document.getElementById("toggleDividerBtn"),
 };
 
 const mapCtx = elements.mapCanvas.getContext("2d");
@@ -1506,6 +1507,9 @@ function renderFrameList() {
     const option = document.createElement("option");
     option.value = String(index);
     option.textContent = describeFrame(frame, index);
+    if (frame?.divider && index > 0) {
+      option.classList.add("divider-before");
+    }
     if (state.selectedFrameIndices.includes(index)) {
       option.selected = true;
     }
@@ -2550,6 +2554,32 @@ function bindEvents() {
     state.selectedFrameIndex = selected[0];
     renderFrameList();
     setStatus(`Inverted ${selected.length} selected frame(s)`);
+  });
+
+  elements.toggleDividerBtn.addEventListener("click", () => {
+    const frames = getCurrentFrames();
+    const selected = getSelectedFrameIndices();
+    if (!selected.length) {
+      setStatus("Select at least 1 frame");
+      return;
+    }
+
+    pushHistorySnapshot();
+    const allMarked = selected.every((index) => frames[index].divider);
+    selected.forEach((index) => {
+      if (allMarked) {
+        delete frames[index].divider;
+      } else {
+        frames[index].divider = true;
+      }
+    });
+
+    renderFrameList();
+    setStatus(
+      allMarked
+        ? `Removed divider above ${selected.length} frame(s)`
+        : `Added divider above ${selected.length} frame(s)`,
+    );
   });
 
   elements.clearBranchFieldsBtn.addEventListener("click", () => {

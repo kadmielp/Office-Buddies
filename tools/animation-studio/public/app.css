@@ -166,6 +166,14 @@ textarea {
   min-width: 0;
 }
 
+.frame-action-grid .frame-action-wide {
+  grid-column: 1 / -1;
+}
+
+#frameList option.divider-before {
+  border-top: 2px solid #808080;
+}
+
 .frame-action-grid > * {
   margin-top: 0;
 }

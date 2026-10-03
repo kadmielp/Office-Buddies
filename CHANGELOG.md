@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-03
+
+### Added
+
+- Local models now run on a bundled llama.cpp server (CPU, Vulkan and CUDA) instead of node-llama-cpp. New Runtime and Context window settings, automatic fallback to the CPU if a GPU runtime fails, and a working Stop for streaming replies.
+- The model list and the Options page show a spinner while a local model is still loading.
+- Animation Studio: branching is clearer and links stay stable when you edit animations.
+- The buddy animates while chatting.
+- Muting sound makes the buddy play `Hearing` once.
+- Chat window opens wider by default, and About links to the repository.
+
+### Changed
+
+- "Finished" agent notifications dismiss themselves after 15 seconds if nobody clicks them. "Needs your input" cards stay until answered.
+- Processing and proactive-message animations play once instead of looping.
+- The Assistant Gallery preview is silent.
+
+### Fixed
+
+- The model no longer reloads (and the buddy no longer restarts) when you toggle sound or other cosmetic settings.
+- Chat animation cues from small models: `Idle*` clips are no longer offered in chat, prefixed cues like `[IdleGestureUp]` resolve to the real clip, and missing clips fall back to `Default`.
+- Chat history stays template-safe.
+
 ## [0.7.3] - 2026-10-03
 
 ### Added

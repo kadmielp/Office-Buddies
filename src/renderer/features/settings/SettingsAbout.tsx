@@ -41,6 +41,12 @@ export const SettingsAbout: React.FC = () => {
         This app is a tribute to the assistant era and is <i>not</i> affiliated
         with, endorsed by, or sponsored by Microsoft.
       </p>
+      <p>
+        Source code and releases:{" "}
+        <a href="https://github.com/kadmielp/Office-Buddies" target="_blank">
+          github.com/kadmielp/Office-Buddies
+        </a>
+      </p>
       <h3>Acknowledgments</h3>
       <p>
         Office Buddies began as a fork of{" "}

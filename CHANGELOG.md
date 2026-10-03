@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-10-03
+
+### Fixed
+
+- Release builds: the Windows build now downloads the llama.cpp runtimes, and macOS/Linux builds no longer fail when they are missing (they ship without the local engine for now). 0.8.0 failed to build and was never published.
+
 ## [0.8.0] - 2026-10-03
 
 ### Added

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-10-09
+
+### Changed
+
+- Win11 theme: the speech balloon close button now uses the Windows 11 dismiss icon with the title-bar hover and pressed states.
+- Win11 theme: mini chat messages render markdown with proper paragraph, list and heading spacing.
+- The mini chat balloon can grow taller and scrolls to the newest message as you send or as a reply streams in.
+- Updated production dependencies and GitHub Actions.
+
 ## [0.8.2] - 2026-10-03
 
 ### Added

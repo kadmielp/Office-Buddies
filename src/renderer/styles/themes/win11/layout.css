@@ -204,6 +204,10 @@ table.interactive.app-table tbody tr[aria-selected="true"] > :first-child {
   cursor: default;
 }
 
+.buddy-speech-close-glyph {
+  display: none;
+}
+
 .buddy-speech-close::before {
   content: "";
   position: absolute;

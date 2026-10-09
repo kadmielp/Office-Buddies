@@ -1437,7 +1437,9 @@ export function Clippy() {
             aria-label="Close mini chat"
             onClick={closeMiniChat}
           >
-            x
+            <span className="buddy-speech-close-glyph" aria-hidden="true">
+              x
+            </span>
           </button>
           {displayedMiniChatMessages.length > 0 && (
             <div
@@ -1647,7 +1649,9 @@ export function Clippy() {
             aria-label="Close message"
             onClick={closeProactiveSpeech}
           >
-            x
+            <span className="buddy-speech-close-glyph" aria-hidden="true">
+              x
+            </span>
           </button>
           <div className="buddy-speech-content">
             <Markdown
@@ -1736,7 +1740,9 @@ export function Clippy() {
             aria-label="Close buddy message"
             onClick={closeBuddySpeech}
           >
-            x
+            <span className="buddy-speech-close-glyph" aria-hidden="true">
+              x
+            </span>
           </button>
           <div className="buddy-speech-content">
             <Markdown

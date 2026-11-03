@@ -9,7 +9,7 @@
     "prepare": "node scripts/prepare-assets.mjs"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.530",
+    "@remotion/cli": "^4.0.540",
     "@remotion/transitions": "^4.0.530",
     "@types/react": "^19.3.0",
     "react": "^19.3.0",

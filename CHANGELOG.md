@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-11-08
+
+### Fixed
+
+- Maritaca and other OpenAI-compatible providers: models that only accept the default temperature no longer fail with a 400 error. The request is retried without the temperature setting.
+
 ## [0.8.3] - 2026-10-09
 
 ### Changed

@@ -195,6 +195,44 @@ async function fetchJson(url: string, headers?: Record<string, string>) {
   }
 }
 
+// Some models (e.g. reasoning models on Maritaca/OpenAI) only accept the
+// default temperature. Retry once without it when the provider rejects it.
+async function postChatCompletion(
+  endpoint: string,
+  headers: Record<string, string>,
+  body: Record<string, unknown>,
+  signal?: AbortSignal,
+): Promise<Response> {
+  const send = (payload: Record<string, unknown>) =>
+    fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+      signal,
+    });
+
+  const response = await send(body);
+  if (response.ok) return response;
+
+  const errorText = await response.text();
+  if (
+    response.status === 400 &&
+    body.temperature !== undefined &&
+    /temperature/i.test(errorText)
+  ) {
+    const { temperature: _omit, ...withoutTemperature } = body;
+    const retry = await send(withoutTemperature);
+    if (retry.ok) return retry;
+    throw new Error(
+      `Provider request failed (${retry.status}) at ${endpoint}: ${await retry.text()}`,
+    );
+  }
+
+  throw new Error(
+    `Provider request failed (${response.status}) at ${endpoint}: ${errorText}`,
+  );
+}
+
 async function promptOpenAiCompatible(args: {
   endpoint: string;
   apiKey: string;
@@ -231,18 +269,7 @@ async function promptOpenAiCompatible(args: {
     body.metadata = { reply_to: "bubble" };
   }
 
-  const response = await fetch(args.endpoint, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(
-      `Provider request failed (${response.status}) at ${args.endpoint}: ${body}`,
-    );
-  }
+  const response = await postChatCompletion(args.endpoint, headers, body);
 
   const payload = await response.json();
   return getOpenAiCompatibleText(payload);
@@ -405,19 +432,12 @@ async function* streamOpenAiCompatible(args: {
     body.metadata = { reply_to: "bubble" };
   }
 
-  const response = await fetch(args.endpoint, {
-    method: "POST",
+  const response = await postChatCompletion(
+    args.endpoint,
     headers,
-    body: JSON.stringify(body),
-    signal: args.signal,
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(
-      `Provider request failed (${response.status}) at ${args.endpoint}: ${body}`,
-    );
-  }
+    body,
+    args.signal,
+  );
 
   if (!response.body) {
     throw new Error("No response body");

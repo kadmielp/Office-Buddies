@@ -19,6 +19,7 @@ type StreamAssistantReplyArgs = {
   history: Message[];
   input: string;
   requestUUID: string;
+  hands?: boolean;
   onResponding?: () => void;
   onChunk: (content: string) => void;
   onAnimationKey?: (animationKey: string) => void;
@@ -30,6 +31,7 @@ export async function streamAssistantReply({
   history,
   input,
   requestUUID,
+  hands,
   onResponding,
   onChunk,
   onAnimationKey,
@@ -64,6 +66,7 @@ export async function streamAssistantReply({
     history,
     input,
     requestUUID,
+    hands,
   });
 
   const resolve = createAnimationResolver(getChatAnimationKeys(selectedAgent));

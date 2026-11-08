@@ -6,6 +6,8 @@ import { useChat } from "../../contexts/ChatContext";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { abortProviderRequest } from "../../ai-provider-client";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
+import { useBuddyRequest } from "../../helpers/buddy-request";
+import { AgentQueueCard } from "../agents/AgentQueueCard";
 
 export function Chat() {
   const { settings } = useSharedState();
@@ -18,6 +20,7 @@ export function Chat() {
     isModelLoaded,
   } = useChat();
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const buddyRequest = useBuddyRequest();
   const [streamingMessageContent, setStreamingMessageContent] =
     useState<string>("");
   const [lastRequestUUID, setLastRequestUUID] = useState<string>(
@@ -76,6 +79,7 @@ export function Chat() {
         history,
         input: message,
         requestUUID,
+        hands: !!settings.handsEnabled,
         onResponding: () => setStatus("responding"),
         onChunk: (content) => setStreamingMessageContent(content),
         onAnimationKey: (animationKey) => setAnimationKey(animationKey),
@@ -129,6 +133,17 @@ export function Chat() {
           />
         )}
       </div>
+      {buddyRequest && (
+        <div className="chat-buddy-request">
+          <AgentQueueCard
+            item={buddyRequest}
+            position={1}
+            total={1}
+            onPrevious={() => {}}
+            onNext={() => {}}
+          />
+        </div>
+      )}
       <ChatInput onSend={handleSendMessage} onAbort={handleAbortMessage} />
       <div className="status-bar chat-status-bar">
         <p className="status-bar-field">{statusText}</p>

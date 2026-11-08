@@ -15,7 +15,7 @@ export const MARITACA_BASE_URL = "https://chat.maritaca.ai/api";
 
 export const OPENCLAW_DEFAULT_MODEL = HARNESS_PROVIDERS.openclaw.defaultModel;
 
-type RemoteProvider =
+export type RemoteProvider =
   | "local"
   | "openai"
   | "gemini"
@@ -721,4 +721,158 @@ export async function promptRemoteProvider(args: {
 
   const payload = await response.json();
   return getGeminiText(payload);
+}
+
+// ---------- Tool calling (computer use) ----------
+
+export interface ToolCall {
+  id: string;
+  type: "function";
+  function: { name: string; arguments: string };
+}
+
+export interface ToolChatMessage {
+  role: "system" | "user" | "assistant" | "tool";
+  content: string | null | Array<Record<string, unknown>>;
+  tool_calls?: ToolCall[];
+  tool_call_id?: string;
+}
+
+export interface ToolDefinition {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
+export const TOOL_CAPABLE_PROVIDERS = [
+  "local",
+  "openai",
+  "maritaca",
+  "openclaw",
+  "hermes",
+] as const;
+
+export function isToolCapableProvider(provider: string): boolean {
+  return (TOOL_CAPABLE_PROVIDERS as readonly string[]).includes(provider);
+}
+
+async function getOpenAiCompatibleTarget(
+  provider: RemoteProvider,
+  settings: SettingsState,
+) {
+  if (provider === "local") {
+    const endpoint = await ensureLocalModel(settings);
+    return {
+      endpoint: endpoint.url,
+      apiKey: endpoint.apiKey,
+      model: "local",
+      maxTokens: 1024,
+      extraBody: {
+        ...getLocalSamplingBody(settings),
+        parallel_tool_calls: false,
+        // Qwen3-style reasoning makes every step take tens of seconds on a
+        // local model; computer use needs short, frequent turns.
+        chat_template_kwargs: { enable_thinking: false },
+      },
+    };
+  }
+
+  if (provider === "openai") {
+    return {
+      endpoint: "https://api.openai.com/v1/chat/completions",
+      apiKey: settings.openAiApiKey || "",
+      model: settings.remoteModel || "",
+      maxTokens: resolveRemoteMaxTokens(settings),
+      extraBody: { parallel_tool_calls: false },
+    };
+  }
+
+  if (provider === "maritaca") {
+    return {
+      endpoint: `${MARITACA_BASE_URL}/chat/completions`,
+      apiKey: settings.maritacaApiKey || "",
+      model: settings.remoteModel || "",
+      maxTokens: resolveRemoteMaxTokens(settings),
+      extraBody: {},
+    };
+  }
+
+  if (isHarnessProvider(provider)) {
+    return {
+      endpoint: getHarnessChatUrl(settings, provider),
+      apiKey: getHarnessApiKey(settings, provider),
+      model: settings.remoteModel || HARNESS_PROVIDERS[provider].defaultModel,
+      maxTokens: resolveRemoteMaxTokens(settings),
+      extraBody: {},
+    };
+  }
+
+  throw new Error(
+    "Computer use needs a Local, OpenAI, Maritaca, OpenClaw or Hermes model for now.",
+  );
+}
+
+// The buddy's chat history in the OpenAI message format, ready for a tool loop.
+export function toToolChatHistory(
+  history: MessageRecord[],
+  includeImages: boolean,
+): ToolChatMessage[] {
+  return toChatHistoryMessages(history, { includeImages }) as ToolChatMessage[];
+}
+
+// One non-streaming chat completion that may answer with tool calls.
+export async function chatWithTools(args: {
+  provider: RemoteProvider;
+  settings: SettingsState;
+  messages: ToolChatMessage[];
+  tools: ToolDefinition[];
+  signal?: AbortSignal;
+}): Promise<{ content: string; toolCalls: ToolCall[] }> {
+  const target = await getOpenAiCompatibleTarget(args.provider, args.settings);
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (target.apiKey && target.apiKey.trim()) {
+    headers.Authorization = `Bearer ${target.apiKey.trim()}`;
+  }
+
+  const response = await postChatCompletion(
+    target.endpoint,
+    headers,
+    {
+      model: target.model,
+      messages: args.messages,
+      tools: args.tools,
+      tool_choice: "auto",
+      temperature: args.settings.temperature,
+      max_tokens: target.maxTokens,
+      stream: false,
+      ...target.extraBody,
+    },
+    args.signal,
+  );
+
+  const payload = await response.json();
+  const message = payload?.choices?.[0]?.message ?? {};
+  const toolCalls: ToolCall[] = Array.isArray(message.tool_calls)
+    ? message.tool_calls
+        .filter((call: any) => call?.function?.name)
+        .map((call: any, index: number) => ({
+          id: call.id || `call_${Date.now()}_${index}`,
+          type: "function" as const,
+          function: {
+            name: call.function.name,
+            arguments:
+              typeof call.function.arguments === "string"
+                ? call.function.arguments
+                : JSON.stringify(call.function.arguments ?? {}),
+          },
+        }))
+    : [];
+
+  return { content: getOpenAiCompatibleText(payload), toolCalls };
 }

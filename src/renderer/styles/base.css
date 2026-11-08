@@ -247,6 +247,25 @@ body {
   gap: 8px;
 }
 
+/* The buddy's Allow or question card, repeated above the chat input
+   (the chat window covers the buddy's own balloon). */
+.chat-buddy-request {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.chat-buddy-request .buddy-speech {
+  position: static;
+  width: min(100%, 420px);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.chat-buddy-request .buddy-speech-tail {
+  display: none;
+}
+
 .chat-transcript {
   flex: 1 1 auto;
   min-height: 0;
@@ -513,7 +532,10 @@ body {
   border-radius: 11px;
   background: #d83b01;
   color: #fff;
-  font: 700 12px/18px Tahoma, "Segoe UI", sans-serif;
+  font:
+    700 12px/18px Tahoma,
+    "Segoe UI",
+    sans-serif;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   cursor: pointer;
 }

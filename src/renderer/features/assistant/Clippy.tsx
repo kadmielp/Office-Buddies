@@ -25,6 +25,7 @@ import { Message } from "../chat/Message";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
 import { getThemeIcons } from "../../theme/theme";
 import { AgentQueueCard } from "../agents/AgentQueueCard";
+import { setBuddyRequest } from "../../helpers/buddy-request";
 import type {
   AgentEventKind,
   AgentQueueItem,
@@ -300,7 +301,12 @@ export function Clippy() {
     0,
     agentQueue.findIndex((item) => item.id === agentCardId),
   );
-  const agentCardItem = isBalloonBusy ? null : agentQueue[agentCardIndex];
+  // The buddy's own question or Allow card (computer use) blocks its task, so it
+  // takes over the balloon even while the mini chat is open.
+  const buddyRequest = agentQueue.find((item) => item.source === "buddy");
+  useEffect(() => setBuddyRequest(buddyRequest ?? null), [buddyRequest]);
+  const agentCardItem =
+    buddyRequest ?? (isBalloonBusy ? null : agentQueue[agentCardIndex]);
   const hasSpeechBubble = isBalloonBusy || Boolean(agentCardItem);
 
   const clearFrameTimeout = useCallback(() => {
@@ -659,6 +665,7 @@ export function Clippy() {
         history,
         input: prompt,
         requestUUID: crypto.randomUUID(),
+        hands: !!settings.handsEnabled,
         onResponding: () => setStatus("responding"),
         onChunk: (content) => setMiniChatStreamingContent(content),
         onAnimationKey: (animationKey) => setAnimationKey(animationKey),
@@ -1374,7 +1381,7 @@ export function Clippy() {
         pointerEvents: isAssistantGalleryOpen ? "none" : "auto",
       }}
     >
-      {isMiniChatOpen && (
+      {isMiniChatOpen && !buddyRequest && (
         <div
           className={`buddy-speech buddy-speech-mini-chat app-no-drag ${
             miniChatScreenshots.length > 0 || isCapturingMiniChatScreenshot
@@ -1642,7 +1649,7 @@ export function Clippy() {
           <div className="buddy-speech-tail" />
         </div>
       )}
-      {!isMiniChatOpen && proactiveSpeech && (
+      {!isMiniChatOpen && !buddyRequest && proactiveSpeech && (
         <div className="buddy-speech app-no-drag" aria-live="polite">
           <button
             className="buddy-speech-close"
@@ -1733,7 +1740,7 @@ export function Clippy() {
           <div className="buddy-speech-tail" />
         </div>
       )}
-      {!isMiniChatOpen && buddySpeech && (
+      {!isMiniChatOpen && !buddyRequest && buddySpeech && (
         <div className="buddy-speech app-no-drag" aria-live="polite">
           <button
             className="buddy-speech-close"

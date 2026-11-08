@@ -177,7 +177,7 @@ const AgentQuestionCard: React.FC<AgentQueueCardProps> = ({
             </button>
           ))
         )}
-        <HandoffOption item={item} />
+        {item.source !== "buddy" && <HandoffOption item={item} />}
       </div>
       {total > 1 && (
         <div className="buddy-agent-card-actions">
@@ -240,7 +240,7 @@ const AgentPermissionCard: React.FC<AgentQueueCardProps> = ({
           <span className="buddy-speech-option-dot" />
           Deny
         </button>
-        <HandoffOption item={item} />
+        {item.source !== "buddy" && <HandoffOption item={item} />}
       </div>
       {total > 1 && (
         <div className="buddy-agent-card-actions">

@@ -175,6 +175,7 @@ const clippyApi: ClippyApi = {
     systemPrompt: string;
     history: ChatWithMessages["messages"];
     requestUUID?: string;
+    hands?: boolean;
     onChunk?: (chunk: string) => void;
     onDone?: () => void;
     onError?: (error: string) => void;
@@ -217,6 +218,7 @@ const clippyApi: ClippyApi = {
         systemPrompt: payload.systemPrompt,
         history: payload.history,
         requestUUID: payload.requestUUID,
+        hands: payload.hands,
       });
     } else {
       return ipcRenderer.invoke(IpcMessages.AI_PROMPT, payload);
@@ -225,6 +227,8 @@ const clippyApi: ClippyApi = {
 
   abortRemoteProvider: (requestUUID: string) =>
     ipcRenderer.send(IpcMessages.AI_ABORT, requestUUID),
+  isHandsAvailable: (): Promise<boolean> =>
+    ipcRenderer.invoke(IpcMessages.HANDS_AVAILABLE),
   startLocalModel: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_START),
   stopLocalModel: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_STOP),
   getLocalModelStatus: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_STATUS),

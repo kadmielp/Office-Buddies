@@ -148,11 +148,14 @@ export type ClippyApi = {
     systemPrompt: string;
     history: MessageRecord[];
     requestUUID?: string;
+    hands?: boolean;
     onChunk?: (chunk: string) => void;
     onDone?: () => void;
     onError?: (error: string) => void;
   }) => Promise<string> | void;
   abortRemoteProvider: (requestUUID: string) => void;
+  // Computer use: whether the native hands helper is present (Windows)
+  isHandsAvailable: () => Promise<boolean>;
   // Local model (bundled llama.cpp)
   startLocalModel: () => Promise<LocalLlmStatus>;
   stopLocalModel: () => Promise<void>;

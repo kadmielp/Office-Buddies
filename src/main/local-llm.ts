@@ -174,6 +174,8 @@ async function launch(args: {
     "--parallel",
     "1",
     "--no-webui",
+    // Chat templates with tool-call support (computer use).
+    "--jinja",
   ];
 
   if (backend !== "cpu") {

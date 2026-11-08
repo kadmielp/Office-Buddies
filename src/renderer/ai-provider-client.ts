@@ -132,6 +132,8 @@ export async function* promptStreamingWithProvider(args: {
   history: Message[];
   input: string;
   requestUUID: string;
+  // Run as a computer-use task (main process tool loop) instead of plain chat.
+  hands?: boolean;
 }): AsyncGenerator<string> {
   const provider = (args.settings.aiProvider || "local") as ProviderName;
 
@@ -142,7 +144,8 @@ export async function* promptStreamingWithProvider(args: {
     if (
       provider === "local" ||
       provider === "openai" ||
-      isHarnessProvider(provider)
+      isHarnessProvider(provider) ||
+      args.hands
     ) {
       const chunks: string[] = [];
       let isDone = false;
@@ -162,6 +165,7 @@ export async function* promptStreamingWithProvider(args: {
         systemPrompt: args.systemPrompt,
         history,
         requestUUID: args.requestUUID,
+        hands: args.hands,
         onChunk: (chunk) => {
           chunks.push(chunk);
           if (resolveNext) {

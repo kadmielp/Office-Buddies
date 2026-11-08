@@ -22,6 +22,12 @@ import {
 import { startProactiveServer } from "./proactive-server";
 import { createTray, destroyTray, isTrayQuitInProgress } from "./tray";
 
+// Development only: run a separate copy (its own settings, models and
+// instance lock) next to an installed Office Buddies.
+if (!app.isPackaged && process.env.OFFICE_BUDDIES_USER_DATA) {
+  app.setPath("userData", process.env.OFFICE_BUDDIES_USER_DATA);
+}
+
 // Only one buddy may run: a second copy couldn't open the agent listener's
 // port, so it hands over to the running one and quits.
 const hasInstanceLock = !shouldQuit && app.requestSingleInstanceLock();

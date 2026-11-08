@@ -183,6 +183,32 @@ function holdRequest(
   });
 }
 
+// The buddy's own requests (computer use) reuse the same balloon cards. The
+// response is the decision itself: { allow } or { answers }.
+const inAppAdapter: AgentAdapter = {
+  id: "buddy",
+  label: "Office Buddies",
+  normalize: () => null,
+  answerQuestion: (_item, _toolInput, answers) => ({ answers }),
+  decidePermission: (_item, allow) => ({ allow }),
+  sessionUrl: () => null,
+};
+
+// Shows a permission or question card for the buddy itself and resolves with
+// the answer, or null when it timed out, was dismissed or the task stopped.
+export function requestInAppDecision(
+  item: AgentQueueItem,
+  signal?: AbortSignal,
+): Promise<AgentEventResponse> {
+  if (signal?.aborted) {
+    return Promise.resolve(null);
+  }
+
+  return holdRequest(inAppAdapter, item, {}, (callback) =>
+    signal?.addEventListener("abort", callback, { once: true }),
+  );
+}
+
 // Process names of the apps each kind of session runs in.
 const HOST_PROCESS_NAMES: Record<AgentHost, string[]> = {
   "claude-desktop": ["claude"],

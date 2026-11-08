@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { useChat } from "../../contexts/ChatContext";
@@ -15,6 +17,13 @@ export const SettingsAdvanced: React.FC = () => {
     (model) => model.downloaded,
   ).length;
   const hasDownloadedLocalModels = downloadedLocalModelCount > 0;
+  const [handsAvailable, setHandsAvailable] = useState(false);
+
+  useEffect(() => {
+    if (isWindows) {
+      void clippyApi.isHandsAvailable().then(setHandsAvailable);
+    }
+  }, [isWindows]);
 
   const handleDeleteAllModels = async () => {
     if (!hasDownloadedLocalModels) {
@@ -38,6 +47,25 @@ export const SettingsAdvanced: React.FC = () => {
 
   return (
     <div>
+      {isWindows && (
+        <fieldset>
+          <legend>Computer use (preview)</legend>
+          <Checkbox
+            id="handsEnabled"
+            label={`Let ${settings.selectedAgent || "Clippy"} use apps on this PC`}
+            checked={!!settings.handsEnabled}
+            disabled={!handsAvailable}
+            onChange={(checked) => {
+              clippyApi.setState("settings.handsEnabled", checked);
+            }}
+          />
+          <p style={{ marginBottom: 0 }}>
+            {handsAvailable
+              ? "In chat, your buddy can open apps and settings, read windows, click and type. Deleting, sending, buying and similar actions always ask you first. Works best with OpenAI or a local model of 4B or more (such as Qwen3 4B)."
+              : 'The hands helper is missing from this build. Run "npm run build:hands" and restart.'}
+          </p>
+        </fieldset>
+      )}
       <fieldset>
         <legend>Startup</legend>
         <Checkbox

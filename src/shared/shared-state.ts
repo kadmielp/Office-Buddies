@@ -95,6 +95,8 @@ export interface SettingsState {
   // Claude's notification levels before the buddy changed them.
   claudeNotificationLevelsBackup?: Record<string, string>;
   agentShowFinished?: Partial<Record<"claude-code" | "codex", boolean>>;
+  // Computer use (Windows): the buddy may read windows, click and type.
+  handsEnabled?: boolean;
   useKnowledgeAtStart?: boolean;
   useKnowledgeInMiniChat?: boolean;
   knowledgeFiles?: KnowledgeFileSource[];

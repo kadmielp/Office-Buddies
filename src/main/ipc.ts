@@ -1,3 +1,5 @@
+import { runHandsTask } from "./computer-use/loop";
+import { isHandsAvailable } from "./computer-use/hands-client";
 import {
   app,
   clipboard,
@@ -260,6 +262,8 @@ export function setupIpcListeners() {
       }),
   );
 
+  ipcMain.handle(IpcMessages.HANDS_AVAILABLE, () => isHandsAvailable());
+
   ipcMain.handle(IpcMessages.LOCAL_LLM_START, () =>
     loadLocalModel(getStateManager().getSettings()),
   );
@@ -287,19 +291,32 @@ export function setupIpcListeners() {
         systemPrompt: string;
         history: ChatWithMessages["messages"];
         requestUUID: string;
+        // Let the buddy use the computer for this message (Settings > Advanced).
+        hands?: boolean;
       },
     ) => {
       const controller = new AbortController();
       promptAbortControllers.set(payload.requestUUID, controller);
 
       try {
-        const stream = promptStreamingRemoteProvider({
-          provider: payload.provider as any,
-          settings: getStateManager().getSettings(),
-          systemPrompt: payload.systemPrompt,
-          history: payload.history,
-          signal: controller.signal,
-        });
+        const settings = getStateManager().getSettings();
+        const useHands =
+          payload.hands && settings.handsEnabled && isHandsAvailable();
+        const stream = useHands
+          ? runHandsTask({
+              provider: payload.provider as any,
+              settings,
+              systemPrompt: payload.systemPrompt,
+              history: payload.history,
+              signal: controller.signal,
+            })
+          : promptStreamingRemoteProvider({
+              provider: payload.provider as any,
+              settings,
+              systemPrompt: payload.systemPrompt,
+              history: payload.history,
+              signal: controller.signal,
+            });
 
         for await (const chunk of stream) {
           event.reply(`clippy_ai_prompt_chunk_${payload.requestUUID}`, {

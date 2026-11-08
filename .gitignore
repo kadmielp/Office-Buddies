@@ -97,3 +97,7 @@ Microsoft.Trusted.Signing.Client
 
 # Prebuilt llama.cpp runtimes (npm run prepare:llama)
 /resources/local_gguf/
+/resources/buddy-hands/
+
+# Computer-use dev harness bundle
+/.harness.cjs

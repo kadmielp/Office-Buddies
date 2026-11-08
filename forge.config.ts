@@ -219,6 +219,10 @@ const config: ForgeConfig = {
       ...(fs.existsSync(path.resolve(__dirname, "resources/local_gguf"))
         ? [path.resolve(__dirname, "resources/local_gguf")]
         : []),
+      // Native hands helper for computer use (Windows), see `npm run build:hands`.
+      ...(fs.existsSync(path.resolve(__dirname, "resources/buddy-hands"))
+        ? [path.resolve(__dirname, "resources/buddy-hands")]
+        : []),
     ],
     junk: true,
     overwrite: true,

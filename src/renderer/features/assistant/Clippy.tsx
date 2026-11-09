@@ -29,6 +29,7 @@ import { AgentQueueCard } from "../agents/AgentQueueCard";
 import { ReplyContent } from "../chat/ReplyContent";
 import { MicButton, VoiceError } from "../../voice/MicButton";
 import { useVoiceInput } from "../../voice/useVoiceInput";
+import { isRecording } from "../../voice/recorder";
 import { setBuddyRequest } from "../../helpers/buddy-request";
 import type {
   AgentEventKind,
@@ -424,6 +425,12 @@ export function Clippy() {
       }
 
       if (!soundKey) {
+        return;
+      }
+
+      // Silent while the microphone is open: the "Hearing" animation (and any
+      // other sound) would get into the recording.
+      if (isRecording()) {
         return;
       }
 

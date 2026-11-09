@@ -793,7 +793,10 @@ namespace OfficeBuddies.Hands
         {
             var json = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             string line;
-            while ((line = Console.In.ReadLine()) != null)
+            // The app writes UTF-8. Console.In would decode it with the console's legacy code page
+            // (850/437), turning "ações" into "a├º├Áes" before it is typed anywhere.
+            var input = new StreamReader(Console.OpenStandardInput(), new UTF8Encoding(false));
+            while ((line = input.ReadLine()) != null)
             {
                 Dictionary<string, object> r;
                 try

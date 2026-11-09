@@ -101,6 +101,8 @@ export interface SettingsState {
   voiceEnabled?: boolean;
   // deviceId of the chosen microphone; empty means the system default.
   voiceMicrophoneId?: string;
+  // Global shortcut that starts and stops listening (Electron accelerator).
+  voiceShortcut?: string;
   useKnowledgeAtStart?: boolean;
   useKnowledgeInMiniChat?: boolean;
   knowledgeFiles?: KnowledgeFileSource[];

@@ -163,6 +163,8 @@ export type ClippyApi = {
   warmVoice: () => Promise<void>;
   transcribeVoice: (pcm: ArrayBuffer) => Promise<VoiceTranscription>;
   onVoiceStatus: (callback: (status: VoiceStatus) => void) => () => void;
+  // The global voice shortcut was pressed.
+  onVoiceShortcut: (callback: () => void) => () => void;
   // Local model (bundled llama.cpp)
   startLocalModel: () => Promise<LocalLlmStatus>;
   stopLocalModel: () => Promise<void>;

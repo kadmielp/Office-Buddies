@@ -14,6 +14,7 @@ import {
   VoiceTranscription,
 } from "../../shared/voice";
 import { getLogger } from "../logger";
+import { getVoiceShortcutStatus } from "./shortcut";
 
 // Local speech-to-text: a whisper.cpp server started on first use and kept
 // running, like the llama.cpp one. Audio never leaves this computer.
@@ -67,10 +68,11 @@ export function getVoiceStatus(): VoiceStatus {
     model: currentModelState(),
     modelName: MODEL.name,
     modelSizeMb: Math.round(MODEL.bytes / 1_000_000),
+    shortcut: getVoiceShortcutStatus(),
   };
 }
 
-function broadcastStatus() {
+export function broadcastStatus() {
   const status = getVoiceStatus();
   for (const window of BrowserWindow.getAllWindows()) {
     if (!window.isDestroyed()) {

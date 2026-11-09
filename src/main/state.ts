@@ -1,3 +1,5 @@
+import { syncVoiceShortcut } from "./voice/shortcut";
+import { broadcastStatus as broadcastVoiceStatus } from "./voice/stt";
 import Store from "electron-store";
 import { safeStorage } from "electron";
 import { randomBytes } from "crypto";
@@ -305,6 +307,14 @@ export class StateManager {
       if (actualValue !== Boolean(nextSettings.startWithWindows)) {
         this.store.set("settings.startWithWindows", actualValue);
       }
+    }
+
+    if (
+      previousSettings.voiceEnabled !== nextSettings.voiceEnabled ||
+      previousSettings.voiceShortcut !== nextSettings.voiceShortcut
+    ) {
+      syncVoiceShortcut();
+      broadcastVoiceStatus();
     }
 
     // Update the menu, which contains state

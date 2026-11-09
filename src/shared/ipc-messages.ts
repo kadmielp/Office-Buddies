@@ -65,6 +65,7 @@ export const IpcMessages = {
   VOICE_DOWNLOAD_MODEL: "clippy_voice_download_model",
   VOICE_WARM: "clippy_voice_warm",
   VOICE_TRANSCRIBE: "clippy_voice_transcribe",
+  VOICE_SHORTCUT: "clippy_voice_shortcut",
   AI_ABORT: "clippy_ai_abort",
   LOCAL_LLM_START: "clippy_local_llm_start",
   LOCAL_LLM_STOP: "clippy_local_llm_stop",

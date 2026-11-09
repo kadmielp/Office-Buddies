@@ -238,6 +238,12 @@ const clippyApi: ClippyApi = {
     ipcRenderer.invoke(IpcMessages.VOICE_TRANSCRIBE, pcm),
   // Several components follow the status, so listeners are added and removed
   // one by one rather than all at once.
+  onVoiceShortcut: (callback: () => void) => {
+    const listener = () => callback();
+    ipcRenderer.on(IpcMessages.VOICE_SHORTCUT, listener);
+    return () =>
+      ipcRenderer.removeListener(IpcMessages.VOICE_SHORTCUT, listener);
+  },
   onVoiceStatus: (callback: (status: VoiceStatus) => void) => {
     const listener = (_event: unknown, status: VoiceStatus) => callback(status);
     ipcRenderer.on(IpcMessages.VOICE_STATUS_UPDATED, listener);

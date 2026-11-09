@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useChat } from "../../contexts/ChatContext";
 import { MicButton, VoiceError } from "../../voice/MicButton";
 import { useVoiceInput } from "../../voice/useVoiceInput";
+import { onChatVoiceToggle } from "../../voice/shortcut-bus";
 export type ChatInputProps = {
   onSend: (message: string) => void;
   onAbort: () => void;
@@ -20,6 +21,11 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     );
     requestAnimationFrame(() => textareaRef.current?.focus());
   });
+
+  // The global voice shortcut uses this microphone while the chat is open.
+  const voiceToggleRef = useRef(voice.toggle);
+  voiceToggleRef.current = voice.toggle;
+  useEffect(() => onChatVoiceToggle(() => voiceToggleRef.current()), []);
 
   const handleSend = useCallback(() => {
     const trimmedMessage = message.trim();

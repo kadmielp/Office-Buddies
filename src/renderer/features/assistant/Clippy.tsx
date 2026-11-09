@@ -30,6 +30,7 @@ import { ReplyContent } from "../chat/ReplyContent";
 import { MicButton, VoiceError } from "../../voice/MicButton";
 import { useVoiceInput } from "../../voice/useVoiceInput";
 import { isRecording } from "../../voice/recorder";
+import { toggleChatVoice } from "../../voice/shortcut-bus";
 import { setBuddyRequest } from "../../helpers/buddy-request";
 import type {
   AgentEventKind,
@@ -609,6 +610,19 @@ export function Clippy() {
       miniChatInputRef.current?.focus();
     });
   }, [clearCopyFeedbackTimeout, clearSpeechTimeout]);
+
+  // Global voice shortcut: the open chat window's microphone, otherwise the
+  // mini chat's (opening it first).
+  const voiceShortcutRef = useRef<() => void>(() => {});
+  voiceShortcutRef.current = () => {
+    if (isChatWindowOpen && toggleChatVoice()) return;
+    if (!isMiniChatOpen) openMiniChat();
+    miniChatVoice.toggle();
+  };
+  useEffect(
+    () => clippyApi.onVoiceShortcut(() => voiceShortcutRef.current()),
+    [],
+  );
 
   const captureMiniChatScreenshot = useCallback(async () => {
     if (!isMiniChatOpen || isCapturingMiniChatScreenshot) {

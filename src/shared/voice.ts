@@ -2,6 +2,15 @@
 
 export const VOICE_SAMPLE_RATE = 16000;
 
+// Press to start listening from any app, press again to stop.
+export const DEFAULT_VOICE_SHORTCUT = "Ctrl+Alt+B";
+
+export interface VoiceShortcutStatus {
+  accelerator: string;
+  registered: boolean;
+  error?: string;
+}
+
 export type VoiceModelState =
   | { state: "missing" }
   | { state: "downloading"; percent: number }
@@ -14,6 +23,7 @@ export interface VoiceStatus {
   model: VoiceModelState;
   modelName: string;
   modelSizeMb: number;
+  shortcut: VoiceShortcutStatus;
 }
 
 // What a recording came back as.

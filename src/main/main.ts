@@ -14,6 +14,7 @@ import {
 } from "./windows";
 import { stopLocalLlm } from "./local-llm";
 import { stopVoice } from "./voice/stt";
+import { syncVoiceShortcut } from "./voice/shortcut";
 import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
 import {
@@ -55,6 +56,7 @@ async function onReady() {
   await createMainWindow();
   await createTray();
   registerGlobalShortcuts();
+  syncVoiceShortcut();
   startProactiveServer();
 }
 

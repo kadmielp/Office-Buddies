@@ -476,7 +476,12 @@ Esc discard, the missing-model message, the Settings section, and the model down
 opening was read as another start (there is now a `starting` state); and the very first status load could falsely
 report the runtime as missing.
 
-**Not yet:** a global push-to-talk shortcut, live partial text, the wake word, dictation into other apps, TTS, and the
+**Global shortcut (added):** **Ctrl+Alt+B** works from any app (it's configurable in Settings, and Ctrl+Alt+Space was
+avoided because Claude Code uses it). Press it to start listening and press it again to stop. If the chat window is open,
+it uses that window's microphone; otherwise it opens the mini chat. Taken or invalid shortcuts show an error. The buddy's
+sounds are muted while the microphone is open. Tested with real global key presses in both cases.
+
+**Not yet:** true hold-to-talk (Electron can't detect the key being released), live partial text, the wake word, dictation into other apps, TTS, and the
 small and large-v3-turbo models. A test with a real voice is still needed: the user's own microphone, not the fake
 device.
 

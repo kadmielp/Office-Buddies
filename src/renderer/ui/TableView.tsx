@@ -110,6 +110,12 @@ export const TableView: React.FC<TableViewProps> = ({
         return;
       }
 
+      // Arrow keys in a dropdown or text field belong to that control.
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.("input, select, textarea, [contenteditable]")) {
+        return;
+      }
+
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
@@ -135,11 +141,13 @@ export const TableView: React.FC<TableViewProps> = ({
     [handleRowSelect, selectedRowIndex, sortedData],
   );
 
+  // Focus once when the table appears, for arrow-key navigation. Never again
+  // on re-render: that stole focus from other controls and scrolled the page.
   useEffect(() => {
-    if (tableRef.current) {
-      tableRef.current.focus();
-    }
+    tableRef.current?.focus({ preventScroll: true });
+  }, []);
 
+  useEffect(() => {
     currentWindow.addEventListener("keydown", handleKeyDown);
 
     return () => {
@@ -257,7 +265,10 @@ export const TableView: React.FC<TableViewProps> = ({
                 <span className="app-table-header-content">
                   <span>{column.header}</span>
                   {sortConfig?.key === column.key && (
-                    <span className="app-table-sort-indicator" aria-hidden="true">
+                    <span
+                      className="app-table-sort-indicator"
+                      aria-hidden="true"
+                    >
                       {sortConfig.direction === "asc" ? "^" : "v"}
                     </span>
                   )}

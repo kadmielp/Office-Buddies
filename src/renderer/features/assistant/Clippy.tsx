@@ -27,6 +27,8 @@ import { abortProviderRequest } from "../../ai-provider-client";
 import { getThemeIcons } from "../../theme/theme";
 import { AgentQueueCard } from "../agents/AgentQueueCard";
 import { ReplyContent } from "../chat/ReplyContent";
+import { MicButton, VoiceError } from "../../voice/MicButton";
+import { useVoiceInput } from "../../voice/useVoiceInput";
 import { setBuddyRequest } from "../../helpers/buddy-request";
 import type {
   AgentEventKind,
@@ -556,6 +558,13 @@ export function Clippy() {
   // The mini chat's request in flight, so Esc, Stop and closing can cancel it
   // (a computer-use task keeps acting on the PC until it is cancelled).
   const miniChatRequestRef = useRef<string | null>(null);
+  // Spoken words land in the mini chat box for review before sending.
+  const miniChatVoice = useVoiceInput((text) => {
+    setMiniChatInput((previous) =>
+      previous.trim() ? `${previous.trimEnd()} ${text}` : text,
+    );
+    requestAnimationFrame(() => miniChatInputRef.current?.focus());
+  });
   const stopMiniChatRequest = useCallback(() => {
     if (miniChatRequestRef.current) {
       abortProviderRequest(settings, miniChatRequestRef.current);
@@ -772,6 +781,12 @@ export function Clippy() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && miniChatVoice.listening) {
+        event.preventDefault();
+        miniChatVoice.cancel();
+        return;
+      }
+
       if (event.key === "Escape" && isMiniChatOpen) {
         event.preventDefault();
         // Working: Esc stops the task and keeps the balloon. Idle: it closes.
@@ -823,6 +838,8 @@ export function Clippy() {
     closeMiniChat,
     isChatWindowOpen,
     isMiniChatOpen,
+    miniChatVoice.state,
+    miniChatVoice.cancel,
     openMiniChat,
     sendMiniChatMessage,
   ]);
@@ -1594,6 +1611,16 @@ export function Clippy() {
             }
             onChange={(event) => setMiniChatInput(event.target.value)}
             onKeyDown={(event) => {
+              if (miniChatVoice.listening) {
+                if (event.key === "Escape" || event.key === "Enter") {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (event.key === "Escape") miniChatVoice.cancel();
+                  else miniChatVoice.toggle();
+                  return;
+                }
+              }
+
               if (event.key === "Escape") {
                 event.preventDefault();
                 closeMiniChat();
@@ -1609,7 +1636,17 @@ export function Clippy() {
                 void sendMiniChatMessage();
               }
             }}
-            placeholder="Start typing... (press Enter to send)"
+            placeholder={
+              miniChatVoice.listening
+                ? "Listening… Enter stops, Esc discards."
+                : miniChatVoice.state === "transcribing"
+                  ? "Writing down what you said…"
+                  : "Start typing... (press Enter to send)"
+            }
+          />
+          <VoiceError
+            voice={miniChatVoice}
+            className="buddy-mini-chat-voice-error"
           />
           <div className="buddy-mini-chat-footer">
             {hasMiniChatKnowledge && (
@@ -1662,6 +1699,11 @@ export function Clippy() {
               </div>
             ) : (
               <div className="buddy-mini-chat-shortcuts">
+                <MicButton
+                  voice={miniChatVoice}
+                  className="buddy-mini-chat-mic"
+                  disabled={isCapturingMiniChatScreenshot}
+                />
                 <span className="buddy-mini-chat-shortcut">
                   <kbd>Ctrl</kbd>
                   <kbd>E</kbd>
@@ -1674,7 +1716,7 @@ export function Clippy() {
                 </span>
                 <span className="buddy-mini-chat-shortcut">
                   <kbd>Esc</kbd>
-                  <span>Close</span>
+                  <span>{miniChatVoice.listening ? "Discard" : "Close"}</span>
                 </span>
               </div>
             )}

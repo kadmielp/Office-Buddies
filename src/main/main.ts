@@ -13,6 +13,7 @@ import {
   showAssistantFromTray,
 } from "./windows";
 import { stopLocalLlm } from "./local-llm";
+import { stopVoice } from "./voice/stt";
 import { setupAutoUpdater } from "./update";
 import { setupAppMenu } from "./menu";
 import {
@@ -70,6 +71,7 @@ app.on("window-all-closed", () => {
 
 app.on("will-quit", () => {
   stopLocalLlm();
+  stopVoice();
   unregisterGlobalShortcuts();
   destroyTray();
 });

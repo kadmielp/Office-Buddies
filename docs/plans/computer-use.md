@@ -435,3 +435,48 @@ to fields), and Qwen3's thinking mode making each step take 20–40 s.
 3. An action log (`actions.jsonl`) and "Always allow for this task" on the Allow card.
 4. A test pass with OpenAI (`gpt-4.1-mini` class) and a 7B+ local model, then compare success rates on 10 fixed tasks
    using `harness.ts`.
+
+## 12. Voice input, part 1 (2026-11-09)
+
+Shipped on `plan/computer-use`. It's off by default under **Settings → Advanced → Voice input (preview)**, Windows only.
+
+- **Runtime:** whisper.cpp `b5454`, **CPU build only** (`npm run prepare:whisper` → `resources/whisper`, packaged
+  through `extraResource`, checksum pinned). The CUDA build is a 685 MB download, so GPU support is a follow-up that
+  could share llama.cpp's CUDA DLLs.
+- **Model:** `ggml-base.bin` (148 MB, multilingual). The app downloads it into its data folder, checks the SHA-256, and
+  retries on connection timeouts. The existing model manager couldn't be reused, because it rejects any download that
+  isn't in its GGUF list.
+- **Server:** `src/main/voice/stt.ts` starts `whisper-server` on first use and keeps it running (`-l auto -nt -bs 1
+  -bo 1`, half the CPU threads, at most 8). It's warmed up when a mic button appears. Whisper's no-speech markers and
+  "- " speaker-turn markers are removed from the text.
+- **Capture:** `src/renderer/voice/recorder.ts` uses `getUserMedia`, a 16 kHz `AudioContext` and an AudioWorklet, and
+  sends 16-bit PCM over IPC. Only one recording runs at a time, with a 60 s limit. Silent recordings are dropped
+  (whisper invents text on silence). Chromium's echo cancellation and noise suppression are off, since they distorted
+  the speech.
+- **UI:** a mic button in the chat window and in the mini chat (`useVoiceInput` and `MicButton`).
+  - Click to record, then click or press Enter to stop. Esc discards the recording.
+  - While it listens, the buddy plays **Hearing**: Clippy puts on headphones. Packs without that animation look up
+    instead.
+  - The text lands in the message box for review; nothing is sent automatically.
+  - Errors show in one line: model missing, microphone blocked, no microphone.
+  - Settings shows the model status with a Download button, plus a microphone picker.
+
+**Tested:** real clips were played through Chromium's fake microphone, so the whole chain ran: button, capture,
+worklet, IPC, whisper, text box.
+
+| Input | Result in the text box |
+|---|---|
+| English (Windows TTS) "Open the calculator and multiply seven by six." | "Open the calculator and multiply 7 by 6." (chat window and mini chat) |
+| Portuguese (Lingua Libre words) "obrigado, você, informação, pão de queijo, ação" | "Obrigado. Você? Informação. Tanto caixa. Ação. Obrigado." (accents intact; "pão de queijo" is a hard isolated phrase for `base`) |
+
+Transcription takes about 1.4–1.6 s for 2–6 s of speech on the CPU. Also checked: the first click right after launch,
+Esc discard, the missing-model message, the Settings section, and the model download with checksum.
+
+**Bugs the tests found, fixed:** the mic was disabled until the chat model loaded; a click while the mic was still
+opening was read as another start (there is now a `starting` state); and the very first status load could falsely
+report the runtime as missing.
+
+**Not yet:** a global push-to-talk shortcut, live partial text, the wake word, dictation into other apps, TTS, and the
+small and large-v3-turbo models. A test with a real voice is still needed: the user's own microphone, not the fake
+device.
+

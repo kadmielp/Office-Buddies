@@ -97,6 +97,10 @@ export interface SettingsState {
   agentShowFinished?: Partial<Record<"claude-code" | "codex", boolean>>;
   // Computer use (Windows): the buddy may read windows, click and type.
   handsEnabled?: boolean;
+  // Voice input (local whisper.cpp): microphone buttons in the chats.
+  voiceEnabled?: boolean;
+  // deviceId of the chosen microphone; empty means the system default.
+  voiceMicrophoneId?: string;
   useKnowledgeAtStart?: boolean;
   useKnowledgeInMiniChat?: boolean;
   knowledgeFiles?: KnowledgeFileSource[];

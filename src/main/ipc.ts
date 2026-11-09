@@ -1,5 +1,11 @@
 import { runHandsTask } from "./computer-use/loop";
 import { getLogger } from "./logger";
+import {
+  downloadVoiceModel,
+  getVoiceStatus,
+  transcribe,
+  warmVoice,
+} from "./voice/stt";
 import { isHandsAvailable } from "./computer-use/hands-client";
 import {
   app,
@@ -264,6 +270,12 @@ export function setupIpcListeners() {
   );
 
   ipcMain.handle(IpcMessages.HANDS_AVAILABLE, () => isHandsAvailable());
+  ipcMain.handle(IpcMessages.VOICE_STATUS_GET, () => getVoiceStatus());
+  ipcMain.handle(IpcMessages.VOICE_DOWNLOAD_MODEL, () => downloadVoiceModel());
+  ipcMain.handle(IpcMessages.VOICE_WARM, () => warmVoice());
+  ipcMain.handle(IpcMessages.VOICE_TRANSCRIBE, (_, pcm: ArrayBuffer) =>
+    transcribe(pcm),
+  );
 
   ipcMain.handle(IpcMessages.LOCAL_LLM_START, () =>
     loadLocalModel(getStateManager().getSettings()),

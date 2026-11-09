@@ -704,3 +704,91 @@ body {
   font-weight: 600;
   opacity: 1;
 }
+
+/* Voice input: the microphone button (themes style the button itself). */
+.voice-mic-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.chat-composer .chat-composer-mic {
+  width: 40px;
+  height: auto;
+}
+
+.buddy-mini-chat-mic {
+  width: 30px;
+  height: 22px;
+  min-height: 22px;
+}
+
+.voice-mic-icon {
+  display: block;
+}
+
+.voice-mic-button.is-recording {
+  color: #d13438;
+  box-shadow: 0 0 0 calc(2px + var(--voice-level, 0) * 5px)
+    rgba(209, 52, 56, 0.35);
+  transition: box-shadow 80ms linear;
+}
+
+.voice-mic-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: voice-spin 0.8s linear infinite;
+}
+
+@keyframes voice-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-mic-spinner {
+    animation: none;
+  }
+
+  .voice-mic-button.is-recording {
+    transition: none;
+  }
+}
+
+.voice-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #c42b1c;
+}
+
+.voice-error span {
+  flex: 1 1 auto;
+}
+
+.voice-error-dismiss {
+  flex: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.buddy-mini-chat-voice-error {
+  margin-top: 6px;
+}

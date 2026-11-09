@@ -1,6 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
+import type { VoiceStatus } from "../shared/voice";
 import { contextBridge, Data, ipcRenderer } from "electron";
 import { IpcMessages } from "../shared/ipc-messages";
 import type { KnowledgeFileSource, SharedState } from "../shared/shared-state";
@@ -229,6 +230,20 @@ const clippyApi: ClippyApi = {
     ipcRenderer.send(IpcMessages.AI_ABORT, requestUUID),
   isHandsAvailable: (): Promise<boolean> =>
     ipcRenderer.invoke(IpcMessages.HANDS_AVAILABLE),
+  getVoiceStatus: () => ipcRenderer.invoke(IpcMessages.VOICE_STATUS_GET),
+  downloadVoiceModel: () =>
+    ipcRenderer.invoke(IpcMessages.VOICE_DOWNLOAD_MODEL),
+  warmVoice: () => ipcRenderer.invoke(IpcMessages.VOICE_WARM),
+  transcribeVoice: (pcm: ArrayBuffer) =>
+    ipcRenderer.invoke(IpcMessages.VOICE_TRANSCRIBE, pcm),
+  // Several components follow the status, so listeners are added and removed
+  // one by one rather than all at once.
+  onVoiceStatus: (callback: (status: VoiceStatus) => void) => {
+    const listener = (_event: unknown, status: VoiceStatus) => callback(status);
+    ipcRenderer.on(IpcMessages.VOICE_STATUS_UPDATED, listener);
+    return () =>
+      ipcRenderer.removeListener(IpcMessages.VOICE_STATUS_UPDATED, listener);
+  },
   startLocalModel: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_START),
   stopLocalModel: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_STOP),
   getLocalModelStatus: () => ipcRenderer.invoke(IpcMessages.LOCAL_LLM_STATUS),

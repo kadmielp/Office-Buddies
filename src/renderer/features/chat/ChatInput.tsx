@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useChat } from "../../contexts/ChatContext";
+import { MicButton, VoiceError } from "../../voice/MicButton";
+import { useVoiceInput } from "../../voice/useVoiceInput";
 export type ChatInputProps = {
   onSend: (message: string) => void;
   onAbort: () => void;
@@ -11,6 +13,13 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
   const { isModelLoaded } = useChat();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isModelReplying = status === "thinking" || status === "responding";
+  // Spoken words land in the box for review; the user sends them.
+  const voice = useVoiceInput((text) => {
+    setMessage((previous) =>
+      previous.trim() ? `${previous.trimEnd()} ${text}` : text,
+    );
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  });
 
   const handleSend = useCallback(() => {
     const trimmedMessage = message.trim();
@@ -54,6 +63,19 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
   }, [isModelLoaded, isModelReplying]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (voice.listening) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        voice.cancel();
+        return;
+      }
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        voice.toggle();
+        return;
+      }
+    }
+
     if (e.key === "Enter" && !e.shiftKey) {
       const trimmedMessage = message.trim();
 
@@ -67,32 +89,45 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     }
   };
 
-  const placeholder = isModelLoaded
-    ? "Type a message, press Enter to send..."
-    : "This is your chat input, we're just waiting for a model to load...";
+  const placeholder = voice.listening
+    ? "Listening… Enter or the microphone button stops, Esc discards."
+    : voice.state === "transcribing"
+      ? "Writing down what you said…"
+      : isModelLoaded
+        ? "Type a message, press Enter to send..."
+        : "This is your chat input, we're just waiting for a model to load...";
 
   return (
-    <div className="chat-composer">
-      <textarea
-        className={`chat-composer-input${
-          isModelReplying ? " chat-input-busy is-busy" : ""
-        }`}
-        rows={3}
-        ref={textareaRef}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        disabled={!isModelLoaded || isModelReplying}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-      />
-      <button
-        className="chat-composer-send default"
-        disabled={!isModelLoaded}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={handleSendOrAbort}
-      >
-        {isModelReplying ? "Abort" : "Send"}
-      </button>
-    </div>
+    <>
+      <VoiceError voice={voice} className="chat-voice-error" />
+      <div className="chat-composer">
+        <textarea
+          className={`chat-composer-input${
+            isModelReplying ? " chat-input-busy is-busy" : ""
+          }`}
+          rows={3}
+          ref={textareaRef}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          disabled={!isModelLoaded || isModelReplying}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+        />
+        <MicButton
+          voice={voice}
+          className="chat-composer-mic"
+          // Speech doesn't need the chat model: talk while it is still loading.
+          disabled={isModelReplying}
+        />
+        <button
+          className="chat-composer-send default"
+          disabled={!isModelLoaded}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={handleSendOrAbort}
+        >
+          {isModelReplying ? "Abort" : "Send"}
+        </button>
+      </div>
+    </>
   );
 }

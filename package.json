@@ -7,6 +7,7 @@
   "scripts": {
     "start": "electron-forge start",
     "prepare:llama": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-llama-runtimes.ps1",
+    "prepare:whisper": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-whisper-runtime.ps1",
     "build:hands": "node -e \"require('child_process').execFileSync('cmd.exe',['/c',require('path').resolve('tools/buddy-hands/build.cmd')],{stdio:'inherit'})\"",
     "package": "electron-forge package",
     "make": "electron-forge make",

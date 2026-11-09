@@ -4,6 +4,7 @@ import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
 import { useChat } from "../../contexts/ChatContext";
 import { Checkbox } from "../../ui/Checkbox";
+import { SettingsVoice } from "./SettingsVoice";
 import { getThemeIcons } from "../../theme/theme";
 
 export const SettingsAdvanced: React.FC = () => {
@@ -66,6 +67,7 @@ export const SettingsAdvanced: React.FC = () => {
           </p>
         </fieldset>
       )}
+      {isWindows && <SettingsVoice />}
       <fieldset>
         <legend>Startup</legend>
         <Checkbox

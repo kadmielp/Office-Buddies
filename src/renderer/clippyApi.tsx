@@ -1,3 +1,4 @@
+import type { VoiceStatus, VoiceTranscription } from "../shared/voice";
 import {
   IntegrationConfig,
   IntegrationTestResult,
@@ -156,6 +157,12 @@ export type ClippyApi = {
   abortRemoteProvider: (requestUUID: string) => void;
   // Computer use: whether the native hands helper is present (Windows)
   isHandsAvailable: () => Promise<boolean>;
+  // Voice input: local speech-to-text (whisper.cpp)
+  getVoiceStatus: () => Promise<VoiceStatus>;
+  downloadVoiceModel: () => Promise<void>;
+  warmVoice: () => Promise<void>;
+  transcribeVoice: (pcm: ArrayBuffer) => Promise<VoiceTranscription>;
+  onVoiceStatus: (callback: (status: VoiceStatus) => void) => () => void;
   // Local model (bundled llama.cpp)
   startLocalModel: () => Promise<LocalLlmStatus>;
   stopLocalModel: () => Promise<void>;

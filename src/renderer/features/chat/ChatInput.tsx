@@ -26,13 +26,15 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
     onAbort();
   }, [onAbort]);
 
+  // Abort as soon as a reply starts, not only once text arrives: a computer
+  // use task can work for a long time before its first line.
   const handleSendOrAbort = useCallback(() => {
-    if (status === "responding") {
+    if (isModelReplying) {
       handleAbort();
     } else {
       handleSend();
     }
-  }, [status, handleSend, handleAbort]);
+  }, [isModelReplying, handleSend, handleAbort]);
 
   useEffect(() => {
     if (isModelLoaded && textareaRef.current) {
@@ -89,9 +91,8 @@ export function ChatInput({ onSend, onAbort }: ChatInputProps) {
         onMouseDown={(e) => e.preventDefault()}
         onClick={handleSendOrAbort}
       >
-        {status === "responding" ? "Abort" : "Send"}
+        {isModelReplying ? "Abort" : "Send"}
       </button>
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-import Markdown from "react-markdown";
+import { ReplyContent } from "./ReplyContent";
 import { MessageRecord, MessageReference } from "../../../types/interfaces";
 import { clippyApi } from "../../clippyApi";
 import { useSharedState } from "../../contexts/SharedStateContext";
@@ -16,7 +16,7 @@ export function Message({ message }: { message: Message }) {
   const { settings } = useSharedState();
   const themeIcons = getThemeIcons(settings.uiDesign);
   const isUser = message.sender === "user";
-  const senderName = isUser ? "User" :settings.selectedAgent || "Clippy";
+  const senderName = isUser ? "User" : settings.selectedAgent || "Clippy";
 
   return (
     <div className={`chat-message ${isUser ? "is-user" : "is-assistant"}`}>
@@ -33,15 +33,10 @@ export function Message({ message }: { message: Message }) {
         {message.children ? (
           message.children
         ) : (
-          <Markdown
-            components={{
-              a: ({ node, ...props }) => (
-                <a target="_blank" rel="noopener noreferrer" {...props} />
-              ),
-            }}
-          >
-            {message.content}
-          </Markdown>
+          <ReplyContent
+            content={message.content || ""}
+            live={message.id === "streaming"}
+          />
         )}
         {!isUser && message.actions && message.actions.length > 0 && (
           <div className="chat-message-actions">
@@ -102,8 +97,10 @@ export function Message({ message }: { message: Message }) {
 }
 
 function canOpenReference(reference: MessageReference) {
-  return ("url" in reference && Boolean(reference.url)) ||
-    ("path" in reference && Boolean(reference.path));
+  return (
+    ("url" in reference && Boolean(reference.url)) ||
+    ("path" in reference && Boolean(reference.path))
+  );
 }
 
 function getReferenceMeta(reference: MessageReference) {
@@ -127,4 +124,3 @@ function getReferenceMeta(reference: MessageReference) {
 
   return metaParts.join(" | ");
 }
-

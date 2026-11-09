@@ -605,3 +605,102 @@ body {
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+/* Mini chat: Stop button while the buddy works (themes style the button). */
+.buddy-mini-chat-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+  padding: 1px 10px;
+}
+
+.buddy-mini-chat-stop-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+/* Computer-use steps: the current step, or a summary, that expands on click. */
+.reply-steps {
+  margin: 2px 0 8px;
+}
+
+.reply-steps-toggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  font-style: italic;
+  text-align: left;
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+.reply-steps-toggle:hover,
+.reply-steps-toggle:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.reply-steps.is-working .reply-steps-toggle {
+  opacity: 1;
+}
+
+.reply-steps-chevron {
+  flex: 0 0 auto;
+  font-style: normal;
+}
+
+.reply-steps-summary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reply-steps-count {
+  flex: 0 0 auto;
+  opacity: 0.7;
+}
+
+.reply-steps-dots::after {
+  content: "…";
+  display: inline-block;
+  animation: reply-steps-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes reply-steps-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reply-steps-dots::after {
+    animation: none;
+  }
+}
+
+.reply-steps-list {
+  margin: 6px 0 0;
+  padding-left: 22px;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.reply-steps-list li.is-current {
+  font-weight: 600;
+  opacity: 1;
+}

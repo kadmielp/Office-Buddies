@@ -23,8 +23,10 @@ import {
 } from "../../../types/interfaces";
 import { Message } from "../chat/Message";
 import { streamAssistantReply } from "../../helpers/stream-assistant-reply";
+import { abortProviderRequest } from "../../ai-provider-client";
 import { getThemeIcons } from "../../theme/theme";
 import { AgentQueueCard } from "../agents/AgentQueueCard";
+import { ReplyContent } from "../chat/ReplyContent";
 import { setBuddyRequest } from "../../helpers/buddy-request";
 import type {
   AgentEventKind,
@@ -294,6 +296,7 @@ export function Clippy() {
       log.scrollTop = log.scrollHeight;
     }
   }, [miniChatScrollKey, isMiniChatOpen]);
+  const isMiniChatBusy = status === "thinking" || status === "responding";
   const isBalloonBusy =
     isMiniChatOpen || Boolean(buddySpeech) || Boolean(proactiveSpeech);
   // Agent requests never take over the balloon; they wait until it is idle.
@@ -550,7 +553,18 @@ export function Clippy() {
     setIsChatWindowOpen(true);
   }, [isChatWindowOpen, setCurrentView, setIsChatWindowOpen]);
 
+  // The mini chat's request in flight, so Esc, Stop and closing can cancel it
+  // (a computer-use task keeps acting on the PC until it is cancelled).
+  const miniChatRequestRef = useRef<string | null>(null);
+  const stopMiniChatRequest = useCallback(() => {
+    if (miniChatRequestRef.current) {
+      abortProviderRequest(settings, miniChatRequestRef.current);
+      miniChatRequestRef.current = null;
+    }
+  }, [settings]);
+
   const closeMiniChat = useCallback(() => {
+    stopMiniChatRequest();
     setIsMiniChatOpen(false);
     setMiniChatInput("");
     setMiniChatMessages([]);
@@ -558,7 +572,7 @@ export function Clippy() {
     setExpandedMiniChatReferenceIds({});
     setMiniChatScreenshots([]);
     setIsCapturingMiniChatScreenshot(false);
-  }, []);
+  }, [stopMiniChatRequest]);
 
   const toggleMiniChatReferences = useCallback((messageId: string) => {
     setExpandedMiniChatReferenceIds((prevState) => ({
@@ -656,6 +670,8 @@ export function Clippy() {
     setStatus("thinking");
 
     try {
+      const requestUUID = crypto.randomUUID();
+      miniChatRequestRef.current = requestUUID;
       const reply = await streamAssistantReply({
         settings: {
           ...settings,
@@ -664,7 +680,7 @@ export function Clippy() {
         selectedAgent,
         history,
         input: prompt,
-        requestUUID: crypto.randomUUID(),
+        requestUUID,
         hands: !!settings.handsEnabled,
         onResponding: () => setStatus("responding"),
         onChunk: (content) => setMiniChatStreamingContent(content),
@@ -699,6 +715,7 @@ export function Clippy() {
         },
       ]);
     } finally {
+      miniChatRequestRef.current = null;
       setMiniChatStreamingContent("");
       setStatus("idle");
       requestAnimationFrame(() => {
@@ -757,7 +774,12 @@ export function Clippy() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isMiniChatOpen) {
         event.preventDefault();
-        closeMiniChat();
+        // Working: Esc stops the task and keeps the balloon. Idle: it closes.
+        if (miniChatRequestRef.current) {
+          stopMiniChatRequest();
+        } else {
+          closeMiniChat();
+        }
         return;
       }
 
@@ -1480,19 +1502,10 @@ export function Clippy() {
                         </div>
                       )}
                       {message.content && (
-                        <Markdown
-                          components={{
-                            a: ({ node, ...props }) => (
-                              <a
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                {...props}
-                              />
-                            ),
-                          }}
-                        >
-                          {message.content}
-                        </Markdown>
+                        <ReplyContent
+                          content={message.content}
+                          live={message.id === "mini-chat-streaming"}
+                        />
                       )}
                       {message.references && message.references.length > 0 && (
                         <div className="buddy-mini-chat-references">
@@ -1629,22 +1642,42 @@ export function Clippy() {
                 </button>
               </div>
             )}
-            <div className="buddy-mini-chat-shortcuts">
-              <span className="buddy-mini-chat-shortcut">
-                <kbd>Ctrl</kbd>
-                <kbd>E</kbd>
-                <span>Screenshot</span>
-              </span>
-              <span className="buddy-mini-chat-shortcut">
-                <kbd>Ctrl</kbd>
-                <kbd>Enter</kbd>
-                <span>Send</span>
-              </span>
-              <span className="buddy-mini-chat-shortcut">
-                <kbd>Esc</kbd>
-                <span>Cancel</span>
-              </span>
-            </div>
+            {isMiniChatBusy ? (
+              <div className="buddy-mini-chat-shortcuts">
+                <button
+                  type="button"
+                  className="buddy-mini-chat-stop"
+                  onClick={stopMiniChatRequest}
+                >
+                  <span
+                    className="buddy-mini-chat-stop-icon"
+                    aria-hidden="true"
+                  />
+                  Stop
+                </button>
+                <span className="buddy-mini-chat-shortcut">
+                  <kbd>Esc</kbd>
+                  <span>Stop</span>
+                </span>
+              </div>
+            ) : (
+              <div className="buddy-mini-chat-shortcuts">
+                <span className="buddy-mini-chat-shortcut">
+                  <kbd>Ctrl</kbd>
+                  <kbd>E</kbd>
+                  <span>Screenshot</span>
+                </span>
+                <span className="buddy-mini-chat-shortcut">
+                  <kbd>Ctrl</kbd>
+                  <kbd>Enter</kbd>
+                  <span>Send</span>
+                </span>
+                <span className="buddy-mini-chat-shortcut">
+                  <kbd>Esc</kbd>
+                  <span>Close</span>
+                </span>
+              </div>
+            )}
           </div>
           <div className="buddy-speech-tail" />
         </div>

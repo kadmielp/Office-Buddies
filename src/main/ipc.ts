@@ -1,4 +1,5 @@
 import { runHandsTask } from "./computer-use/loop";
+import { getLogger } from "./logger";
 import { isHandsAvailable } from "./computer-use/hands-client";
 import {
   app,
@@ -330,8 +331,15 @@ export function setupIpcListeners() {
           // Aborted by the user: end the stream cleanly with what we have.
           event.reply(`clippy_ai_prompt_done_${payload.requestUUID}`);
         } else {
+          // Node's fetch only says "fetch failed"; the reason is in its cause.
+          const cause =
+            error instanceof Error && error.cause instanceof Error
+              ? `: ${error.cause.message}`
+              : "";
+          getLogger().error("Prompt failed", error);
           event.reply(`clippy_ai_prompt_error_${payload.requestUUID}`, {
-            error: error instanceof Error ? error.message : String(error),
+            error:
+              (error instanceof Error ? error.message : String(error)) + cause,
           });
         }
       } finally {

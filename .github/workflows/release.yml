@@ -83,6 +83,24 @@ jobs:
         run: npm run prepare:llama
         shell: pwsh
 
+      - name: Download whisper.cpp runtime (voice input)
+        if: matrix.os == 'windows-latest'
+        run: npm run prepare:whisper
+        shell: pwsh
+
+      - name: Build hands helper (computer use)
+        if: matrix.os == 'windows-latest'
+        run: npm run build:hands
+        shell: pwsh
+
+      - name: Check Windows native helpers
+        if: matrix.os == 'windows-latest'
+        run: |
+          foreach ($file in @('resources/buddy-hands/buddy-hands.exe', 'resources/whisper/whisper-server.exe')) {
+            if (!(Test-Path $file)) { throw "Missing $file" }
+          }
+        shell: pwsh
+
       - name: Build distributables
         run: npm run make -- --arch=${{ matrix.arch }}
         shell: bash

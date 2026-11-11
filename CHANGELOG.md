@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-11
+
+### Added
+
+- Computer use (preview, Windows): turn on Settings > Advanced > Computer use and your buddy can open apps and Settings pages, read windows, click, type and press keys from the chat. It acts by the names of buttons and fields, and most actions run without taking over your mouse or keyboard. Deleting, sending, buying and similar actions (including their keyboard shortcuts) always ask you first with an Allow / Deny balloon, and the buddy asks you to choose when a request is ambiguous. Works with Local, OpenAI, Maritaca, OpenClaw and Hermes models; a local model of 4B or more (such as Qwen3 4B) is recommended.
+- Voice input (preview, Windows): a microphone button in the chat window and the mini chat, and Ctrl+Alt+B from any app to start and stop listening. Speech is recognized on your PC with whisper.cpp (Portuguese, English and many other languages; the voice model downloads once, about 148 MB) and lands in the message box for you to review. The buddy puts on its headphones while it listens and stays silent so its sounds don't get recorded. Turn it on, pick a microphone or change the shortcut in Settings > Advanced > Voice input.
+- While the buddy works on the PC, its reply shows the current step, then a "N steps" summary you can click to see every step.
+
+### Changed
+
+- Abort is available as soon as a reply starts, not only once text arrives. The mini chat has a Stop button while the buddy works, and Esc stops the task instead of only closing the balloon.
+- When a request to a model fails, the error now says why instead of only "fetch failed".
+
+### Fixed
+
+- Settings > Model no longer scrolls down by itself or takes focus away from the Provider dropdown.
+
 ## [0.8.4] - 2026-11-08
 
 ### Fixed
